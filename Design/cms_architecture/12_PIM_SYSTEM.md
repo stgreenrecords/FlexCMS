@@ -137,7 +137,7 @@ At read time, the PIM service **merges** the source product's attributes with th
 
 | From | To | Mechanism |
 |---|---|---|
-| CMS → PIM | Content node has `productSku: "SHOE-X1"` in JSONB properties | CMS Sling Model calls PIM API to enrich component data |
+| CMS → PIM | Content node has `productSku: "SHOE-X1"` in JSONB properties | CMS ComponentModel calls PIM API to enrich component data |
 | PIM → DAM | Product has `ProductAssetRef` rows pointing to DAM paths | PIM API returns DAM URLs in product response |
 | PIM → CMS | Product publish triggers CMS page rebuild (if page references product) | RabbitMQ event: `product.published` → build worker recompiles affected pages |
 | DAM → PIM | Asset metadata update triggers PIM product re-index | RabbitMQ event: `asset.updated` → PIM updates asset references |
@@ -339,7 +339,7 @@ input ProductFilter {
 
 ## 5. CMS ↔ PIM Integration Pattern
 
-A CMS component references a product — the Sling Model enriches the data at render time:
+A CMS component references a product — the ComponentModel enriches the data at render time:
 
 ```java
 @FlexCmsComponent(resourceType = "myapp/product-card", title = "Product Card")
@@ -388,7 +388,7 @@ public class ProductCardModel extends AbstractComponentModel {
 }
 ```
 
-The frontend team renders this using `@flexcms/react` — they never call the PIM API directly; the backend Sling Model does the enrichment.
+The frontend team renders this using `@flexcms/react` — they never call the PIM API directly; the backend ComponentModel does the enrichment.
 
 ---
 

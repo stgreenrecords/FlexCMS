@@ -5,6 +5,8 @@ import com.flexcms.core.exception.FlexCmsException;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.exception.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -101,6 +103,43 @@ public class GlobalExceptionHandler {
         problem.setProperty("fieldErrors", fieldErrors);
 
         log.warn("[{}] Validation error on {}: {} field errors",
+                correlationId, request.getRequestURI(), fieldErrors.size());
+        return ResponseEntity.badRequest().body(problem);
+    }
+
+    // -------------------------------------------------------------------------
+    // @Validated @RequestParam / @PathVariable constraint violations
+    // -------------------------------------------------------------------------
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ProblemDetail> handleConstraintViolation(
+            ConstraintViolationException ex, HttpServletRequest request) {
+
+        String correlationId = resolveCorrelationId(request);
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setType(URI.create(TYPE_BASE + "validation-error"));
+        problem.setTitle("Validation Failed");
+        problem.setDetail("One or more request parameters are invalid.");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        problem.setProperty("errorCode", "VALIDATION_ERROR");
+        problem.setProperty("correlationId", correlationId);
+        problem.setProperty("timestamp", Instant.now().toString());
+
+        List<Map<String, Object>> fieldErrors = ex.getConstraintViolations().stream()
+                .map(cv -> {
+                    // path is like "methodName.paramName" — extract just the param name
+                    String path = cv.getPropertyPath().toString();
+                    String param = path.contains(".") ? path.substring(path.lastIndexOf('.') + 1) : path;
+                    return Map.<String, Object>of(
+                            "field", param,
+                            "message", cv.getMessage()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        problem.setProperty("fieldErrors", fieldErrors);
+
+        log.warn("[{}] Constraint violation on {}: {} violations",
                 correlationId, request.getRequestURI(), fieldErrors.size());
         return ResponseEntity.badRequest().body(problem);
     }

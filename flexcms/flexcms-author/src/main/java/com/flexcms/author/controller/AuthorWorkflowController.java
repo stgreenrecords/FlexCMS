@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -22,40 +23,36 @@ public class AuthorWorkflowController {
     @Autowired
     private WorkflowEngine workflowEngine;
 
-    /**
-     * Start a new workflow for content.
-     */
+    /** Start a new workflow for content. */
     @PostMapping("/start")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<WorkflowInstance> startWorkflow(@Valid @RequestBody StartWorkflowRequest request) {
         WorkflowInstance instance = workflowEngine.startWorkflow(
                 request.workflowName(), request.contentPath(), request.userId());
         return ResponseEntity.ok(instance);
     }
 
-    /**
-     * Advance a workflow (approve, reject, publish, etc.).
-     */
+    /** Advance a workflow (approve, reject, publish, etc.). */
     @PostMapping("/advance")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<WorkflowInstance> advance(@Valid @RequestBody AdvanceWorkflowRequest request) {
         WorkflowInstance instance = workflowEngine.advance(
                 request.instanceId(), request.action(), request.userId(), request.comment());
         return ResponseEntity.ok(instance);
     }
 
-    /**
-     * Cancel an active workflow.
-     */
+    /** Cancel an active workflow. */
     @PostMapping("/cancel")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<WorkflowInstance> cancel(@RequestParam UUID instanceId,
-                                                     @RequestParam String userId,
-                                                     @RequestParam(required = false) String reason) {
+                                                    @RequestParam String userId,
+                                                    @RequestParam(required = false) String reason) {
         return ResponseEntity.ok(workflowEngine.cancel(instanceId, userId, reason));
     }
 
-    /**
-     * Get the active workflow for a content path.
-     */
+    /** Get the active workflow for a content path. */
     @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<WorkflowInstance> getActive(@RequestParam String contentPath) {
         return ResponseEntity.ok(
                 workflowEngine.getActiveWorkflow(contentPath)

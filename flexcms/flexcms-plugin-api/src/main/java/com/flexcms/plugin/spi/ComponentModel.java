@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * <h3>Two styles of implementation:</h3>
  *
- * <p><b>1. Field-injection style (recommended — Sling Model pattern):</b></p>
+ * <p><b>1. Field-injection style (recommended — ComponentModel pattern):</b></p>
  * <p>Extend {@link AbstractComponentModel} and declare properties as annotated fields:</p>
  * <pre>{@code
  * @FlexCmsComponent(resourceType = "myapp/hero-banner")

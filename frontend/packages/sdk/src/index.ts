@@ -24,3 +24,21 @@ export type {
   ComponentDefinition,
 } from './types';
 
+// Zod validation schemas
+export {
+  FlexCmsConfigSchema,
+  SearchOptionsSchema,
+  SearchQuerySchema,
+  PageFetchOptionsSchema,
+  NavigationOptionsSchema,
+  ContentPathSchema,
+  SiteIdSchema,
+  LocaleSchema,
+} from './validation';
+export type {
+  ValidatedFlexCmsConfig,
+  ValidatedSearchOptions,
+  ValidatedPageFetchOptions,
+  ValidatedNavigationOptions,
+} from './validation';
+

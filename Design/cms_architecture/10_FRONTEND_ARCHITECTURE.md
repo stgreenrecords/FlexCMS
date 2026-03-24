@@ -20,7 +20,7 @@ FlexCMS enforces **strict separation** between backend (content management + API
 │  BACKEND (Java / Spring Boot)       │  FRONTEND (TypeScript)         │
 │  ─────────────────────────────      │  ──────────────────────────    │
 │  • Content tree (PostgreSQL)        │  • @flexcms/sdk (core)         │
-│  • Component models (Sling Model)   │  • @flexcms/react adapter     │
+│  • Component models (ComponentModel SPI) │  • @flexcms/react adapter     │
 │  • Workflow engine                  │  • @flexcms/vue adapter        │
 │  • DAM + rendition pipeline         │  • @flexcms/angular adapter   │
 │  • Replication (RabbitMQ)           │  • @flexcms/ui (design system) │
@@ -338,7 +338,7 @@ The FlexCMS `flexcms-publish` module becomes a **pure JSON API server** — no T
 public class HeroBannerModel extends AbstractComponentModel {
     @ValueMapValue
     private String title;
-    // ... (Sling Model fields)
+    // ... (ComponentModel fields)
 }
 ```
 

@@ -8,8 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Injects a property value from the content node's JSONB properties map.
  *
- * <p>Equivalent to AEM Sling Model's {@code @ValueMapValue}.
- * Applied to fields in a {@link FlexCmsComponent} class that extends
+ * <p>Applied to fields in a {@link FlexCmsComponent} class that extends
  * {@link com.flexcms.plugin.spi.AbstractComponentModel}.</p>
  *
  * <h3>Usage:</h3>

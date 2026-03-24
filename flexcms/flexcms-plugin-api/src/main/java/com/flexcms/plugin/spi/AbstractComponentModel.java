@@ -10,11 +10,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Base class for field-injection-style component models (Sling Model pattern).
+ * Base class for field-injection-style component models (ComponentModel pattern).
  *
  * <p>Extend this class and declare component properties as annotated fields.
  * The framework will inject values from the content node's JSONB properties,
- * child nodes, and the render context — just like AEM Sling Models.</p>
+ * child nodes, and the render context.</p>
  *
  * <h3>Example — Hero Banner Model:</h3>
  * <pre>{@code

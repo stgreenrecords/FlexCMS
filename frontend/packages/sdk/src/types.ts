@@ -31,7 +31,7 @@ export interface ComponentNode {
   resourceType: string;
   data: Record<string, unknown>;
   children?: ComponentNode[];
-  /** Present only if the backend Sling Model threw an error */
+  /** Present only if the backend ComponentModel threw an error */
   _error?: string;
 }
 

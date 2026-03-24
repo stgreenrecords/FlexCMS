@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 /**
  * Author-side REST API for site administration.
+ * All site-management operations require at minimum ADMIN role.
  */
 @RestController
 @RequestMapping("/api/admin/sites")
@@ -27,10 +29,9 @@ public class SiteAdminController {
     @Autowired
     private TranslationService translationService;
 
-    /**
-     * Create a new site.
-     */
+    /** Create a new site. */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Site> createSite(@Valid @RequestBody CreateSiteRequest request) {
         Site site = siteService.createSite(
                 request.siteId(), request.title(), request.defaultLocale(),
@@ -38,36 +39,32 @@ public class SiteAdminController {
         return ResponseEntity.ok(site);
     }
 
-    /**
-     * List all sites.
-     */
+    /** List all sites. */
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<List<Site>> listSites() {
         return ResponseEntity.ok(siteService.listSites());
     }
 
-    /**
-     * Get a summary of a specific site.
-     */
+    /** Get a summary of a specific site. */
     @GetMapping("/{siteId}")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Map<String, Object>> getSiteSummary(@PathVariable String siteId) {
         return ResponseEntity.ok(siteService.getSiteSummary(siteId));
     }
 
-    /**
-     * Add a domain to a site.
-     */
+    /** Add a domain to a site. */
     @PostMapping("/{siteId}/domains")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DomainMapping> addDomain(
             @PathVariable String siteId,
             @Valid @RequestBody AddDomainRequest request) {
         return ResponseEntity.ok(siteService.addDomain(siteId, request.domain(), request.primary()));
     }
 
-    /**
-     * Add a language to a site by copying from an existing locale.
-     */
+    /** Add a language to a site by copying from an existing locale. */
     @PostMapping("/{siteId}/languages/{locale}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TranslationService.LanguageCopyResult> addLanguage(
             @PathVariable String siteId,
             @PathVariable String locale,

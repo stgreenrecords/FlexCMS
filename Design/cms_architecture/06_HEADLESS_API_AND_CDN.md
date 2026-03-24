@@ -148,7 +148,7 @@ type Page {
 type Component {
   name: String!
   resourceType: String!
-  data: JSON!          # Flexible JSON from Sling Model
+  data: JSON!          # Flexible JSON from ComponentModel
   children: [Component!]
 }
 

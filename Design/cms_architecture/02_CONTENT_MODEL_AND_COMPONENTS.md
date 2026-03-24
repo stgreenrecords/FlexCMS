@@ -173,7 +173,7 @@ Every component in FlexCMS is defined by three artifacts:
 ```
 my-component/
 ├── component.json           # Component metadata and dialog definition
-├── MyComponentModel.java    # Backend Sling Model (data logic)
+├── MyComponentModel.java    # Backend Component Model (data logic)
 └── my-component.html        # Thymeleaf template (SSR rendering)
     OR
 └── MyComponent.tsx          # React component (headless rendering)
@@ -273,20 +273,20 @@ my-component/
 }
 ```
 
-### 3.3 Component Sling Model (Backend Logic)
+### 3.3 Component Model (Backend Logic)
 
-The Sling Model is a Java/Kotlin class that encapsulates all backend logic for a component. Each authored property is declared as a **class field** annotated with `@ValueMapValue`, following the AEM Sling Model pattern. The framework automatically injects values from the content node's JSONB properties.
+The Component Model is a Java/Kotlin class that encapsulates all backend logic for a component. Each authored property is declared as a **class field** annotated with `@ValueMapValue`. The framework automatically injects values from the content node's JSONB properties.
 
 Component models have full access to Spring beans, services, external APIs — **no limits on customization**.
 
 #### Annotations:
 
-| Annotation | Purpose | AEM Equivalent |
-|---|---|---|
-| `@ValueMapValue` | Inject a property from node's JSONB map | `@ValueMapValue` |
-| `@Self` | Inject the ContentNodeData or RenderContext | `@Self`, `@ScriptVariable` |
-| `@ChildResource` | Inject child nodes | `@ChildResource` |
-| `@Autowired` | Inject Spring services (standard DI) | `@OSGiService`, `@Inject` |
+| Annotation | Purpose |
+|---|---|
+| `@ValueMapValue` | Inject a property from node's JSONB map |
+| `@Self` | Inject the ContentNodeData or RenderContext |
+| `@ChildResource` | Inject child nodes |
+| `@Autowired` | Inject Spring services (standard DI) |
 
 #### Field-Injection Style (Recommended):
 
@@ -467,7 +467,7 @@ public class DynamicFeedModel implements ComponentModel {
 
 ### 3.5 Component for Headless (React/JSON)
 
-For headless delivery, the Sling Model output is directly serialized as JSON:
+For headless delivery, the Component Model output is directly serialized as JSON:
 
 ```json
 {
@@ -631,7 +631,7 @@ HTTP Request: GET /about-us
 [6. Component Tree Build] -> recursively build component tree
       |
       v
-[7. Sling Model Adaptation] -> each component's model.adapt() called
+[7. ComponentModel Adaptation] -> each component's model.adapt() called
       |
       v
 [8. Template Rendering] -> Thymeleaf renders HTML (or JSON for headless)

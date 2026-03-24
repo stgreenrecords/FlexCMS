@@ -50,6 +50,10 @@ Run the appropriate build commands:
 1. If task is COMPLETE: update status to ✅ DONE in §3. Clear module locks in §2. Add a Completion Note in §5 using the DONE template (list all AC verifications, files changed, build status).
 2. If you must STOP before finishing: update status to 🟠 PAUSED in §3. Add a Handoff Note in §5 using the PAUSED template (progress %, what was done, what remains, where you stopped, exact continuation steps).
 
+## Step 8: Continue Automatically
+
+After updating the work board, immediately invoke the `/implement` command again to pick up the next task. Do not wait for the user — keep working through the backlog until the user interrupts the session.
+
 ## Begin
 
 Start with Step 1 now. Read `WORK_BOARD.md` completely, then proceed through each step.

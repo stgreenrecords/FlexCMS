@@ -1,6 +1,8 @@
 # FlexCMS — Modern Enterprise Content Management System
 
-> **AI Agent Quick Context:** FlexCMS is a **headless-only** Spring Boot 3.x + Java 21 CMS inspired by Adobe AEM/Sling architecture. The backend is a pure JSON API — it **never generates HTML**. It uses a PostgreSQL ltree-backed content tree (instead of JCR), separates Author (read-write) and Publish (read-only) environments connected via RabbitMQ replication, and delivers content via REST + GraphQL APIs behind CDN. Frontend rendering is handled by a framework-agnostic TypeScript SDK (`@flexcms/sdk`) with adapters for React (`@flexcms/react`), Vue (`@flexcms/vue`), and Angular (`@flexcms/angular`). SSR is done by Next.js/Nuxt/Angular SSR. Admin UI is built with Next.js + `@flexcms/ui` design system (Radix + Tailwind + theme tokens). Backend and frontend teams work independently against a **Component Registry Schema** contract. See § "AI Agent Onboarding Guide" at the bottom for full context map.
+[![CI](https://github.com/FlexCMS/flexcms/actions/workflows/ci.yml/badge.svg)](https://github.com/FlexCMS/flexcms/actions/workflows/ci.yml)
+
+> **AI Agent Quick Context:** FlexCMS is a **headless-only** Spring Boot 3.x + Java 21 CMS. The backend is a pure JSON API — it **never generates HTML**. It uses a PostgreSQL ltree-backed content tree, separates Author (read-write) and Publish (read-only) environments connected via RabbitMQ replication, and delivers content via REST + GraphQL APIs behind CDN. Frontend rendering is handled by a framework-agnostic TypeScript SDK (`@flexcms/sdk`) with adapters for React (`@flexcms/react`), Vue (`@flexcms/vue`), and Angular (`@flexcms/angular`). SSR is done by Next.js/Nuxt/Angular SSR. Admin UI is built with Next.js + `@flexcms/ui` design system (Radix + Tailwind + theme tokens). Backend and frontend teams work independently against a **Component Registry Schema** contract. See § "AI Agent Onboarding Guide" at the bottom for full context map.
 
 ---
 
@@ -20,13 +22,13 @@
 
 ## 1. Project Vision
 
-FlexCMS is designed to be a **production-grade, open-architecture CMS** suitable for powering any enterprise company website — from corporate portals and multi-brand marketing sites to headless backends for mobile apps and IoT. It draws proven patterns from Adobe AEM (component model, author/publish separation, Sling resource resolution) while replacing legacy JCR/OSGi with a modern Spring Boot + PostgreSQL foundation.
+FlexCMS is designed to be a **production-grade, open-architecture CMS** suitable for powering any enterprise company website — from corporate portals and multi-brand marketing sites to headless backends for mobile apps and IoT. It implements proven enterprise CMS patterns (component model, author/publish separation, path-based resource resolution) on a modern Spring Boot + PostgreSQL foundation.
 
 **Key design goals:**
 - **Headless-only backend:** All content delivered as JSON via REST & GraphQL; the backend never generates HTML
 - **Framework-agnostic frontend:** Core TypeScript SDK with adapters for React, Vue, Angular (swap frameworks without touching backend)
 - **Contract-driven separation:** Backend and frontend teams work independently against a Component Registry Schema contract
-- **Component-driven:** Atomic content units with pluggable backend logic (Sling Model pattern)
+- **Component-driven:** Atomic content units with pluggable backend logic (ComponentModel SPI)
 - **Author/Publish separation:** Read-write authoring → async replication → read-only delivery tier
 - **Themeable Admin UI:** Next.js admin interface with `@flexcms/ui` design system — unified buttons, inputs, labels with light/dark/custom brand theme support
 - **Multi-site & multi-language:** Tenant-isolated sites with full i18n, translation workflows, and XLIFF export
@@ -251,7 +253,7 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 |---|---|---|---|
 | **Content Model (tree + JSONB)** | ██████████ 10/10 | ████████░░ 8/10 | ✅ Yes |
 | **Author/Publish Separation** | ██████████ 10/10 | ███████░░░ 7/10 | 🟡 Mostly |
-| **Component Framework (Sling Model)** | ██████████ 10/10 | ███████░░░ 7/10 | 🟡 Mostly |
+| **Component Framework (ComponentModel SPI)** | ██████████ 10/10 | ███████░░░ 7/10 | 🟡 Mostly |
 | **Content Replication (RabbitMQ)** | █████████░ 9/10 | ████████░░ 8/10 | ✅ Yes |
 | **Headless API (REST)** | █████████░ 9/10 | ███████░░░ 7/10 | 🟡 Mostly |
 | **Headless API (GraphQL)** | █████████░ 9/10 | ████░░░░░░ 4/10 | 🔴 No |
@@ -285,7 +287,7 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 
 ### What's Working Well
 - ✅ **Content tree model** with ltree-backed hierarchy, JSONB properties, and full CRUD
-- ✅ **Component model** with SPI, registry, field-injection (`@ValueMapValue`), and adapter pattern (mirrors AEM Sling Models)
+- ✅ **Component model** with SPI, registry, field-injection (`@ValueMapValue`), and adapter pattern (ComponentModel SPI)
 - ✅ **Backend/Frontend contract** — Component Registry Schema endpoint (`/api/content/v1/component-registry`) with `dataSchema` JSON Schema per component
 - ✅ **Frontend SDK** (`@flexcms/sdk`) — framework-agnostic client, component mapper, tree walker
 - ✅ **Three framework adapters** — `@flexcms/react` (Provider, Page, Component, hooks), `@flexcms/vue` (Plugin, Page, Component, composables), `@flexcms/angular` (scaffolded)
@@ -417,7 +419,7 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 | 37-38 | **PIM core: schemas, catalogs, products** | Complete ProductService with full CRUD, schema validation against JSON Schema, catalog management, product versioning history |
 | 38-39 | **Year-over-year carryforward** | Implement full inheritance merge (source product attributes + overrides); batch carryforward wizard; diff view for overridden vs inherited fields |
 | 39-40 | **Import pipeline (CSV/Excel/JSON/API)** | Complete ImportService with pluggable parsers; field mapping profiles; batch upsert; error tracking; auto-schema inference from source |
-| 40-41 | **PIM ↔ CMS integration** | PimClient injectable into Sling Models; product enrichment at render time; RabbitMQ events for product.published → page rebuild triggers |
+| 40-41 | **PIM ↔ CMS integration** | PimClient injectable into ComponentModels; product enrichment at render time; RabbitMQ events for product.published → page rebuild triggers |
 | 41-42 | **PIM ↔ DAM integration** | Product asset linker UI; DAM picker in product editor; asset role management (hero, gallery, swatch); broken reference detection |
 | 42-43 | **PIM Admin UI pages** | Admin UI: catalog browser, product grid with faceted search, product editor (auto-generated from schema), variant editor, import wizard |
 | 43-44 | **PIM visual schema editor** | Drag-and-drop attribute group builder; field type picker; inheritance visualization; schema diff between versions |
@@ -534,22 +536,21 @@ curl -X POST http://localhost:8080/graphql \
 - How to document your progress so the next agent can continue
 
 ### Project Identity
-- **What:** Enterprise CMS platform (like Adobe AEM, but built on Spring Boot + PostgreSQL + TypeScript SDK)
-- **Why:** Replace expensive proprietary CMS (AEM $500K+/yr) with modern open-architecture alternative
+- **What:** Enterprise CMS platform built on Spring Boot + PostgreSQL + TypeScript SDK
+- **Why:** Open-architecture alternative to expensive proprietary CMS platforms ($500K+/yr); fully customisable, self-hosted
 - **Who:** For enterprises needing multi-site, multi-language websites with headless delivery
 - **Stage:** Core backend is working; frontend SDK + adapters + design system implemented; Admin UI scaffolded; security/testing not started.
 
 ### Architecture Mental Model
 ```
-Think of it as:  AEM concepts  →  FlexCMS equivalent
-                 JCR nodes     →  PostgreSQL rows with ltree paths + JSONB properties
-                 Sling Models  →  ComponentModel SPI (adapt node → view model)
-                 Dispatcher    →  Redis + Caffeine + CDN caching layers
-                 OSGi bundles  →  Spring Boot starter plugins
-                 Author/Publish →  Same, connected via RabbitMQ instead of Sling Distribution
-                 HTL templates →  React/Vue/Angular components (via @flexcms/react|vue|angular)
-                 AEM UI (Coral) →  @flexcms/ui (Radix + Tailwind + theme tokens)
-                 AEM SPA Editor →  Next.js Admin + @flexcms/react
+FlexCMS core concepts:
+  Content Tree   →  PostgreSQL rows with ltree paths + JSONB properties
+  ComponentModel →  Java SPI class (adapt content node → JSON view model)
+  Cache Layers   →  Redis + Caffeine + CDN (CloudFront/Cloudflare/Akamai)
+  Plugin System  →  Spring Boot starter modules (no core modification needed)
+  Author/Publish →  Two separate environments connected via RabbitMQ replication
+  Frontend       →  React/Vue/Angular components (via @flexcms/react|vue|angular)
+  Admin UI       →  Next.js + @flexcms/ui (Radix + Tailwind + theme tokens)
 
 KEY RULE: Backend NEVER generates HTML. It only returns JSON.
           Frontend owns ALL rendering (SSR via Next.js/Nuxt, CSR via SDK).
@@ -601,7 +602,7 @@ KEY RULE: Backend NEVER generates HTML. It only returns JSON.
 1. **Backend = JSON only, Frontend = HTML only** — The backend NEVER generates HTML. The `PublishPageController` returns JSON. All rendering (SSR, CSR) is handled by `@flexcms/react`, `@flexcms/vue`, or `@flexcms/angular` in Next.js/Nuxt/Angular SSR.
 2. **Component Registry Contract** — Every component has a `dataSchema` (JSON Schema) stored in `component_definitions.data_schema`. The backend guarantees output matches the schema; the frontend renders based on it. Access via `GET /api/content/v1/component-registry`.
 3. **Content is a tree** — all content lives under paths like `content.corporate.en.homepage.jcr_content.hero`. Use `.` as path separator (ltree convention).
-4. **Component Sling Model (field-injection)** — when adding a new backend component: extend `AbstractComponentModel`, annotate property fields with `@ValueMapValue`, inject services with `@Autowired`, and add derived getters for computed values. See `flexcms-plugin-api/spi/AbstractComponentModel.java`.
+4. **ComponentModel (field-injection)** — when adding a new backend component: extend `AbstractComponentModel`, annotate property fields with `@ValueMapValue`, inject services with `@Autowired`, and add derived getters for computed values. See `flexcms-plugin-api/spi/AbstractComponentModel.java`.
 5. **Component Frontend Renderer** — when adding a new frontend component: create a React/Vue/Angular component, register it in the `ComponentMapper` with `mapper.register('myapp/hero-banner', HeroBanner)`. See `site-nextjs/src/components/component-map.tsx`.
 6. **Author vs Publish** — services gated by `@ConditionalOnProperty(name = "flexcms.runmode")`. Author services are read-write; publish services are read-only.
 7. **Replication events** — content changes on Author trigger `ReplicationEvent` → RabbitMQ → consumed by publish instances → cache invalidation + CDN purge.

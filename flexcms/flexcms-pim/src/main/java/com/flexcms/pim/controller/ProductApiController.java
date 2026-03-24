@@ -1,6 +1,5 @@
 package com.flexcms.pim.controller;
 
-import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.pim.model.Product;
 import com.flexcms.pim.service.ProductService;
 import jakarta.validation.Valid;
@@ -20,7 +19,7 @@ import java.util.UUID;
  *
  * <p>This API serves product data to:
  * <ul>
- *   <li>CMS Sling Models (backend enrichment at render time)</li>
+ *   <li>CMS ComponentModels (backend enrichment at render time)</li>
  *   <li>Admin UI (product editor, catalog browser)</li>
  *   <li>External systems (ERP, e-commerce, POS)</li>
  *   <li>Frontend SDK (direct product queries)</li>
@@ -36,10 +35,9 @@ public class ProductApiController {
     /** Get a product by SKU with fully resolved attributes */
     @GetMapping("/{sku}")
     public ResponseEntity<Map<String, Object>> getProduct(@PathVariable String sku) {
-        return ResponseEntity.ok(
-                productService.getResolvedProduct(sku)
-                        .orElseThrow(() -> NotFoundException.forId("Product", sku))
-        );
+        return productService.getResolvedProduct(sku)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /** List products in a catalog (paginated) */

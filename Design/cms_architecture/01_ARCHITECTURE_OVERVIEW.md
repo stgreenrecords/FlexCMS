@@ -68,14 +68,14 @@ FlexCMS is a modern, headless-first CMS built on Spring Boot (backend) and React
 - Components are composed into **Templates** (page layouts)
 - Templates are assigned to **Pages** (URL-addressable content nodes)
 - Developers extend the system by registering new components with:
-  - A **Sling Model** (backend data model + logic in Java/Kotlin)
+  - A **Component Model** (backend data model + logic in Java/Kotlin)
   - A **Dialog definition** (JSON schema for authoring UI)
   - A **Data Schema** (JSON Schema contract defining the component's output shape)
   - A **Frontend Renderer** (React, Vue, Angular, or any framework component — lives in the frontend codebase)
 - Backend and frontend teams work independently against the **Component Registry Schema** contract
 
 ### 3.3 Content as a Tree (JCR-Inspired, SQL-Backed)
-- Content is stored as a hierarchical tree of nodes (like JCR/AEM) but backed by PostgreSQL with `ltree` extension
+- Content is stored as a hierarchical tree of nodes backed by PostgreSQL with `ltree` extension
 - Each node has properties (key-value), a resource type (component type), and children
 - This enables path-based content resolution: `/content/site-a/en/homepage/hero`
 
@@ -174,7 +174,7 @@ frontend/                              # TypeScript frontend (pnpm monorepo)
 ### 6.2 Content Delivery Flow (SSR via Next.js/Nuxt)
 1. Request hits CDN -> cache miss -> hits Next.js/Nuxt SSR server
 2. SSR server calls FlexCMS Headless API (REST or GraphQL) via `@flexcms/sdk`
-3. API resolves content node from tree, runs Sling Models, returns JSON
+3. API resolves content node from tree, runs ComponentModels, returns JSON
 4. `@flexcms/react` (or `@flexcms/vue`) maps each component's `resourceType` to a frontend renderer
 5. Framework renders full HTML with hydration markers
 6. Response returned with cache headers -> CDN caches it

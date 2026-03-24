@@ -10,6 +10,7 @@ import com.flexcms.core.repository.ContentNodeVersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class ContentNodeService {
     /**
      * Get a single content node by path.
      */
+    @PreAuthorize("hasPermission(#path, 'READ')")
     public Optional<ContentNode> getByPath(String path) {
         return nodeRepository.findByPath(path);
     }
@@ -35,6 +37,7 @@ public class ContentNodeService {
     /**
      * Get a content node with its full component tree (children loaded recursively).
      */
+    @PreAuthorize("hasPermission(#path, 'READ')")
     @Transactional(readOnly = true)
     public Optional<ContentNode> getWithChildren(String path) {
         return nodeRepository.findByPath(path).map(this::loadChildrenRecursive);
@@ -43,6 +46,7 @@ public class ContentNodeService {
     /**
      * Create a new content node.
      */
+    @PreAuthorize("hasPermission(#parentPath, 'WRITE')")
     @Transactional
     public ContentNode create(String parentPath, String name, String resourceType,
                                Map<String, Object> properties, String userId) {
@@ -73,6 +77,7 @@ public class ContentNodeService {
     /**
      * Update node properties (partial merge).
      */
+    @PreAuthorize("hasPermission(#path, 'WRITE')")
     @Transactional
     public ContentNode updateProperties(String path, Map<String, Object> updates, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
@@ -98,12 +103,14 @@ public class ContentNodeService {
     /**
      * Move a node to a new parent.
      */
+    @PreAuthorize("hasPermission(#sourcePath, 'WRITE') and hasPermission(#targetParentPath, 'WRITE')")
     @Transactional
     public ContentNode move(String sourcePath, String targetParentPath, String userId) {
         ContentNode node = nodeRepository.findByPath(sourcePath)
                 .orElseThrow(() -> NotFoundException.forPath(sourcePath));
 
-        ContentNode targetParent = nodeRepository.findByPath(targetParentPath)
+        // Validate target parent exists
+        nodeRepository.findByPath(targetParentPath)
                 .orElseThrow(() -> NotFoundException.forPath(targetParentPath));
 
         String newPath = targetParentPath + "." + node.getName();
@@ -129,6 +136,7 @@ public class ContentNodeService {
     /**
      * Delete a node and all its descendants.
      */
+    @PreAuthorize("hasPermission(#path, 'DELETE')")
     @Transactional
     public void delete(String path) {
         nodeRepository.deleteSubtree(path);
@@ -137,6 +145,7 @@ public class ContentNodeService {
     /**
      * Lock a node for editing.
      */
+    @PreAuthorize("hasPermission(#path, 'WRITE')")
     @Transactional
     public ContentNode lock(String path, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
@@ -154,6 +163,7 @@ public class ContentNodeService {
     /**
      * Unlock a node.
      */
+    @PreAuthorize("hasPermission(#path, 'WRITE')")
     @Transactional
     public ContentNode unlock(String path, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
@@ -171,6 +181,7 @@ public class ContentNodeService {
     /**
      * Update node status.
      */
+    @PreAuthorize("hasPermission(#path, 'PUBLISH')")
     @Transactional
     public ContentNode updateStatus(String path, NodeStatus status, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
@@ -213,6 +224,7 @@ public class ContentNodeService {
     /**
      * Get direct children of a node (shallow — one level only).
      */
+    @PreAuthorize("hasPermission(#parentPath, 'READ')")
     @Transactional(readOnly = true)
     public List<ContentNode> getChildren(String parentPath) {
         return nodeRepository.findByParentPathOrderByOrderIndex(parentPath);

@@ -48,6 +48,19 @@ spring:
     username: guest
     password: guest
 
+  # ----- Security / OAuth2 Resource Server -----
+  # Configure the JWT issuer URI for your IdP:
+  #   Keycloak: http://<host>:8180/realms/<realm>
+  #   Auth0:    https://<tenant>.auth0.com/
+  #   Okta:     https://<domain>/oauth2/default
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${FLEXCMS_JWT_ISSUER_URI:http://localhost:8180/realms/flexcms}
+          # Optional: set jwk-set-uri directly if issuer metadata endpoint is unavailable
+          # jwk-set-uri: ${FLEXCMS_JWK_SET_URI:http://localhost:8180/realms/flexcms/protocol/openid-connect/certs}
+
   # ----- File Upload -----
   servlet:
     multipart:
