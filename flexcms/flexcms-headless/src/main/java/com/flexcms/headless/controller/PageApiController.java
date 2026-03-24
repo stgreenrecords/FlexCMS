@@ -1,5 +1,6 @@
 package com.flexcms.headless.controller;
 
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.service.ContentDeliveryService;
 import com.flexcms.core.service.ContentNodeService;
 import com.flexcms.plugin.model.RenderContext;
@@ -21,6 +22,9 @@ public class PageApiController {
     @Autowired
     private ContentDeliveryService deliveryService;
 
+    @Autowired
+    private ContentNodeService nodeService;   // FIX BUG-01: injected via DI, not new()
+
     /**
      * Get a page with full component tree.
      */
@@ -31,36 +35,36 @@ public class PageApiController {
             @RequestHeader(value = "X-FlexCMS-Locale", required = false, defaultValue = "en") String locale,
             HttpServletRequest request) {
 
-        String contentPath = path.replace("/", ".");
-        if (!contentPath.startsWith("content.")) {
-            contentPath = "content." + contentPath;
-        }
-
+        String contentPath = toContentPath(path);
         RenderContext context = new RenderContext(siteId, Locale.forLanguageTag(locale),
                 request.getRequestURI(), "publish");
 
-        try {
-            Map<String, Object> pageData = deliveryService.renderPage(contentPath, context);
-            return ResponseEntity.ok(pageData);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Map<String, Object> pageData = deliveryService.renderPage(contentPath, context);
+        return ResponseEntity.ok(pageData);
+        // NotFoundException from deliveryService propagates to GlobalExceptionHandler
     }
 
     /**
      * Get child pages (for navigation).
      */
     @GetMapping("/{*path}/children")
-    public ResponseEntity<?> getChildren(@PathVariable String path,
-                                          @RequestHeader(value = "X-FlexCMS-Site", required = false) String siteId) {
-        String contentPath = path.replace("/", ".");
-        if (!contentPath.startsWith("content.")) {
-            contentPath = "content." + contentPath;
-        }
+    public ResponseEntity<?> getChildren(
+            @PathVariable String path,
+            @RequestHeader(value = "X-FlexCMS-Site", required = false) String siteId) {
+        String contentPath = toContentPath(path);
+        var parent = nodeService.getByPath(contentPath)
+                .orElseThrow(() -> NotFoundException.forPath(contentPath));
+        var children = nodeService.getChildren(contentPath);
+        return ResponseEntity.ok(Map.of(
+                "path", contentPath,
+                "siteId", parent.getSiteId() != null ? parent.getSiteId() : "",
+                "children", children
+        ));
+    }
 
-        var node = new ContentNodeService();
-        // Delegate to delivery service for child listing
-        return ResponseEntity.ok(Map.of("path", contentPath, "message", "Children endpoint"));
+    private String toContentPath(String path) {
+        String p = path.startsWith("/") ? path.substring(1) : path;
+        p = p.replace("/", ".");
+        return p.startsWith("content.") ? p : "content." + p;
     }
 }
-

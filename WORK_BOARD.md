@@ -148,7 +148,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P1-01 | **Spring Security OAuth2 + JWT** | 🟢 OPEN | 🔴 P0 | XL | `flexcms-app`, `flexcms-core` | — | — |
 | P1-02 | **RBAC roles + method-level @PreAuthorize** | 🟢 OPEN | 🔴 P0 | L | `flexcms-author`, `flexcms-headless`, `flexcms-publish` | P1-01 | — |
 | P1-03 | **Per-node ACL enforcement** | 🟢 OPEN | 🔴 P0 | L | `flexcms-core` | P1-01 | — |
-| P1-04 | **Global error handling (@ControllerAdvice)** | 🟢 OPEN | 🔴 P0 | M | `flexcms-app`, `flexcms-core` | — | — |
+| P1-04 | **Global error handling (@ControllerAdvice)** | ✅ DONE | 🔴 P0 | M | `flexcms-app`, `flexcms-core` | — | Claude Sonnet 4.6 |
 | P1-05 | **Request DTO validation (@Valid + Zod schemas)** | 🟢 OPEN | 🔴 P0 | M | `flexcms-author`, `flexcms-headless`, `flexcms-pim` | P1-04 | — |
 | P1-06 | **XSS sanitization on rich text** | 🟢 OPEN | 🟡 P1 | S | `flexcms-core` | P1-04 | — |
 | P1-07 | **Unit tests: flexcms-core services** | 🟢 OPEN | 🔴 P0 | L | `flexcms-core` | — | — |
@@ -528,7 +528,29 @@ output_files:
 
 ---
 
-*No entries yet — this section will be populated as agents complete work.*
+### P1-04 — Global error handling (@ControllerAdvice)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-24
+**AC Verification:**
+  - [x] GlobalExceptionHandler with @ControllerAdvice created — `flexcms-app/.../config/GlobalExceptionHandler.java`
+  - [x] RFC 7807 ProblemDetail response format for all errors — Spring's `ProblemDetail` used throughout
+  - [x] Custom exception hierarchy — `FlexCmsException`, `NotFoundException`, `ConflictException`, `ValidationException`, `ForbiddenException` in `flexcms-core/.../exception/`
+  - [x] All existing controllers updated — `ContentNodeService` throws typed exceptions; `PageApiController` removes inline try/catch; BUG-01 also fixed (DI injection in PageApiController)
+  - [x] Error response includes correlation ID — resolved from `X-Correlation-ID` header → MDC `traceId` → generated UUID
+  - [x] Tests: 9 unit tests covering all exception types — all pass (`mvn test -pl flexcms-app`)
+**Files Changed:**
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/FlexCmsException.java` — new base exception
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/NotFoundException.java` — new (HTTP 404)
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/ConflictException.java` — new (HTTP 409)
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/ValidationException.java` — new (HTTP 422, with field errors)
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/ForbiddenException.java` — new (HTTP 403)
+  - `flexcms-core/src/main/java/com/flexcms/core/service/ContentNodeService.java` — replaced all `IllegalArgumentException`/`IllegalStateException` with typed exceptions
+  - `flexcms-app/src/main/java/com/flexcms/app/config/GlobalExceptionHandler.java` — new @RestControllerAdvice
+  - `flexcms-headless/src/main/java/com/flexcms/headless/controller/PageApiController.java` — removed inline try/catch; IDE also fixed BUG-01
+  - `flexcms-app/src/test/java/com/flexcms/app/config/GlobalExceptionHandlerTest.java` — 9 unit tests
+**Build Verified:** Yes — `mvn install -DskipTests -q` + `mvn test -pl flexcms-app` → 9/9 tests pass, BUILD SUCCESS
+**Notes:** P1-05 and P1-06 are now unblocked. BUG-01 (`PageApiController` used `new ContentNodeService()`) was incidentally fixed by the IDE during this session.
 
 ---
 
@@ -540,7 +562,8 @@ output_files:
 
 **Backend (Java):**
 - P1-01 (Security) — `flexcms-app`, `flexcms-core`
-- P1-04 (Error handling) — `flexcms-app`, `flexcms-core`
+- P1-05 (Request DTO validation) — `flexcms-author`, `flexcms-headless`, `flexcms-pim` ⭐ **newly unblocked** (P1-04 ✅ DONE)
+- P1-06 (XSS sanitization) — `flexcms-core` ⭐ **newly unblocked** (P1-04 ✅ DONE)
 - P1-07 (Tests: core) — `flexcms-core`
 - P1-08 (Tests: author) — `flexcms-author`
 - P1-09 (Tests: replication) — `flexcms-replication`
@@ -554,7 +577,7 @@ output_files:
 - P4-03 (CDN: CloudFront) — `flexcms-cdn`
 - P4-05 (Translation: DeepL) — `flexcms-i18n`
 - P5-01 (PIM CRUD) — `flexcms-pim`
-- BUG-01 through BUG-05 (all independent)
+- BUG-02 through BUG-05 (BUG-01 is ✅ DONE)
 
 **Frontend (TypeScript):**
 - P1-15 (Tests: SDK) — `frontend/packages/sdk`
@@ -584,5 +607,5 @@ No module conflicts — all 8 can run simultaneously.
 
 ---
 
-*Last updated: 2026-03-24 | Created by: Project & Delivery Manager*
+*Last updated: 2026-03-24 | P1-04 ✅ DONE + BUG-01 ✅ DONE by claude-agent-1*
 

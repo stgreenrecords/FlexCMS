@@ -1,7 +1,9 @@
 package com.flexcms.author.controller;
 
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.dam.service.AssetIngestService;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +43,10 @@ public class AuthorAssetController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Asset> getAsset(@PathVariable UUID id) {
-        return assetService.getAssetById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(
+                assetService.getAssetById(id)
+                        .orElseThrow(() -> NotFoundException.forId("Asset", id))
+        );
     }
 
     /**

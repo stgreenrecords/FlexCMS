@@ -1,7 +1,11 @@
 package com.flexcms.author.controller;
 
 import com.flexcms.author.service.WorkflowEngine;
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.WorkflowInstance;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +26,7 @@ public class AuthorWorkflowController {
      * Start a new workflow for content.
      */
     @PostMapping("/start")
-    public ResponseEntity<WorkflowInstance> startWorkflow(@RequestBody StartWorkflowRequest request) {
+    public ResponseEntity<WorkflowInstance> startWorkflow(@Valid @RequestBody StartWorkflowRequest request) {
         WorkflowInstance instance = workflowEngine.startWorkflow(
                 request.workflowName(), request.contentPath(), request.userId());
         return ResponseEntity.ok(instance);
@@ -32,7 +36,7 @@ public class AuthorWorkflowController {
      * Advance a workflow (approve, reject, publish, etc.).
      */
     @PostMapping("/advance")
-    public ResponseEntity<WorkflowInstance> advance(@RequestBody AdvanceWorkflowRequest request) {
+    public ResponseEntity<WorkflowInstance> advance(@Valid @RequestBody AdvanceWorkflowRequest request) {
         WorkflowInstance instance = workflowEngine.advance(
                 request.instanceId(), request.action(), request.userId(), request.comment());
         return ResponseEntity.ok(instance);
@@ -53,12 +57,21 @@ public class AuthorWorkflowController {
      */
     @GetMapping("/active")
     public ResponseEntity<WorkflowInstance> getActive(@RequestParam String contentPath) {
-        return workflowEngine.getActiveWorkflow(contentPath)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(
+                workflowEngine.getActiveWorkflow(contentPath)
+                        .orElseThrow(() -> new NotFoundException(
+                                "No active workflow for content path: " + contentPath))
+        );
     }
 
-    public record StartWorkflowRequest(String workflowName, String contentPath, String userId) {}
-    public record AdvanceWorkflowRequest(UUID instanceId, String action, String userId, String comment) {}
-}
+    public record StartWorkflowRequest(
+            @NotBlank(message = "workflowName is required") String workflowName,
+            @NotBlank(message = "contentPath is required") String contentPath,
+            @NotBlank(message = "userId is required") String userId) {}
 
+    public record AdvanceWorkflowRequest(
+            @NotNull(message = "instanceId is required") UUID instanceId,
+            @NotBlank(message = "action is required") String action,
+            @NotBlank(message = "userId is required") String userId,
+            String comment) {}
+}

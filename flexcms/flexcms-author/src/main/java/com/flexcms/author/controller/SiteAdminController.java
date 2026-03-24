@@ -4,6 +4,9 @@ import com.flexcms.core.model.DomainMapping;
 import com.flexcms.core.model.Site;
 import com.flexcms.i18n.service.TranslationService;
 import com.flexcms.multisite.service.SiteManagementService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +31,7 @@ public class SiteAdminController {
      * Create a new site.
      */
     @PostMapping
-    public ResponseEntity<Site> createSite(@RequestBody CreateSiteRequest request) {
+    public ResponseEntity<Site> createSite(@Valid @RequestBody CreateSiteRequest request) {
         Site site = siteService.createSite(
                 request.siteId(), request.title(), request.defaultLocale(),
                 request.supportedLocales(), request.userId());
@@ -36,7 +39,7 @@ public class SiteAdminController {
     }
 
     /**
-     * List all sites with summary info.
+     * List all sites.
      */
     @GetMapping
     public ResponseEntity<List<Site>> listSites() {
@@ -44,7 +47,7 @@ public class SiteAdminController {
     }
 
     /**
-     * Get site summary with page count and domains.
+     * Get a summary of a specific site.
      */
     @GetMapping("/{siteId}")
     public ResponseEntity<Map<String, Object>> getSiteSummary(@PathVariable String siteId) {
@@ -52,17 +55,17 @@ public class SiteAdminController {
     }
 
     /**
-     * Add a domain mapping to a site.
+     * Add a domain to a site.
      */
     @PostMapping("/{siteId}/domains")
     public ResponseEntity<DomainMapping> addDomain(
             @PathVariable String siteId,
-            @RequestBody AddDomainRequest request) {
+            @Valid @RequestBody AddDomainRequest request) {
         return ResponseEntity.ok(siteService.addDomain(siteId, request.domain(), request.primary()));
     }
 
     /**
-     * Add a new language to a site (creates full language copy).
+     * Add a language to a site by copying from an existing locale.
      */
     @PostMapping("/{siteId}/languages/{locale}")
     public ResponseEntity<TranslationService.LanguageCopyResult> addLanguage(
@@ -74,8 +77,14 @@ public class SiteAdminController {
         return ResponseEntity.ok(result);
     }
 
-    public record CreateSiteRequest(String siteId, String title, String defaultLocale,
-                                     List<String> supportedLocales, String userId) {}
-    public record AddDomainRequest(String domain, boolean primary) {}
-}
+    public record CreateSiteRequest(
+            @NotBlank(message = "siteId is required") String siteId,
+            @NotBlank(message = "title is required") String title,
+            @NotBlank(message = "defaultLocale is required") String defaultLocale,
+            @NotEmpty(message = "at least one supportedLocale is required") List<String> supportedLocales,
+            @NotBlank(message = "userId is required") String userId) {}
 
+    public record AddDomainRequest(
+            @NotBlank(message = "domain is required") String domain,
+            boolean primary) {}
+}

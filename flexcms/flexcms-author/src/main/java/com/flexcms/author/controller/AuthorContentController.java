@@ -1,9 +1,13 @@
 package com.flexcms.author.controller;
 
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.service.ContentNodeService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,9 +32,10 @@ public class AuthorContentController {
      */
     @GetMapping("/node")
     public ResponseEntity<ContentNode> getNode(@RequestParam String path) {
-        return nodeService.getByPath(path)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(
+                nodeService.getByPath(path)
+                        .orElseThrow(() -> NotFoundException.forPath(path))
+        );
     }
 
     /**
@@ -38,16 +43,17 @@ public class AuthorContentController {
      */
     @GetMapping("/page")
     public ResponseEntity<ContentNode> getPage(@RequestParam String path) {
-        return nodeService.getWithChildren(path)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(
+                nodeService.getWithChildren(path)
+                        .orElseThrow(() -> NotFoundException.forPath(path))
+        );
     }
 
     /**
      * Create a new content node.
      */
     @PostMapping("/node")
-    public ResponseEntity<ContentNode> createNode(@RequestBody CreateNodeRequest request) {
+    public ResponseEntity<ContentNode> createNode(@Valid @RequestBody CreateNodeRequest request) {
         ContentNode node = nodeService.create(
                 request.parentPath(),
                 request.name(),
@@ -62,7 +68,7 @@ public class AuthorContentController {
      * Update node properties (partial merge).
      */
     @PutMapping("/node/properties")
-    public ResponseEntity<ContentNode> updateProperties(@RequestBody UpdatePropertiesRequest request) {
+    public ResponseEntity<ContentNode> updateProperties(@Valid @RequestBody UpdatePropertiesRequest request) {
         ContentNode node = nodeService.updateProperties(request.path(), request.properties(), request.userId());
         return ResponseEntity.ok(node);
     }
@@ -71,7 +77,7 @@ public class AuthorContentController {
      * Move a node to a new parent.
      */
     @PostMapping("/node/move")
-    public ResponseEntity<ContentNode> moveNode(@RequestBody MoveNodeRequest request) {
+    public ResponseEntity<ContentNode> moveNode(@Valid @RequestBody MoveNodeRequest request) {
         ContentNode node = nodeService.move(request.sourcePath(), request.targetParentPath(), request.userId());
         return ResponseEntity.ok(node);
     }
@@ -132,10 +138,21 @@ public class AuthorContentController {
         return ResponseEntity.ok(nodeService.restoreVersion(nodeId, versionNumber, userId));
     }
 
-    // Request DTOs
-    public record CreateNodeRequest(String parentPath, String name, String resourceType,
-                                     Map<String, Object> properties, String userId) {}
-    public record UpdatePropertiesRequest(String path, Map<String, Object> properties, String userId) {}
-    public record MoveNodeRequest(String sourcePath, String targetParentPath, String userId) {}
-}
+    // Request DTOs with validation constraints
+    public record CreateNodeRequest(
+            @NotBlank(message = "parentPath is required") String parentPath,
+            @NotBlank(message = "name is required") String name,
+            @NotBlank(message = "resourceType is required") String resourceType,
+            Map<String, Object> properties,
+            @NotBlank(message = "userId is required") String userId) {}
 
+    public record UpdatePropertiesRequest(
+            @NotBlank(message = "path is required") String path,
+            @NotNull(message = "properties is required") Map<String, Object> properties,
+            @NotBlank(message = "userId is required") String userId) {}
+
+    public record MoveNodeRequest(
+            @NotBlank(message = "sourcePath is required") String sourcePath,
+            @NotBlank(message = "targetParentPath is required") String targetParentPath,
+            @NotBlank(message = "userId is required") String userId) {}
+}

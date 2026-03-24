@@ -1,5 +1,7 @@
 package com.flexcms.core.service;
 
+import com.flexcms.core.exception.ConflictException;
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
@@ -47,11 +49,11 @@ public class ContentNodeService {
         String path = parentPath + "." + sanitizeName(name);
 
         if (nodeRepository.existsByPath(path)) {
-            throw new IllegalArgumentException("Node already exists at path: " + path);
+            throw ConflictException.alreadyExists(path);
         }
 
         ContentNode parent = nodeRepository.findByPath(parentPath)
-                .orElseThrow(() -> new IllegalArgumentException("Parent not found: " + parentPath));
+                .orElseThrow(() -> NotFoundException.forPath(parentPath));
 
         ContentNode node = new ContentNode(path, name, resourceType);
         node.setParentPath(parentPath);
@@ -74,11 +76,11 @@ public class ContentNodeService {
     @Transactional
     public ContentNode updateProperties(String path, Map<String, Object> updates, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
-                .orElseThrow(() -> new IllegalArgumentException("Node not found: " + path));
+                .orElseThrow(() -> NotFoundException.forPath(path));
 
         // Check lock
         if (node.getLockedBy() != null && !node.getLockedBy().equals(userId)) {
-            throw new IllegalStateException("Node is locked by: " + node.getLockedBy());
+            throw ConflictException.lockedBy(node.getLockedBy());
         }
 
         // Save version before update
@@ -99,10 +101,10 @@ public class ContentNodeService {
     @Transactional
     public ContentNode move(String sourcePath, String targetParentPath, String userId) {
         ContentNode node = nodeRepository.findByPath(sourcePath)
-                .orElseThrow(() -> new IllegalArgumentException("Source not found: " + sourcePath));
+                .orElseThrow(() -> NotFoundException.forPath(sourcePath));
 
         ContentNode targetParent = nodeRepository.findByPath(targetParentPath)
-                .orElseThrow(() -> new IllegalArgumentException("Target parent not found: " + targetParentPath));
+                .orElseThrow(() -> NotFoundException.forPath(targetParentPath));
 
         String newPath = targetParentPath + "." + node.getName();
 
@@ -138,10 +140,10 @@ public class ContentNodeService {
     @Transactional
     public ContentNode lock(String path, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
-                .orElseThrow(() -> new IllegalArgumentException("Node not found: " + path));
+                .orElseThrow(() -> NotFoundException.forPath(path));
 
         if (node.getLockedBy() != null && !node.getLockedBy().equals(userId)) {
-            throw new IllegalStateException("Node is already locked by: " + node.getLockedBy());
+            throw ConflictException.lockedBy(node.getLockedBy());
         }
 
         node.setLockedBy(userId);
@@ -155,10 +157,10 @@ public class ContentNodeService {
     @Transactional
     public ContentNode unlock(String path, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
-                .orElseThrow(() -> new IllegalArgumentException("Node not found: " + path));
+                .orElseThrow(() -> NotFoundException.forPath(path));
 
         if (node.getLockedBy() != null && !node.getLockedBy().equals(userId)) {
-            throw new IllegalStateException("Cannot unlock — locked by different user: " + node.getLockedBy());
+            throw ConflictException.lockedBy(node.getLockedBy());
         }
 
         node.setLockedBy(null);
@@ -172,7 +174,7 @@ public class ContentNodeService {
     @Transactional
     public ContentNode updateStatus(String path, NodeStatus status, String userId) {
         ContentNode node = nodeRepository.findByPath(path)
-                .orElseThrow(() -> new IllegalArgumentException("Node not found: " + path));
+                .orElseThrow(() -> NotFoundException.forPath(path));
 
         node.setStatus(status);
         node.setModifiedBy(userId);
@@ -192,10 +194,10 @@ public class ContentNodeService {
     @Transactional
     public ContentNode restoreVersion(UUID nodeId, Long versionNumber, String userId) {
         ContentNodeVersion version = versionRepository.findByNodeIdAndVersionNumber(nodeId, versionNumber)
-                .orElseThrow(() -> new IllegalArgumentException("Version not found"));
+                .orElseThrow(() -> new NotFoundException("Version " + versionNumber + " not found for node " + nodeId));
 
         ContentNode node = nodeRepository.findById(nodeId)
-                .orElseThrow(() -> new IllegalArgumentException("Node not found"));
+                .orElseThrow(() -> NotFoundException.forId("ContentNode", nodeId));
 
         // Save current state as a version
         versionRepository.save(ContentNodeVersion.fromNode(node));
@@ -206,6 +208,14 @@ public class ContentNodeService {
         node.setModifiedBy(userId);
 
         return nodeRepository.save(node);
+    }
+
+    /**
+     * Get direct children of a node (shallow — one level only).
+     */
+    @Transactional(readOnly = true)
+    public List<ContentNode> getChildren(String parentPath) {
+        return nodeRepository.findByParentPathOrderByOrderIndex(parentPath);
     }
 
     /**
