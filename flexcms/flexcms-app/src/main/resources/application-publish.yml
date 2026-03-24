@@ -1,0 +1,21 @@
+# Publish environment profile
+flexcms:
+  runmode: publish
+  features:
+    authoring-ui: false
+    workflows: false
+    preview: false
+    replication-receiver: true
+    dam-upload: false
+    version-management: false
+  cache:
+    redis:
+      enabled: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flexcms_publish
+
+server:
+  port: 8081
+

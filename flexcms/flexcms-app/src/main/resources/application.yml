@@ -1,0 +1,108 @@
+# ==============================================================================
+# FlexCMS - Base Application Configuration
+# ==============================================================================
+
+spring:
+  application:
+    name: flexcms
+
+  # ----- Database -----
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flexcms
+    username: flexcms
+    password: flexcms
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # ----- Flyway -----
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # ----- Redis -----
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # ----- Elasticsearch -----
+  elasticsearch:
+    uris: http://localhost:9200
+
+  # ----- RabbitMQ -----
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  # ----- File Upload -----
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+  # ----- GraphQL -----
+  graphql:
+    graphiql:
+      enabled: true
+    schema:
+      locations: classpath:graphql/
+
+# ==============================================================================
+# FlexCMS Custom Properties
+# ==============================================================================
+flexcms:
+  runmode: author    # "author" or "publish"
+  instance:
+    id: ${random.uuid}
+
+  # DAM / S3
+  dam:
+    s3:
+      endpoint: http://localhost:9000
+      access-key: minioadmin
+      secret-key: minioadmin
+      bucket: flexcms-assets
+      region: us-east-1
+
+  # Cache
+  cache:
+    redis:
+      enabled: true
+
+  # PIM — separate database
+  pim:
+    datasource:
+      url: jdbc:postgresql://localhost:5432/flexcms_pim
+      username: flexcms
+      password: flexcms
+      driver-class-name: org.postgresql.Driver
+
+# ==============================================================================
+# Server
+# ==============================================================================
+server:
+  port: 8080
+
+# ==============================================================================
+# Logging
+# ==============================================================================
+logging:
+  level:
+    com.flexcms: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+

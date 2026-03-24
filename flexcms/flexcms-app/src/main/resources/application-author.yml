@@ -1,0 +1,18 @@
+# Author environment profile
+flexcms:
+  runmode: author
+  features:
+    authoring-ui: true
+    workflows: true
+    preview: true
+    replication-agent: true
+    dam-upload: true
+    version-management: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/flexcms_author
+
+server:
+  port: 8080
+

@@ -1,0 +1,22 @@
+{
+  "name": "@flexcms/site-nuxt",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reference implementation: Nuxt 3 site powered by FlexCMS",
+  "scripts": {
+    "dev": "nuxt dev --port 3002",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "lint": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@flexcms/sdk": "workspace:*",
+    "@flexcms/vue": "workspace:*",
+    "nuxt": "^3.11.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
+

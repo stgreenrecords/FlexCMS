@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.flexcms</groupId>
+        <artifactId>flexcms-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>flexcms-app</artifactId>
+    <name>FlexCMS - Application</name>
+    <description>Spring Boot application assembling all FlexCMS modules into a deployable artifact</description>
+
+    <dependencies>
+        <!-- All FlexCMS modules -->
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-plugin-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-dam</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-replication</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-search</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-cdn</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-i18n</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-multisite</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-headless</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-author</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-publish</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-clientlibs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-pim</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.flexcms</groupId>
+        <artifactId>flexcms-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>flexcms-author</artifactId>
+    <name>FlexCMS - Author</name>
+    <description>Authoring UI for content editing, asset management, and publishing workflows</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-dam</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-replication</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-i18n</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-multisite</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-search</artifactId>
+        </dependency>
+
+        <!-- Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Thymeleaf templating -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
