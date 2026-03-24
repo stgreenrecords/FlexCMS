@@ -6,7 +6,20 @@
 
 ## How This Board Works
 
-### For a New Agent Starting Work
+### Claude Code Slash Commands (Preferred Method)
+
+Use these commands — they automate the entire protocol described below:
+
+| Command | What it does |
+|---|---|
+| `/implement` | Reads all docs → picks next available task → claims it → reads context → implements → validates → updates this board |
+| `/pick P1-04` | Same as `/implement` but for a specific task ID |
+| `/continue` | Finds paused tasks → reads handoff notes → resumes work |
+| `/status` | Shows work board summary: open/progress/paused/done counts, next available tasks |
+| `/finish` | Properly completes or pauses your current task with documentation |
+| `/validate` | Builds entire project, checks work board consistency, suggests next actions |
+
+### For a New Agent Starting Work (Manual Protocol)
 
 ```
 1. Read this file top to bottom (takes 5 min)

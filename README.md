@@ -621,6 +621,18 @@ KEY RULE: Backend NEVER generates HTML. It only returns JSON.
 - `ContentNode.getChildren()` returns `List<ContentNodeData>` which is populated by `ContentNodeService.loadChildrenRecursive()` — this could be an N+1 problem at scale.
 
 ### Quick Commands for Agents
+
+**Claude Code slash commands** (use these — they automate the full protocol):
+```
+/implement          Pick the next available task, read context, implement, validate, update board
+/pick P1-04         Implement a specific task by ID
+/continue           Resume a paused task (reads handoff notes)
+/status             Show work board summary (open/in-progress/paused/done counts)
+/finish             Complete or pause your current task with proper documentation
+/validate           Full project build + work board consistency check
+```
+
+**Manual build commands:**
 ```bash
 # Build backend
 cd flexcms && mvn clean install

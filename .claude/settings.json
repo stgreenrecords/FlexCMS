@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Bash(mvn clean compile)",
+      "Bash(mvn clean install)",
+      "Bash(mvn test*)",
+      "Bash(mvn spring-boot:run*)",
+      "Bash(cd flexcms*)",
+      "Bash(cd frontend*)",
+      "Bash(pnpm*)",
+      "Bash(docker-compose*)",
+      "Bash(docker exec*)",
+      "Bash(curl*)",
+      "Bash(cat*)",
+      "Bash(ls*)",
+      "Bash(find*)",
+      "Bash(grep*)",
+      "Bash(head*)",
+      "Bash(tail*)",
+      "Bash(wc*)",
+      "Bash(mkdir*)",
+      "Bash(New-Item*)",
+      "Bash(Get-Content*)",
+      "Bash(Select-String*)",
+      "Bash(Write-Host*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(del /s /q C:\\)",
+      "Bash(*DROP DATABASE*)",
+      "Bash(*DROP TABLE*)",
+      "Bash(git push --force*)"
+    ]
+  }
+}
+
