@@ -46,6 +46,7 @@ export {
   Table, TableHeader, TableBody, TableFooter,
   TableRow, TableHead, TableCell, TableCaption,
 } from './components/DataTable';
+export type { ColumnDef } from '@tanstack/react-table';
 
 // TreeView, Sidebar, Breadcrumb
 export { TreeView, type TreeViewProps, type TreeNode } from './components/TreeView';

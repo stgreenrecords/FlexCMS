@@ -123,7 +123,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `frontend/packages/vue` | — | — | — |
 | `frontend/packages/angular` | — | — | — |
 | `frontend/packages/ui` | — | — | — |
-| `frontend/apps/admin` | P3-14 | Claude Sonnet 4.6 | 2026-03-25 |
+| `frontend/apps/admin` | — | — | — |
 | `frontend/apps/build-worker` | — | — | — |
 | `frontend/apps/site-nextjs` | — | — | — |
 | `frontend/apps/site-nuxt` | — | — | — |
@@ -204,7 +204,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P3-11 | **Site manager page** | ✅ DONE | 🟡 P1 | M | `frontend/apps/admin` | P3-09, P3-03 | Claude Sonnet 4.6 |
 | P3-12 | **Content tree browser page** | ✅ DONE | 🔴 P0 | XL | `frontend/apps/admin` | P3-09, P3-04, P3-03 | Claude Sonnet 4.6 |
 | P3-13 | **Visual page editor (drag-and-drop)** | ✅ DONE | 🔴 P0 | XL | `frontend/apps/admin` | P3-12, P3-01 | Claude Sonnet 4.6 |
-| P3-14 | **DAM browser page** | 🔵 IN PROGRESS | 🔴 P0 | L | `frontend/apps/admin` | P3-09, P3-03, P3-07 | Claude Sonnet 4.6 |
+| P3-14 | **DAM browser page** | ✅ DONE | 🔴 P0 | L | `frontend/apps/admin` | P3-09, P3-03, P3-07 | Claude Sonnet 4.6 |
 | P3-15 | **DAM asset detail page** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-14 | — |
 | P3-16 | **Workflow inbox page** | 🟢 OPEN | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03 | — |
 | P3-17 | **Component registry browser page** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-09, P3-03 | — |
@@ -573,6 +573,38 @@ output_files:
   - `packages/ui/src/components/DatePicker.tsx` — new: DatePicker + DateRangePicker
   - `packages/ui/src/index.ts` — added exports for all new form controls
 **Build Verified:** Yes — `npx tsc --noEmit` → 0 new errors
+
+---
+
+### P3-14 — DAM browser page
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] Page at `src/app/(admin)/dam/page.tsx` — uses AppShell via `(admin)` route group layout
+  - [x] Breadcrumb: Dashboard > Assets > [folder] (RULE 10)
+  - [x] Left panel: folder tree (All Assets / Images / Videos / Documents / Archives with counts), Archive + Trash links; active folder highlighted with `var(--color-primary)` tint
+  - [x] Grid view: responsive 2→3→4→5→6 column grid; asset cards with thumbnail, filename, meta (size + dimensions/duration/pages/sheets/files)
+  - [x] Asset type thumbnails: images show gradient placeholder, video shows play icon + duration badge, PDF/ZIP/XLSX/other show type icon + label
+  - [x] Asset selection: click card to toggle; checkmark indicator appears on hover and when selected; selected cards get primary border + tint
+  - [x] List view: `DataTable` with checkbox, name+thumbnail, type, info, date, status, action menu columns
+  - [x] View mode toggle (grid/list) in toolbar
+  - [x] Search input filters by name (client-side)
+  - [x] Multi-select action bar: shows count + Download / Move / Delete (destructive) when ≥1 selected
+  - [x] Upload button opens `Dialog` with `FileUpload` dropzone from `@flexcms/ui`; simulates adding assets as "processing"
+  - [x] Right context rail: Info / History / Access Control / Settings icon buttons with Tooltips
+  - [x] Empty state: illustration + heading + description + Upload CTA when folder empty (RULE 8)
+  - [x] Loading skeleton: 10 grid cards with Skeleton components (RULE 9)
+  - [x] Status badges: Active (primary), Processing (orange), Error (red) — all use `var(--color-*)` tokens
+  - [x] Zero hardcoded colors — all via `var(--color-*)` tokens (RULE 2)
+  - [x] Exported `ColumnDef` from `@flexcms/ui` index so admin app doesn't need direct `@tanstack/react-table` dep
+  - [x] TypeScript: `npx tsc --noEmit` → 0 errors
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/dam/page.tsx` — new: complete DAM browser page
+  - `frontend/packages/ui/src/index.ts` — re-exported `ColumnDef` from `@tanstack/react-table`
+  - `frontend/packages/ui` rebuilt → BUILD SUCCESS
+**Build Verified:** Yes — `npm run build` in `packages/ui` → BUILD SUCCESS; `npx tsc --noEmit` in `apps/admin` → 0 errors
+**Notes:** P3-15 (DAM asset detail page) is now unblocked.
 
 ---
 
