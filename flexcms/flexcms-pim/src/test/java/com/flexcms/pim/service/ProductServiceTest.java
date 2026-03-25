@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +46,9 @@ class ProductServiceTest {
 
     @Mock
     private SchemaValidationService schemaValidationService;
+
+    @Mock
+    private RabbitTemplate rabbitTemplate;
 
     @InjectMocks
     private ProductService productService;
@@ -215,5 +219,34 @@ class ProductServiceTest {
         Page<Product> result = productService.search("shoe", PageRequest.of(0, 10));
 
         assertThat(result.getTotalElements()).isEqualTo(1);
+    }
+
+    // --- updateStatus / product published event ---
+
+    @Test
+    void updateStatus_published_sendsRabbitMessage() {
+        Product p = product("WIDGET-2024");
+        Catalog c = catalog(UUID.randomUUID());
+        p.setCatalog(c);
+        when(productRepo.findBySku("WIDGET-2024")).thenReturn(Optional.of(p));
+        when(productRepo.save(any())).thenReturn(p);
+
+        productService.updateStatus("WIDGET-2024", ProductStatus.PUBLISHED, "editor");
+
+        verify(rabbitTemplate).convertAndSend(
+                eq("flexcms.replication"),
+                eq(ProductService.PRODUCT_PUBLISHED_ROUTING_KEY),
+                any());
+    }
+
+    @Test
+    void updateStatus_draft_doesNotSendRabbitMessage() {
+        Product p = product("WIDGET-2024");
+        when(productRepo.findBySku("WIDGET-2024")).thenReturn(Optional.of(p));
+        when(productRepo.save(any())).thenReturn(p);
+
+        productService.updateStatus("WIDGET-2024", ProductStatus.DRAFT, "editor");
+
+        verify(rabbitTemplate, never()).convertAndSend(any(String.class), any(String.class), any(Object.class));
     }
 }
