@@ -6,7 +6,10 @@
  * The frontend team builds the renderer (this file).
  * Neither side touches the other's code.
  */
-import { ComponentMapper, type FlexCmsRenderer } from '@flexcms/react';
+'use client';
+
+import { ComponentMapper } from '@flexcms/sdk';
+import type { FlexCmsRenderer } from '@flexcms/react';
 
 // ---------------------------------------------------------------------------
 // Component Renderers
@@ -33,7 +36,7 @@ function Image({ data }: { data: Record<string, unknown> }) {
         height={data.height as number}
         loading="lazy"
       />
-      {data.caption && <figcaption>{data.caption as string}</figcaption>}
+      {data.caption != null && <figcaption>{String(data.caption)}</figcaption>}
     </figure>
   );
 }

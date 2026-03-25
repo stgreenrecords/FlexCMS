@@ -1,3 +1,5 @@
+'use client';
+
 // @flexcms/react — React adapter for FlexCMS
 
 export { FlexCmsProvider, useFlexCms, type FlexCmsRenderer, type FlexCmsContextValue, type FlexCmsProviderProps } from './FlexCmsProvider';
