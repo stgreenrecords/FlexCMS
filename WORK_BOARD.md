@@ -103,9 +103,9 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | Module | Locked By Item | Agent | Since |
 |---|---|---|---|
-| `flexcms-core` | P4-02 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-core` | — | — | — |
 | `flexcms-app` | — | — | — |
-| `flexcms-author` | P4-02 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-author` | — | — | — |
 | `flexcms-publish` | — | — | — |
 | `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
@@ -217,7 +217,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
 | P4-01 | **Scheduled publishing (cron scheduler)** | ✅ DONE | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
-| P4-02 | **Bulk operations (publish/delete/move)** | 🔵 IN PROGRESS | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
+| P4-02 | **Bulk operations (publish/delete/move)** | ✅ DONE | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
 | P4-03 | **CDN: CloudFront provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
 | P4-04 | **CDN: Cloudflare provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
 | P4-05 | **Translation: DeepL connector** | 🟢 OPEN | 🟢 P2 | M | `flexcms-i18n` | — | — |
@@ -624,6 +624,30 @@ output_files:
   - `flexcms-author/pom.xml` — added springdoc dependency
   - `flexcms-app/.../config/OpenApiConfig.java` — new OpenAPI config with two API groups
   - 8 controller files — added `@Tag` class-level annotations
+
+---
+
+### P4-02 — Bulk operations (publish/delete/move)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `BulkOperationResult` model — `succeeded`, `failed`, `errors` list; `addError()` auto-increments failed; `hasErrors()`, `getTotal()`
+  - [x] `ContentNodeService.bulkUpdateStatus()` — processes each path independently, catches per-path exceptions
+  - [x] `ContentNodeService.bulkDelete()` — processes each path independently
+  - [x] `ContentNodeService.bulkMove()` — moves each path to the same target parent independently
+  - [x] `POST /api/author/content/bulk/publish` — bulk publish + triggers `replicationAgent.replicate(ACTIVATE)` per path
+  - [x] `DELETE /api/author/content/bulk` — bulk delete
+  - [x] `POST /api/author/content/bulk/move` — bulk move to common target parent
+  - [x] `BulkPathsRequest` and `BulkMoveRequest` inner DTO records with validation constraints
+  - [x] Per-item error isolation — one failure does not abort others, errors accumulate in result
+  - [x] 6 bulk tests added to `ContentNodeServiceTest` — all pass; `mvn test -pl flexcms-core` → BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-core/.../model/BulkOperationResult.java` — new model class
+  - `flexcms-core/.../service/ContentNodeService.java` — added 3 bulk methods
+  - `flexcms-author/.../controller/AuthorContentController.java` — added 3 bulk endpoints + 2 DTO records + `ReplicationAgent` autowire
+  - `flexcms-core/src/test/.../service/ContentNodeServiceTest.java` — 6 new bulk tests
+**Build Verified:** Yes — `mvn clean compile -pl flexcms-core,flexcms-author -am` → BUILD SUCCESS; `mvn test -pl flexcms-core` → all tests pass
 
 ---
 
