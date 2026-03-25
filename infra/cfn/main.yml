@@ -408,6 +408,123 @@ Resources:
         ScaleInCooldown: 300
         ScaleOutCooldown: 60
 
+  # ===========================================================================
+  # CDN Hybrid Routing — CloudFront Distribution
+  # ===========================================================================
+  # Origin Group:
+  #   Primary origin  : S3 static site bucket (pre-built HTML from build-worker)
+  #   Fallback origin : Publish ALB (SSR — renders pages dynamically on 403/404)
+  #
+  # CloudFront automatically retries the SSR origin when S3 returns a 403 or 404.
+  # This mirrors the local-dev nginx proxy defined in infra/local/nginx/.
+  # ===========================================================================
+
+  # Origin Access Control — allows CloudFront to read from the private S3 bucket
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub flexcms-${EnvironmentName}-static-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # Bucket policy — grants CloudFront OAC read access to the static site bucket
+  StaticSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !GetAtt StorageStack.Outputs.StaticSiteBucketName
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOACRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub
+              - arn:aws:s3:::${Bucket}/*
+              - Bucket: !GetAtt StorageStack.Outputs.StaticSiteBucketName
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub
+                  - arn:aws:cloudfront::${AWS::AccountId}:distribution/${DistId}
+                  - DistId: !Ref FlexCMSDistribution
+
+  # CloudFront Distribution with hybrid routing Origin Group
+  FlexCMSDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Sub FlexCMS ${EnvironmentName} — hybrid routing (S3 primary / SSR fallback)
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        PriceClass: !If [IsProd, PriceClass_All, PriceClass_100]
+
+        Origins:
+          # Primary: S3 static site bucket (pre-built HTML)
+          - Id: S3StaticOrigin
+            DomainName: !Sub
+              - ${Bucket}.s3.${AWS::Region}.amazonaws.com
+              - Bucket: !GetAtt StorageStack.Outputs.StaticSiteBucketName
+            OriginAccessControlId: !Ref CloudFrontOAC
+            S3OriginConfig:
+              OriginAccessIdentity: ''  # empty = use OAC (not legacy OAI)
+
+          # Fallback: Publish ALB (SSR — renders dynamically on cache miss)
+          - Id: SSRPublishOrigin
+            DomainName: !GetAtt PublishALB.DNSName
+            CustomOriginConfig:
+              HTTPPort: 80
+              OriginProtocolPolicy: http-only
+              OriginReadTimeout: 30
+              OriginKeepaliveTimeout: 5
+
+        # Origin Group — CloudFront retries SSR when S3 returns 403/404
+        OriginGroups:
+          Items:
+            - Id: HybridOriginGroup
+              FailoverCriteria:
+                StatusCodes:
+                  Items: [403, 404]
+                  Quantity: 2
+              Members:
+                Items:
+                  - OriginId: S3StaticOrigin
+                  - OriginId: SSRPublishOrigin
+                Quantity: 2
+          Quantity: 1
+
+        DefaultCacheBehavior:
+          TargetOriginId: HybridOriginGroup
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6  # CachingOptimized (managed)
+          OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac  # AllViewerExceptHostHeader
+
+        # Cache behaviour for the S3 manifest — short TTL so routing decisions stay fresh
+        CacheBehaviors:
+          - PathPattern: _meta/*
+            TargetOriginId: S3StaticOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD]
+            CachedMethods: [GET, HEAD]
+            Compress: false
+            DefaultTTL: 60
+            MaxTTL: 60
+            MinTTL: 0
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # CachingDisabled (managed)
+
+        CustomErrorResponses:
+          # On SSR 404 — return SSR response as-is (not a CloudFront error page)
+          - ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /404
+            ErrorCachingMinTTL: 0
+
 Outputs:
   PublishALBDns:
     Value: !GetAtt PublishALB.DNSName
@@ -419,4 +536,8 @@ Outputs:
     Value: !GetAtt DatabaseStack.Outputs.DBEndpoint
   RedisEndpoint:
     Value: !GetAtt CacheStack.Outputs.RedisEndpoint
+  CloudFrontDistributionId:
+    Value: !Ref FlexCMSDistribution
+  CloudFrontDomain:
+    Value: !GetAtt FlexCMSDistribution.DomainName
 

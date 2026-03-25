@@ -109,7 +109,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-publish` | — | — | — |
 | `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
-| `flexcms-replication` | P5-10 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-replication` | — | — | — |
 | `flexcms-search` | — | — | — |
 | `flexcms-cache` | — | — | — |
 | `flexcms-cdn` | — | — | — |
@@ -117,7 +117,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-multisite` | — | — | — |
 | `flexcms-plugin-api` | — | — | — |
 | `flexcms-clientlibs` | — | — | — |
-| `flexcms-pim` | P5-10 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-pim` | — | — | — |
 | `frontend/packages/sdk` | — | — | — |
 | `frontend/packages/react` | — | — | — |
 | `frontend/packages/vue` | — | — | — |
@@ -185,7 +185,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P2H-01 | **Build worker: complete event consumer + renderer** | ✅ DONE | 🟡 P1 | L | `frontend/apps/build-worker` | — | GitHub Copilot |
 | P2H-02 | **Build worker: dependency graph resolution** | ✅ DONE | 🟡 P1 | L | `frontend/apps/build-worker`, `flexcms-core` | P2H-01 | GitHub Copilot |
 | P2H-03 | **Build worker: S3 upload + manifest** | ✅ DONE | 🟡 P1 | M | `frontend/apps/build-worker` | P2H-01 | GitHub Copilot |
-| P2H-04 | **CDN hybrid routing (S3 primary, SSR fallback)** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn`, `docker / infra` | P2H-03 | — |
+| P2H-04 | **CDN hybrid routing (S3 primary, SSR fallback)** | ✅ DONE | 🟡 P1 | M | `flexcms-cdn`, `docker / infra` | P2H-03 | Claude Sonnet 4.6 |
 
 ### Phase 3 — Admin UI
 
@@ -220,13 +220,13 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P4-02 | **Bulk operations (publish/delete/move)** | ✅ DONE | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
 | P4-03 | **CDN: CloudFront provider implementation** | ✅ DONE | 🟡 P1 | M | `flexcms-cdn` | — | Claude Sonnet 4.6 |
 | P4-04 | **CDN: Cloudflare provider implementation** | ✅ DONE | 🟡 P1 | M | `flexcms-cdn` | — | Claude Sonnet 4.6 |
-| P4-05 | **Translation: DeepL connector** | 🟢 OPEN | 🟢 P2 | M | `flexcms-i18n` | — | — |
+| P4-05 | **Translation: DeepL connector** | ✅ DONE | 🟢 P2 | M | `flexcms-i18n` | — | Claude Sonnet 4.6 |
 | P4-06 | **Live copy / content sharing service** | 🟢 OPEN | 🟢 P2 | L | `flexcms-core`, `flexcms-multisite` | — | — |
 | P4-07 | **AWS Infrastructure: CloudFormation + ECS Fargate** | ✅ DONE | 🟡 P1 | L | `docker / infra`, `CI/CD` | — | Claude Sonnet 4.6 |
-| P4-08 | **Sitemap + robots.txt generation** | 🟢 OPEN | 🟢 P2 | M | `flexcms-publish`, `flexcms-headless` | — | — |
+| P4-08 | **Sitemap + robots.txt generation** | ✅ DONE | 🟢 P2 | M | `flexcms-publish`, `flexcms-headless` | — | Claude Sonnet 4.6 |
 | P4-09 | **Audit trail admin API** | ✅ DONE | 🟢 P2 | S | `flexcms-author` | — | GitHub Copilot |
 | P4-10 | **Performance: Gatling load tests** | ✅ DONE | 🟡 P1 | L | `flexcms-app` | P1-07 | GitHub Copilot |
-| P4-11 | **Content import/export (JSON/ZIP)** | 🟢 OPEN | 🟢 P2 | M | `flexcms-author`, `flexcms-core` | — | — |
+| P4-11 | **Content import/export (JSON/ZIP)** | ✅ DONE | 🟢 P2 | M | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
 
 ### Phase 5 — PIM
 
@@ -241,7 +241,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P5-07 | **PIM: JSON/API import source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-08 | **PIM: auto-schema inference from source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-09 | **PIM ↔ CMS: PimClient for ComponentModels** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-plugin-api` | P5-01 | Claude Sonnet 4.6 |
-| P5-10 | **PIM ↔ CMS: product.published → page rebuild** | 🔵 IN PROGRESS | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | Claude Sonnet 4.6 |
+| P5-10 | **PIM ↔ CMS: product.published → page rebuild** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | Claude Sonnet 4.6 |
 | P5-11 | **PIM: Elasticsearch product index** | 🟢 OPEN | 🟢 P2 | L | `flexcms-pim`, `flexcms-search` | P2-03, P5-01 | — |
 | P5-12 | **PIM: GraphQL schema extension** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim`, `flexcms-headless` | P2-01, P5-01 | — |
 | P5-13 | **PIM Admin: catalog browser + product grid** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03, P5-01 | GitHub Copilot |
@@ -481,6 +481,95 @@ output_files:
 ## §5. Completion Notes & Handoff Log
 
 > When you finish or pause an item, add an entry here. This is the most critical section — it enables handoff between agents.
+
+### P4-05 — Translation: DeepL connector
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`DeepLProperties`** — `@ConfigurationProperties(prefix = "flexcms.translation.deepl")`: enabled, apiKey, apiUrl (Free/Pro endpoint), maxCharsPerRequest
+  - [x] **`DeepLTranslationConnector`** — implements `TranslationConnector` SPI; `@ConditionalOnProperty(deepl.enabled=true)`; `getProviderId()` → `"deepl"`; `translate()` → batches units, calls `POST /translate`, returns `Map<unitId, translatedText>`
+  - [x] **Batching** — `splitIntoBatches()` splits unit list into chunks ≤ maxCharsPerRequest chars to avoid DeepL API limits
+  - [x] **Locale mapping** — `toDeepLLocale()`: source → language only uppercase (`en-US` → `EN`); target → full region uppercase (`en-US` → `EN-US`); underscore normalized to hyphen
+  - [x] **`application.yml`** — added `flexcms.translation.deepl.*` config block with env-var overrides
+  - [x] **pom.xml** — added `spring-boot-starter-web` for `RestClient`
+  - [x] **Tests** — 13 unit tests; all pass (`mvn test -pl flexcms-i18n` → BUILD SUCCESS)
+**Files Changed:**
+  - NEW: `flexcms/flexcms-i18n/src/main/java/com/flexcms/i18n/connector/DeepLProperties.java`
+  - NEW: `flexcms/flexcms-i18n/src/main/java/com/flexcms/i18n/connector/DeepLTranslationConnector.java`
+  - NEW: `flexcms/flexcms-i18n/src/test/java/com/flexcms/i18n/connector/DeepLTranslationConnectorTest.java`
+  - MODIFIED: `flexcms/flexcms-i18n/pom.xml` (added `spring-boot-starter-web`)
+  - MODIFIED: `flexcms/flexcms-app/src/main/resources/application.yml` (added `flexcms.translation.deepl.*`)
+**Build Verified:** `mvn test -pl flexcms-i18n` → BUILD SUCCESS, 13 tests, 0 failures
+
+---
+
+### P4-11 — Content import/export (JSON/ZIP)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`ContentExportService`** — `buildPackage(rootPath)` fetches root + all descendants via `findDescendants()`; `exportJson(rootPath)` → UTF-8 JSON bytes; `exportZip(rootPath)` → ZIP archive containing `content.json`; package format: `{version, exportedAt, rootPath, nodes[]}`
+  - [x] **`ContentImportService`** — `importJson(bytes, overwrite)` parses export package, creates/updates nodes; `importZip(bytes, overwrite)` extracts `content.json` from ZIP and delegates to JSON import; `importZipStream(inputStream, overwrite)` for multipart uploads; `overwriteExisting=false` skips existing, `=true` overwrites
+  - [x] **`ContentImportExportController`** — `GET /api/author/content/export?path=...&format=json|zip` (downloadable file response); `POST /api/author/content/import` (multipart file, auto-detects JSON vs ZIP by filename extension); secured with `@PreAuthorize`
+  - [x] **`ImportResult`** record — `{created, updated, skipped, errors}` with `hasErrors()` and `total()` helpers
+  - [x] **Tests** — 15 unit tests; all pass (`mvn test -pl flexcms-core -Dtest=ContentExportImportServiceTest` → BUILD SUCCESS)
+**Files Changed:**
+  - NEW: `flexcms/flexcms-core/src/main/java/com/flexcms/core/service/ContentExportService.java`
+  - NEW: `flexcms/flexcms-core/src/main/java/com/flexcms/core/service/ContentImportService.java`
+  - NEW: `flexcms/flexcms-author/src/main/java/com/flexcms/author/controller/ContentImportExportController.java`
+  - NEW: `flexcms/flexcms-core/src/test/java/com/flexcms/core/service/ContentExportImportServiceTest.java`
+**Build Verified:** `mvn compile -pl flexcms-core,flexcms-author --also-make` → BUILD SUCCESS; `mvn test -pl flexcms-core -Dtest=ContentExportImportServiceTest` → 15 tests, 0 failures
+
+---
+
+### P4-08 — Sitemap + robots.txt generation
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`SitemapService`** — `@Service` in `flexcms-headless`; `buildSitemap()` → `<urlset>` XML (sitemaps.org schema) with `<loc>`, `<lastmod>`, `<changefreq>`, `<priority>`; `buildSitemapIndex()` → `<sitemapindex>` listing per-locale sitemaps; `buildRobots()` reads `site.settings.robotsDisallow` list and emits robots.txt; `getSitemapEntries()` → `List<SitemapEntry>` for JSON API consumers
+  - [x] **Content filtering** — only PUBLISHED nodes with `resourceType=flexcms/page`, `hideInNav≠true`, `hideFromSitemap≠true`
+  - [x] **Priority computation** — homepage=1.0, depth-1=0.8, depth-2=0.6, deeper=0.5
+  - [x] **Locale handling** — default locale omits locale prefix in URLs; non-default prepends `{locale}/`
+  - [x] **`SitemapController`** (flexcms-publish) — `GET /sitemap.xml` (XML, resolves site from request), `GET /sitemap-index.xml` (all supported locales), `GET /robots.txt` (plain text); site context resolved via `SiteResolver`
+  - [x] **`SitemapApiController`** (flexcms-headless) — `GET /api/content/v1/sitemap/{siteId}/{locale}` returns `List<SitemapEntry>` JSON for headless consumers
+  - [x] **Tests** — 23 unit tests in `SitemapServiceTest`; all pass (`mvn test -pl flexcms-headless` → BUILD SUCCESS, 50 tests, 0 failures); both modules compile clean
+**Files Changed:**
+  - NEW: `flexcms/flexcms-headless/src/main/java/com/flexcms/headless/service/SitemapService.java`
+  - NEW: `flexcms/flexcms-headless/src/main/java/com/flexcms/headless/controller/SitemapApiController.java`
+  - NEW: `flexcms/flexcms-publish/src/main/java/com/flexcms/publish/controller/SitemapController.java`
+  - NEW: `flexcms/flexcms-headless/src/test/java/com/flexcms/headless/service/SitemapServiceTest.java`
+**Build Verified:** `mvn test -pl flexcms-headless` → BUILD SUCCESS, 50 tests, 0 failures; `mvn compile -pl flexcms-publish --also-make` → BUILD SUCCESS
+
+---
+
+### P2H-04 — CDN hybrid routing (S3 primary, SSR fallback)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`HybridRoutingProperties`** — `@ConfigurationProperties(prefix = "flexcms.cdn.hybrid")` with: enabled, s3Endpoint, s3Bucket, s3Region, s3AccessKey, s3SecretKey, s3PublicBaseUrl, ssrBaseUrl, manifestCacheSeconds
+  - [x] **`HybridRoutingService`** — `@ConditionalOnProperty(name = "flexcms.cdn.hybrid.enabled", havingValue = "true")`; reads S3 build manifest, caches it in-memory with TTL, returns `RoutingDecision(Origin.S3 | Origin.SSR, resolvedUrl)`; public API: `resolve()`, `isStaticallyBuilt()`, `getS3Key()`, `invalidateManifestCache()`
+  - [x] **`application.yml`** — added `flexcms.cdn.hybrid.*` config block with env-var overrides
+  - [x] **Nginx local dev proxy** — `infra/local/nginx/default.conf.template`; tries MinIO (S3) first, falls back to `publish:8081` on 403/404; uses `SITE_ID`/`LOCALE` env vars substituted at container startup
+  - [x] **`docker-compose.dev.yml`** — added `hybrid-cdn` service (nginx:1.27-alpine, port 8082, `--profile cdn`)
+  - [x] **CloudFormation** — added `CloudFrontOAC`, `StaticSiteBucketPolicy`, `FlexCMSDistribution` to `infra/cfn/main.yml`; Origin Group with S3 as primary (OAC-secured) and Publish ALB as SSR fallback (failover on 403/404); manifest path `_meta/*` has short-TTL cache behaviour
+  - [x] **Tests** — 9 unit tests in `HybridRoutingServiceTest`; all pass (`mvn test -pl flexcms-cdn` → 29 tests, 0 failures)
+**Files Changed:**
+  - NEW: `flexcms/flexcms-cdn/src/main/java/com/flexcms/cdn/config/HybridRoutingProperties.java`
+  - NEW: `flexcms/flexcms-cdn/src/main/java/com/flexcms/cdn/service/HybridRoutingService.java`
+  - NEW: `infra/local/nginx/default.conf.template`
+  - NEW: `flexcms/flexcms-cdn/src/test/java/com/flexcms/cdn/service/HybridRoutingServiceTest.java`
+  - MODIFIED: `flexcms/flexcms-cdn/pom.xml` (added `software.amazon.awssdk:s3`)
+  - MODIFIED: `flexcms/pom.xml` (added `software.amazon.awssdk:s3` to dependency management)
+  - MODIFIED: `flexcms/flexcms-app/src/main/resources/application.yml` (added hybrid config section)
+  - MODIFIED: `infra/local/docker-compose.dev.yml` (added `hybrid-cdn` service with `cdn` profile)
+  - MODIFIED: `infra/local/.env.local` (added `HYBRID_CDN_SITE_ID`, `HYBRID_CDN_LOCALE`)
+  - MODIFIED: `infra/cfn/main.yml` (added CloudFront OAC + Distribution + Origin Group)
+**Build Verified:** `mvn test -pl flexcms-cdn` → BUILD SUCCESS, 29 tests, 0 failures
+
+---
 
 ### P2H-03 — Build worker: S3 upload + manifest
 **Status:** ✅ DONE
@@ -2095,6 +2184,40 @@ output_files:
   - `README.md` — added CI badge after the `h1` title
 **Build Verified:** N/A — workflow files are not executable locally; structure and syntax reviewed manually (standard GitHub Actions v4 actions with correct indentation and required fields)
 **Notes:** P1-14 (Docker image build + push to registry) is now unblocked. `pnpm-lock.yaml` does not exist yet — CI uses `pnpm install` without `--frozen-lockfile`; add the flag once the lockfile is committed. The Docker job currently sets `push: false`; P1-14 will add registry credentials and `push: true` for tagged releases.
+
+---
+
+### P5-10 — PIM ↔ CMS: product.published → page rebuild
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `ProductPublishedMessage` POJO created in `flexcms-pim/event/` — serializable, carries sku, catalogId, publishedBy, publishedAt
+  - [x] `ProductService.updateStatus()` publishes `ProductPublishedMessage` to `flexcms.replication` exchange with routing key `product.published` when status → PUBLISHED
+  - [x] Non-PUBLISHED status changes do NOT send a message
+  - [x] `ReplicationQueueConfig` extended: `PRODUCT_PUBLISHED_ROUTING_KEY` constant, `authorProductQueue` bean (author-side, instance-scoped), `authorProductBinding` binding
+  - [x] `ProductPublishListener` created in `flexcms-replication` — author-only (`@ConditionalOnProperty(runmode=author)`), `@RabbitListener`
+  - [x] Listener queries `ContentNodeRepository.findByProductSku(sku)` to find all CMS pages referencing the product
+  - [x] For each matching page: calls `ReplicationAgent.replicate(path, ACTIVATE, userId)` to trigger rebuild
+  - [x] Per-page failures are caught/logged — other pages still rebuilt
+  - [x] Null `publishedBy` falls back to `"pim-system"`
+  - [x] `ContentNodeRepository.findByProductSku(sku)` added — JSONB native query on `properties->>'productSku'`
+  - [x] Convention documented: CMS pages reference PIM products via `productSku` in their properties JSONB
+  - [x] `flexcms-replication` pom.xml: added `flexcms-pim` dependency
+  - [x] `ProductService` `replicationExchange` field defaulted to `"flexcms.replication"` for test compatibility
+  - [x] 5 unit tests in `ProductPublishListenerTest` — trigger, no match, multiple pages, failure isolation, null publishedBy
+  - [x] 2 new tests in `ProductServiceTest` — PUBLISHED sends message, DRAFT does not
+  - [x] All tests pass: `flexcms-pim` 89/89, `flexcms-replication` 25/25 — BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-pim/src/main/java/.../event/ProductPublishedMessage.java` — new
+  - `flexcms-pim/src/main/java/.../service/ProductService.java` — injected `RabbitTemplate`, fire message on PUBLISHED
+  - `flexcms-pim/src/test/.../service/ProductServiceTest.java` — added `@Mock RabbitTemplate`, 2 new tests
+  - `flexcms-replication/pom.xml` — added `flexcms-pim` dependency
+  - `flexcms-replication/src/main/java/.../config/ReplicationQueueConfig.java` — new routing key, author queue + binding
+  - `flexcms-replication/src/main/java/.../service/ProductPublishListener.java` — new
+  - `flexcms-replication/src/test/.../service/ProductPublishListenerTest.java` — new, 5 tests
+  - `flexcms-core/src/main/java/.../repository/ContentNodeRepository.java` — added `findByProductSku()`
+**Build Verified:** Yes — `mvn test -pl flexcms-pim,flexcms-replication` → 89+25=114 tests pass, BUILD SUCCESS
 
 ---
 

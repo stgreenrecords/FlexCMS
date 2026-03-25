@@ -1,0 +1,72 @@
+# =============================================================================
+# FlexCMS — Hybrid CDN routing (local development)
+# =============================================================================
+# Simulates CloudFront Origin Group behavior:
+#   Primary origin  : MinIO S3 (pre-built static HTML, uploaded by build-worker)
+#   Fallback origin : CMS Publish (renders pages dynamically from headless API)
+#
+# S3 key convention: sites/${SITE_ID}/${LOCALE}/{urlPath}/index.html
+# SITE_ID and LOCALE are substituted from docker-compose environment variables.
+# nginx variables ($request_uri, $host, etc.) use single-dollar syntax and are
+# NOT touched by envsubst — only ${SITE_ID} and ${LOCALE} are substituted.
+#
+# Quick start (add cdn profile to docker compose):
+#   SITE_ID=corporate LOCALE=en docker compose --profile cdn up -d hybrid-cdn
+#
+# Architecture:
+#   Browser → nginx:8082 → MinIO:9000 (bucket: flexcms-static)
+#                              ↓ 403/404?
+#                          Publish:8081 (SSR fallback)
+# =============================================================================
+
+upstream s3_minio {
+    server minio:9000;
+}
+
+upstream ssr_publish {
+    server publish:8081;
+}
+
+server {
+    listen 80;
+    server_name _;
+
+    # ------------------------------------------------------------------
+    # Primary origin: serve pre-built HTML from MinIO S3
+    # Maps request URI to S3 key: sites/${SITE_ID}/${LOCALE}{uri}/index.html
+    # ------------------------------------------------------------------
+    location / {
+        proxy_pass http://s3_minio/flexcms-static/sites/${SITE_ID}/${LOCALE}$request_uri;
+        proxy_set_header Host minio;
+
+        # Intercept S3 4xx errors and retry against the SSR fallback
+        proxy_intercept_errors on;
+        error_page 400 403 404 = @ssr_fallback;
+
+        # Forward routing origin info for debugging
+        add_header X-FlexCMS-Origin "s3" always;
+    }
+
+    # ------------------------------------------------------------------
+    # Fallback origin: CMS Publish (dynamic SSR)
+    # Requested when S3 returns 403/404 (page not yet compiled or deleted)
+    # ------------------------------------------------------------------
+    location @ssr_fallback {
+        proxy_pass http://ssr_publish;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        add_header X-FlexCMS-Origin "ssr" always;
+    }
+
+    # ------------------------------------------------------------------
+    # Health check — used by docker-compose healthcheck
+    # ------------------------------------------------------------------
+    location = /health {
+        access_log off;
+        return 200 "ok\n";
+        add_header Content-Type text/plain;
+    }
+}

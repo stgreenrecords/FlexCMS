@@ -264,6 +264,40 @@ services:
       start_period: 60s
 
   # ===========================================================================
+  # Hybrid CDN Proxy (--profile cdn)
+  # ===========================================================================
+  # Simulates CloudFront Origin Group for local development:
+  #   - Primary:  MinIO S3 (pre-built HTML from build-worker)
+  #   - Fallback: CMS Publish (SSR, renders pages dynamically on cache miss)
+  #
+  # Access: http://localhost:8082/{pagePath}
+  #
+  # Usage:
+  #   SITE_ID=corporate LOCALE=en docker compose --profile cdn up -d hybrid-cdn
+  # ===========================================================================
+  hybrid-cdn:
+    profiles: [cdn]
+    image: nginx:1.27-alpine
+    container_name: flexcms-hybrid-cdn
+    ports:
+      - "8082:80"
+    environment:
+      SITE_ID: ${HYBRID_CDN_SITE_ID:-corporate}
+      LOCALE: ${HYBRID_CDN_LOCALE:-en}
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    depends_on:
+      minio:
+        condition: service_started
+      publish:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ===========================================================================
   # Admin UI — Next.js (Content + DAM + PIM admin interface)
   # ===========================================================================
   admin-ui:

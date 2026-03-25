@@ -19,6 +19,12 @@
             <artifactId>flexcms-core</artifactId>
         </dependency>
 
+        <!-- Spring Web — provides RestClient for DeepL HTTP calls -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

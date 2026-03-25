@@ -236,7 +236,7 @@ class ProductServiceTest {
         verify(rabbitTemplate).convertAndSend(
                 eq("flexcms.replication"),
                 eq(ProductService.PRODUCT_PUBLISHED_ROUTING_KEY),
-                any());
+                any(com.flexcms.pim.event.ProductPublishedMessage.class));
     }
 
     @Test

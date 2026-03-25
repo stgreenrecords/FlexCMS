@@ -108,6 +108,17 @@ flexcms:
       enabled: false
       zone-id: ${FLEXCMS_CDN_CLOUDFLARE_ZONE_ID:}
       api-token: ${FLEXCMS_CDN_CLOUDFLARE_API_TOKEN:}
+    # Hybrid routing — S3 primary, SSR fallback (enable on publish tier)
+    hybrid:
+      enabled: false
+      s3-endpoint: ${FLEXCMS_CDN_HYBRID_S3_ENDPOINT:}     # blank = AWS S3; set "http://minio:9000" for local
+      s3-bucket: ${FLEXCMS_CDN_HYBRID_S3_BUCKET:flexcms-static}
+      s3-region: ${FLEXCMS_CDN_HYBRID_S3_REGION:us-east-1}
+      s3-access-key: ${FLEXCMS_CDN_HYBRID_S3_ACCESS_KEY:}
+      s3-secret-key: ${FLEXCMS_CDN_HYBRID_S3_SECRET_KEY:}
+      s3-public-base-url: ${FLEXCMS_CDN_HYBRID_PUBLIC_BASE_URL:}  # CloudFront domain
+      ssr-base-url: ${FLEXCMS_CDN_HYBRID_SSR_BASE_URL:http://localhost:8081}
+      manifest-cache-seconds: 60
 
   # Rate limiting (token bucket per client IP — applies to public/headless APIs)
   rate-limit:
@@ -116,6 +127,15 @@ flexcms:
     refill-tokens: 60          # Sustained rate: 60 tokens added every...
     refill-seconds: 1          # ...1 second → 60 req/s per IP
     bucket-eviction-minutes: 10 # Purge stale IP buckets every 10 min
+
+  # Translation connectors
+  translation:
+    deepl:
+      enabled: false                          # Set to true to activate DeepL machine translation
+      api-key: ${FLEXCMS_DEEPL_API_KEY:}      # Required when enabled
+      # Free plan endpoint (keys ending in :fx); change to https://api.deepl.com/v2 for Pro
+      api-url: ${FLEXCMS_DEEPL_API_URL:https://api-free.deepl.com/v2}
+      max-chars-per-request: 50000
 
   # PIM — separate database
   pim:

@@ -35,6 +35,12 @@
             <artifactId>cloudfront</artifactId>
         </dependency>
 
+        <!-- AWS S3 SDK v2 (manifest reads for hybrid routing) -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

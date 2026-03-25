@@ -143,10 +143,15 @@
                 <version>${bucket4j.version}</version>
             </dependency>
 
-            <!-- AWS SDK v2 — CloudFront + STS (CDN invalidation) -->
+            <!-- AWS SDK v2 — CloudFront + S3 + STS (CDN invalidation + hybrid routing) -->
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>cloudfront</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
                 <version>${aws-sdk.version}</version>
             </dependency>
             <dependency>
