@@ -24,15 +24,14 @@
       "Bash(New-Item*)",
       "Bash(Get-Content*)",
       "Bash(Select-String*)",
-      "Bash(Write-Host*)"
+      "Bash(Write-Host*)",
+      "Bash(ls \"c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/admin/src/app/\\(admin\\)/\")"
     ],
     "deny": [
       "Bash(rm -rf /)",
-      "Bash(del /s /q C:\\)",
       "Bash(*DROP DATABASE*)",
       "Bash(*DROP TABLE*)",
       "Bash(git push --force*)"
     ]
   }
 }
-
