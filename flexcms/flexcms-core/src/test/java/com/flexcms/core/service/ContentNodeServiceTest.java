@@ -23,10 +23,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.flexcms.core.model.BulkOperationResult;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -417,6 +420,97 @@ class ContentNodeServiceTest {
                 Map.of("hero", "<img src=x onerror=alert(1)>"), "user1");
 
         assertThat(result.getProperties()).containsEntry("hero", "<img src=\"x\" />");
+    }
+
+    // --- bulk operations ---
+
+    @Test
+    void bulkUpdateStatus_countsSuccessAndFailure() {
+        ContentNode node1 = buildNode("content.corporate.en.page1", "page1");
+        when(nodeRepository.findByPath("content.corporate.en.page1")).thenReturn(Optional.of(node1));
+        when(nodeRepository.save(node1)).thenReturn(node1);
+        when(nodeRepository.findByPath("content.corporate.en.missing")).thenReturn(Optional.empty());
+
+        BulkOperationResult result = contentNodeService.bulkUpdateStatus(
+                List.of("content.corporate.en.page1", "content.corporate.en.missing"),
+                NodeStatus.PUBLISHED, "user1");
+
+        assertThat(result.getSucceeded()).isEqualTo(1);
+        assertThat(result.getFailed()).isEqualTo(1);
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().get(0)).contains("content.corporate.en.missing");
+    }
+
+    @Test
+    void bulkUpdateStatus_allSucceed() {
+        ContentNode n1 = buildNode("content.corporate.en.p1", "p1");
+        ContentNode n2 = buildNode("content.corporate.en.p2", "p2");
+        when(nodeRepository.findByPath("content.corporate.en.p1")).thenReturn(Optional.of(n1));
+        when(nodeRepository.findByPath("content.corporate.en.p2")).thenReturn(Optional.of(n2));
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        BulkOperationResult result = contentNodeService.bulkUpdateStatus(
+                List.of("content.corporate.en.p1", "content.corporate.en.p2"),
+                NodeStatus.ARCHIVED, "user1");
+
+        assertThat(result.getSucceeded()).isEqualTo(2);
+        assertThat(result.getFailed()).isEqualTo(0);
+        assertThat(result.hasErrors()).isFalse();
+        verify(nodeRepository, times(2)).save(any());
+    }
+
+    @Test
+    void bulkDelete_callsDeleteSubtreeForEachPath() {
+        BulkOperationResult result = contentNodeService.bulkDelete(
+                List.of("content.corporate.en.p1", "content.corporate.en.p2"), "user1");
+
+        verify(nodeRepository).deleteSubtree("content.corporate.en.p1");
+        verify(nodeRepository).deleteSubtree("content.corporate.en.p2");
+        assertThat(result.getSucceeded()).isEqualTo(2);
+    }
+
+    @Test
+    void bulkDelete_isolatesPerPathFailure() {
+        org.mockito.Mockito.doThrow(new RuntimeException("db error"))
+                .when(nodeRepository).deleteSubtree("content.corporate.en.bad");
+
+        BulkOperationResult result = contentNodeService.bulkDelete(
+                List.of("content.corporate.en.bad", "content.corporate.en.good"), "user1");
+
+        assertThat(result.getFailed()).isEqualTo(1);
+        assertThat(result.getSucceeded()).isEqualTo(1);
+        assertThat(result.getErrors().get(0)).contains("db error");
+    }
+
+    @Test
+    void bulkMove_movesEachPathToSameTarget() {
+        ContentNode src1 = buildNode("content.corporate.en.p1", "p1");
+        ContentNode src2 = buildNode("content.corporate.en.p2", "p2");
+        ContentNode target = buildNode("content.corporate.en.archive", "archive");
+        when(nodeRepository.findByPath("content.corporate.en.p1")).thenReturn(Optional.of(src1));
+        when(nodeRepository.findByPath("content.corporate.en.p2")).thenReturn(Optional.of(src2));
+        when(nodeRepository.findByPath("content.corporate.en.archive")).thenReturn(Optional.of(target));
+        when(nodeRepository.findDescendants(any())).thenReturn(new ArrayList<>());
+        when(nodeRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        BulkOperationResult result = contentNodeService.bulkMove(
+                List.of("content.corporate.en.p1", "content.corporate.en.p2"),
+                "content.corporate.en.archive", "user1");
+
+        assertThat(result.getSucceeded()).isEqualTo(2);
+        assertThat(result.getFailed()).isEqualTo(0);
+    }
+
+    @Test
+    void bulkMove_isolatesPerPathFailure() {
+        when(nodeRepository.findByPath("content.corporate.en.missing")).thenReturn(Optional.empty());
+
+        BulkOperationResult result = contentNodeService.bulkMove(
+                List.of("content.corporate.en.missing"),
+                "content.corporate.en.archive", "user1");
+
+        assertThat(result.getFailed()).isEqualTo(1);
+        assertThat(result.getErrors()).hasSize(1);
     }
 
     @Test
