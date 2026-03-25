@@ -136,7 +136,9 @@ function Launch-InWindow([string]$title, [string]$workDir, [string]$cmd, [string
 # Set UTF-8 encoding so Next.js / Node.js Unicode symbols render correctly
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding  = [System.Text.Encoding]::UTF8
+`$OutputEncoding = [System.Text.Encoding]::UTF8
 `$env:PYTHONIOENCODING = 'utf-8'
+`$env:CHCP = '65001'
 chcp 65001 | Out-Null
 `$Host.UI.RawUI.WindowTitle = '$title'
 Set-Location '$workDir'
