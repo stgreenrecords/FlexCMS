@@ -477,7 +477,7 @@ function ComponentGridCard({ comp }: { comp: ComponentDef }) {
 // Main page
 // ---------------------------------------------------------------------------
 
-export function ComponentRegistryPage() {
+function ComponentRegistryPage() {
   const [isLoading] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [searchQuery, setSearchQuery] = useState('');

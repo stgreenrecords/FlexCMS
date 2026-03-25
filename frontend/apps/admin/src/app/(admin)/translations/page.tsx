@@ -346,7 +346,7 @@ function EmptyState() {
 // Main page
 // ---------------------------------------------------------------------------
 
-export function TranslationManagerPage() {
+function TranslationManagerPage() {
   const [isLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>('all');

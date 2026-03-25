@@ -704,7 +704,7 @@ export default function ProductEditorPage() {
             <h4 className="text-sm font-bold mb-1" style={{ color: '#e5e2e1' }}>Digital Storefront Sync</h4>
             <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
               This product is currently mapped to the{' '}
-              <span style={{ color: '#b0c6ff' }}>'Premium Home'</span> storefront channel.
+              <span style={{ color: '#b0c6ff' }}>&apos;Premium Home&apos;</span> storefront channel.
             </p>
             <div className="mt-3 flex gap-2">
               <span className="flex items-center gap-1.5 text-[10px] font-bold" style={{ color: '#4ade80' }}>

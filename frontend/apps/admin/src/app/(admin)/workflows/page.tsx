@@ -403,7 +403,6 @@ function WorkflowTimeline({ steps }: { steps: TimelineStep[] }) {
                 className="absolute left-0 top-1 h-6 w-6 rounded-full flex items-center justify-center ring-4"
                 style={{
                   backgroundColor: 'var(--color-primary)',
-                  ringColor: 'var(--color-surface)',
                   boxShadow: '0 0 0 4px var(--color-surface)',
                 }}
               >

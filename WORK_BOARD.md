@@ -129,6 +129,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `frontend/apps/site-nuxt` | — | — | — |
 | `docker / infra` | — | — | — |
 | `CI/CD` | — | — | — |
+| `flexcms-author (XF)` | — | — | — |
+| `sample-website/` | — | — | — |
 
 ---
 
@@ -138,6 +140,91 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 - **ID format:** `P{phase}-{seq}` (e.g., P1-01 = Phase 1, item 1)
 - **Effort:** S = <1 day, M = 1-3 days, L = 3-7 days, XL = 1-2 weeks
 - **Parallel group:** Items in the same group CAN run in parallel. Items across groups can also run in parallel if they don't share modules.
+
+---
+
+### Phase 0 — Experience Fragments (NEW — TOP PRIORITY)
+
+> Experience Fragments (XF) are a core CMS concept borrowed from AEM: reusable authored content chunks (header, footer, promos, contributor bylines) with multiple named **variations** (master, mobile, email, etc.) stored in a dedicated content tree and referenced inline from regular pages. All three pillars below must ship together before the Sample Website can be installed.
+
+| ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
+|---|---|---|---|---|---|---|---|
+| P0-XF-01 | **Experience Fragments: Backend** — service, REST API, inline delivery resolution, Flyway migration | 🔵 IN PROGRESS | 🔴 P0 | L | `flexcms-core`, `flexcms-author`, `flexcms-headless` | — | GitHub Copilot |
+| P0-XF-02 | **Experience Fragments: Admin UI** — XF browser + XF variation editor page | 🟢 OPEN | 🟡 P1 | L | `frontend/apps/admin` | P0-XF-01 | — |
+| SAMPLE-01 | **Sample Website: WKND Adventures** — install/uninstall scripts, SQL seed data, standalone Next.js frontend with WKND component renderers | 🔵 IN PROGRESS | 🟡 P1 | L | `sample-website/` (external folder) | P0-XF-01 | GitHub Copilot |
+
+### Phase 0 — Context Packets
+
+#### P0-XF-01: Experience Fragments Backend
+```yaml
+read_first:
+  - flexcms/flexcms-app/src/main/resources/db/migration/V1__core_schema.sql   (sites + content_nodes schema)
+  - flexcms/flexcms-app/src/main/resources/db/migration/V6__seed_data.sql     (component_definitions inserts)
+  - flexcms/flexcms-core/src/main/java/com/flexcms/core/service/ContentDeliveryService.java
+  - flexcms/flexcms-core/src/main/java/com/flexcms/core/service/ContentNodeService.java
+  - flexcms/flexcms-author/src/main/java/com/flexcms/author/controller/AuthorContentController.java
+understand:
+  - XFs are content nodes stored at paths like "experience-fragments.{site}.{locale}.{category}.{xf-name}"
+  - XF root has resourceType="flexcms/xf-folder"; variations are children with resourceType="flexcms/xf-page"
+  - A page references an XF via a component with resourceType="flexcms/experience-fragment"
+    and properties.fragmentPath pointing to the variation node path
+  - ContentDeliveryService.adaptComponent() must detect this resource type and embed the
+    variation's component tree inline (recursive resolution)
+  - Next Flyway version: V12 (V11 = live_copy_tables)
+acceptance_criteria:
+  - [ ] V12__experience_fragment_support.sql: add XF component types to component_definitions
+  - [ ] ExperienceFragmentService: createXF, addVariation, listXFs, listVariations, getVariation,
+         resolveReference, deleteXF, deleteVariation
+  - [ ] ExperienceFragmentController: POST /api/author/xf, GET /api/author/xf,
+         POST /api/author/xf/{path}/variations, DELETE /api/author/xf/{path},
+         all endpoints @PreAuthorize
+  - [ ] ExperienceFragmentApiController (headless): GET /api/content/v1/xf/{path}/{variationType}
+         returns resolved component tree JSON
+  - [ ] ContentDeliveryService updated: when encountering resourceType=flexcms/experience-fragment,
+         resolves fragmentPath and embeds target variation's component tree inline
+  - [ ] Circular XF reference guard (max depth 5)
+  - [ ] Unit tests: ExperienceFragmentServiceTest (≥10 tests), all pass
+  - [ ] mvn test -pl flexcms-core,flexcms-author,flexcms-headless → BUILD SUCCESS
+output_files:
+  - flexcms/flexcms-app/src/main/resources/db/migration/V12__experience_fragment_support.sql
+  - flexcms/flexcms-author/src/main/java/com/flexcms/author/service/ExperienceFragmentService.java
+  - flexcms/flexcms-author/src/main/java/com/flexcms/author/controller/ExperienceFragmentController.java
+  - flexcms/flexcms-headless/src/main/java/com/flexcms/headless/controller/ExperienceFragmentApiController.java
+  - flexcms/flexcms-core/src/main/java/com/flexcms/core/service/ContentDeliveryService.java  (updated)
+  - flexcms/flexcms-author/src/test/java/com/flexcms/author/service/ExperienceFragmentServiceTest.java
+```
+
+#### SAMPLE-01: Sample Website (WKND Adventures)
+```yaml
+read_first:
+  - AEM-Website-Example/jcr_root/content/wknd/language-masters/en/.content.xml  (home page content)
+  - AEM-Website-Example/jcr_root/content/experience-fragments/wknd/language-masters/en/site/  (header/footer XFs)
+  - flexcms/flexcms-app/src/main/resources/db/migration/V1__core_schema.sql    (sites + content_nodes schema)
+  - flexcms/flexcms-app/src/main/resources/db/migration/V6__seed_data.sql      (component insert pattern)
+  - WORK_BOARD.md §3 P0-XF-01 (XF backend must be done first)
+understand:
+  - WKND site is an adventure/travel brand: sections are Home, Adventures (16 trips), Magazine (6 articles), FAQs, About Us
+  - AEM components map to FlexCMS resource types: wknd/components/teaser → wknd/teaser, etc.
+  - Sample website MUST NOT modify any files inside flexcms/ or frontend/ — all code goes in sample-website/
+  - SQL seed scripts run against the live FlexCMS PostgreSQL; they are REVERSIBLE (uninstall script deletes by site_id='wknd')
+  - The frontend is a standalone Next.js app in sample-website/frontend/ that connects to the FlexCMS public API
+acceptance_criteria:
+  - [ ] sample-website/ folder at project root — no files inside flexcms/ or frontend/
+  - [ ] install.sh + install.ps1: idempotent — check if WKND site already exists before inserting
+  - [ ] uninstall.sh + uninstall.ps1: cleanly removes all WKND data (site, nodes, XFs, component defs)
+  - [ ] SQL data files: 01_site_components, 02_templates, 03_experience_fragments, 04_home, 05_adventures, 06_magazine, 07_faqs_about
+  - [ ] Frontend: all WKND component resource types have a React renderer
+  - [ ] Frontend: Experience Fragment reference component fetches and renders inline
+  - [ ] README.md explains prerequisites, install steps, how to run
+  - [ ] Frontend starts with: cd sample-website/frontend && npm install && npm run dev
+output_files:
+  - sample-website/README.md
+  - sample-website/install.sh + install.ps1
+  - sample-website/uninstall.sh + uninstall.ps1
+  - sample-website/data/01_site_components.sql through 07_faqs_about.sql
+  - sample-website/frontend/package.json + tsconfig.json + next.config.js + tailwind.config.js
+  - sample-website/frontend/src/  (layout, catch-all route, component renderers, component-map)
+```
 
 ---
 
