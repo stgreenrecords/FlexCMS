@@ -25,7 +25,7 @@ export function ThemeProvider({ children, defaultTheme = 'system', brandOverride
       : mode;
 
     const baseTokens = resolved === 'dark' ? darkTheme : lightTheme;
-    const tokens = brandOverrides ? { ...baseTokens, ...brandOverrides } : baseTokens;
+    const tokens = brandOverrides ? { ...baseTokens, ...brandOverrides } as ThemeTokens : baseTokens;
     applyTheme(tokens);
 
     document.documentElement.setAttribute('data-theme', resolved);

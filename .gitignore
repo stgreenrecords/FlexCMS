@@ -52,9 +52,15 @@ Thumbs.db
 .env.production.local
 *.env.local
 
+# AWS / Cloud credentials — NEVER commit these
+aws.config
+aws.credentials
+.aws/credentials
+
 # Logs
 *.log
 logs/
 
 # Optional: TypeScript cache
 *.tsbuildinfo
+/aws.config

@@ -123,7 +123,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `frontend/packages/vue` | — | — | — |
 | `frontend/packages/angular` | — | — | — |
 | `frontend/packages/ui` | — | — | — |
-| `frontend/apps/admin` | P3-13 | Claude Sonnet 4.6 | 2026-03-25 |
+| `frontend/apps/admin` | — | — | — |
 | `frontend/apps/build-worker` | — | — | — |
 | `frontend/apps/site-nextjs` | — | — | — |
 | `frontend/apps/site-nuxt` | — | — | — |
@@ -195,15 +195,15 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P3-02 | **Design system: Tabs, Accordion, Popover, Tooltip** | ✅ DONE | 🔴 P0 | M | `frontend/packages/ui` | — | Claude Sonnet 4.6 |
 | P3-03 | **Design system: DataTable (sort, select, paginate)** | ✅ DONE | 🔴 P0 | L | `frontend/packages/ui` | — | Claude Sonnet 4.6 |
 | P3-04 | **Design system: TreeView, Sidebar, Breadcrumb** | ✅ DONE | 🔴 P0 | L | `frontend/packages/ui` | — | Claude Sonnet 4.6 |
-| P3-05 | **Design system: Toast, CommandPalette, StepIndicator** | 🟢 OPEN | 🟡 P1 | M | `frontend/packages/ui` | — | — |
+| P3-05 | **Design system: Toast, CommandPalette, StepIndicator** | ✅ DONE | 🟡 P1 | M | `frontend/packages/ui` | — | Claude Sonnet 4.6 |
 | P3-06 | **Design system: Select, Checkbox, Radio, Switch, DatePicker** | ✅ DONE | 🔴 P0 | L | `frontend/packages/ui` | — | Claude Sonnet 4.6 |
-| P3-07 | **Design system: FileUpload/Dropzone, TagInput, ColorPicker** | 🟢 OPEN | 🟡 P1 | M | `frontend/packages/ui` | — | — |
+| P3-07 | **Design system: FileUpload/Dropzone, TagInput, ColorPicker** | ✅ DONE | 🟡 P1 | M | `frontend/packages/ui` | — | Claude Sonnet 4.6 |
 | P3-08 | **Storybook setup + stories for all components** | 🟢 OPEN | 🟡 P1 | M | `frontend/packages/ui` | P3-01 | — |
 | P3-09 | **AppShell layout (top nav + sidebar + content)** | ✅ DONE | 🔴 P0 | M | `frontend/apps/admin` | P3-04 | Claude Sonnet 4.6 |
-| P3-10 | **Dashboard page (stats, recent, quick actions)** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-09 | — |
-| P3-11 | **Site manager page** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-09, P3-03 | — |
+| P3-10 | **Dashboard page (stats, recent, quick actions)** | ✅ DONE | 🟡 P1 | M | `frontend/apps/admin` | P3-09 | Claude Sonnet 4.6 |
+| P3-11 | **Site manager page** | ✅ DONE | 🟡 P1 | M | `frontend/apps/admin` | P3-09, P3-03 | Claude Sonnet 4.6 |
 | P3-12 | **Content tree browser page** | ✅ DONE | 🔴 P0 | XL | `frontend/apps/admin` | P3-09, P3-04, P3-03 | Claude Sonnet 4.6 |
-| P3-13 | **Visual page editor (drag-and-drop)** | 🔵 IN PROGRESS | 🔴 P0 | XL | `frontend/apps/admin` | P3-12, P3-01 | Claude Sonnet 4.6 |
+| P3-13 | **Visual page editor (drag-and-drop)** | ✅ DONE | 🔴 P0 | XL | `frontend/apps/admin` | P3-12, P3-01 | Claude Sonnet 4.6 |
 | P3-14 | **DAM browser page** | 🟢 OPEN | 🔴 P0 | L | `frontend/apps/admin` | P3-09, P3-03, P3-07 | — |
 | P3-15 | **DAM asset detail page** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-14 | — |
 | P3-16 | **Workflow inbox page** | 🟢 OPEN | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03 | — |

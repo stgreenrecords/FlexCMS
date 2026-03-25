@@ -71,6 +71,31 @@ export { RadioGroup, RadioGroupItem } from './components/RadioGroup';
 export { Switch } from './components/Switch';
 export { DatePicker, DateRangePicker, type DatePickerProps, type DateRangePickerProps, type DateRange } from './components/DatePicker';
 
+// Toast, CommandPalette, StepIndicator
+export {
+  ToastProvider, useToast, toastVariants,
+  type ToastOptions, type ToastVariant,
+} from './components/Toast';
+export {
+  CommandPalette, CommandPaletteProvider, useCommandPalette,
+  type CommandItem, type CommandPaletteProps,
+} from './components/CommandPalette';
+export {
+  StepIndicator, stepCircleVariants,
+  type Step, type StepStatus, type StepIndicatorProps,
+} from './components/StepIndicator';
+
+// FileUpload, TagInput, ColorPicker
+export {
+  FileUpload, FileUploadList, useFileUpload,
+  type FileUploadProps, type FileUploadListProps, type UploadedFile,
+} from './components/FileUpload';
+export { TagInput, type TagInputProps } from './components/TagInput';
+export {
+  ColorPicker, ColorSwatchGroup,
+  type ColorPickerProps, type ColorSwatchGroupProps,
+} from './components/ColorPicker';
+
 // Theming
 export {
   lightTheme, darkTheme, applyTheme, createTheme, type ThemeTokens,
