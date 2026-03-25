@@ -177,7 +177,7 @@ function Start-Publish {
 
 function Start-Admin {
     Write-Banner "Admin UI  (Next.js)  :3000"
-    $adminDir = Join-Path $FrontendDir "apps" "admin"
+    $adminDir = Join-Path (Join-Path $FrontendDir "apps") "admin"
     Launch-InWindow "FlexCMS Admin :3000" $FrontendDir `
         "pnpm install --silent 2>&1 | Out-Null; Set-Location '$adminDir'; pnpm dev" `
         "admin"
