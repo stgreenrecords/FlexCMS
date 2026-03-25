@@ -1,0 +1,215 @@
+# =============================================================================
+# FlexCMS — Full Local Development Stack
+# =============================================================================
+# Runs author + publish backend instances with all infrastructure services.
+# Usage:
+#   cd infra/local
+#   cp .env.local .env        # (first time only)
+#   docker compose -f docker-compose.dev.yml up -d
+#
+# Services available:
+#   Author API:       http://localhost:8080
+#   Publish API:      http://localhost:8081
+#   Admin UI:         http://localhost:3000   (run separately: cd frontend/apps/admin && pnpm dev)
+#   RabbitMQ Console: http://localhost:15672  (guest/guest)
+#   MinIO Console:    http://localhost:9001   (minioadmin/minioadmin)
+#   Elasticsearch:    http://localhost:9200
+#   PostgreSQL:       localhost:5432          (flexcms/flexcms)
+# =============================================================================
+
+version: '3.9'
+
+services:
+  # ---------------------------------------------------------------------------
+  # Infrastructure Services
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: flexcms-postgres
+    environment:
+      POSTGRES_DB: flexcms
+      POSTGRES_USER: ${POSTGRES_USER:-flexcms}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../flexcms/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flexcms"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: flexcms-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: flexcms-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: flexcms-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  # Create the default S3 bucket on startup
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_started
+    entrypoint: >
+      /bin/sh -c "
+      sleep 3;
+      mc alias set local http://minio:9000 minioadmin minioadmin;
+      mc mb --ignore-existing local/flexcms-assets;
+      mc mb --ignore-existing local/flexcms-static;
+      echo 'MinIO buckets created';
+      "
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: flexcms-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ---------------------------------------------------------------------------
+  # FlexCMS Author Instance (read-write)
+  # ---------------------------------------------------------------------------
+  author:
+    image: ghcr.io/stgreenrecords/flexcms-app:latest
+    build:
+      context: ../../flexcms
+      dockerfile: Dockerfile
+    container_name: flexcms-author
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: author
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_author
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      FLEXCMS_DAM_S3_ENDPOINT: http://minio:9000
+      FLEXCMS_DAM_S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      FLEXCMS_DAM_S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      FLEXCMS_DAM_S3_BUCKET: flexcms-assets
+      FLEXCMS_DAM_S3_REGION: us-east-1
+      FLEXCMS_PIM_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_pim
+      FLEXCMS_PIM_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
+      FLEXCMS_PIM_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      FLEXCMS_JWT_ISSUER_URI: ${FLEXCMS_JWT_ISSUER_URI:-http://localhost:8180/realms/flexcms}
+      SERVER_PORT: 8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health/readiness || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # FlexCMS Publish Instance (read-only, receives replication)
+  # ---------------------------------------------------------------------------
+  publish:
+    image: ghcr.io/stgreenrecords/flexcms-app:latest
+    build:
+      context: ../../flexcms
+      dockerfile: Dockerfile
+    container_name: flexcms-publish
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: publish
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_publish
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      FLEXCMS_DAM_S3_ENDPOINT: http://minio:9000
+      FLEXCMS_DAM_S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      FLEXCMS_DAM_S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      FLEXCMS_DAM_S3_BUCKET: flexcms-assets
+      FLEXCMS_DAM_S3_REGION: us-east-1
+      FLEXCMS_PIM_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_pim
+      FLEXCMS_PIM_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
+      FLEXCMS_PIM_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      FLEXCMS_JWT_ISSUER_URI: ${FLEXCMS_JWT_ISSUER_URI:-http://localhost:8180/realms/flexcms}
+      SERVER_PORT: 8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      author:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health/readiness || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+volumes:
+  postgres_data:
+  minio_data:
+  es_data:
+

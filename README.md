@@ -583,6 +583,10 @@ KEY RULE: Backend NEVER generates HTML. It only returns JSON.
 | DAM (asset ingest, renditions) | `flexcms-dam/src/main/java/com/flexcms/dam/service/` |
 | Caching + invalidation | `flexcms-cache/src/main/java/com/flexcms/cache/` |
 | Docker infrastructure | `flexcms/docker-compose.yml` |
+| **Local dev stack (author+publish)** | **`infra/local/docker-compose.dev.yml`** |
+| **AWS CloudFormation (all stacks)** | **`infra/cfn/main.yml`** + nested templates |
+| **AWS deploy pipeline** | **`.github/workflows/deploy-environment.yml`** |
+| **Infrastructure docs** | **`infra/README.md`** |
 | Application config | `flexcms-app/src/main/resources/application*.yml` |
 | **Frontend SDK (core)** | **`frontend/packages/sdk/src/`** |
 | **React adapter** | **`frontend/packages/react/src/`** |

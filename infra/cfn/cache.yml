@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: FlexCMS - ElastiCache Redis 7 cluster.
+Parameters:
+  EnvironmentName:
+    Type: String
+    AllowedValues: [qa, prod]
+  CacheNodeType:
+    Type: String
+    Default: cache.t3.micro
+  PrivateSubnetA:
+    Type: String
+  PrivateSubnetB:
+    Type: String
+  CacheSecurityGroup:
+    Type: String
+Conditions:
+  IsProd: !Equals [!Ref EnvironmentName, prod]
+Resources:
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: !Sub flexcms-${EnvironmentName} Redis subnet group
+      SubnetIds:
+        - !Ref PrivateSubnetA
+        - !Ref PrivateSubnetB
+  RedisReplicationGroup:
+    Type: AWS::ElastiCache::ReplicationGroup
+    Properties:
+      ReplicationGroupDescription: !Sub FlexCMS ${EnvironmentName} Redis
+      Engine: redis
+      EngineVersion: '7.1'
+      CacheNodeType: !Ref CacheNodeType
+      NumCacheClusters: !If [IsProd, 2, 1]
+      AutomaticFailoverEnabled: !If [IsProd, true, false]
+      MultiAZEnabled: !If [IsProd, true, false]
+      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      SecurityGroupIds:
+        - !Ref CacheSecurityGroup
+      TransitEncryptionEnabled: true
+      AtRestEncryptionEnabled: !If [IsProd, true, false]
+      Port: 6379
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+Outputs:
+  RedisEndpoint:
+    Value: !GetAtt RedisReplicationGroup.PrimaryEndPoint.Address
+    Export:
+      Name: !Sub ${AWS::StackName}-RedisEndpoint
+  RedisPort:
+    Value: !GetAtt RedisReplicationGroup.PrimaryEndPoint.Port
+    Export:
+      Name: !Sub ${AWS::StackName}-RedisPort

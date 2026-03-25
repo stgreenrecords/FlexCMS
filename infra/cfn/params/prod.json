@@ -1,0 +1,11 @@
+[
+  {"ParameterKey": "EnvironmentName",    "ParameterValue": "prod"},
+  {"ParameterKey": "DBInstanceClass",    "ParameterValue": "db.r6g.large"},
+  {"ParameterKey": "DBAllocatedStorage", "ParameterValue": "100"},
+  {"ParameterKey": "CacheNodeType",      "ParameterValue": "cache.r6g.large"},
+  {"ParameterKey": "BrokerInstanceType", "ParameterValue": "mq.m5.large"},
+  {"ParameterKey": "AuthorDesiredCount", "ParameterValue": "2"},
+  {"ParameterKey": "PublishDesiredCount","ParameterValue": "5"},
+  {"ParameterKey": "PublishMaxCount",    "ParameterValue": "20"}
+]
+

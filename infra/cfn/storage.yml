@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: FlexCMS — S3 buckets for DAM assets, static site, and CFN templates.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    AllowedValues: [qa, prod]
+
+Resources:
+  AssetsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub flexcms-${EnvironmentName}-assets-${AWS::AccountId}
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: CleanOldVersions
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 90
+            Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  StaticSiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub flexcms-${EnvironmentName}-static-${AWS::AccountId}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+  TemplatesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub flexcms-${EnvironmentName}-cfn-templates-${AWS::AccountId}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  AssetsBucketName:
+    Value: !Ref AssetsBucket
+    Export:
+      Name: !Sub ${AWS::StackName}-AssetsBucket
+  AssetsBucketArn:
+    Value: !GetAtt AssetsBucket.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-AssetsBucketArn
+  StaticSiteBucketName:
+    Value: !Ref StaticSiteBucket
+    Export:
+      Name: !Sub ${AWS::StackName}-StaticBucket
+  StaticSiteBucketArn:
+    Value: !GetAtt StaticSiteBucket.Arn
+    Export:
+      Name: !Sub ${AWS::StackName}-StaticBucketArn
+  TemplatesBucketName:
+    Value: !Ref TemplatesBucket
+

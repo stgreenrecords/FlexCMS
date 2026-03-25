@@ -51,11 +51,16 @@ Thumbs.db
 .env.test.local
 .env.production.local
 *.env.local
+# Allow the infrastructure template
+!infra/local/.env.local
 
 # AWS / Cloud credentials — NEVER commit these
 aws.config
 aws.credentials
 .aws/credentials
+
+# Infrastructure local env (template .env.local is committed)
+infra/local/.env
 
 # Logs
 *.log

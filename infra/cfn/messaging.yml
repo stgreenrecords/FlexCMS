@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: FlexCMS — Amazon MQ RabbitMQ broker.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    AllowedValues: [qa, prod]
+  BrokerInstanceType:
+    Type: String
+    Default: mq.m5.large
+  BrokerPassword:
+    Type: String
+    NoEcho: true
+  PrivateSubnetA:
+    Type: String
+  PrivateSubnetB:
+    Type: String
+  MessagingSecurityGroup:
+    Type: String
+
+Conditions:
+  IsProd: !Equals [!Ref EnvironmentName, prod]
+
+Resources:
+  RabbitMQBroker:
+    Type: AWS::AmazonMQ::Broker
+    Properties:
+      BrokerName: !Sub flexcms-${EnvironmentName}-rabbitmq
+      EngineType: RABBITMQ
+      EngineVersion: '3.13'
+      HostInstanceType: !Ref BrokerInstanceType
+      DeploymentMode: !If [IsProd, CLUSTER_MULTI_AZ, SINGLE_INSTANCE]
+      PubliclyAccessible: false
+      SubnetIds:
+        - !If
+          - IsProd
+          - !Ref PrivateSubnetA
+          - !Ref PrivateSubnetA
+        - !If
+          - IsProd
+          - !Ref PrivateSubnetB
+          - !Ref AWS::NoValue
+      SecurityGroups:
+        - !Ref MessagingSecurityGroup
+      Users:
+        - Username: flexcms
+          Password: !Ref BrokerPassword
+      AutoMinorVersionUpgrade: true
+      MaintenanceWindowStartTime:
+        DayOfWeek: SUNDAY
+        TimeOfDay: '04:00'
+        TimeZone: UTC
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+Outputs:
+  BrokerEndpoint:
+    Value: !Select [0, !GetAtt RabbitMQBroker.AmqpEndpoints]
+    Export:
+      Name: !Sub ${AWS::StackName}-BrokerEndpoint
+  BrokerId:
+    Value: !Ref RabbitMQBroker
+

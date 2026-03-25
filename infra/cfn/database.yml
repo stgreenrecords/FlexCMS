@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: FlexCMS — RDS PostgreSQL 16 with Multi-AZ for production.
+
+Parameters:
+  EnvironmentName:
+    Type: String
+    AllowedValues: [qa, prod]
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.medium
+  DBAllocatedStorage:
+    Type: Number
+    Default: 50
+  DBMasterPassword:
+    Type: String
+    NoEcho: true
+  PrivateSubnetA:
+    Type: String
+  PrivateSubnetB:
+    Type: String
+  DatabaseSecurityGroup:
+    Type: String
+
+Conditions:
+  IsProd: !Equals [!Ref EnvironmentName, prod]
+
+Resources:
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: !Sub flexcms-${EnvironmentName} private subnets
+      SubnetIds:
+        - !Ref PrivateSubnetA
+        - !Ref PrivateSubnetB
+
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Family: postgres16
+      Description: !Sub FlexCMS ${EnvironmentName} PostgreSQL 16 params
+      Parameters:
+        shared_preload_libraries: pg_stat_statements
+
+  DBInstance:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: !Sub flexcms-${EnvironmentName}
+      Engine: postgres
+      EngineVersion: '16.4'
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref DBAllocatedStorage
+      StorageType: gp3
+      MasterUsername: flexcms
+      MasterUserPassword: !Ref DBMasterPassword
+      DBName: flexcms
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      DBParameterGroupName: !Ref DBParameterGroup
+      VPCSecurityGroups:
+        - !Ref DatabaseSecurityGroup
+      MultiAZ: !If [IsProd, true, false]
+      StorageEncrypted: !If [IsProd, true, false]
+      BackupRetentionPeriod: !If [IsProd, 14, 3]
+      PreferredBackupWindow: '03:00-04:00'
+      PreferredMaintenanceWindow: 'sun:04:00-sun:05:00'
+      PubliclyAccessible: false
+      CopyTagsToSnapshot: true
+      DeletionProtection: !If [IsProd, true, false]
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+Outputs:
+  DBEndpoint:
+    Value: !GetAtt DBInstance.Endpoint.Address
+    Export:
+      Name: !Sub ${AWS::StackName}-DBEndpoint
+  DBPort:
+    Value: !GetAtt DBInstance.Endpoint.Port
+    Export:
+      Name: !Sub ${AWS::StackName}-DBPort
+

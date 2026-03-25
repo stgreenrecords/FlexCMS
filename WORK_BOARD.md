@@ -222,7 +222,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P4-04 | **CDN: Cloudflare provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
 | P4-05 | **Translation: DeepL connector** | 🟢 OPEN | 🟢 P2 | M | `flexcms-i18n` | — | — |
 | P4-06 | **Live copy / content sharing service** | 🟢 OPEN | 🟢 P2 | L | `flexcms-core`, `flexcms-multisite` | — | — |
-| P4-07 | **Kubernetes Helm charts** | 🟢 OPEN | 🟡 P1 | L | `docker / infra` | — | — |
+| P4-07 | **AWS Infrastructure: CloudFormation + ECS Fargate** | ✅ DONE | 🟡 P1 | L | `docker / infra`, `CI/CD` | — | Claude Sonnet 4.6 |
 | P4-08 | **Sitemap + robots.txt generation** | 🟢 OPEN | 🟢 P2 | M | `flexcms-publish`, `flexcms-headless` | — | — |
 | P4-09 | **Audit trail admin API** | 🟢 OPEN | 🟢 P2 | S | `flexcms-author` | — | — |
 | P4-10 | **Performance: Gatling load tests** | 🟢 OPEN | 🟡 P1 | L | `flexcms-app` | P1-07 | — |

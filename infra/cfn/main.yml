@@ -1,0 +1,408 @@
+﻿AWSTemplateFormatVersion: '2010-09-09'
+Description: FlexCMS Root orchestrator - deploys all nested stacks.
+Parameters:
+  EnvironmentName:
+    Type: String
+    AllowedValues: [qa, prod]
+  VpcCidr:
+    Type: String
+    Default: '10.0.0.0/16'
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.medium
+  DBAllocatedStorage:
+    Type: Number
+    Default: 50
+  DBMasterPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+  CacheNodeType:
+    Type: String
+    Default: cache.t3.micro
+  BrokerInstanceType:
+    Type: String
+    Default: mq.m5.large
+  BrokerPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 8
+  DockerImageTag:
+    Type: String
+    Default: latest
+  AuthorDesiredCount:
+    Type: Number
+    Default: 1
+  PublishDesiredCount:
+    Type: Number
+    Default: 2
+  PublishMaxCount:
+    Type: Number
+    Default: 10
+  TemplateBucketUrl:
+    Type: String
+    Description: S3 URL prefix for nested CFN templates
+Conditions:
+  IsProd: !Equals [!Ref EnvironmentName, prod]
+
+Resources:
+  NetworkStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateBucketUrl}/network.yml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        VpcCidr: !Ref VpcCidr
+
+  StorageStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateBucketUrl}/storage.yml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+
+  DatabaseStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateBucketUrl}/database.yml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        DBInstanceClass: !Ref DBInstanceClass
+        DBAllocatedStorage: !Ref DBAllocatedStorage
+        DBMasterPassword: !Ref DBMasterPassword
+        PrivateSubnetA: !GetAtt NetworkStack.Outputs.PrivateSubnetA
+        PrivateSubnetB: !GetAtt NetworkStack.Outputs.PrivateSubnetB
+        DatabaseSecurityGroup: !GetAtt NetworkStack.Outputs.DatabaseSecurityGroup
+
+  CacheStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateBucketUrl}/cache.yml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        CacheNodeType: !Ref CacheNodeType
+        PrivateSubnetA: !GetAtt NetworkStack.Outputs.PrivateSubnetA
+        PrivateSubnetB: !GetAtt NetworkStack.Outputs.PrivateSubnetB
+        CacheSecurityGroup: !GetAtt NetworkStack.Outputs.CacheSecurityGroup
+
+  MessagingStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${TemplateBucketUrl}/messaging.yml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        BrokerInstanceType: !Ref BrokerInstanceType
+        BrokerPassword: !Ref BrokerPassword
+        PrivateSubnetA: !GetAtt NetworkStack.Outputs.PrivateSubnetA
+        PrivateSubnetB: !GetAtt NetworkStack.Outputs.PrivateSubnetB
+        MessagingSecurityGroup: !GetAtt NetworkStack.Outputs.MessagingSecurityGroup
+
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub flexcms-${EnvironmentName}
+      CapacityProviders: [FARGATE, FARGATE_SPOT]
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+
+  AuthorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/flexcms-${EnvironmentName}-author
+      RetentionInDays: !If [IsProd, 90, 30]
+
+  PublishLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/flexcms-${EnvironmentName}-publish
+      RetentionInDays: !If [IsProd, 90, 30]
+
+  EcsExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub flexcms-${EnvironmentName}-ecs-execution
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  EcsTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub flexcms-${EnvironmentName}-ecs-task
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [s3:GetObject, s3:PutObject, s3:DeleteObject, s3:ListBucket]
+                Resource:
+                  - !GetAtt StorageStack.Outputs.AssetsBucketArn
+                  - !Sub ${StorageStack.Outputs.AssetsBucketArn}/*
+                  - !GetAtt StorageStack.Outputs.StaticSiteBucketArn
+                  - !Sub ${StorageStack.Outputs.StaticSiteBucketArn}/*
+
+  PublishALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-pub
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+        - !GetAtt NetworkStack.Outputs.PublicSubnetA
+        - !GetAtt NetworkStack.Outputs.PublicSubnetB
+      SecurityGroups:
+        - !GetAtt NetworkStack.Outputs.AlbSecurityGroup
+
+  PublishTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-pub-tg
+      Port: 8081
+      Protocol: HTTP
+      VpcId: !GetAtt NetworkStack.Outputs.VpcId
+      TargetType: ip
+      HealthCheckPath: /actuator/health/readiness
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+
+  PublishListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref PublishALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref PublishTargetGroup
+
+  AuthorALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-auth
+      Scheme: internal
+      Type: application
+      Subnets:
+        - !GetAtt NetworkStack.Outputs.PrivateSubnetA
+        - !GetAtt NetworkStack.Outputs.PrivateSubnetB
+      SecurityGroups:
+        - !GetAtt NetworkStack.Outputs.AlbSecurityGroup
+
+  AuthorTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-auth-tg
+      Port: 8080
+      Protocol: HTTP
+      VpcId: !GetAtt NetworkStack.Outputs.VpcId
+      TargetType: ip
+      HealthCheckPath: /actuator/health/readiness
+      TargetGroupAttributes:
+        - Key: stickiness.enabled
+          Value: 'true'
+        - Key: stickiness.type
+          Value: lb_cookie
+        - Key: stickiness.lb_cookie.duration_seconds
+          Value: '3600'
+
+  AuthorListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref AuthorALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AuthorTargetGroup
+
+  AuthorTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub flexcms-${EnvironmentName}-author
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      Cpu: !If [IsProd, '2048', '1024']
+      Memory: !If [IsProd, '4096', '2048']
+      ExecutionRoleArn: !GetAtt EcsExecutionRole.Arn
+      TaskRoleArn: !GetAtt EcsTaskRole.Arn
+      ContainerDefinitions:
+        - Name: flexcms-author
+          Image: !Sub ghcr.io/stgreenrecords/flexcms-app:${DockerImageTag}
+          Essential: true
+          PortMappings: [{ContainerPort: 8080}]
+          Environment:
+            - {Name: SPRING_PROFILES_ACTIVE, Value: author}
+            - {Name: SERVER_PORT, Value: '8080'}
+            - Name: SPRING_DATASOURCE_URL
+              Value: !Sub
+                - jdbc:postgresql://${EP}:5432/flexcms_author
+                - EP: !GetAtt DatabaseStack.Outputs.DBEndpoint
+            - {Name: SPRING_DATASOURCE_USERNAME, Value: flexcms}
+            - {Name: SPRING_DATASOURCE_PASSWORD, Value: !Ref DBMasterPassword}
+            - {Name: SPRING_DATA_REDIS_HOST, Value: !GetAtt CacheStack.Outputs.RedisEndpoint}
+            - {Name: SPRING_DATA_REDIS_PORT, Value: '6379'}
+            - {Name: SPRING_RABBITMQ_PORT, Value: '5671'}
+            - {Name: SPRING_RABBITMQ_USERNAME, Value: flexcms}
+            - {Name: SPRING_RABBITMQ_PASSWORD, Value: !Ref BrokerPassword}
+            - {Name: SPRING_RABBITMQ_SSL_ENABLED, Value: 'true'}
+            - {Name: FLEXCMS_DAM_S3_BUCKET, Value: !GetAtt StorageStack.Outputs.AssetsBucketName}
+            - {Name: FLEXCMS_DAM_S3_REGION, Value: !Ref 'AWS::Region'}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AuthorLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: author
+
+  AuthorService:
+    Type: AWS::ECS::Service
+    DependsOn: AuthorListener
+    Properties:
+      ServiceName: !Sub flexcms-${EnvironmentName}-author
+      Cluster: !Ref EcsCluster
+      TaskDefinition: !Ref AuthorTaskDef
+      DesiredCount: !Ref AuthorDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetA
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetB
+          SecurityGroups:
+            - !GetAtt NetworkStack.Outputs.EcsSecurityGroup
+      LoadBalancers:
+        - ContainerName: flexcms-author
+          ContainerPort: 8080
+          TargetGroupArn: !Ref AuthorTargetGroup
+
+  PublishTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub flexcms-${EnvironmentName}-publish
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      Cpu: !If [IsProd, '2048', '1024']
+      Memory: !If [IsProd, '4096', '2048']
+      ExecutionRoleArn: !GetAtt EcsExecutionRole.Arn
+      TaskRoleArn: !GetAtt EcsTaskRole.Arn
+      ContainerDefinitions:
+        - Name: flexcms-publish
+          Image: !Sub ghcr.io/stgreenrecords/flexcms-app:${DockerImageTag}
+          Essential: true
+          PortMappings: [{ContainerPort: 8081}]
+          Environment:
+            - {Name: SPRING_PROFILES_ACTIVE, Value: publish}
+            - {Name: SERVER_PORT, Value: '8081'}
+            - Name: SPRING_DATASOURCE_URL
+              Value: !Sub
+                - jdbc:postgresql://${EP}:5432/flexcms_publish
+                - EP: !GetAtt DatabaseStack.Outputs.DBEndpoint
+            - {Name: SPRING_DATASOURCE_USERNAME, Value: flexcms}
+            - {Name: SPRING_DATASOURCE_PASSWORD, Value: !Ref DBMasterPassword}
+            - {Name: SPRING_DATA_REDIS_HOST, Value: !GetAtt CacheStack.Outputs.RedisEndpoint}
+            - {Name: SPRING_DATA_REDIS_PORT, Value: '6379'}
+            - {Name: SPRING_RABBITMQ_PORT, Value: '5671'}
+            - {Name: SPRING_RABBITMQ_USERNAME, Value: flexcms}
+            - {Name: SPRING_RABBITMQ_PASSWORD, Value: !Ref BrokerPassword}
+            - {Name: SPRING_RABBITMQ_SSL_ENABLED, Value: 'true'}
+            - {Name: FLEXCMS_DAM_S3_BUCKET, Value: !GetAtt StorageStack.Outputs.AssetsBucketName}
+            - {Name: FLEXCMS_DAM_S3_REGION, Value: !Ref 'AWS::Region'}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref PublishLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: publish
+
+  PublishService:
+    Type: AWS::ECS::Service
+    DependsOn: PublishListener
+    Properties:
+      ServiceName: !Sub flexcms-${EnvironmentName}-publish
+      Cluster: !Ref EcsCluster
+      TaskDefinition: !Ref PublishTaskDef
+      DesiredCount: !Ref PublishDesiredCount
+      CapacityProviderStrategy:
+        - {CapacityProvider: FARGATE, Weight: 1, Base: 1}
+        - {CapacityProvider: FARGATE_SPOT, Weight: 3}
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetA
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetB
+          SecurityGroups:
+            - !GetAtt NetworkStack.Outputs.EcsSecurityGroup
+      LoadBalancers:
+        - ContainerName: flexcms-publish
+          ContainerPort: 8081
+          TargetGroupArn: !Ref PublishTargetGroup
+
+  PublishScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref PublishMaxCount
+      MinCapacity: !Ref PublishDesiredCount
+      ResourceId: !Sub service/${EcsCluster}/${PublishService.Name}
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  PublishCpuScaling:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub flexcms-${EnvironmentName}-publish-cpu
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref PublishScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        TargetValue: 60.0
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 60
+
+  PublishRequestScaling:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub flexcms-${EnvironmentName}-publish-requests
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref PublishScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ALBRequestCountPerTarget
+          ResourceLabel: !Sub
+            - ${ALB}/${TG}
+            - ALB: !GetAtt PublishALB.LoadBalancerFullName
+              TG: !GetAtt PublishTargetGroup.TargetGroupFullName
+        TargetValue: 1000.0
+        ScaleInCooldown: 300
+        ScaleOutCooldown: 60
+
+Outputs:
+  PublishALBDns:
+    Value: !GetAtt PublishALB.DNSName
+  AuthorALBDns:
+    Value: !GetAtt AuthorALB.DNSName
+  ClusterName:
+    Value: !Ref EcsCluster
+  RDSEndpoint:
+    Value: !GetAtt DatabaseStack.Outputs.DBEndpoint
+  RedisEndpoint:
+    Value: !GetAtt CacheStack.Outputs.RedisEndpoint
+
