@@ -107,10 +107,10 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-app` | — | — | — |
 | `flexcms-author` | — | — | — |
 | `flexcms-publish` | — | — | — |
-| `flexcms-headless` | — | — | — |
+| `flexcms-headless` | P2-04 | Claude Sonnet 4.6 | 2026-03-25 |
 | `flexcms-dam` | — | — | — |
 | `flexcms-replication` | — | — | — |
-| `flexcms-search` | — | — | — |
+| `flexcms-search` | P2-04 | Claude Sonnet 4.6 | 2026-03-25 |
 | `flexcms-cache` | — | — | — |
 | `flexcms-cdn` | — | — | — |
 | `flexcms-i18n` | — | — | — |
@@ -168,15 +168,15 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 |---|---|---|---|---|---|---|---|
 | P2-01 | **Complete GraphQL resolvers (all query types)** | ✅ DONE | 🟡 P1 | L | `flexcms-headless` | — | Claude Sonnet 4.6 |
 | P2-02 | **GraphQL: pagination + field resolvers** | ✅ DONE | 🟡 P1 | M | `flexcms-headless` | P2-01 | Claude Sonnet 4.6 |
-| P2-03 | **Elasticsearch: full-text indexing on publish** | 🟢 OPEN | 🟡 P1 | L | `flexcms-search`, `flexcms-replication` | — | — |
-| P2-04 | **Elasticsearch: search API with facets** | 🟢 OPEN | 🟡 P1 | M | `flexcms-search`, `flexcms-headless` | P2-03 | — |
+| P2-03 | **Elasticsearch: full-text indexing on publish** | ✅ DONE | 🟡 P1 | L | `flexcms-search`, `flexcms-replication` | — | Claude Sonnet 4.6 |
+| P2-04 | **Elasticsearch: search API with facets** | 🔵 IN PROGRESS | 🟡 P1 | M | `flexcms-search`, `flexcms-headless` | P2-03 | Claude Sonnet 4.6 |
 | P2-05 | **Angular adapter: full implementation** | 🟢 OPEN | 🟡 P1 | L | `frontend/packages/angular` | — | — |
 | P2-06 | **Angular reference site (SSR)** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/site-angular` (new) | P2-05 | — |
 | P2-07 | **OpenAPI/Swagger spec for REST** | ✅ DONE | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | Claude Sonnet 4.6 |
 | P2-08 | **Observability: Micrometer + Prometheus** | ✅ DONE | 🔴 P0 | M | `flexcms-app` | — | Claude Sonnet 4.6 |
 | P2-09 | **Observability: OpenTelemetry tracing** | ✅ DONE | 🔴 P0 | M | `flexcms-app` | P2-08 | Claude Sonnet 4.6 |
 | P2-10 | **Observability: structured JSON logging** | ✅ DONE | 🔴 P0 | S | `flexcms-app` | — | Claude Sonnet 4.6 |
-| P2-11 | **Rate limiting on public APIs** | 🟢 OPEN | 🟡 P1 | S | `flexcms-app`, `flexcms-publish` | — | — |
+| P2-11 | **Rate limiting on public APIs** | ✅ DONE | 🟡 P1 | S | `flexcms-app`, `flexcms-publish` | — | Claude Sonnet 4.6 |
 
 ### Phase 2.5 — Static Site Compilation
 
@@ -218,8 +218,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 |---|---|---|---|---|---|---|---|
 | P4-01 | **Scheduled publishing (cron scheduler)** | ✅ DONE | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
 | P4-02 | **Bulk operations (publish/delete/move)** | ✅ DONE | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
-| P4-03 | **CDN: CloudFront provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
-| P4-04 | **CDN: Cloudflare provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
+| P4-03 | **CDN: CloudFront provider implementation** | ✅ DONE | 🟡 P1 | M | `flexcms-cdn` | — | Claude Sonnet 4.6 |
+| P4-04 | **CDN: Cloudflare provider implementation** | ✅ DONE | 🟡 P1 | M | `flexcms-cdn` | — | Claude Sonnet 4.6 |
 | P4-05 | **Translation: DeepL connector** | 🟢 OPEN | 🟢 P2 | M | `flexcms-i18n` | — | — |
 | P4-06 | **Live copy / content sharing service** | 🟢 OPEN | 🟢 P2 | L | `flexcms-core`, `flexcms-multisite` | — | — |
 | P4-07 | **AWS Infrastructure: CloudFormation + ECS Fargate** | ✅ DONE | 🟡 P1 | L | `docker / infra`, `CI/CD` | — | Claude Sonnet 4.6 |
@@ -235,12 +235,12 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P5-01 | **PIM: complete ProductService CRUD + validation** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | — | Claude Sonnet 4.6 |
 | P5-02 | **PIM: schema validation (JSON Schema)** | ✅ DONE | 🟡 P1 | M | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-03 | **PIM: product versioning history** | ✅ DONE | 🟡 P1 | M | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
-| P5-04 | **PIM: year-over-year carryforward (full merge)** | 🟢 OPEN | 🟡 P1 | L | `flexcms-pim` | P5-01 | — |
+| P5-04 | **PIM: year-over-year carryforward (full merge)** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-05 | **PIM: ImportService + field mapping profiles** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-06 | **PIM: Excel import source (POI)** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-07 | **PIM: JSON/API import source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-08 | **PIM: auto-schema inference from source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
-| P5-09 | **PIM ↔ CMS: PimClient for ComponentModels** | 🟢 OPEN | 🟡 P1 | M | `flexcms-pim`, `flexcms-plugin-api` | P5-01 | — |
+| P5-09 | **PIM ↔ CMS: PimClient for ComponentModels** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-plugin-api` | P5-01 | Claude Sonnet 4.6 |
 | P5-10 | **PIM ↔ CMS: product.published → page rebuild** | 🟢 OPEN | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | — |
 | P5-11 | **PIM: Elasticsearch product index** | 🟢 OPEN | 🟢 P2 | L | `flexcms-pim`, `flexcms-search` | P2-03, P5-01 | — |
 | P5-12 | **PIM: GraphQL schema extension** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim`, `flexcms-headless` | P2-01, P5-01 | — |
@@ -627,6 +627,106 @@ output_files:
 
 ---
 
+### P4-03 — CDN: CloudFront provider implementation
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `CloudFrontCdnProvider` implements `CdnProvider` SPI from `flexcms-plugin-api`
+  - [x] `@ConditionalOnProperty(name="flexcms.cdn.cloudfront.enabled", havingValue="true")` — opt-in only
+  - [x] `purgeUrls(List<String>)` — strips scheme+host from URLs to extract CloudFront paths
+  - [x] `purgePaths(List<String>)` — creates invalidation with provided path patterns (wildcards supported)
+  - [x] `purgeAll(String siteId)` — creates `/*` invalidation (full distribution)
+  - [x] `purgeSurrogateKeys(List<String>)` — logs warning (CloudFront doesn't support native tags); optionally falls back to `/*` via `fallback-full-purge-on-surrogate-key` flag
+  - [x] All paths normalized to start with `/` before sending to CloudFront API
+  - [x] Duplicate paths deduplicated per invalidation request
+  - [x] `AWS SDK v2 cloudfront 2.26.7` added to parent pom + flexcms-cdn pom
+  - [x] `CloudFrontProperties` — distributionId, region, accessKeyId/secretAccessKey (IAM role preferred), fallback flag
+  - [x] `application.yml` — CloudFront + Cloudflare config blocks documented with env var overrides
+  - [x] 10/10 `CloudFrontCdnProviderTest` pass; BUILD SUCCESS
+**Files Changed:**
+  - `flexcms/pom.xml` — added `aws-sdk.version=2.26.7`, `software.amazon.awssdk:cloudfront` + `sts` in dependencyManagement
+  - `flexcms-cdn/pom.xml` — added `software.amazon.awssdk:cloudfront`
+  - `flexcms-cdn/.../provider/CloudFrontCdnProvider.java` — new implementation
+  - `flexcms-app/src/main/resources/application.yml` — added CDN config block
+  - `flexcms-cdn/src/test/.../provider/CloudFrontCdnProviderTest.java` — 10 unit tests
+
+---
+
+### P4-04 — CDN: Cloudflare provider implementation
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `CloudflareCdnProvider` implements `CdnProvider` SPI from `flexcms-plugin-api`
+  - [x] `@ConditionalOnProperty(name="flexcms.cdn.cloudflare.enabled", havingValue="true")` — opt-in only
+  - [x] `purgeUrls(List<String>)` — sends `{files: [...]}` to Cloudflare Cache Purge API; batches at 30/request (CF limit)
+  - [x] `purgePaths(List<String>)` — prepends configurable `baseUrl` to relative paths, delegates to `purgeUrls`
+  - [x] `purgeAll(String siteId)` — sends `{purge_everything: true}`
+  - [x] `purgeSurrogateKeys(List<String>)` — sends `{tags: [...]}` (native CF cache-tag support, Enterprise plan)
+  - [x] Batch processing for large URL/tag lists (configurable `batchSize`, max 30)
+  - [x] Uses `WebClient` (already in flexcms-cdn deps via webflux) with Bearer token auth
+  - [x] `CloudflareProperties` — zoneId, apiToken, baseUrl, batchSize
+  - [x] 10/10 `CloudflareCdnProviderTest` pass; BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-cdn/.../provider/CloudflareCdnProvider.java` — new implementation
+  - `flexcms-cdn/src/test/.../provider/CloudflareCdnProviderTest.java` — 10 unit tests
+**Build Verified:** Both P4-03 and P4-04: `mvn test -pl flexcms-cdn` → 20/20 tests pass; BUILD SUCCESS
+
+---
+
+### P5-09 — PIM ↔ CMS: PimClient for ComponentModels
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `PimClient` interface in `flexcms-plugin-api` — 4 methods: `getProduct(sku)`, `getBulk(skus)`, `listByCatalog(catalogId, page, size)`, `exists(sku)`
+  - [x] `PimProductData` DTO in `flexcms-plugin-api` — carries resolved attributes, overriddenFields, variants, assets (no dependency on PIM internals)
+  - [x] `DirectPimClient` implementation in `flexcms-pim` — in-process, calls `ProductRepository` directly via `pimTransactionManager`
+  - [x] `getProduct()` returns `Optional<PimProductData>` with fully-resolved attributes (carryforward-aware via `Product.getResolvedAttributes()`)
+  - [x] `getBulk()` silently omits not-found SKUs; returns empty list for empty input
+  - [x] `listByCatalog()` filters by `PUBLISHED` status, clamps page size to 100, handles invalid UUID gracefully
+  - [x] `exists()` uses `ProductRepository.existsBySku()` (cheapest check)
+  - [x] `flexcms-pim/pom.xml` — added `flexcms-plugin-api` dependency
+  - [x] JavaDoc usage example in both `PimClient` and `PimProductData`
+  - [x] 11/11 `DirectPimClientTest` tests pass; all PIM tests pass; BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-plugin-api/.../pim/PimClient.java` — new interface
+  - `flexcms-plugin-api/.../pim/PimProductData.java` — new DTO
+  - `flexcms-pim/pom.xml` — added `flexcms-plugin-api` dependency
+  - `flexcms-pim/.../client/DirectPimClient.java` — new implementation
+  - `flexcms-pim/src/test/.../client/DirectPimClientTest.java` — 11 unit tests
+**Build Verified:** Yes — `mvn clean compile -pl flexcms-plugin-api,flexcms-pim -am` → BUILD SUCCESS; `mvn test -pl flexcms-pim` → all pass
+
+---
+
+### P5-04 — PIM: year-over-year carryforward (full merge)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] Fixed bug in `carryforward()` — removed unused `sourceProducts` variable; now uses `allSource` exclusively
+  - [x] SKU convention: `{sourceSku}-{targetYear}` ensures uniqueness across years while tracing lineage
+  - [x] Duplicate skip: `existsBySku(targetSku)` prevents double-carryforward if run again
+  - [x] `mergeInheritedAttributes(sku, userId)` — resolves full attribute chain via `getResolvedAttributes()`, writes to own `attributes` map, clears `sourceProduct` and `overriddenFields` (breaks chain)
+  - [x] `mergeInheritedAttributes` is a no-op (returns product unchanged) when product has no `sourceProduct`
+  - [x] `mergeInheritedAttributes` saves a version snapshot with summary "Merged inherited attributes — inheritance chain broken"
+  - [x] `getCarryforwardDelta(sourceCatalogId, targetCatalogId)` returns `CarryforwardDeltaReport` with: `modifiedProducts` (carried + ≥1 override), `newProductSkus` (no source link), `notCarriedForwardSkus` (source with no target)
+  - [x] `ProductRepository.findCarryforwardProductsInCatalog()` + `findBySourceProductCatalogId()` JPQL queries added
+  - [x] `CarryforwardDeltaReport` model with nested `ProductDelta` (targetSku, sourceSku, overriddenFields)
+  - [x] `POST /api/pim/v1/products/{sku}/merge-inherited?userId=` REST endpoint
+  - [x] `GET /api/pim/v1/products/carryforward/delta?sourceCatalogId=&targetCatalogId=` REST endpoint
+  - [x] 10/10 `CarryforwardServiceTest` tests pass; all PIM tests pass; BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-pim/.../repository/ProductRepository.java` — added `findCarryforwardProductsInCatalog()`, `findBySourceProductCatalogId()`
+  - `flexcms-pim/.../model/CarryforwardDeltaReport.java` — new model class with inner `ProductDelta`
+  - `flexcms-pim/.../service/ProductService.java` — fixed carryforward bug; added `mergeInheritedAttributes()`, `getCarryforwardDelta()`
+  - `flexcms-pim/.../controller/ProductApiController.java` — added `merge-inherited` + `carryforward/delta` endpoints
+  - `flexcms-pim/src/test/.../service/CarryforwardServiceTest.java` — 10 unit tests
+**Build Verified:** Yes — `mvn clean compile -pl flexcms-pim -am` → BUILD SUCCESS; `mvn test -pl flexcms-pim` → all pass
+
+---
+
 ### P4-02 — Bulk operations (publish/delete/move)
 **Status:** ✅ DONE
 **Agent:** Claude Sonnet 4.6
@@ -648,6 +748,33 @@ output_files:
   - `flexcms-author/.../controller/AuthorContentController.java` — added 3 bulk endpoints + 2 DTO records + `ReplicationAgent` autowire
   - `flexcms-core/src/test/.../service/ContentNodeServiceTest.java` — 6 new bulk tests
 **Build Verified:** Yes — `mvn clean compile -pl flexcms-core,flexcms-author -am` → BUILD SUCCESS; `mvn test -pl flexcms-core` → all tests pass
+
+---
+
+### P2-11 — Rate limiting on public APIs
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] Token-bucket rate limiter per client IP — Bucket4j 8.10.1 (`bucket4j-core`, pure Java, no extra infra)
+  - [x] Applied to public/headless paths: `/api/content/**`, `/api/pages/**`, `/graphql`, `/api/pim/v1/**`
+  - [x] Author and actuator paths explicitly excluded (never rate-limited)
+  - [x] Returns HTTP 429 with `Retry-After` + `X-Rate-Limit-Remaining: 0` headers and JSON body
+  - [x] Successful responses include `X-Rate-Limit-Remaining` header showing tokens left
+  - [x] `X-Forwarded-For` header respected — leftmost IP used (CDN / load balancer safe)
+  - [x] Configurable via `flexcms.rate-limit.*` in `application.yml` (capacity, refill rate, period)
+  - [x] Disabled by default (`enabled: false`) — opt-in for publish tier
+  - [x] Stale bucket eviction every N minutes (configurable, default 10) to bound memory use
+  - [x] `@ConditionalOnProperty` — filter bean only created when enabled
+  - [x] 12/12 `RateLimitingFilterTest` pass; `mvn test -pl flexcms-app` → BUILD SUCCESS
+**Files Changed:**
+  - `flexcms/pom.xml` — added `bucket4j.version=8.10.1` + `bucket4j-core` in dependencyManagement
+  - `flexcms-app/pom.xml` — added `bucket4j-core` dependency
+  - `flexcms-app/.../config/RateLimitingFilter.java` — new filter + inner `RateLimitProperties` config class
+  - `flexcms-app/src/main/resources/application.yml` — added `flexcms.rate-limit.*` config block
+  - `flexcms-app/src/test/.../config/RateLimitingFilterTest.java` — 12 unit tests
+**Build Verified:** Yes — `mvn clean compile -pl flexcms-app -am` → BUILD SUCCESS; `mvn test -pl flexcms-app` → all pass
+**Notes:** Bucket4j is pure-Java (no Redis required). To enable on publish tier, set `flexcms.rate-limit.enabled=true` in the publish-profile YAML or env var `FLEXCMS_RATE_LIMIT_ENABLED=true`.
 
 ---
 
@@ -1487,6 +1614,38 @@ output_files:
   - `README.md` — added CI badge after the `h1` title
 **Build Verified:** N/A — workflow files are not executable locally; structure and syntax reviewed manually (standard GitHub Actions v4 actions with correct indentation and required fields)
 **Notes:** P1-14 (Docker image build + push to registry) is now unblocked. `pnpm-lock.yaml` does not exist yet — CI uses `pnpm install` without `--frozen-lockfile`; add the flag once the lockfile is committed. The Docker job currently sets `push: false`; P1-14 will add registry credentials and `push: true` for tagged releases.
+
+---
+
+### P2-03 — Elasticsearch: full-text indexing on publish
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `ContentIndexEvent` ApplicationEvent created in `flexcms-core/event/` — carries node (for INDEX) or path (for REMOVE)
+  - [x] `ReplicationReceiver` publishes `ContentIndexEvent.index()` after ACTIVATE (single + tree nodes)
+  - [x] `ReplicationReceiver` publishes `ContentIndexEvent.remove()` after DEACTIVATE and DELETE
+  - [x] `SearchIndexingListener` in `flexcms-search` handles events via `@EventListener @Async` — routes to `SearchIndexService.index()` / `remove()`
+  - [x] Failures in the listener are caught and logged — do not affect replication transaction
+  - [x] `IndexRebuildService` added: `rebuildSite()`, `rebuildAll()`, `purgeAndRebuildSite()` with batching (500/batch)
+  - [x] `removeBySite()` added to `SearchIndexService`
+  - [x] `findBySiteIdAndStatus(siteId, status)` and `findByStatus(status)` added to `ContentNodeRepository`
+  - [x] 5 unit tests for `SearchIndexingListenerTest` — index, remove, exception isolation
+  - [x] 5 unit tests for `IndexRebuildServiceTest` — batching, empty site, purge-and-rebuild
+  - [x] All existing `ReplicationReceiverTest` updated to mock `ApplicationEventPublisher` + stub `nodeRepository.save()` — 20/20 tests pass
+  - [x] All tests pass: `flexcms-search` 10/10, `flexcms-replication` 20/20 — BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-core/src/main/java/.../event/ContentIndexEvent.java` — new
+  - `flexcms-core/src/main/java/.../repository/ContentNodeRepository.java` — added `findBySiteIdAndStatus(siteId, status)`, `findByStatus(status)`
+  - `flexcms-replication/src/main/java/.../service/ReplicationReceiver.java` — inject `ApplicationEventPublisher`, fire events; `activateSingleNode` now returns `ContentNode`
+  - `flexcms-replication/src/test/.../service/ReplicationReceiverTest.java` — added `@Mock ApplicationEventPublisher`, `setUp()` with save stub
+  - `flexcms-search/src/main/java/.../listener/SearchIndexingListener.java` — new
+  - `flexcms-search/src/main/java/.../service/IndexRebuildService.java` — new
+  - `flexcms-search/src/main/java/.../service/SearchIndexService.java` — added `removeBySite()`
+  - `flexcms-search/src/test/.../listener/SearchIndexingListenerTest.java` — new, 5 tests
+  - `flexcms-search/src/test/.../service/IndexRebuildServiceTest.java` — new, 5 tests
+**Build Verified:** Yes — `mvn test -pl flexcms-search,flexcms-replication -am` → 30 tests pass, BUILD SUCCESS
+**Notes:** P2-04 (Elasticsearch: search API with facets) is now unblocked.
 
 ---
 

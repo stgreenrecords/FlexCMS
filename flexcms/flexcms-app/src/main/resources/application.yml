@@ -94,6 +94,29 @@ flexcms:
     redis:
       enabled: true
 
+  # CDN providers (all disabled by default — enable in publish-tier YAML)
+  cdn:
+    cloudfront:
+      enabled: false
+      distribution-id: ${FLEXCMS_CDN_CF_DISTRIBUTION_ID:}
+      region: ${FLEXCMS_CDN_CF_REGION:us-east-1}
+      # Leave access-key-id blank to use IAM role credentials (recommended in ECS/EC2)
+      access-key-id: ${FLEXCMS_CDN_CF_ACCESS_KEY_ID:}
+      secret-access-key: ${FLEXCMS_CDN_CF_SECRET_ACCESS_KEY:}
+      fallback-full-purge-on-surrogate-key: false
+    cloudflare:
+      enabled: false
+      zone-id: ${FLEXCMS_CDN_CLOUDFLARE_ZONE_ID:}
+      api-token: ${FLEXCMS_CDN_CLOUDFLARE_API_TOKEN:}
+
+  # Rate limiting (token bucket per client IP — applies to public/headless APIs)
+  rate-limit:
+    enabled: false             # Set to true in publish-tier deployments
+    capacity: 100              # Burst cap: up to 100 requests immediately
+    refill-tokens: 60          # Sustained rate: 60 tokens added every...
+    refill-seconds: 1          # ...1 second → 60 req/s per IP
+    bucket-eviction-minutes: 10 # Purge stale IP buckets every 10 min
+
   # PIM — separate database
   pim:
     datasource:

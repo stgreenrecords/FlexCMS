@@ -1,5 +1,6 @@
 package com.flexcms.pim.controller;
 
+import com.flexcms.pim.model.CarryforwardDeltaReport;
 import com.flexcms.pim.model.Product;
 import com.flexcms.pim.model.ProductAssetRef;
 import com.flexcms.pim.model.ProductStatus;
@@ -117,6 +118,33 @@ public class ProductApiController {
                 request.sourceCatalogId(), request.targetCatalogId(), request.userId()
         );
         return ResponseEntity.ok(Map.of("carriedForward", count));
+    }
+
+    /**
+     * Permanently merge all inherited attributes into this product's own attribute map
+     * and break the carryforward inheritance chain. Use when the product is fully reviewed
+     * for the new year and should stand on its own.
+     */
+    @PostMapping("/{sku}/merge-inherited")
+    public ResponseEntity<Product> mergeInherited(
+            @PathVariable String sku,
+            @NotBlank(message = "userId is required") @RequestParam String userId) {
+        return productService.getBysku(sku)
+                .map(p -> ResponseEntity.ok(productService.mergeInheritedAttributes(sku, userId)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Get a delta report comparing a source catalog (previous year) to a target catalog.
+     * Shows which products were modified, which are brand-new, and which source products
+     * were not carried forward.
+     */
+    @GetMapping("/carryforward/delta")
+    public ResponseEntity<CarryforwardDeltaReport> getCarryforwardDelta(
+            @RequestParam UUID sourceCatalogId,
+            @RequestParam UUID targetCatalogId) {
+        return ResponseEntity.ok(
+                productService.getCarryforwardDelta(sourceCatalogId, targetCatalogId));
     }
 
     // -------------------------------------------------------------------------

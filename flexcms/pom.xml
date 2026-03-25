@@ -49,6 +49,8 @@
         <caffeine.version>3.1.8</caffeine.version>
         <graphql-java.version>22.1</graphql-java.version>
         <springdoc.version>2.5.0</springdoc.version>
+        <bucket4j.version>8.10.1</bucket4j.version>
+        <aws-sdk.version>2.26.7</aws-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -130,6 +132,25 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
+            </dependency>
+
+            <!-- Token-bucket rate limiting (pure Java, no extra infra) -->
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j-core</artifactId>
+                <version>${bucket4j.version}</version>
+            </dependency>
+
+            <!-- AWS SDK v2 — CloudFront + STS (CDN invalidation) -->
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>cloudfront</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>sts</artifactId>
+                <version>${aws-sdk.version}</version>
             </dependency>
 
             <!-- Structured JSON logging -->

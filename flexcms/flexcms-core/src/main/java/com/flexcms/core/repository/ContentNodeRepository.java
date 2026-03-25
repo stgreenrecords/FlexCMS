@@ -75,6 +75,16 @@ public interface ContentNodeRepository extends JpaRepository<ContentNode, UUID> 
     Page<ContentNode> findBySiteIdAndStatus(String siteId, NodeStatus status, Pageable pageable);
 
     /**
+     * Find all nodes for a site with a given status (no pagination — used for bulk index rebuild).
+     */
+    List<ContentNode> findBySiteIdAndStatus(String siteId, NodeStatus status);
+
+    /**
+     * Find all nodes with a given status across all sites (used for full index rebuild).
+     */
+    List<ContentNode> findByStatus(NodeStatus status);
+
+    /**
      * Count pages per site.
      */
     @Query("SELECT COUNT(n) FROM ContentNode n WHERE n.siteId = :siteId AND n.resourceType = 'flexcms/page'")

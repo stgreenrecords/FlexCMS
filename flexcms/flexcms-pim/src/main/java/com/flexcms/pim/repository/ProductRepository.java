@@ -30,5 +30,12 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     Page<Product> searchGlobal(String query, Pageable pageable);
 
     boolean existsBySku(String sku);
+
+    /** Find all products in a catalog that were carried forward from a source (have a sourceProduct). */
+    List<Product> findBySourceProductCatalogId(UUID sourceCatalogId);
+
+    /** Find all products in the target catalog that link back to any source product. */
+    @Query("SELECT p FROM Product p WHERE p.catalog.id = :catalogId AND p.sourceProduct IS NOT NULL")
+    List<Product> findCarryforwardProductsInCatalog(UUID catalogId);
 }
 

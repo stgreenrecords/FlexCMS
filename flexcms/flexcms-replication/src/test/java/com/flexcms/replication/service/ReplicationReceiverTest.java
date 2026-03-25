@@ -6,12 +6,14 @@ import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.replication.model.ReplicationEvent;
 import com.flexcms.replication.model.ReplicationEvent.ReplicationAction;
 import com.flexcms.replication.model.ReplicationEvent.ReplicationType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.*;
 
@@ -24,9 +26,17 @@ class ReplicationReceiverTest {
 
     @Mock private ContentNodeRepository nodeRepository;
     @Mock private AuthorNodeClient authorNodeClient;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private ReplicationReceiver replicationReceiver;
+
+    @BeforeEach
+    void setUp() {
+        // Return the same ContentNode that was passed to save() so callers can chain on the result
+        lenient().when(nodeRepository.save(any(ContentNode.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+    }
 
     // ── Fixture ────────────────────────────────────────────────────────────────
 

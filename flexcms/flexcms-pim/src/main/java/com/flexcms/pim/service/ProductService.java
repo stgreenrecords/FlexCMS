@@ -5,6 +5,8 @@ import com.flexcms.pim.repository.CatalogRepository;
 import com.flexcms.pim.repository.ProductRepository;
 import com.flexcms.pim.repository.ProductSchemaRepository;
 import com.flexcms.pim.repository.ProductVersionRepository;
+
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,22 +129,19 @@ public class ProductService {
         Catalog targetCatalog = catalogRepo.findById(targetCatalogId)
                 .orElseThrow(() -> new IllegalArgumentException("Target catalog not found"));
 
-        List<Product> sourceProducts = productRepo.findByCatalogIdAndSourceProductIsNull(sourceCatalogId);
-        // Also get carryforward products from the source
         Page<Product> allSource = productRepo.findByCatalogId(sourceCatalogId, Pageable.unpaged());
 
         int count = 0;
         for (Product source : allSource) {
-            // Skip if SKU already exists in target
-            String newSku = source.getSku(); // Same SKU across years
-            if (productRepo.existsBySku(newSku + "-" + targetCatalog.getYear())) continue;
+            String targetSku = source.getSku() + "-" + targetCatalog.getYear();
+            if (productRepo.existsBySku(targetSku)) continue;
 
             Product carried = new Product();
-            carried.setSku(newSku + "-" + targetCatalog.getYear());
+            carried.setSku(targetSku);
             carried.setName(source.getName());
             carried.setCatalog(targetCatalog);
             carried.setSchema(targetCatalog.getSchema());
-            carried.setAttributes(new HashMap<>()); // Empty — inherits from source
+            carried.setAttributes(new HashMap<>());  // empty — inherits from source at read time
             carried.setSourceProduct(source);
             carried.setOverriddenFields(new String[0]);
             carried.setCreatedBy(userId);
@@ -152,6 +151,98 @@ public class ProductService {
 
         log.info("Carried forward {} products from catalog {} to {}", count, sourceCatalogId, targetCatalogId);
         return count;
+    }
+
+    /**
+     * Permanently merge inherited attributes from the source product into this product's
+     * own {@code attributes} map, then break the inheritance chain by clearing
+     * {@code sourceProduct} and {@code overriddenFields}.
+     *
+     * <p>Use this when a carryforward product has been fully reviewed and should stand
+     * on its own — typically at end-of-season or when the source catalog is archived.</p>
+     *
+     * @return the updated product with all inherited values baked in
+     */
+    @Transactional("pimTransactionManager")
+    public Product mergeInheritedAttributes(String sku, String userId) {
+        Product product = productRepo.findBySku(sku)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+
+        if (product.getSourceProduct() == null) {
+            // Already standalone — nothing to merge
+            return product;
+        }
+
+        // Resolved attributes already does the deep merge (recursive through source chain)
+        Map<String, Object> merged = new HashMap<>(product.getResolvedAttributes());
+        product.setAttributes(merged);
+        product.setSourceProduct(null);
+        product.setOverriddenFields(new String[0]);
+        product.setUpdatedBy(userId);
+        product = productRepo.save(product);
+
+        ProductVersion snapshot = ProductVersion.fromProduct(product);
+        snapshot.setChangeSummary("Merged inherited attributes — inheritance chain broken");
+        productVersionRepo.save(snapshot);
+
+        log.info("Merged inherited attributes for product {} ({})", product.getId(), sku);
+        return product;
+    }
+
+    /**
+     * Build a delta report comparing a source catalog to a target catalog.
+     *
+     * <p>Returns three groups:
+     * <ol>
+     *   <li><b>modifiedProducts</b> — carried-forward products that have at least one
+     *       explicitly overridden field in the target.</li>
+     *   <li><b>newProductSkus</b> — products in the target with no source link
+     *       (created fresh in the new year).</li>
+     *   <li><b>notCarriedForwardSkus</b> — source products that have no corresponding
+     *       carried product in the target.</li>
+     * </ol></p>
+     */
+    @Transactional(value = "pimTransactionManager", readOnly = true)
+    public CarryforwardDeltaReport getCarryforwardDelta(UUID sourceCatalogId, UUID targetCatalogId) {
+        List<Product> sourceProducts = productRepo.findByCatalogId(sourceCatalogId, Pageable.unpaged())
+                .getContent();
+        List<Product> targetProducts = productRepo.findByCatalogId(targetCatalogId, Pageable.unpaged())
+                .getContent();
+
+        // Target products that have a source link (carryforward)
+        List<Product> carried = targetProducts.stream()
+                .filter(p -> p.getSourceProduct() != null)
+                .toList();
+
+        // Target products with NO source link (brand new)
+        List<String> newSkus = targetProducts.stream()
+                .filter(p -> p.getSourceProduct() == null)
+                .map(Product::getSku)
+                .toList();
+
+        // Which source SKUs have a carried product in target?
+        Set<UUID> carriedSourceIds = carried.stream()
+                .map(p -> p.getSourceProduct().getId())
+                .collect(Collectors.toSet());
+
+        // Source products not carried forward
+        List<String> notCarried = sourceProducts.stream()
+                .filter(p -> !carriedSourceIds.contains(p.getId()))
+                .map(Product::getSku)
+                .toList();
+
+        // Modified: carried products that have ≥1 overridden field
+        List<CarryforwardDeltaReport.ProductDelta> modified = carried.stream()
+                .filter(p -> p.getOverriddenFields() != null && p.getOverriddenFields().length > 0)
+                .map(p -> new CarryforwardDeltaReport.ProductDelta(
+                        p.getSku(),
+                        p.getSourceProduct().getSku(),
+                        Arrays.asList(p.getOverriddenFields())))
+                .toList();
+
+        return new CarryforwardDeltaReport(
+                modified, newSkus, notCarried,
+                sourceProducts.size(), targetProducts.size(), carried.size());
     }
 
     @Transactional("pimTransactionManager")

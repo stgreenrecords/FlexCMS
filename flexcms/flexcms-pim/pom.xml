@@ -51,6 +51,12 @@
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
+        <!-- Plugin API — PimClient interface lives here -->
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-plugin-api</artifactId>
+        </dependency>
+
         <!-- CSV/Excel parsing for imports -->
         <dependency>
             <groupId>com.opencsv</groupId>

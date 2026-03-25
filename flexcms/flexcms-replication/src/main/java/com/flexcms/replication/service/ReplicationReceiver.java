@@ -1,5 +1,6 @@
 package com.flexcms.replication.service;
 
+import com.flexcms.core.event.ContentIndexEvent;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,9 @@ public class ReplicationReceiver {
     @Autowired
     private AuthorNodeClient authorNodeClient;
 
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+
     @RabbitListener(queues = "#{publishQueue.name}")
     @Transactional
     public void handleReplication(ReplicationEvent event) {
@@ -48,9 +53,10 @@ public class ReplicationReceiver {
             activateTree(event);
             return;
         }
-        activateSingleNode(event.getPath(), event.getResourceType(), event.getParentPath(),
+        ContentNode saved = activateSingleNode(event.getPath(), event.getResourceType(), event.getParentPath(),
                 event.getSiteId(), event.getLocale(), event.getNodeProperties(),
                 event.getOrderIndex(), event.getVersion());
+        eventPublisher.publishEvent(ContentIndexEvent.index(this, saved));
     }
 
     /**
@@ -83,7 +89,7 @@ public class ReplicationReceiver {
                     continue;
                 }
 
-                activateSingleNode(
+                ContentNode saved = activateSingleNode(
                         path,
                         (String) nodeData.get("resourceType"),
                         (String) nodeData.get("parentPath"),
@@ -93,6 +99,7 @@ public class ReplicationReceiver {
                         nodeData.get("orderIndex") instanceof Number n ? n.intValue() : null,
                         nodeData.get("version") instanceof Number n ? n.longValue() : null
                 );
+                eventPublisher.publishEvent(ContentIndexEvent.index(this, saved));
                 succeeded++;
             } catch (Exception e) {
                 log.error("Error activating node '{}' during tree replication: {}", path, e.getMessage());
@@ -108,10 +115,12 @@ public class ReplicationReceiver {
 
     /**
      * Upsert a single content node into the publish store.
+     *
+     * @return the saved {@link ContentNode} (used by the caller to fire a search index event)
      */
-    private void activateSingleNode(String path, String resourceType, String parentPath,
-                                     String siteId, String locale,
-                                     Map<String, Object> properties, Integer orderIndex, Long version) {
+    private ContentNode activateSingleNode(String path, String resourceType, String parentPath,
+                                            String siteId, String locale,
+                                            Map<String, Object> properties, Integer orderIndex, Long version) {
         var existing = nodeRepository.findByPath(path);
         ContentNode node;
 
@@ -138,8 +147,9 @@ public class ReplicationReceiver {
         node.setVersion(version != null ? version : node.getVersion());
         node.setStatus(NodeStatus.PUBLISHED);
 
-        nodeRepository.save(node);
+        node = nodeRepository.save(node);
         log.debug("Activated content on publish: {}", path);
+        return node;
     }
 
     private void deactivateContent(ReplicationEvent event) {
@@ -148,11 +158,13 @@ public class ReplicationReceiver {
             nodeRepository.save(node);
             log.info("Deactivated content on publish: {}", event.getPath());
         });
+        eventPublisher.publishEvent(ContentIndexEvent.remove(this, event.getPath()));
     }
 
     private void deleteContent(ReplicationEvent event) {
         nodeRepository.deleteSubtree(event.getPath());
         log.info("Deleted content from publish: {}", event.getPath());
+        eventPublisher.publishEvent(ContentIndexEvent.remove(this, event.getPath()));
     }
 
     private String extractName(String path) {
