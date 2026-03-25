@@ -8,6 +8,7 @@ import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ContentNodeVersionRepository;
 import com.flexcms.core.util.RichTextSanitizer;
+import com.flexcms.core.service.AuditService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +45,9 @@ class ContentNodeServiceTest {
 
     @Mock
     private RichTextSanitizer richTextSanitizer;
+
+    @Mock
+    private AuditService auditService;
 
     @InjectMocks
     private ContentNodeService contentNodeService;

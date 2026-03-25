@@ -9,6 +9,7 @@ import {
   type PropType,
   type InjectionKey,
   type Ref,
+  type VNode,
 } from 'vue';
 import {
   FlexCmsClient,
@@ -66,7 +67,7 @@ export const FlexCmsPlugin = {
 // FlexCmsComponent
 // ---------------------------------------------------------------------------
 
-export const FlexCmsComponent = defineComponent({
+export const FlexCmsComponent: ReturnType<typeof defineComponent> = defineComponent({
   name: 'FlexCmsComponent',
   props: {
     node: { type: Object as PropType<ComponentNode>, required: true },
@@ -74,7 +75,7 @@ export const FlexCmsComponent = defineComponent({
   setup(props, { slots }) {
     const { mapper } = useFlexCms();
 
-    return () => {
+    return (): VNode => {
       const Renderer = mapper.resolve(props.node.resourceType);
       if (!Renderer) {
         return h('div', { 'data-flexcms-missing': props.node.resourceType }, [
@@ -82,11 +83,11 @@ export const FlexCmsComponent = defineComponent({
         ]);
       }
 
-      const children = props.node.children?.map((child) =>
+      const children: VNode[] = (props.node.children ?? []).map((child) =>
         h(FlexCmsComponent, { node: child, key: child.name })
       );
 
-      return h(Renderer, { data: props.node.data }, () => children);
+      return h(Renderer, { data: props.node.data }, (): VNode[] => children);
     };
   },
 });

@@ -237,8 +237,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P5-03 | **PIM: product versioning history** | ✅ DONE | 🟡 P1 | M | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-04 | **PIM: year-over-year carryforward (full merge)** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-05 | **PIM: ImportService + field mapping profiles** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
-| P5-06 | **PIM: Excel import source (POI)** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
-| P5-07 | **PIM: JSON/API import source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
+| P5-06 | **PIM: Excel import source (POI)** | ✅ DONE | 🟢 P2 | M | `flexcms-pim` | P5-05 | Claude Sonnet 4.6 |
+| P5-07 | **PIM: JSON/API import source** | ✅ DONE | 🟢 P2 | M | `flexcms-pim` | P5-05 | Claude Sonnet 4.6 |
 | P5-08 | **PIM: auto-schema inference from source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-09 | **PIM ↔ CMS: PimClient for ComponentModels** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-plugin-api` | P5-01 | Claude Sonnet 4.6 |
 | P5-10 | **PIM ↔ CMS: product.published → page rebuild** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | Claude Sonnet 4.6 |
@@ -546,6 +546,44 @@ output_files:
   - NEW: `flexcms/flexcms-author/src/main/java/com/flexcms/author/controller/ContentImportExportController.java`
   - NEW: `flexcms/flexcms-core/src/test/java/com/flexcms/core/service/ContentExportImportServiceTest.java`
 **Build Verified:** `mvn compile -pl flexcms-core,flexcms-author --also-make` → BUILD SUCCESS; `mvn test -pl flexcms-core -Dtest=ContentExportImportServiceTest` → 15 tests, 0 failures
+
+---
+
+### P5-06 — PIM: Excel import source (POI)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`ExcelImportSource`** — implements `ProductImportSource` with `getSourceType()` → `"EXCEL"`; `@Component` for auto-discovery by `ImportService`
+  - [x] **`parse()`** — reads first row as headers (trimmed), subsequent rows as data records; returns `Stream<Map<String, Object>>`; blank rows skipped; empty cells omitted from record; numeric cells returned as `Long` for whole numbers, `Double` for decimals; boolean cells returned as `Boolean`; date cells returned as ISO date string
+  - [x] **`inferSchema()`** — inspects first data row to infer field types (string/number/boolean); returns JSON Schema draft-07 `properties` map
+  - [x] **Formula cells** — handled via cached formula result type
+  - [x] **Apache POI** (`poi-ooxml 5.2.5`) — already in `flexcms-pim/pom.xml`, no new dependency needed
+  - [x] **Tests** — 12 unit tests in `ExcelImportSourceTest`; all pass (`mvn test -pl flexcms-pim` → 101 tests, 0 failures)
+**Files Changed:**
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/importer/ExcelImportSource.java`
+  - NEW: `flexcms/flexcms-pim/src/test/java/com/flexcms/pim/importer/ExcelImportSourceTest.java`
+**Build Verified:** `mvn test -pl flexcms-pim` → BUILD SUCCESS, 101 tests, 0 failures
+
+---
+
+### P5-07 — PIM: JSON/API import source
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`JsonImportSource`** — implements `ProductImportSource` with `getSourceType()` → `"JSON"`; `@Component` for auto-discovery by `ImportService`
+  - [x] **`parse()` — array root** — `[{...}, ...]` → each element becomes one record
+  - [x] **`parse()` — wrapper object** — `{"products": [...]}` → first array-valued field extracted as record list
+  - [x] **`parse()` — single object** — `{...}` with no array field → treated as one record
+  - [x] **Type coercion** — JSON strings → `String`; JSON integers → `Long`; JSON decimals → `Double`; JSON booleans → `Boolean`; nested objects/arrays → serialized JSON string
+  - [x] **Null fields omitted** — `null` JSON values not included in record map
+  - [x] **`inferSchema()`** — inspects first record fields to infer types (string/number/boolean); returns JSON Schema draft-07
+  - [x] **Tests** — 13 unit tests in `JsonImportSourceTest`; all pass (`mvn test -pl flexcms-pim` → 114 tests, 0 failures)
+**Files Changed:**
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/importer/JsonImportSource.java`
+  - NEW: `flexcms/flexcms-pim/src/test/java/com/flexcms/pim/importer/JsonImportSourceTest.java`
+**Build Verified:** `mvn test -pl flexcms-pim` → BUILD SUCCESS, 114 tests, 0 failures
 
 ---
 
