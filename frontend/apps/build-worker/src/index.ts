@@ -16,6 +16,7 @@ import { DependencyResolver } from './dependency-resolver';
 import { PageRenderer } from './page-renderer';
 import { S3Publisher } from './s3-publisher';
 import { ManifestManager } from './manifest-manager';
+import { BuildDependencyClient } from './build-dependency-client';
 import { createLogger } from './logger';
 
 const log = createLogger('build-worker');
@@ -55,6 +56,7 @@ async function main() {
 
   const publisher = new S3Publisher(config);
   const manifest  = new ManifestManager(config);
+  const depClient = new BuildDependencyClient(config);
   // Pass manifest to renderer so it can skip unchanged pages
   const renderer  = new PageRenderer(config, manifest);
   const resolver  = new DependencyResolver(config);
@@ -77,6 +79,15 @@ async function main() {
       if (removed > 0) {
         await manifest.remove(event.siteId, event.locale, pathsToRemove);
       }
+
+      // Remove dependency graph entries for deactivated pages so they no longer
+      // trigger rebuilds when a shared component or asset changes.
+      await Promise.all(
+        pathsToRemove.map((p) =>
+          depClient.removeDependencies(event.siteId, event.locale, p),
+        ),
+      );
+
       log.info(
         { removed, action: event.action, durationMs: Date.now() - startTime },
         'Deactivation complete'
@@ -118,7 +129,20 @@ async function main() {
     // 4. Update build manifest
     await manifest.update(event.siteId, event.locale, uploaded);
 
-    // 5. Log changed URLs (CDN invalidation should be triggered here in production)
+    // 5. Record dependency graph — enables future incremental builds to determine
+    //    which pages are affected when an asset or shared component changes.
+    //    Runs in parallel for all rendered pages; errors are non-fatal.
+    await Promise.all(
+      rendered
+        .filter((r) => r.dependencies.length > 0)
+        .map((r) =>
+          depClient.recordDependencies(
+            event.siteId, event.locale, r.pagePath, r.dependencies,
+          ),
+        ),
+    );
+
+    // 6. Log changed URLs (CDN invalidation should be triggered here in production)
     const changedUrls = uploaded.map((u) => u.publicUrl);
     log.info(
       {

@@ -107,10 +107,10 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-app` | — | — | — |
 | `flexcms-author` | — | — | — |
 | `flexcms-publish` | — | — | — |
-| `flexcms-headless` | P2-04 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
 | `flexcms-replication` | — | — | — |
-| `flexcms-search` | P2-04 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-search` | — | — | — |
 | `flexcms-cache` | — | — | — |
 | `flexcms-cdn` | — | — | — |
 | `flexcms-i18n` | — | — | — |
@@ -183,8 +183,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
 | P2H-01 | **Build worker: complete event consumer + renderer** | ✅ DONE | 🟡 P1 | L | `frontend/apps/build-worker` | — | GitHub Copilot |
-| P2H-02 | **Build worker: dependency graph resolution** | 🟢 OPEN | 🟡 P1 | L | `frontend/apps/build-worker`, `flexcms-core` | P2H-01 | — |
-| P2H-03 | **Build worker: S3 upload + manifest** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/build-worker` | P2H-01 | — |
+| P2H-02 | **Build worker: dependency graph resolution** | ✅ DONE | 🟡 P1 | L | `frontend/apps/build-worker`, `flexcms-core` | P2H-01 | GitHub Copilot |
+| P2H-03 | **Build worker: S3 upload + manifest** | ✅ DONE | 🟡 P1 | M | `frontend/apps/build-worker` | P2H-01 | GitHub Copilot |
 | P2H-04 | **CDN hybrid routing (S3 primary, SSR fallback)** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn`, `docker / infra` | P2H-03 | — |
 
 ### Phase 3 — Admin UI
@@ -481,6 +481,84 @@ output_files:
 ## §5. Completion Notes & Handoff Log
 
 > When you finish or pause an item, add an entry here. This is the most critical section — it enables handoff between agents.
+
+### P2H-03 — Build worker: S3 upload + manifest
+**Status:** ✅ DONE
+**Agent:** GitHub Copilot
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **S3Publisher** (`s3-publisher.ts`) — `publishBatch()` uploads HTML pages to `sites/{siteId}/{locale}/{urlPath}/index.html` with `CacheControl`, content hash, and FlexCMS metadata; `deleteBatch()` uses `DeleteObjectsCommand` in 1000-item chunks
+  - [x] **ManifestManager** (`manifest-manager.ts`) — `load()`, `update()`, `remove()`, `isStale()` all fully implemented; manifest stored at `_meta/{siteId}/{locale}/manifest.json` in S3
+  - [x] Both classes wired in `index.ts`; manifest passed to `PageRenderer` for staleness checks
+  - [x] `npx tsc --noEmit` → 0 errors
+**Files Changed:**
+  - `frontend/apps/build-worker/src/s3-publisher.ts` — fully implemented (completed in P2H-01)
+  - `frontend/apps/build-worker/src/manifest-manager.ts` — fully implemented (completed in P2H-01)
+**Build Verified:** Yes — `npx tsc --noEmit` → 0 errors
+**Notes:** Implemented as part of P2H-01. P2H-04 (CDN hybrid routing) is now unblocked.
+
+---
+
+### P2H-02 — Build worker: dependency graph resolution
+**Status:** ✅ DONE
+**Agent:** GitHub Copilot
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`StaticBuildDependency.java`** JPA entity mapping `static_build_dependencies` table (V8 migration); fields: `siteId`, `locale`, `pagePath`, `dependsOnType` (COMPONENT/ASSET/NAVIGATION), `dependsOnKey`; unique constraint enforced at DB level
+  - [x] **`StaticBuildDependencyRepository.java`** Spring Data repo with:
+    - `findBySiteIdAndLocaleAndPagePath()` — get all edges for a page
+    - `findPagePathsByDependency()` — find pages by dep type+key (powers asset→page lookups)
+    - `findPagePathsByType()` — all pages with a given dep type (powers navigation change scope)
+    - `deleteByPagePath()` — atomic cleanup before re-recording
+    - `deleteBySiteAndLocale()` — full locale reset
+  - [x] **`BuildDependencyService.java`** in `flexcms-core/service/`:
+    - `recordPageDependencies(siteId, locale, pagePath, deps)` — transactional replace (delete + saveAll)
+    - `findAffectedPages(siteId, locale, type, key)` — delegates to repo
+    - `findPagesByDependencyType(siteId, locale, type)` — for NAVIGATION scope
+    - `removePageDependencies(siteId, locale, pagePath)` — on DEACTIVATE/DELETE
+    - `removeSiteLocaleDependencies(siteId, locale)` — full rebuild / locale removal
+    - `DependencyRecord` record type (type, key)
+  - [x] **`BuildDependencyController.java`** in `flexcms-headless/controller/`:
+    - `POST /api/build/v1/dependencies` — record page dep graph (requires ADMIN/CONTENT_PUBLISHER)
+    - `GET /api/build/v1/dependencies/pages?siteId&locale&type&key` — find affected pages
+    - `GET /api/build/v1/dependencies/pages/by-type?siteId&locale&type` — all pages by dep type
+    - `GET /api/build/v1/dependencies?siteId&locale&pagePath` — get deps for a page (diagnostics)
+    - `DELETE /api/build/v1/dependencies/{siteId}/{locale}?pagePath` — remove page deps
+    - `DELETE /api/build/v1/dependencies/{siteId}/{locale}/all` — full locale reset (ADMIN only)
+    - Full OpenAPI/Swagger annotations
+  - [x] **`build-dependency-client.ts`** TypeScript client for the new API:
+    - `recordDependencies(siteId, locale, pagePath, deps)` — non-fatal POST
+    - `findPagesForAsset(siteId, locale, assetKey)` — queries ASSET dep type
+    - `findPagesForComponent(siteId, locale, resourceType)` — queries COMPONENT dep type
+    - `findPagesWithNavigationDependency(siteId, locale)` — queries NAVIGATION dep type
+    - `removeDependencies(siteId, locale, pagePath)` — non-fatal DELETE
+    - All network errors caught and logged; returns safe empty arrays on failure
+  - [x] **`dependency-resolver.ts`** updated:
+    - Imports and instantiates `BuildDependencyClient`
+    - `resolveAssetChange()` now calls `depClient.findPagesForAsset()` instead of returning `[]`
+    - TODO comment removed
+  - [x] **`index.ts`** updated:
+    - `BuildDependencyClient` instantiated at startup alongside other services
+    - DEACTIVATE/DELETE path: calls `depClient.removeDependencies()` for each removed page path
+    - ACTIVATE path: after upload, calls `depClient.recordDependencies()` in parallel for all rendered pages
+  - [x] `mvn clean compile -pl flexcms-core,flexcms-headless -am` → **BUILD SUCCESS**
+  - [x] `npx tsc --noEmit` in `apps/build-worker` → **0 errors**
+**Files Changed:**
+  - `flexcms/flexcms-core/src/main/java/com/flexcms/core/model/StaticBuildDependency.java` — new entity
+  - `flexcms/flexcms-core/src/main/java/com/flexcms/core/repository/StaticBuildDependencyRepository.java` — new repo
+  - `flexcms/flexcms-core/src/main/java/com/flexcms/core/service/BuildDependencyService.java` — new service
+  - `flexcms/flexcms-headless/src/main/java/com/flexcms/headless/controller/BuildDependencyController.java` — new controller
+  - `frontend/apps/build-worker/src/build-dependency-client.ts` — new TypeScript API client
+  - `frontend/apps/build-worker/src/dependency-resolver.ts` — added `BuildDependencyClient`; implemented `resolveAssetChange`
+  - `frontend/apps/build-worker/src/index.ts` — added `BuildDependencyClient`; records deps after upload; removes deps on deactivation
+**Build Verified:** Yes — `mvn clean compile -pl flexcms-core,flexcms-headless -am` → BUILD SUCCESS; `npx tsc --noEmit` → 0 errors
+**Notes:**
+  - No new Flyway migration needed — `static_build_dependencies` table was already created in V8
+  - The dependency graph is populated lazily: on first run the graph is empty and ASSET events return `[]` (no spurious rebuilds). Pages are added to the graph as they are first compiled.
+  - `BuildDependencyClient` errors are all non-fatal — the build worker continues even if the graph API is unavailable; it simply cannot narrow the rebuild scope for asset events.
+  - P2H-04 (CDN hybrid routing) is now unblocked. Next open 🟡 P1 item is P3-18 (Content preview iframe).
+
+---
 
 ### P2H-01 — Build worker: complete event consumer + renderer
 **Status:** ✅ DONE

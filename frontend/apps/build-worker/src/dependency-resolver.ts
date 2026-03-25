@@ -7,15 +7,18 @@
 import { FlexCmsClient } from '@flexcms/sdk';
 import type { ReplicationEvent } from './event-consumer';
 import type { BuildWorkerConfig } from './index';
+import { BuildDependencyClient } from './build-dependency-client';
 import { createLogger } from './logger';
 
 const log = createLogger('dependency-resolver');
 
 export class DependencyResolver {
   private client: FlexCmsClient;
+  private depClient: BuildDependencyClient;
 
   constructor(private config: BuildWorkerConfig) {
     this.client = new FlexCmsClient({ apiUrl: config.cmsApiUrl });
+    this.depClient = new BuildDependencyClient(config);
   }
 
   /**
@@ -84,16 +87,31 @@ export class DependencyResolver {
   }
 
   /**
-   * Asset changed — find all pages that reference this asset.
-   * In a full implementation this queries the dependency graph table.
-   * For now, returns empty (asset changes don't trigger page recompilation
-   * unless the page's content node also changed).
+   * Asset changed — find all pages that reference this asset via the dependency graph.
+   *
+   * Queries the backend {@code static_build_dependencies} table for pages that
+   * recorded an ASSET dependency on this path during their last render.
+   *
+   * Falls back gracefully to an empty list if the graph is not yet populated
+   * (e.g. first run before any page has been compiled) — the content node's
+   * version will already change when an inline asset reference is edited, so the
+   * page-change event typically triggers the rebuild anyway.
    */
-  private async resolveAssetChange(_event: ReplicationEvent): Promise<string[]> {
-    // TODO: Query static_build_dependencies table for pages depending on this asset
-    // For now, asset changes alone don't trigger page rebuilds
-    // (the page's content version would also change if an asset reference was updated)
-    return [];
+  private async resolveAssetChange(event: ReplicationEvent): Promise<string[]> {
+    const { path, siteId, locale } = event;
+    log.info({ assetPath: path, siteId, locale }, 'Asset changed — querying dependency graph');
+
+    const pages = await this.depClient.findPagesForAsset(siteId, locale, path);
+
+    if (pages.length > 0) {
+      log.info({ assetPath: path, count: pages.length, pages: pages.slice(0, 5) },
+        'Dependency graph: pages depending on asset');
+    } else {
+      log.info({ assetPath: path },
+        'No pages depend on this asset in the graph — skipping rebuild');
+    }
+
+    return pages;
   }
 
   /**
