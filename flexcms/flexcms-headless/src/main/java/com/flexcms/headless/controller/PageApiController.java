@@ -48,8 +48,9 @@ public class PageApiController {
 
     /**
      * Get child pages (for navigation).
+     * URL: GET /api/content/v1/pages/children/{*path}
      */
-    @GetMapping("/{*path}/children")
+    @GetMapping("/children/{*path}")
     public ResponseEntity<?> getChildren(
             @PathVariable String path,
             @RequestHeader(value = "X-FlexCMS-Site", required = false) String siteId) {

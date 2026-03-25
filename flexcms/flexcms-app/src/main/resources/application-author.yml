@@ -16,3 +16,11 @@ spring:
 server:
   port: 8080
 
+# Disable distributed tracing in local dev — no OTLP collector running
+management:
+  tracing:
+    sampling:
+      probability: 0.0   # 0 = no sampling in local dev
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces   # ignored when sampling=0

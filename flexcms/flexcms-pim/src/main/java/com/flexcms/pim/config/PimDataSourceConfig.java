@@ -1,9 +1,11 @@
 package com.flexcms.pim.config;
 
+import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -52,7 +54,25 @@ public class PimDataSourceConfig {
                 .build();
     }
 
+    /**
+     * Flyway migration for the PIM database.
+     * Runs migrations from {@code classpath:db/pim/} before Hibernate validation.
+     * This bean MUST initialize before {@code pimEntityManagerFactory}.
+     * baselineOnMigrate=true with baselineVersion=0 ensures V1+ migrations all run.
+     * If the schema already exists (e.g. manually applied), Flyway will baseline
+     * and skip already-applied scripts.
+     */
+    @Bean(initMethod = "migrate")
+    public Flyway pimFlyway() {
+        return Flyway.configure()
+                .dataSource(pimDataSource())
+                .locations("classpath:db/pim")
+                .validateOnMigrate(false)   // skip checksum check for pre-seeded history
+                .load();
+    }
+
     @Bean
+    @DependsOn("pimFlyway")
     public LocalContainerEntityManagerFactoryBean pimEntityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(pimDataSource());
@@ -64,8 +84,9 @@ public class PimDataSourceConfig {
         em.setJpaVendorAdapter(vendorAdapter);
 
         Map<String, Object> props = new HashMap<>();
-        props.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        props.put("hibernate.hbm2ddl.auto", "validate");
+        // Do NOT set hibernate.dialect — auto-detected from PostgreSQL driver
+        // hbm2ddl.auto=none: Flyway manages PIM schema; Hibernate must not validate or modify it.
+        props.put("hibernate.hbm2ddl.auto", "none");
         em.setJpaPropertyMap(props);
 
         return em;

@@ -35,10 +35,12 @@ public class NodeApiController {
 
     /**
      * Get subtree of descendants up to a maximum depth.
+     * URL: GET /api/content/v1/nodes/descendants/{*path}?depth=5
+     * Example: /api/content/v1/nodes/descendants/content/site/en/homepage
      *
      * @param depth maximum traversal depth (1 = direct children only, default 5, max 10)
      */
-    @GetMapping("/{*path}/descendants")
+    @GetMapping("/descendants/{*path}")
     public ResponseEntity<Map<String, Object>> getDescendants(
             @PathVariable String path,
             @RequestParam(defaultValue = "5") int depth) {

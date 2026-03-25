@@ -162,7 +162,7 @@ Write-Host '>>> Stopped. Press any key.' -ForegroundColor Yellow
 function Start-Author {
     Write-Banner "Author  (Content + DAM + PIM read-write)  :8080"
     Launch-InWindow "FlexCMS Author :8080" $FlexcmsDir `
-        "mvn spring-boot:run -pl flexcms-app ``-Dspring-boot.run.profiles=author" `
+        "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=author" `
         "author"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
 }
@@ -170,7 +170,7 @@ function Start-Author {
 function Start-Publish {
     Write-Banner "Publish  (Content + DAM read-only)  :8081"
     Launch-InWindow "FlexCMS Publish :8081" $FlexcmsDir `
-        "mvn spring-boot:run -pl flexcms-app ``-Dspring-boot.run.profiles=publish" `
+        "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=publish" `
         "publish"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
 }

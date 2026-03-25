@@ -12,6 +12,14 @@
 -->
 <configuration>
 
+    <!-- ── Explicit converter declarations (required for %clr / %wEx) ─────── -->
+    <!-- Spring Boot registers these via SpringBootJoranConfigurator, but     -->
+    <!-- declaring them explicitly avoids race conditions on early init.       -->
+    <conversionRule conversionWord="clr"
+                    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
     <!-- ── Shared properties ──────────────────────────────────────────────── -->
     <springProperty scope="context" name="APP_NAME"       source="spring.application.name"  defaultValue="flexcms"/>
     <springProperty scope="context" name="INSTANCE_ID"    source="flexcms.instance.id"       defaultValue="local"/>

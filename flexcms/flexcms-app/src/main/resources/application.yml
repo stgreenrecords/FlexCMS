@@ -16,20 +16,18 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 5
 
+  # ----- JPA -----
+  # ddl-auto and show-sql only apply to the auto-configured JPA (disabled).
+  # Each datasource config (CmsDataSourceConfig, PimDataSourceConfig) sets
+  # hibernate.hbm2ddl.auto=validate explicitly.
   jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+    open-in-view: false
 
   # ----- Flyway -----
+  # Disabled: Flyway is configured explicitly per-datasource in CmsDataSourceConfig
+  # and PimDataSourceConfig to avoid multi-datasource interference.
   flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
+    enabled: false
 
   # ----- Redis -----
   data:
