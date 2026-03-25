@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/FlexCMS/flexcms/actions/workflows/ci.yml/badge.svg)](https://github.com/FlexCMS/flexcms/actions/workflows/ci.yml)
 
-> **AI Agent Quick Context:** FlexCMS is a **headless-only** Spring Boot 3.x + Java 21 CMS. The backend is a pure JSON API — it **never generates HTML**. It uses a PostgreSQL ltree-backed content tree, separates Author (read-write) and Publish (read-only) environments connected via RabbitMQ replication, and delivers content via REST + GraphQL APIs behind CDN. Frontend rendering is handled by a framework-agnostic TypeScript SDK (`@flexcms/sdk`) with adapters for React (`@flexcms/react`), Vue (`@flexcms/vue`), and Angular (`@flexcms/angular`). SSR is done by Next.js/Nuxt/Angular SSR. Admin UI is built with Next.js + `@flexcms/ui` design system (Radix + Tailwind + theme tokens). Backend and frontend teams work independently against a **Component Registry Schema** contract. See § "AI Agent Onboarding Guide" at the bottom for full context map.
+> **AI Agent Quick Context:** FlexCMS is a **headless-only** Spring Boot 3.x + Java 21 CMS. The backend is a pure JSON API — it **never generates HTML**. It uses a PostgreSQL ltree-backed content tree, separates Author (read-write) and Publish (read-only) environments connected via RabbitMQ replication, and delivers content via REST + GraphQL APIs behind CDN. Frontend rendering is handled by a framework-agnostic TypeScript SDK (`@flexcms/sdk`) with adapters for React (`@flexcms/react`) and Vue (`@flexcms/vue`). SSR is done by Next.js/Nuxt. Admin UI is built with Next.js + `@flexcms/ui` design system (Radix + Tailwind + theme tokens). Backend and frontend teams work independently against a **Component Registry Schema** contract. See § "AI Agent Onboarding Guide" at the bottom for full context map.
 
 ---
 
@@ -26,7 +26,7 @@ FlexCMS is designed to be a **production-grade, open-architecture CMS** suitable
 
 **Key design goals:**
 - **Headless-only backend:** All content delivered as JSON via REST & GraphQL; the backend never generates HTML
-- **Framework-agnostic frontend:** Core TypeScript SDK with adapters for React, Vue, Angular (swap frameworks without touching backend)
+- **Framework-agnostic frontend:** Core TypeScript SDK with adapters for React and Vue (swap frameworks without touching backend)
 - **Contract-driven separation:** Backend and frontend teams work independently against a Component Registry Schema contract
 - **Component-driven:** Atomic content units with pluggable backend logic (ComponentModel SPI)
 - **Author/Publish separation:** Read-write authoring → async replication → read-only delivery tier
@@ -110,7 +110,6 @@ FlexCMS is designed to be a **production-grade, open-architecture CMS** suitable
 | Frontend SDK | @flexcms/sdk (TypeScript) | ✅ Implemented (client, mapper, walker, types) |
 | React Adapter | @flexcms/react | ✅ Implemented (Provider, Page, Component, hooks) |
 | Vue 3 Adapter | @flexcms/vue | ✅ Implemented (Plugin, Page, Component, composables) |
-| Angular Adapter | @flexcms/angular | 🟡 Scaffolded (factory, re-exports) |
 | Design System | @flexcms/ui (Radix + Tailwind + CVA) | ✅ Implemented (Button, Input, Label, Card, Badge, etc.) |
 | Theming | CSS custom properties (light/dark/brand) | ✅ Implemented (token system + applyTheme) |
 | Admin UI | Next.js 14+ App Router + @flexcms/ui | 🟡 Scaffolded (layout, dashboard, ThemeProvider) |
@@ -218,8 +217,6 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 │   │   └── src/                       # FlexCmsProvider, FlexCmsPage, FlexCmsComponent, hooks
 │   ├── vue/                           # @flexcms/vue — Vue 3 adapter
 │   │   └── src/                       # FlexCmsPlugin, FlexCmsPage, FlexCmsComponent, composables
-│   ├── angular/                       # @flexcms/angular — Angular adapter
-│   │   └── src/                       # createFlexCmsProviders, re-exports
 │   └── ui/                            # @flexcms/ui — Design System (Radix + Tailwind + CVA)
 │       └── src/
 │           ├── components/            # Button, Input, Label, Card, Badge, Textarea, etc.
@@ -261,7 +258,6 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 | **Frontend SDK (@flexcms/sdk)** | █████████░ 9/10 | ████████░░ 8/10 | ✅ Yes |
 | **React Adapter (@flexcms/react)** | █████████░ 9/10 | ████████░░ 8/10 | ✅ Yes |
 | **Vue Adapter (@flexcms/vue)** | █████████░ 9/10 | ███████░░░ 7/10 | 🟡 Mostly |
-| **Angular Adapter (@flexcms/angular)** | ███████░░░ 7/10 | ███░░░░░░░ 3/10 | 🔴 Scaffold only |
 | **Design System (@flexcms/ui)** | █████████░ 9/10 | ██████░░░░ 6/10 | 🟡 Core components done |
 | **Theming (light/dark/brand)** | █████████░ 9/10 | ████████░░ 8/10 | ✅ Yes |
 | **Admin UI (Next.js)** | █████████░ 9/10 | ██░░░░░░░░ 2/10 | 🔴 **Scaffolded — needs build-out** |
@@ -290,7 +286,7 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 - ✅ **Component model** with SPI, registry, field-injection (`@ValueMapValue`), and adapter pattern (ComponentModel SPI)
 - ✅ **Backend/Frontend contract** — Component Registry Schema endpoint (`/api/content/v1/component-registry`) with `dataSchema` JSON Schema per component
 - ✅ **Frontend SDK** (`@flexcms/sdk`) — framework-agnostic client, component mapper, tree walker
-- ✅ **Three framework adapters** — `@flexcms/react` (Provider, Page, Component, hooks), `@flexcms/vue` (Plugin, Page, Component, composables), `@flexcms/angular` (scaffolded)
+- ✅ **Two framework adapters** — `@flexcms/react` (Provider, Page, Component, hooks), `@flexcms/vue` (Plugin, Page, Component, composables)
 - ✅ **Design system** (`@flexcms/ui`) — Button, Input, Label, Card, Badge, Textarea, Separator, Skeleton, Avatar with CSS custom property theming
 - ✅ **Theme system** — light/dark/custom brand themes via token maps + `applyTheme()` runtime switching
 - ✅ **Reference sites** — Next.js (React SSR) and Nuxt 3 (Vue SSR) with component maps and catch-all routes
@@ -322,7 +318,6 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 | # | Gap | Impact | Effort |
 |---|---|---|---|
 | 6 | **GraphQL resolver is incomplete** — Schema is defined but only `ContentQueryResolver` is partially implemented. Most queries return stubs. | Headless clients relying on GraphQL have limited functionality. | 2-3 weeks |
-| 7 | **Angular adapter is scaffold-only** — `@flexcms/angular` has factory + re-exports but no Angular-native components, directives, or DI providers. No reference Angular SSR site. | Angular teams cannot adopt FlexCMS without writing their own adapter layer. | 2-3 weeks |
 | 8 | **Error handling is ad-hoc** — No global `@ControllerAdvice`, no standardized error response format, no circuit breakers, no retry policies. | Inconsistent API errors, poor DX, cascading failures in production. | 1-2 weeks |
 | 9 | **Input validation missing** — No `@Valid`, no request DTOs with constraints, no XSS sanitization on rich text fields. | Injection attacks, malformed data in DB. | 1-2 weeks |
 | 10 | **Elasticsearch integration is skeleton** — `SearchIndexService` and `ContentSearchRepository` exist but full-text search indexing/querying is not wired. | Search doesn't work. | 2-3 weeks |
@@ -368,7 +363,6 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 |---|---|---|---|
 | 7-8 | **Complete GraphQL resolvers** | `flexcms-headless` | Implement all Query resolvers (page, pages, search, navigation, asset, components); add pagination; implement field-level resolvers for nested types |
 | 8-9 | **Elasticsearch integration** | `flexcms-search` | Implement full-text indexing on content publish; search query with filters, facets, highlighting; auto-reindex on replication events |
-| 9-10 | **Angular adapter build-out + reference site** | `frontend/packages/angular`, `frontend/apps/site-angular` | Implement `FlexCmsModule`, `FlexCmsPageComponent`, `FlexCmsComponentDirective`, `ComponentMapperService` with DI; create Angular SSR reference site using `@angular/ssr` |
 | 10-11 | **API documentation** | `flexcms-headless`, `flexcms-author` | SpringDoc OpenAPI for REST endpoints; GraphiQL + docs for GraphQL; Postman collection export; auto-generate SDK TypeScript types from GraphQL via `graphql-codegen` |
 | 11-12 | **Observability stack** | `flexcms-app` | Micrometer + Prometheus metrics; OpenTelemetry distributed tracing; structured JSON logging (Logback); custom metrics for replication lag, cache hit rate, content operations |
 
@@ -627,11 +621,11 @@ KEY RULE: Backend NEVER generates HTML. It only returns JSON.
 | **PIM database migrations** | **`flexcms-pim/src/main/resources/db/pim/`** |
 
 ### Key Patterns to Follow
-1. **Backend = JSON only, Frontend = HTML only** — The backend NEVER generates HTML. The `PublishPageController` returns JSON. All rendering (SSR, CSR) is handled by `@flexcms/react`, `@flexcms/vue`, or `@flexcms/angular` in Next.js/Nuxt/Angular SSR.
+1. **Backend = JSON only, Frontend = HTML only** — The backend NEVER generates HTML. The `PublishPageController` returns JSON. All rendering (SSR, CSR) is handled by `@flexcms/react` or `@flexcms/vue` in Next.js/Nuxt.
 2. **Component Registry Contract** — Every component has a `dataSchema` (JSON Schema) stored in `component_definitions.data_schema`. The backend guarantees output matches the schema; the frontend renders based on it. Access via `GET /api/content/v1/component-registry`.
 3. **Content is a tree** — all content lives under paths like `content.corporate.en.homepage.jcr_content.hero`. Use `.` as path separator (ltree convention).
 4. **ComponentModel (field-injection)** — when adding a new backend component: extend `AbstractComponentModel`, annotate property fields with `@ValueMapValue`, inject services with `@Autowired`, and add derived getters for computed values. See `flexcms-plugin-api/spi/AbstractComponentModel.java`.
-5. **Component Frontend Renderer** — when adding a new frontend component: create a React/Vue/Angular component, register it in the `ComponentMapper` with `mapper.register('myapp/hero-banner', HeroBanner)`. See `site-nextjs/src/components/component-map.tsx`.
+5. **Component Frontend Renderer** — when adding a new frontend component: create a React/Vue component, register it in the `ComponentMapper` with `mapper.register('myapp/hero-banner', HeroBanner)`. See `site-nextjs/src/components/component-map.tsx`.
 6. **Author vs Publish** — services gated by `@ConditionalOnProperty(name = "flexcms.runmode")`. Author services are read-write; publish services are read-only.
 7. **Replication events** — content changes on Author trigger `ReplicationEvent` → RabbitMQ → consumed by publish instances → cache invalidation + CDN purge.
 8. **JSONB for flexibility** — component properties are stored as JSONB. Each component type defines its own property schema in `component.json`.

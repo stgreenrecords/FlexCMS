@@ -121,7 +121,6 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `frontend/packages/sdk` | — | — | — |
 | `frontend/packages/react` | — | — | — |
 | `frontend/packages/vue` | — | — | — |
-| `frontend/packages/angular` | — | — | — |
 | `frontend/packages/ui` | — | — | — |
 | `frontend/apps/admin` | — | — | — |
 | `frontend/apps/build-worker` | — | — | — |
@@ -257,8 +256,6 @@ output_files:
 | P2-02 | **GraphQL: pagination + field resolvers** | ✅ DONE | 🟡 P1 | M | `flexcms-headless` | P2-01 | Claude Sonnet 4.6 |
 | P2-03 | **Elasticsearch: full-text indexing on publish** | ✅ DONE | 🟡 P1 | L | `flexcms-search`, `flexcms-replication` | — | Claude Sonnet 4.6 |
 | P2-04 | **Elasticsearch: search API with facets** | ✅ DONE | 🟡 P1 | M | `flexcms-search`, `flexcms-headless` | P2-03 | Claude Sonnet 4.6 |
-| P2-05 | **Angular adapter: full implementation** | ✅ DONE | 🟡 P1 | L | `frontend/packages/angular` | — | GitHub Copilot |
-| P2-06 | **Angular reference site (SSR)** | ✅ DONE | 🟡 P1 | M | `frontend/apps/site-angular` (new) | P2-05 | GitHub Copilot |
 | P2-07 | **OpenAPI/Swagger spec for REST** | ✅ DONE | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | Claude Sonnet 4.6 |
 | P2-08 | **Observability: Micrometer + Prometheus** | ✅ DONE | 🔴 P0 | M | `flexcms-app` | — | Claude Sonnet 4.6 |
 | P2-09 | **Observability: OpenTelemetry tracing** | ✅ DONE | 🔴 P0 | M | `flexcms-app` | P2-08 | Claude Sonnet 4.6 |
@@ -849,96 +846,6 @@ output_files:
   - `dependency-resolver.ts` already contains a working implementation — P2H-02 may already be effectively done (see `resolveContentChange`, `resolveTreeChange`, `getAllPagePaths`)
   - `s3-publisher.ts` and `manifest-manager.ts` are fully implemented including the new `deleteBatch`/`remove` methods — P2H-03 is also effectively done
   - Component map hot-reload: call `renderer.invalidateCache(siteId)` after a new site bundle is deployed
-
----
-
-### P2-06 — Angular reference site (SSR)
-**Status:** ✅ DONE
-**Agent:** GitHub Copilot
-**Date:** 2026-03-25
-**AC Verification:**
-  - [x] New app at `frontend/apps/site-angular` — added to pnpm workspace via `apps/*` glob
-  - [x] Angular 17 standalone components throughout — no NgModule required
-  - [x] `provideFlexCms()` wired in both `app.config.ts` (client) and `app.config.server.ts` (SSR) — env vars used on server, `window.__FLEXCMS_API_URL__` on client
-  - [x] `app.routes.ts` — wildcard `**` → `CmsPageComponent`; feature routes can be added before the wildcard
-  - [x] `CmsPageComponent` — catch-all route component that: reads URL path from `Router.url`, calls `FlexCmsPageService.load()`, subscribes to `NavigationEnd` for client-side SPA navigation, shows loading/error/content states via Angular Signals
-  - [x] `server.ts` — Express SSR server using `@angular/ssr` render engine; serves static assets from `dist/browser/`, SSR-renders all other routes; reads `PORT` / `FLEXCMS_API_URL` env vars
-  - [x] **6 sample component renderers** registered in `FLEXCMS_COMPONENT_MAP`:
-    - `flexcms/rich-text` — `[innerHTML]` with `DomSanitizer.bypassSecurityTrustHtml()`
-    - `flexcms/image` — responsive `<img>` with DAM URL, lazy loading, optional caption
-    - `flexcms/hero` — full-width banner with `[ngStyle]` background, CTA button, configurable text alignment
-    - `flexcms/container` — grid/flex layout container that renders child nodes via `<flexcms-component>`
-    - `flexcms/shared-header` — sticky navigation header with `RouterLink` nav items
-    - `flexcms/shared-footer` — footer with configurable links and copyright
-  - [x] `component-map.ts` — demonstrates both eager (`Type<Component>`) and lazy (`() => import(...).then(m => m.C)`) registration
-  - [x] `package.json` — `ng serve` (dev, port 3003), `ng build` + `ng run server`, `serve:ssr`
-  - [x] `README.md` — architecture diagram, quick start, env vars, "adding a new component" guide, comparison table vs site-nextjs
-  - [x] `npx tsc --noEmit` → **0 errors** (after building `@flexcms/angular`)
-  - [x] `@flexcms/angular` built to `dist/` via `pnpm --filter @flexcms/angular build` — BUILD SUCCESS
-**Files Changed (all new):**
-  - `frontend/apps/site-angular/package.json`
-  - `frontend/apps/site-angular/tsconfig.json`
-  - `frontend/apps/site-angular/server.ts` — Express SSR server
-  - `frontend/apps/site-angular/README.md`
-  - `frontend/apps/site-angular/src/index.html`
-  - `frontend/apps/site-angular/src/main.ts` — client bootstrap
-  - `frontend/apps/site-angular/src/main.server.ts` — SSR entry
-  - `frontend/apps/site-angular/src/app/app.component.ts` — `<router-outlet>` shell
-  - `frontend/apps/site-angular/src/app/app.config.ts` — client providers
-  - `frontend/apps/site-angular/src/app/app.config.server.ts` — server providers
-  - `frontend/apps/site-angular/src/app/app.routes.ts` — route definitions
-  - `frontend/apps/site-angular/src/app/pages/cms-page.component.ts` — catch-all CMS page
-  - `frontend/apps/site-angular/src/flexcms/component-map.ts` — component registry
-  - `frontend/apps/site-angular/src/flexcms/components/rich-text.component.ts`
-  - `frontend/apps/site-angular/src/flexcms/components/image.component.ts`
-  - `frontend/apps/site-angular/src/flexcms/components/hero.component.ts`
-  - `frontend/apps/site-angular/src/flexcms/components/container.component.ts`
-  - `frontend/apps/site-angular/src/flexcms/components/header.component.ts`
-  - `frontend/apps/site-angular/src/flexcms/components/footer.component.ts`
-**Build Verified:** Yes — `pnpm --filter @flexcms/angular build` → BUILD SUCCESS; `npx tsc --noEmit` in `site-angular` → 0 errors
-**Notes:**
-  - `ng build` requires Angular CLI (`@angular/cli`) installed globally or locally. Run `pnpm install` in `site-angular` first.
-  - The `angular.json` workspace config (needed by `ng build`) is not included — it must be generated with `ng new --create-application false` then configured to point to this source. Alternatively, use Vite with `@analogjs/vite-plugin-angular` for a simpler build.
-  - For Turborepo: add `"build": "ng build"` to `turbo.json` tasks (already covered by existing `"build"` task).
-  - Container component (`flexcms/container`) correctly imports `FlexCmsComponentComponent` for recursive child rendering.
-
----
-
-### P2-05 — Angular adapter: full implementation
-**Status:** ✅ DONE
-**Agent:** GitHub Copilot
-**Date:** 2026-03-25
-**AC Verification:**
-  - [x] `provideFlexCms(config)` — returns `EnvironmentProviders` for Angular DI; accepts `apiUrl`, `defaultSite`, `defaultLocale`, and `components` map
-  - [x] `components` map accepts both eager (`Type<FlexCmsComponent>`) and lazy (`() => Promise<Type<FlexCmsComponent>>` or `() => Promise<{ default: Type }>`) factories
-  - [x] `FLEXCMS_CLIENT` + `FLEXCMS_MAPPER` — typed `InjectionToken`s for DI override/testing
-  - [x] `FlexCmsService` — `@Injectable({ providedIn: 'root' })` service with `client`, `mapper`, `getPage()` (Observable), `getNavigation()` (Observable), `resolveSync()`, `resolveComponent()` (async, handles lazy+eager)
-  - [x] `FlexCmsComponentComponent` — standalone Angular component (`<flexcms-component [node]="...">`) that:
-    - Resolves `node.resourceType` to a component type via `FlexCmsService.resolveComponent()`
-    - Renders using `NgComponentOutlet` with `inputs: { data, children }` for Angular 16+ API
-    - Dev-mode placeholder with `data-flexcms-missing` attribute for unknown types
-    - `OnPush` change detection; triggers `ChangeDetectorRef.markForCheck()` after async resolution
-  - [x] `FlexCmsPageComponent` — standalone component (`<flexcms-page [pageData]="...">`) iterating `pageData.components` and rendering `<flexcms-component>` per node; `trackBy: trackByName` for performance
-  - [x] `FlexCmsPageService` — `@Injectable()` (non-root, must be provided per-component) with Angular **Signals**: `pageData`, `loading`, `error`; `load(path, opts)` async method; `reset()`; `getPage$()` Observable helper
-  - [x] `FlexCmsComponent` interface — component contract (`data`, `children?`) that consuming Angular components must implement
-  - [x] Full re-exports of SDK types: `FlexCmsClient`, `ComponentMapper`, `PageResponse`, `ComponentNode`, `NavigationItem`, `ComponentRegistryResponse`, `ComponentDefinition`
-  - [x] `npx tsc --noEmit` → **0 errors**
-  - [x] `experimentalDecorators: true` + `emitDecoratorMetadata: true` already set in `tsconfig.json`
-**Files Changed:**
-  - `frontend/packages/angular/src/types.ts` — new: `FlexCmsComponent` interface, `FlexCmsAngularComponentType`, `FlexCmsAngularComponentFactory`, `FlexCmsAngularConfig`
-  - `frontend/packages/angular/src/tokens.ts` — new: `FLEXCMS_CLIENT` + `FLEXCMS_MAPPER` InjectionTokens
-  - `frontend/packages/angular/src/flexcms.service.ts` — new: `FlexCmsService` with Observable wrappers + lazy component resolution
-  - `frontend/packages/angular/src/flexcms.providers.ts` — new: `provideFlexCms()` environment providers factory
-  - `frontend/packages/angular/src/flexcms-component.component.ts` — new: `FlexCmsComponentComponent` standalone component
-  - `frontend/packages/angular/src/flexcms-page.component.ts` — new: `FlexCmsPageComponent` standalone component
-  - `frontend/packages/angular/src/flexcms-page.service.ts` — new: `FlexCmsPageService` with Signals-based state
-  - `frontend/packages/angular/src/index.ts` — replaced stub with full public API
-**Build Verified:** Yes — `npx tsc --noEmit` → 0 errors
-**Notes:**
-  - Angular 17+ standalone components / signals are used throughout (no NgModule needed)
-  - Lazy component factories: `() => import('./hero.component').then(m => m.HeroComponent)` — the adapter handles both bare `Type` and `{ default: Type }` module shapes
-  - `FlexCmsPageService` must be provided at component level (`providers: [FlexCmsPageService]`) since it's stateful; multiple page services can coexist independently
-  - P2-06 (Angular reference site SSR) is now unblocked
 
 ---
 

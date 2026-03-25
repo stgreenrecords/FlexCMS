@@ -7,7 +7,7 @@
     "dev": "nuxt dev --port 3002",
     "build": "nuxt build",
     "preview": "nuxt preview",
-    "lint": "nuxt typecheck"
+    "lint": "nuxt prepare && nuxt typecheck"
   },
   "dependencies": {
     "@flexcms/sdk": "workspace:*",
