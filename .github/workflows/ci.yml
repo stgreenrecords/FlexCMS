@@ -68,6 +68,17 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Initialize additional PostgreSQL databases
+        run: |
+          psql -h localhost -U flexcms -d flexcms -c "CREATE DATABASE flexcms_author;"
+          psql -h localhost -U flexcms -d flexcms -c "CREATE DATABASE flexcms_publish;"
+          psql -h localhost -U flexcms -d flexcms -c "CREATE DATABASE flexcms_pim;"
+          psql -h localhost -U flexcms -d flexcms_author -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; CREATE EXTENSION IF NOT EXISTS \"ltree\"; CREATE EXTENSION IF NOT EXISTS \"pg_trgm\";"
+          psql -h localhost -U flexcms -d flexcms_publish -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; CREATE EXTENSION IF NOT EXISTS \"ltree\"; CREATE EXTENSION IF NOT EXISTS \"pg_trgm\";"
+          psql -h localhost -U flexcms -d flexcms_pim -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; CREATE EXTENSION IF NOT EXISTS \"pg_trgm\";"
+        env:
+          PGPASSWORD: flexcms
+
       - name: Build and test (Maven)
         working-directory: flexcms
         run: mvn clean verify -B --no-transfer-progress
@@ -75,12 +86,13 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/flexcms
           SPRING_DATASOURCE_USERNAME: flexcms
           SPRING_DATASOURCE_PASSWORD: flexcms
-          SPRING_REDIS_HOST: localhost
-          SPRING_REDIS_PORT: 6379
+          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_REDIS_PORT: 6379
           SPRING_RABBITMQ_HOST: localhost
           SPRING_RABBITMQ_PORT: 5672
           SPRING_RABBITMQ_USERNAME: guest
           SPRING_RABBITMQ_PASSWORD: guest
+          FLEXCMS_JWT_ISSUER_URI: http://localhost:8180/realms/flexcms
 
       - name: Upload test reports
         if: always()
@@ -136,10 +148,9 @@ jobs:
 
       - name: Run tests
         working-directory: frontend
-        # --if-present: only runs if a "test" script is defined in package.json
-        run: pnpm test --if-present || pnpm --recursive --if-present run test
+        run: pnpm --recursive --if-present run test
 
-      - name: Type check
+      - name: Type check and lint
         working-directory: frontend
         run: pnpm --recursive --if-present run lint
 
@@ -170,6 +181,10 @@ jobs:
       - name: Package backend (skip tests — already passed in backend job)
         working-directory: flexcms
         run: mvn package -DskipTests -B --no-transfer-progress
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/flexcms
+          SPRING_DATASOURCE_USERNAME: flexcms
+          SPRING_DATASOURCE_PASSWORD: flexcms
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

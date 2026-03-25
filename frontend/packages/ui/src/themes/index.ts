@@ -113,6 +113,6 @@ export function applyTheme(tokens: ThemeTokens, element?: HTMLElement): void {
 
 /** Create a custom brand theme by overriding specific tokens */
 export function createTheme(overrides: Partial<ThemeTokens>, base: ThemeTokens = lightTheme): ThemeTokens {
-  return { ...base, ...overrides };
+  return { ...base, ...overrides } as ThemeTokens;
 }
 

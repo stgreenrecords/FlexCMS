@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  FlexCMS Logback configuration.
+
+  Profiles:
+    default / dev    — human-readable coloured console output
+    prod / docker    — structured JSON (one log line per event), suitable for
+                       log-aggregation pipelines (ELK, Loki, CloudWatch, etc.)
+
+  MDC fields automatically included in JSON output:
+    traceId, spanId, userId, siteId, requestId (populated by filters / OTel agent)
+-->
+<configuration>
+
+    <!-- ── Shared properties ──────────────────────────────────────────────── -->
+    <springProperty scope="context" name="APP_NAME"       source="spring.application.name"  defaultValue="flexcms"/>
+    <springProperty scope="context" name="INSTANCE_ID"    source="flexcms.instance.id"       defaultValue="local"/>
+
+    <!-- ── Console appender (dev / default profile) ──────────────────────── -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr(%d{HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ── JSON appender (prod / docker profile) ─────────────────────────── -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- Extra fixed fields -->
+            <customFields>{"app":"${APP_NAME}","instance":"${INSTANCE_ID}"}</customFields>
+            <!-- Include MDC automatically -->
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>siteId</includeMdcKeyName>
+            <includeMdcKeyName>requestId</includeMdcKeyName>
+            <!-- Shorten logger name for readability -->
+            <shortenedLoggerNameLength>36</shortenedLoggerNameLength>
+            <!-- Include stack trace as JSON array -->
+            <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                <maxDepthPerCause>20</maxDepthPerCause>
+                <rootCauseFirst>true</rootCauseFirst>
+            </throwableConverter>
+        </encoder>
+    </appender>
+
+    <!-- ── Rolling file appender (prod / docker profile) ────────────────── -->
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/flexcms.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/flexcms.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"app":"${APP_NAME}","instance":"${INSTANCE_ID}"}</customFields>
+            <shortenedLoggerNameLength>36</shortenedLoggerNameLength>
+        </encoder>
+    </appender>
+
+    <!-- ── Profile-conditional root config ───────────────────────────────── -->
+
+    <!-- Dev / local: plain console -->
+    <springProfile name="!prod &amp; !docker">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="com.flexcms" level="DEBUG"/>
+    </springProfile>
+
+    <!-- Prod / Docker: JSON to stdout + rolling file -->
+    <springProfile name="prod,docker">
+        <root level="INFO">
+            <appender-ref ref="JSON_CONSOLE"/>
+            <appender-ref ref="JSON_FILE"/>
+        </root>
+        <logger name="com.flexcms" level="INFO"/>
+        <!-- Suppress noisy framework loggers in production -->
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate"        level="WARN"/>
+        <logger name="com.zaxxer.hikari"    level="WARN"/>
+    </springProfile>
+
+</configuration>

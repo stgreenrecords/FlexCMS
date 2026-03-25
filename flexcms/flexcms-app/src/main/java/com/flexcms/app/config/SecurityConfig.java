@@ -82,7 +82,8 @@ public class SecurityConfig {
                         .requestMatchers("/static/**").permitAll()
 
                         // ── Public: infrastructure ──────────────────────────────────────
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/health/**",
+                                         "/actuator/info", "/actuator/prometheus").permitAll()
 
                         // ── Protected: author & PIM APIs ────────────────────────────────
                         .requestMatchers("/api/author/**").authenticated()

@@ -145,6 +145,13 @@ management:
       server:
         requests:
           name: http.server.requests
+  # ----- Distributed Tracing -----
+  tracing:
+    sampling:
+      probability: ${FLEXCMS_TRACE_SAMPLE_RATE:1.0}   # 1.0 = 100% in dev; lower in prod
+  otlp:
+    tracing:
+      endpoint: ${FLEXCMS_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
 
 # ==============================================================================
 # Logging
