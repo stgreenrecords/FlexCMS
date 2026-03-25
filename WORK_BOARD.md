@@ -221,7 +221,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P4-03 | **CDN: CloudFront provider implementation** | ✅ DONE | 🟡 P1 | M | `flexcms-cdn` | — | Claude Sonnet 4.6 |
 | P4-04 | **CDN: Cloudflare provider implementation** | ✅ DONE | 🟡 P1 | M | `flexcms-cdn` | — | Claude Sonnet 4.6 |
 | P4-05 | **Translation: DeepL connector** | ✅ DONE | 🟢 P2 | M | `flexcms-i18n` | — | Claude Sonnet 4.6 |
-| P4-06 | **Live copy / content sharing service** | 🟢 OPEN | 🟢 P2 | L | `flexcms-core`, `flexcms-multisite` | — | — |
+| P4-06 | **Live copy / content sharing service** | ✅ DONE | 🟢 P2 | L | `flexcms-core`, `flexcms-multisite` | — | Claude Sonnet 4.6 |
 | P4-07 | **AWS Infrastructure: CloudFormation + ECS Fargate** | ✅ DONE | 🟡 P1 | L | `docker / infra`, `CI/CD` | — | Claude Sonnet 4.6 |
 | P4-08 | **Sitemap + robots.txt generation** | ✅ DONE | 🟢 P2 | M | `flexcms-publish`, `flexcms-headless` | — | Claude Sonnet 4.6 |
 | P4-09 | **Audit trail admin API** | ✅ DONE | 🟢 P2 | S | `flexcms-author` | — | GitHub Copilot |
@@ -501,6 +501,32 @@ output_files:
   - MODIFIED: `flexcms/flexcms-i18n/pom.xml` (added `spring-boot-starter-web`)
   - MODIFIED: `flexcms/flexcms-app/src/main/resources/application.yml` (added `flexcms.translation.deepl.*`)
 **Build Verified:** `mvn test -pl flexcms-i18n` → BUILD SUCCESS, 13 tests, 0 failures
+
+---
+
+### P4-06 — Live copy / content sharing service
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] **`LiveCopyRelationship`** entity in `flexcms-core/model/` — tracks source/target paths, `deep` flag (full subtree sync vs root-only), `excludedProps` (CSV of properties excluded from rollout), `createdBy`/`createdAt`; `getExcludedPropsList()` parses CSV
+  - [x] **`LiveCopyRelationshipRepository`** in `flexcms-core/repository/` — `findBySourcePath()`, `findBySourcePathOrPrefix()`, `findByTargetPath()`, `deleteByTargetPath()`, `deleteByTargetPathOrPrefix()`, `existsByTargetPath()`
+  - [x] **`LiveCopyService`** in `flexcms-multisite/service/`:
+    - `createLiveCopy(sourcePath, targetParentPath, targetName, deep, excludedProps, userId)` — copies root node + (when deep=true) all descendants; records a `LiveCopyRelationship` for each copied node
+    - `rollout(sourcePath, userId)` — merges blueprint properties into all live copies matching source path or prefix; respects `excludedProps`; returns `RolloutResult{sourcePath, updatedNodes, errors}`
+    - `detach(targetPath, deep)` — deletes relationships (shallow: single node, deep: entire subtree)
+    - `findLiveCopies(sourcePath)`, `getRelationship(targetPath)`, `isLiveCopy(targetPath)`
+  - [x] **`LiveCopyController`** in `flexcms-author/controller/` — `POST /api/author/livecopy`, `POST /api/author/livecopy/rollout`, `DELETE /api/author/livecopy`, `GET /api/author/livecopy`, `GET /api/author/livecopy/status`; secured with `@PreAuthorize`
+  - [x] **Flyway migration V11** — `live_copy_relationships` table with indexes on `source_path` and `target_path`
+  - [x] **Tests** — 18 unit tests; all pass (`mvn test -pl flexcms-multisite` → BUILD SUCCESS)
+**Files Changed:**
+  - NEW: `flexcms/flexcms-app/src/main/resources/db/migration/V11__live_copy_tables.sql`
+  - NEW: `flexcms/flexcms-core/src/main/java/com/flexcms/core/model/LiveCopyRelationship.java`
+  - NEW: `flexcms/flexcms-core/src/main/java/com/flexcms/core/repository/LiveCopyRelationshipRepository.java`
+  - NEW: `flexcms/flexcms-multisite/src/main/java/com/flexcms/multisite/service/LiveCopyService.java`
+  - NEW: `flexcms/flexcms-author/src/main/java/com/flexcms/author/controller/LiveCopyController.java`
+  - NEW: `flexcms/flexcms-multisite/src/test/java/com/flexcms/multisite/service/LiveCopyServiceTest.java`
+**Build Verified:** `mvn compile -pl flexcms-core,flexcms-multisite,flexcms-author --also-make` → BUILD SUCCESS; `mvn test -pl flexcms-multisite` → 18 tests, 0 failures
 
 ---
 

@@ -52,7 +52,7 @@ jobs:
           - 5672:5672
           - 15672:15672
         options: >-
-          --health-cmd "rabbitmqctl status"
+          --health-cmd "rabbitmq-diagnostics -q ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -113,46 +113,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: '9'
           run_install: false
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: echo "store=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
         with:
-          path: ${{ steps.pnpm-cache.outputs.store }}
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Install dependencies
         working-directory: frontend
-        # Use --frozen-lockfile once pnpm-lock.yaml is committed; remove flag if no lockfile
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build all packages
         working-directory: frontend
-        run: pnpm build
+        run: pnpm run build
 
       - name: Run tests
         working-directory: frontend
-        run: pnpm --recursive --if-present run test
+        run: pnpm run test
 
       - name: Type check and lint
         working-directory: frontend
-        run: pnpm --recursive --if-present run lint
+        run: pnpm run lint
 
   # ===========================================================================
   # Docker image build + push to GHCR
@@ -181,10 +169,6 @@ jobs:
       - name: Package backend (skip tests — already passed in backend job)
         working-directory: flexcms
         run: mvn package -DskipTests -B --no-transfer-progress
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/flexcms
-          SPRING_DATASOURCE_USERNAME: flexcms
-          SPRING_DATASOURCE_PASSWORD: flexcms
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
