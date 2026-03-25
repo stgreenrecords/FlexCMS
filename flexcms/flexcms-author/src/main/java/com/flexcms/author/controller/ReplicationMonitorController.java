@@ -4,6 +4,7 @@ import com.flexcms.core.model.ReplicationLogEntry;
 import com.flexcms.core.model.ReplicationLogEntry.ReplicationStatus;
 import com.flexcms.core.repository.ReplicationLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,6 +18,7 @@ import java.util.Map;
  * Replication monitoring dashboard API.
  * Restricted to ADMIN — this exposes internal infrastructure state.
  */
+@ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 @RestController
 @RequestMapping("/api/admin/replication")
 public class ReplicationMonitorController {

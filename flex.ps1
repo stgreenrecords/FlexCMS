@@ -133,6 +133,11 @@ function Launch-InWindow([string]$title, [string]$workDir, [string]$cmd, [string
     if ($IsWindows -or [System.Environment]::OSVersion.Platform -eq 'Win32NT') {
         # Windows: open a new PowerShell window
         $script = @"
+# Set UTF-8 encoding so Next.js / Node.js Unicode symbols render correctly
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding  = [System.Text.Encoding]::UTF8
+`$env:PYTHONIOENCODING = 'utf-8'
+chcp 65001 | Out-Null
 `$Host.UI.RawUI.WindowTitle = '$title'
 Set-Location '$workDir'
 Write-Host '>>> $title' -ForegroundColor Cyan

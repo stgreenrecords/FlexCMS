@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.flexcms.author.service.ScheduledPublishingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.time.Instant;
 import java.util.List;
@@ -38,6 +39,7 @@ import java.util.UUID;
  * </ul>
  */
 @Tag(name = "Author Content", description = "Content node CRUD, versioning, locking, and scheduled publishing")
+@ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 @RestController
 @RequestMapping("/api/author/content")
 public class AuthorContentController {

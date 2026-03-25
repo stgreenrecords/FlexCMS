@@ -13,6 +13,7 @@ import com.flexcms.replication.service.ReplicationAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.util.*;
  * Workflow definitions are stored as JSON in the DB (see 03_AUTHOR_PUBLISH_REPLICATION.md §4).
  */
 @Service
+@ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 public class WorkflowEngine {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowEngine.class);

@@ -12,12 +12,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.util.UUID;
 
 /**
  * Author-side REST API for workflow management.
  */
 @Tag(name = "Author Workflow", description = "Content approval workflows — start, advance, and query workflow instances")
+@ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 @RestController
 @RequestMapping("/api/author/workflow")
 public class AuthorWorkflowController {

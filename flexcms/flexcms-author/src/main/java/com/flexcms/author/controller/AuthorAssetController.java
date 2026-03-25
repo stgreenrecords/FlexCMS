@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.util.UUID;
  * Author-side REST API for DAM asset management.
  */
 @Tag(name = "Author Assets", description = "DAM asset upload, retrieval, folder listing, and deletion")
+@ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 @Validated
 @RestController
 @RequestMapping("/api/author/assets")
