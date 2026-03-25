@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-fixed-variant": "#812800",
+                        "on-tertiary": "#5c1a00",
+                        "secondary-container": "#324575",
+                        "on-primary-fixed": "#001945",
+                        "primary-container": "#0058cc",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error": "#690005",
+                        "on-secondary": "#1a2e5d",
+                        "on-tertiary-container": "#ffcebd",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed-variant": "#324575",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface": "#131313",
+                        "primary-fixed": "#d9e2ff",
+                        "surface-bright": "#393939",
+                        "surface-tint": "#b0c6ff",
+                        "surface-container-highest": "#353534",
+                        "on-surface-variant": "#c3c6d6",
+                        "on-background": "#e5e2e1",
+                        "tertiary": "#ffb59b",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-primary-container": "#cbd8ff",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "secondary-fixed": "#dae2ff",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-primary": "#0058cc",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "error-container": "#93000a",
+                        "surface-variant": "#353534",
+                        "on-secondary-container": "#a1b4eb",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "outline": "#8d90a0",
+                        "on-primary": "#002d6f",
+                        "on-error-container": "#ffdad6",
+                        "primary": "#b0c6ff",
+                        "on-surface": "#e5e2e1",
+                        "surface-container": "#201f1f",
+                        "background": "#131313",
+                        "tertiary-container": "#a93802",
+                        "secondary": "#b3c5fd",
+                        "on-secondary-fixed": "#001847",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-on-surface": "#313030",
+                        "outline-variant": "#424654",
+                        "on-tertiary-fixed": "#380d00"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #131313;
+        }
+        /* Custom scrollbar for enterprise density */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-hidden h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex justify-between items-center px-6 h-16 w-full font-['Inter'] antialiased tracking-tight">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#b0c6ff]">FlexCMS</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-[#b0c6ff] border-b-2 border-[#b0c6ff] pb-1 text-sm font-medium" href="#">Workspace</a>
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-2 py-1 rounded text-sm font-medium" href="#">Analytics</a>
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-2 py-1 rounded text-sm font-medium" href="#">Users</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-lg border-b border-outline-variant/15">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">search</span>
+<input class="bg-transparent border-none text-sm focus:ring-0 placeholder-on-surface-variant/50 w-48" placeholder="Global search..." type="text"/>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">contrast</span>
+</button>
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="professional portrait of a system administrator with neutral background, cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpLOjM3JrRSJSm1ynf78h1Wer-yJQhgxrxxtDWVlQx-fwrlWuMs4EuT4Q1LxmqLB8FE6Nr_SWLQKXDcNHD2CYhGeVtvFLWjgIUd0Zc8vn2E-zPh-s4bQBpfmAGkG9Yev1xSwWVNvACPBanihfm6Ou9dFz4ZZx0hMJKmAPvU3kNE-kOCE9GKcAugNW6IUygRD4f8BISaGYDhUNV1aaOvrWVMpCSNY2mTVqwc5gVf4h67m9toZVn8PwwhbYb9F2KkdgHfC04FqxoFQ"/>
+</div>
+</div>
+</header>
+<!-- AppShell Container -->
+<div class="flex pt-16 h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#1c1b1b] flex flex-col py-4 space-y-2">
+<!-- Navigation Items -->
+<div class="px-4 mb-6">
+<div class="flex items-center gap-3 px-2 py-3 bg-surface-container rounded-lg mb-4">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm">architecture</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface leading-none">Architectural Curator</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Enterprise Orchestration</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="bg-[#2a2a2a] text-[#b0c6ff] rounded-r-lg border-l-4 border-[#b0c6ff] flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined">article</span>
+<span class="text-sm font-medium font-['Inter']">CMS</span>
+</a>
+<a class="text-[#c3c6d6] hover:bg-[#201f1f] hover:text-white flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-sm font-medium font-['Inter']">DAM</span>
+</a>
+<a class="text-[#c3c6d6] hover:bg-[#201f1f] hover:text-white flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="text-sm font-medium font-['Inter']">PIM</span>
+</a>
+<a class="text-[#c3c6d6] hover:bg-[#201f1f] hover:text-white flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium font-['Inter']">Settings</span>
+</a>
+</nav>
+<!-- Bottom Rail -->
+<div class="px-6 py-4 border-t border-outline-variant/10">
+<div class="flex items-center justify-between text-[#c3c6d6]">
+<span class="text-[10px] font-bold uppercase tracking-widest">System Status</span>
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 overflow-y-auto bg-surface-container">
+<div class="max-w-7xl mx-auto p-8">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 mb-4 text-xs font-medium tracking-wide uppercase text-on-surface-variant/60">
+<span>Workspace</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary-fixed-dim">Sites</span>
+</nav>
+<!-- Page Header -->
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div class="max-w-2xl">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Site Manager</h1>
+<p class="text-on-surface-variant font-medium opacity-80">Manage and monitor all web properties in your ecosystem.</p>
+</div>
+<div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-3 rounded-lg flex items-center gap-2 font-bold shadow-lg hover:shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95">
+<span class="material-symbols-outlined" data-weight="fill">add</span>
+                            Create New Site
+                        </button>
+</div>
+</header>
+<!-- Toolbar -->
+<div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 p-4 bg-surface-container-low rounded-xl border-b border-outline-variant/15">
+<div class="relative w-full md:w-96 group">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-highest border-none border-b border-outline-variant/30 focus:border-primary focus:ring-0 text-sm py-2.5 pl-10 pr-4 rounded transition-all" placeholder="Filter sites by name or URL..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-surface-container-highest p-1 rounded-lg">
+<button class="p-2 bg-surface-container-high shadow-sm text-primary rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">view_list</span>
+</button>
+</div>
+<div class="h-8 w-px bg-outline-variant/30"></div>
+<button class="text-sm font-bold flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                            Sort: Alphabetical
+                        </button>
+</div>
+</div>
+<!-- Content Area: Site Grid (4 columns) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 rounded-xl overflow-hidden flex flex-col relative border-b border-outline-variant/10">
+<div class="h-32 w-full overflow-hidden relative">
+<img alt="Corporate Global" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="minimalist corporate website preview with clean typography and blue accent colors, glassmorphism UI elements" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUeGKC1VqWx2LFn312PzywZMwAE-F6I2Uj7Q-IDyPuqps_8EGpZWzczwKU8CA7NPWRixmvEbPfF4nCnGp11WkfbRONm7cOezs1ufMUzX05eALVCC96aTpmhCrFCYR7J67-_KnPsbCsve69Rv4_GgpXqDaTjIMa3Vd4bEChTSSvt_YowmrxwTTvFotlxDd6ffw7oERJ3BITspQIWpY9jN9hVGt8h4rYnr2_f8XgrLrhhIrut1VOLhBmu05yIxiRhiLZ5IER204YZw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="h-8 w-8 rounded-full bg-surface-container-highest/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<div class="w-10 h-10 rounded bg-primary-container/20 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary">corporate_fare</span>
+</div>
+<span class="px-2 py-0.5 bg-primary-container/30 text-primary-fixed-dim text-[10px] font-bold uppercase tracking-wider rounded">Published</span>
+</div>
+<h3 class="text-base font-bold text-on-surface group-hover:text-primary transition-colors">Corporate Global</h3>
+<p class="text-xs text-on-surface-variant mb-6 font-medium">global.example.com</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Last Published</p>
+<p class="text-xs font-semibold text-on-surface-variant">2h ago</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Pages</p>
+<p class="text-xs font-semibold text-on-surface-variant">452</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 rounded-xl overflow-hidden flex flex-col relative border-b border-outline-variant/10">
+<div class="h-32 w-full overflow-hidden relative">
+<img alt="Customer Portal" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="e-commerce customer portal interface with product grids and user dashboard elements, professional clean dark mode style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeF4LvdMyKemcAW_N7YBKwUKt95BI9AGWtPfXsQty267y55Rj4QxA7dfAuiP7LlMSG2xWM-rXT0KJnvFyH743oZQpe96LZ9ifQFfRd0ygeSqSXu05Gx1sB4kqrAGTLuhur7s25dQZqhu97AMWfO_0XMtvd2H3pF1CIP0n1zgiY2tKfhbthWyTTxQkPJXdqYrWtEEuri92L3Avh1eHLfJkhHqVBAvqTrDkbWORMhpiWWlYN5xI_YLWk2NKg1wQ4EdoWQFvn3pSGWg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="h-8 w-8 rounded-full bg-surface-container-highest/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<div class="w-10 h-10 rounded bg-tertiary-container/20 flex items-center justify-center border border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary">support_agent</span>
+</div>
+<span class="px-2 py-0.5 bg-tertiary-container/30 text-tertiary text-[10px] font-bold uppercase tracking-wider rounded">Maintenance</span>
+</div>
+<h3 class="text-base font-bold text-on-surface group-hover:text-primary transition-colors">Customer Portal</h3>
+<p class="text-xs text-on-surface-variant mb-6 font-medium">portal.example.com</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Last Published</p>
+<p class="text-xs font-semibold text-on-surface-variant">1d ago</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Pages</p>
+<p class="text-xs font-semibold text-on-surface-variant">1,208</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 rounded-xl overflow-hidden flex flex-col relative border-b border-outline-variant/10">
+<div class="h-32 w-full overflow-hidden relative">
+<img alt="Marketing Blog" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="creative editorial blog layout with large typography and artistic photography placeholders, modern dark interface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiZqScfZES8zni4Q3vrg-MdJFMxIIZ3ex1ncCMBfbQ6fNefG8mAKQkZT-HpLHgZ5jVXfowf0z47n6l4Xc7ci8h29wlHS_ir7LQLXjM_k4X0ybswUO8vrGgz9_X-GNlzc-p-7ISLvwfIlH-3K6NZBOLhfN-_tGnh0-yGfJx3AxeR7L7ZyL8mlaA2g2xjsT4it2AK6uRArhOGjlsE8U-Lrx3xSUyaIN2d8MUdjqaiBqewjde3HrIjzXAGI9IMY3ZrSzrBslD8x9lxw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="h-8 w-8 rounded-full bg-surface-container-highest/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<div class="w-10 h-10 rounded bg-secondary-container/20 flex items-center justify-center border border-secondary/20">
+<span class="material-symbols-outlined text-secondary">campaign</span>
+</div>
+<span class="px-2 py-0.5 bg-primary-container/30 text-primary-fixed-dim text-[10px] font-bold uppercase tracking-wider rounded">Published</span>
+</div>
+<h3 class="text-base font-bold text-on-surface group-hover:text-primary transition-colors">Marketing Blog</h3>
+<p class="text-xs text-on-surface-variant mb-6 font-medium">blog.example.com</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Last Published</p>
+<p class="text-xs font-semibold text-on-surface-variant">4h ago</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Pages</p>
+<p class="text-xs font-semibold text-on-surface-variant">89</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 rounded-xl overflow-hidden flex flex-col relative border-b border-outline-variant/10">
+<div class="h-32 w-full overflow-hidden relative">
+<img alt="Internal Admin" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="web application settings panel with various toggles and form elements, muted dark theme" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAQtH1F_uzNloL3zfqf_dnre_bQYSkpxrXad6vSv8Yb1zw8rLvRSop6TXck5Hv3xg2DnJaq047bCoDAbCoF3kj50A0go2kHgttCGkyayoVrdd-i82A1sNiNnGa7ghbA2heYYCVSM9zjpdoJB3Zq4Z9ZN2-EDiwcHp0SOQWouN2Vn14BTlQvXPVJsRl9C7vi-pO33cmFO5-zeFzIf5ItndslwvxeiBiMylKQ8mB8h7YhhqgZJ1L6rswNycqT1-599tIax_knNnvGA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="h-8 w-8 rounded-full bg-surface-container-highest/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<div class="w-10 h-10 rounded bg-error-container/20 flex items-center justify-center border border-error/20">
+<span class="material-symbols-outlined text-error">admin_panel_settings</span>
+</div>
+<span class="px-2 py-0.5 bg-error-container/30 text-error text-[10px] font-bold uppercase tracking-wider rounded">Offline</span>
+</div>
+<h3 class="text-base font-bold text-on-surface group-hover:text-primary transition-colors">Internal Admin</h3>
+<p class="text-xs text-on-surface-variant mb-6 font-medium">admin-stg.internal.net</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Last Published</p>
+<p class="text-xs font-semibold text-on-surface-variant">3d ago</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Pages</p>
+<p class="text-xs font-semibold text-on-surface-variant">12</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Row 2 Card 1 (Duplicate pattern for 4-column fill visual) -->
+<div class="group bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 rounded-xl overflow-hidden flex flex-col relative border-b border-outline-variant/10">
+<div class="h-32 w-full overflow-hidden relative">
+<img alt="App Landing Page" class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="landing page for a mobile app with bright illustrations and dark background, high-end tech aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc753AbJd_lFP-4W7Xd-yOyuQAk7uRghRPdTconHzhLd2AgPn9la0YjH61Yjf4K6-7hb9UJ4Zf48gWwTybLTIIhjTs27X_qIf5JvdkfBuu6cT5RWe3q3Q93w8Qc93gVk1C_3sDBF94OoaXcdua-ctRrkXZSKobYI5u0o4qW8BBw9XW8ZsZksv67BW5QuXtbP8M85tunj549rMDL01nfbKZ9aGFRVA_H7NLs3tLhKfs9tJZPx-urgof7YBdQZiuDIpb6u4L8r45EQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<div class="absolute top-3 right-3">
+<button class="h-8 w-8 rounded-full bg-surface-container-highest/80 backdrop-blur-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col">
+<div class="flex items-center justify-between mb-2">
+<div class="w-10 h-10 rounded bg-primary-container/20 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary">smartphone</span>
+</div>
+<span class="px-2 py-0.5 bg-primary-container/30 text-primary-fixed-dim text-[10px] font-bold uppercase tracking-wider rounded">Published</span>
+</div>
+<h3 class="text-base font-bold text-on-surface group-hover:text-primary transition-colors">App Landing Page</h3>
+<p class="text-xs text-on-surface-variant mb-6 font-medium">app.example.com</p>
+<div class="mt-auto pt-4 border-t border-outline-variant/10 grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Last Published</p>
+<p class="text-xs font-semibold text-on-surface-variant">12m ago</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant/60 uppercase font-bold tracking-tighter">Pages</p>
+<p class="text-xs font-semibold text-on-surface-variant">5</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Placeholder/Empty State Card -->
+<div class="group border-2 border-dashed border-outline-variant/30 hover:border-primary/50 transition-all duration-300 rounded-xl flex flex-col items-center justify-center p-8 cursor-pointer bg-surface-container-lowest/50 hover:bg-surface-container-high">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">add_circle</span>
+</div>
+<p class="text-sm font-bold text-on-surface-variant text-center">Add New Environment</p>
+<p class="text-[10px] text-on-surface-variant/40 text-center uppercase tracking-widest mt-1">Configure property</p>
+</div>
+</div>
+<!-- Footer Stats Rail -->
+<div class="mt-12 flex flex-wrap items-center gap-12 p-6 bg-surface-container-low rounded-2xl">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">Total Properties</span>
+<span class="text-2xl font-extrabold text-on-surface">24</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">Bandwidth (30d)</span>
+<span class="text-2xl font-extrabold text-primary">4.2 TB</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">Total Pageviews</span>
+<span class="text-2xl font-extrabold text-on-surface">1.8M</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">System Health</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-extrabold text-on-surface">99.9%</span>
+<span class="material-symbols-outlined text-primary text-sm">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

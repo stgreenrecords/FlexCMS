@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS | Translation Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #424654; border-radius: 10px; }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#131313",
+                        "error-container": "#93000a",
+                        "tertiary-fixed": "#ffdbcf",
+                        "on-tertiary-fixed": "#380d00",
+                        "on-surface": "#e5e2e1",
+                        "inverse-surface": "#e5e2e1",
+                        "on-secondary-container": "#a1b4eb",
+                        "tertiary": "#ffb59b",
+                        "surface": "#131313",
+                        "secondary-fixed": "#dae2ff",
+                        "on-secondary-fixed-variant": "#324575",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-tint": "#b0c6ff",
+                        "surface-variant": "#353534",
+                        "on-secondary-fixed": "#001847",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "primary": "#b0c6ff",
+                        "on-tertiary": "#5c1a00",
+                        "on-primary-fixed-variant": "#00419c",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "tertiary-container": "#a93802",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "outline": "#8d90a0",
+                        "on-primary": "#002d6f",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "outline-variant": "#424654",
+                        "on-primary-container": "#cbd8ff",
+                        "on-surface-variant": "#c3c6d6",
+                        "on-tertiary-container": "#ffcebd",
+                        "surface-container-highest": "#353534",
+                        "inverse-primary": "#0058cc",
+                        "inverse-on-surface": "#313030",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#393939",
+                        "on-primary-fixed": "#001945",
+                        "secondary": "#b3c5fd",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary": "#1a2e5d",
+                        "surface-container": "#201f1f",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "secondary-container": "#324575",
+                        "primary-container": "#0058cc",
+                        "on-error": "#690005"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary/30 antialiased">
+<!-- TopAppBar -->
+<header class="bg-[#131313]/80 backdrop-blur-xl fixed top-0 w-full z-50 flex items-center justify-between px-6 h-16 w-full shadow-[0_8px_32px_rgba(0,0,0,0.06)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-[#b0c6ff]">FlexCMS</span>
+<nav class="hidden md:flex items-center gap-6 font-['Inter'] antialiased text-sm">
+<a class="text-gray-400 hover:text-gray-200 transition-colors duration-150" href="#">Dashboard</a>
+<a class="text-[#b0c6ff] border-b-2 border-[#b0c6ff] pb-1" href="#">Content</a>
+<a class="text-gray-400 hover:text-gray-200 transition-colors duration-150" href="#">Media</a>
+<a class="text-gray-400 hover:text-gray-200 transition-colors duration-150" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center bg-surface-container-high rounded-lg px-3 py-1.5 group focus-within:ring-1 ring-primary/50 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-on-surface-variant/50" placeholder="Search keys..." type="text"/>
+</div>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-[#2a2a2a] rounded-lg transition-all active:scale-95 duration-150">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-[#2a2a2a] rounded-lg transition-all active:scale-95 duration-150">help_outline</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30 ml-2">
+<img alt="User profile" data-alt="Professional headshot of a software developer in a neutral studio setting with soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBR_Q-ghosHkBlKTe4PBFaQ4dbrQWPY8bKuKD-oy_UgOVbdFOPXo95YJe_d3WFJVdxG4Zc8J0Zhm0_Q1ASQ2dPYfqlqGIA4j4vUrY2L1phiy3AcXb429w21y4Zgf-iJCFNBVG1kjpkUuqdIUKEAvVWJvMnhErtKMDtY_Up--fDLsXVcLjUohrVaCpQyISfgCkaNjAh36knc9hy2MnyN-4okOzTNwZsPQBys-zSOTHMP4Tln36-qjGuSWl9_r31wlcu73wOm5tZmjA"/>
+</div>
+</div>
+</header>
+<!-- Sidebar (SideNavBar) -->
+<aside class="h-screen w-64 fixed left-0 top-16 bg-[#1c1b1b] flex flex-col py-4 px-3 gap-2 overflow-y-auto font-['Inter'] text-[0.875rem] font-medium z-40">
+<div class="px-3 mb-4 flex items-center gap-3">
+<div class="w-8 h-8 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-lg">translate</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-[#b0c6ff] leading-none">Content Tree</h2>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold mt-1">Orchestration Mode</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span>Pages</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-[#b0c6ff] font-bold bg-[#201f1f] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">layers</span>
+<span>Collections</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">label</span>
+<span>Taxonomy</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">alt_route</span>
+<span>Workflows</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">image</span>
+<span>Assets</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-outline-variant/10 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span>Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] rounded-lg transition-all duration-200" href="#">
+<span class="material-symbols-outlined">delete</span>
+<span>Trash</span>
+</a>
+</div>
+<div class="mt-4 px-3">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+                Create New Page
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 pt-16 min-h-screen bg-surface-container">
+<!-- Dashboard Header -->
+<div class="px-8 py-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<nav class="flex items-center gap-2 text-xs font-medium text-on-surface-variant mb-4">
+<span>Sites</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Production</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary">Translation Manager</span>
+</nav>
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface">Language Matrix</h1>
+<p class="text-on-surface-variant mt-2 max-w-xl">Centralized i18n management for all pages and components. Sync across 4 active regions.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-semibold rounded-lg border border-outline-variant/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">publish</span>
+                    Import Translations
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary text-sm font-semibold rounded-lg transition-all hover:brightness-110">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    Export XLIFF
+                </button>
+</div>
+</div>
+<!-- Toolbar & Filter -->
+<div class="px-8 pb-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl border-b border-outline-variant/5">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Filter by status:</span>
+<div class="flex gap-1">
+<span class="px-2 py-0.5 rounded bg-green-500/10 text-green-400 text-[10px] font-bold border border-green-500/20 cursor-pointer hover:bg-green-500/20">Translated</span>
+<span class="px-2 py-0.5 rounded bg-yellow-500/10 text-yellow-400 text-[10px] font-bold border border-yellow-500/20 cursor-pointer hover:bg-yellow-500/20">Outdated</span>
+<span class="px-2 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] font-bold border border-red-500/20 cursor-pointer hover:bg-red-500/20">Missing</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<select class="bg-surface-container-highest border-none rounded text-xs text-on-surface-variant focus:ring-1 ring-primary pr-8">
+<option>All Sections</option>
+<option>Home Page</option>
+<option>User Dashboard</option>
+<option>Global UI Components</option>
+</select>
+<div class="h-4 w-px bg-outline-variant/20"></div>
+<span class="text-[11px] text-on-surface-variant font-medium">Showing 142 keys</span>
+</div>
+</div>
+</div>
+<!-- Translation Grid -->
+<div class="px-8 pb-12">
+<div class="overflow-x-auto custom-scrollbar rounded-xl bg-surface-container-low border border-outline-variant/5">
+<table class="w-full text-left border-collapse min-w-[1000px]">
+<thead>
+<tr class="bg-surface-container-lowest/50">
+<th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10 w-72">Key Name &amp; Context</th>
+<th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10">English (Source)</th>
+<th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10">French (FR)</th>
+<th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10">German (DE)</th>
+<th class="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-outline-variant/10">Spanish (ES)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 align-top">
+<span class="block text-sm font-semibold text-primary mb-1">common.buttons.save</span>
+<span class="block text-[10px] text-on-surface-variant font-mono bg-background/50 px-1.5 py-0.5 rounded w-fit">Global Components</span>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="text-[13px] text-on-surface leading-relaxed">Save Changes</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" readonly="" rows="1">Sauvegarder les modifications</textarea>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" readonly="" rows="1">Änderungen speichern</textarea>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" readonly="" rows="1">Guardar cambios</textarea>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-container-high transition-colors bg-surface-container/30">
+<td class="px-6 py-4 align-top">
+<span class="block text-sm font-semibold text-primary mb-1">dashboard.welcome_msg</span>
+<span class="block text-[10px] text-on-surface-variant font-mono bg-background/50 px-1.5 py-0.5 rounded w-fit">Dashboard Home</span>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="text-[13px] text-on-surface leading-relaxed italic text-on-surface-variant">Welcome back, {user}!</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell border-b border-yellow-500/30">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
+<span class="text-[10px] font-bold text-yellow-500 uppercase">Outdated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" rows="1">Bon retour, {user} !</textarea>
+<span class="absolute right-0 bottom-1 material-symbols-outlined text-[14px] text-on-surface-variant opacity-0 group-hover/cell:opacity-100">edit</span>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" rows="1">Willkommen zurück, {user}!</textarea>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell border-b border-primary/20">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+<span class="text-[10px] font-bold text-red-500 uppercase">Missing</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface-variant focus:ring-0 resize-none overflow-hidden" placeholder="Type translation..." rows="1"></textarea>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-container-high transition-colors">
+<td class="px-6 py-4 align-top">
+<span class="block text-sm font-semibold text-primary mb-1">settings.privacy.disclaimer</span>
+<span class="block text-[10px] text-on-surface-variant font-mono bg-background/50 px-1.5 py-0.5 rounded w-fit">Settings</span>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="text-[13px] text-on-surface leading-relaxed line-clamp-2">Your data privacy is our priority. We never sell your personal information.</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" rows="2">La confidentialité de vos données est notre priorité. Nous ne vendons jamais vos informations.</textarea>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" rows="2">Datenschutz ist unsere Priorität. Wir verkaufen niemals Ihre Informationen.</textarea>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell border-b border-primary/20">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+<span class="text-[10px] font-bold text-red-500 uppercase">Missing</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface-variant focus:ring-0 resize-none overflow-hidden" placeholder="Type translation..." rows="2"></textarea>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-surface-container-high transition-colors bg-surface-container/30">
+<td class="px-6 py-4 align-top">
+<span class="block text-sm font-semibold text-primary mb-1">auth.forgot_password</span>
+<span class="block text-[10px] text-on-surface-variant font-mono bg-background/50 px-1.5 py-0.5 rounded w-fit">Authentication</span>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="text-[13px] text-on-surface leading-relaxed">Forgot password?</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" rows="1">Mot de passe oublié ?</textarea>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" rows="1">Passwort vergessen?</textarea>
+</div>
+</td>
+<td class="px-6 py-4 align-top">
+<div class="relative group/cell">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="text-[10px] font-bold text-green-500 uppercase">Translated</span>
+</div>
+<textarea class="w-full bg-transparent border-none p-0 text-[13px] text-on-surface focus:ring-0 resize-none overflow-hidden" rows="1">¿Has olvidado tu contraseña?</textarea>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination-ish Footer -->
+<div class="mt-6 flex items-center justify-between">
+<p class="text-[11px] text-on-surface-variant">Showing <span class="text-on-surface font-bold">1-15</span> of <span class="text-on-surface font-bold">142</span> keys</p>
+<div class="flex gap-2">
+<button class="p-2 bg-surface-container-low hover:bg-surface-container-high rounded text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 bg-primary/10 text-primary rounded text-xs font-bold border border-primary/20">1</button>
+<button class="px-3 py-1 bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant rounded text-xs font-bold transition-colors">2</button>
+<button class="px-3 py-1 bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant rounded text-xs font-bold transition-colors">3</button>
+<button class="p-2 bg-surface-container-low hover:bg-surface-container-high rounded text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Suppressed on this data-heavy management screen according to suppression rules) -->
+<!-- Status Bar (Bento-style summary) -->
+<div class="fixed bottom-6 right-6 flex flex-col gap-2 z-50">
+<div class="glass-panel p-4 rounded-xl border border-outline-variant/10 shadow-2xl max-w-xs">
+<h4 class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-3">Translation Health</h4>
+<div class="flex items-center gap-4 mb-3">
+<div class="flex-1">
+<div class="flex justify-between text-[11px] mb-1">
+<span class="text-on-surface-variant">Completion</span>
+<span class="text-primary font-bold">84%</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-1">
+<div class="bg-primary h-1 rounded-full w-[84%] shadow-[0_0_8px_rgba(176,198,255,0.4)]"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="p-2 bg-surface-container-lowest/50 rounded flex items-center gap-2">
+<div class="w-1 h-3 bg-green-500 rounded-full"></div>
+<div>
+<p class="text-[10px] text-on-surface-variant leading-none">Healthy</p>
+<p class="text-xs font-bold text-on-surface">118</p>
+</div>
+</div>
+<div class="p-2 bg-surface-container-lowest/50 rounded flex items-center gap-2">
+<div class="w-1 h-3 bg-red-500 rounded-full"></div>
+<div>
+<p class="text-[10px] text-on-surface-variant leading-none">Missing</p>
+<p class="text-xs font-bold text-on-surface">24</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

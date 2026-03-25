@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#131313",
+              "on-surface": "#e5e2e1",
+              "surface-container-highest": "#353534",
+              "surface-bright": "#393939",
+              "tertiary-fixed-dim": "#ffb59b",
+              "on-secondary": "#1a2e5d",
+              "on-tertiary-fixed-variant": "#812800",
+              "primary-fixed": "#d9e2ff",
+              "outline-variant": "#424654",
+              "tertiary-fixed": "#ffdbcf",
+              "surface-variant": "#353534",
+              "on-error": "#690005",
+              "tertiary": "#ffb59b",
+              "secondary-container": "#324575",
+              "surface-container-low": "#1c1b1b",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-container": "#201f1f",
+              "on-primary-container": "#cbd8ff",
+              "background": "#131313",
+              "on-tertiary-fixed": "#380d00",
+              "on-secondary-container": "#a1b4eb",
+              "tertiary-container": "#a93802",
+              "on-secondary-fixed-variant": "#324575",
+              "outline": "#8d90a0",
+              "inverse-primary": "#0058cc",
+              "on-secondary-fixed": "#001847",
+              "inverse-on-surface": "#313030",
+              "error": "#ffb4ab",
+              "primary-container": "#0058cc",
+              "on-primary-fixed-variant": "#00419c",
+              "surface-container-high": "#2a2a2a",
+              "surface-tint": "#b0c6ff",
+              "on-primary-fixed": "#001945",
+              "surface-dim": "#131313",
+              "primary-fixed-dim": "#b0c6ff",
+              "secondary-fixed": "#dae2ff",
+              "primary": "#b0c6ff",
+              "on-tertiary-container": "#ffcebd",
+              "on-surface-variant": "#c3c6d6",
+              "on-primary": "#002d6f",
+              "secondary-fixed-dim": "#b3c5fd",
+              "error-container": "#93000a",
+              "on-background": "#e5e2e1",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#b3c5fd",
+              "on-tertiary": "#5c1a00",
+              "on-error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #131313;
+            color: #e5e2e1;
+            -webkit-font-smoothing: antialiased;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .glass-card {
+            background: rgba(53, 53, 52, 0.4);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-md flex items-center justify-between px-4 h-16 w-full">
+<div class="flex items-center gap-3">
+<button class="text-[#b0c6ff] active:scale-95 duration-200 hover:bg-[#2a2a2a] p-2 rounded-lg">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="text-xl font-bold bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] bg-clip-text text-transparent font-['Inter'] tracking-tight">FlexCMS</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-[#c3c6d6] hover:bg-[#2a2a2a] p-2 rounded-lg active:scale-95 duration-200">
+<span class="material-symbols-outlined">search</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-[10px] font-bold text-on-primary border border-outline-variant/20">
+                JD
+            </div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="pt-20 pb-24 px-4 min-h-screen">
+<!-- Header Section -->
+<div class="mb-8 mt-2">
+<h1 class="font-['Inter'] text-2xl font-bold tracking-tight text-on-surface mb-1">Catalog</h1>
+<p class="font-['Inter'] text-sm text-on-surface-variant">Manage your seasonal asset collections</p>
+</div>
+<!-- Catalog List (Asymmetric/Editorial Layout) -->
+<div class="grid grid-cols-1 gap-6">
+<!-- Catalog Card 1 -->
+<div class="group relative flex flex-col bg-surface-container rounded-xl overflow-hidden">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Modern architectural structure with clean lines and blue sky reflecting in glass panels, high-end editorial photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8dA3Q75KY5_wYSuIVsoh6mM7fRtcDtZ9R7v0skLa4DBxpIU6vMQHAHgZDzQYr8ekLhKoc48I8sxj2ZYXsgyLu1UAtysDNm7g7nQYeeIJOWf61XzPfxw0h-cy2oUyK3ikK1OLCH3UzAmHANXZk23dwzLokmXwlfZ3yw22sLjWkQ8f_bPfajSp4EHGT2YS15U5f09OYreEfwv-pUpJOmBN5V97koZddvNEIrrZyTYL974oURa691Wxku_al8g8OMjGqf4flB8QuDA"/>
+<div class="absolute top-3 left-3 flex items-center gap-2">
+<span class="bg-[#324575] text-[#b0c6ff] px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase backdrop-blur-md">ACTIVE</span>
+</div>
+</div>
+<div class="p-4 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-on-surface tracking-tight">Summer '24 Lookbook</h3>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">more_vert</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span class="text-xs font-medium">Q3 2024</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">photo_library</span>
+<span class="text-xs font-medium">124 Assets</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-surface bg-surface-container-highest"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-primary-container"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-tertiary-container flex items-center justify-center text-[8px] font-bold">+4</div>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container px-4 py-2 rounded-lg text-on-primary text-xs font-bold active:scale-95 transition-all">
+                            View Catalog
+                        </button>
+</div>
+</div>
+</div>
+<!-- Catalog Card 2 -->
+<div class="group relative flex flex-col bg-surface-container rounded-xl overflow-hidden">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-60 grayscale" data-alt="Close up of high-end boutique interior with minimalist rack and soft moody shadows, luxurious retail atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1fftX5Qabp-OEM9GDZlaVAKsgR7_Ple-noNzq6v6muSzew-XMeh88MvI4FtKWl7-AwC7jZWE9flXgX-uI11Fm9qlFFSvQONjN7ftI8_S2zg-z19cX-YagB9pFWJwNbGAJqFgO22jqITgcjCOQEBabBJc1lJsQCH-fwtzE7_Wlm4599XChrzOi2AlSqPLVN7z1IgjUO-y3NJC4uzt8Y4PGugNsYdZuQ2Yc_YyExuLIhjGMyQI9dRoqqgJL-N_jYKwdCuiJEXmHtQ"/>
+<div class="absolute top-3 left-3 flex items-center gap-2">
+<span class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase backdrop-blur-md">ARCHIVED</span>
+</div>
+</div>
+<div class="p-4 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-on-surface tracking-tight">Autumn Essentials</h3>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">more_vert</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span class="text-xs font-medium">Q4 2023</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">photo_library</span>
+<span class="text-xs font-medium">89 Assets</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-surface bg-surface-container-highest"></div>
+<div class="w-6 h-6 rounded-full border border-surface bg-primary-container"></div>
+</div>
+<button class="bg-surface-container-high px-4 py-2 rounded-lg text-on-surface-variant text-xs font-bold active:scale-95 transition-all">
+                            Restore
+                        </button>
+</div>
+</div>
+</div>
+<!-- Catalog Card 3 -->
+<div class="group relative flex flex-col bg-surface-container rounded-xl overflow-hidden">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Bright minimal studio space with natural light streaming through a window, clean aesthetic for content creation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDC5ZBybK3_r1uJEHOBWG_cmEVpIUbWv6KOwntM73rlTOs2OPb6cucn7oqCYklaDDFi0SWPQcTfAFMrajxoCZxRjNaWCkxyANC2_eKvepExNEo0_j2PJVja1bAO81xKN4S7YMDLoVOrXBix2fKIJcbmxUs6-unDReHmLZO8oJ-tB3U0oFi688cAIc_oL3CDCWQ72RSfAT_57YOudrs0hisXQRIQd0aH95rzyTgz--aIIHDlkc4SYeKfccdf3jt7XaovZ8b8MxQF1w"/>
+<div class="absolute top-3 left-3 flex items-center gap-2">
+<span class="bg-[#a93802] text-[#ffcebd] px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase backdrop-blur-md">DRAFT</span>
+</div>
+</div>
+<div class="p-4 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-lg font-bold text-on-surface tracking-tight">Brand Identity v2</h3>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">more_vert</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant mb-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span class="text-xs font-medium">Internal</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">photo_library</span>
+<span class="text-xs font-medium">12 Assets</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-2">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border border-surface bg-surface-container-highest"></div>
+</div>
+<button class="bg-gradient-to-r from-primary to-primary-container px-4 py-2 rounded-lg text-on-primary text-xs font-bold active:scale-95 transition-all">
+                            Continue
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Contextual) -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] rounded-full shadow-lg shadow-[#000]/40 flex items-center justify-center text-on-primary active:scale-90 transition-transform z-50">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-[#131313]/90 backdrop-blur-xl flex justify-around items-center h-16 px-2 border-t border-[#424654]/15">
+<!-- Catalog Active -->
+<a class="flex flex-col items-center justify-center bg-[#324575] text-[#b0c6ff] rounded-full px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-['Inter'] text-[10px] font-semibold">Catalog</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c3c6d6] opacity-70 hover:opacity-100 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-['Inter'] text-[10px] font-semibold">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c3c6d6] opacity-70 hover:opacity-100 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="font-['Inter'] text-[10px] font-semibold">Import</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c3c6d6] opacity-70 hover:opacity-100 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-['Inter'] text-[10px] font-semibold">Admin</span>
+</a>
+</nav>
+</body></html>

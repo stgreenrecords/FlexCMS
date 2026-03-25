@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#e5e2e1",
+                        "primary": "#b0c6ff",
+                        "on-primary": "#002d6f",
+                        "on-error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "outline": "#8d90a0",
+                        "on-secondary-container": "#a1b4eb",
+                        "outline-variant": "#424654",
+                        "on-tertiary-fixed": "#380d00",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-on-surface": "#313030",
+                        "on-secondary-fixed": "#001847",
+                        "tertiary-container": "#a93802",
+                        "secondary": "#b3c5fd",
+                        "surface-container": "#201f1f",
+                        "background": "#131313",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary-container": "#cbd8ff",
+                        "tertiary": "#ffb59b",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#c3c6d6",
+                        "surface-variant": "#353534",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "error-container": "#93000a",
+                        "inverse-primary": "#0058cc",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-fixed": "#dae2ff",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed": "#ffdbcf",
+                        "on-secondary-fixed-variant": "#324575",
+                        "on-tertiary-container": "#ffcebd",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#1a2e5d",
+                        "surface-container-highest": "#353534",
+                        "surface-tint": "#b0c6ff",
+                        "surface-bright": "#393939",
+                        "primary-fixed": "#d9e2ff",
+                        "surface": "#131313",
+                        "primary-container": "#0058cc",
+                        "on-primary-fixed": "#001945",
+                        "secondary-container": "#324575",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "on-tertiary": "#5c1a00",
+                        "on-error": "#690005",
+                        "surface-container-low": "#1c1b1b"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #424654; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container overflow-hidden">
+<!-- SideNavBar (Collapsed - Enterprise Console) -->
+<aside class="fixed left-0 top-0 h-full w-[64px] bg-[#1c1b1b] border-r border-[#424654]/15 flex flex-col items-center py-6 z-[60]">
+<div class="mb-10 text-primary">
+<span class="material-symbols-outlined text-3xl">architecture</span>
+</div>
+<nav class="flex flex-col gap-4 flex-1">
+<button class="p-3 text-[#c3c6d6] hover:bg-[#201f1f] rounded-xl transition-all duration-300">
+<span class="material-symbols-outlined">inventory_2</span>
+</button>
+<button class="p-3 bg-[#324575] text-[#b0c6ff] rounded-xl transition-all duration-300">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+</button>
+<button class="p-3 text-[#c3c6d6] hover:bg-[#201f1f] rounded-xl transition-all duration-300">
+<span class="material-symbols-outlined">account_tree</span>
+</button>
+<button class="p-3 text-[#c3c6d6] hover:bg-[#201f1f] rounded-xl transition-all duration-300">
+<span class="material-symbols-outlined">insights</span>
+</button>
+<button class="p-3 text-[#c3c6d6] hover:bg-[#201f1f] rounded-xl transition-all duration-300">
+<span class="material-symbols-outlined">perm_media</span>
+</button>
+</nav>
+<div class="flex flex-col gap-4 mt-auto">
+<button class="p-3 text-[#c3c6d6] hover:bg-[#201f1f] transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<button class="p-3 text-[#c3c6d6] hover:bg-[#201f1f] transition-all">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 left-[64px] right-0 h-16 bg-[#131313]/80 backdrop-blur-xl flex items-center justify-between px-8 z-50 border-b border-[#424654]/10">
+<div class="flex items-center gap-4">
+<h1 class="text-lg font-bold tracking-tight text-[#b0c6ff]">Architectural Curator</h1>
+<div class="h-4 w-px bg-outline-variant/30"></div>
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-widest">Editor</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant/10">
+<div class="w-2 h-2 rounded-full bg-[#81c784] shadow-[0_0_8px_rgba(129,199,132,0.4)]"></div>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase">Live Sync</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-on-surface-variant hover:bg-[#2a2a2a] rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-[#2a2a2a] rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-primary/20" data-alt="Professional headshot of a creative director in a minimalist studio setting with soft directional lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs8YbWRaQ3GCqznJ-CeGTL2Qr1Wv830YunHTvhherUtKCjRZnWm8NwWuurJ7zXy7cZuF0_Csp-L_HYc7VJg_g43OPnC-t3BIGfokKE7qQ2O1NGVcdSZKcSFh3uvz-DRhT71wos2xnNq8yaMzmcMXVqU8G_HcwpJAHrBZqOUhOes8kfXTApSLWx8UN9nVdCZVdSgyLkDpq4Xe55DczaBdhA6DKjNle8QIGdER77yXWfJ-CPYYw1Ex2LYS5kbHRZSs0Psf_Zy5Ppqw"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[64px] mt-16 p-8 h-[calc(100vh-64px)] overflow-y-auto grid grid-cols-12 gap-6 bg-surface-container">
+<!-- Editor Header & Actions -->
+<div class="col-span-12 flex items-end justify-between mb-2">
+<div>
+<nav class="flex items-center gap-2 text-xs font-medium text-on-surface-variant mb-2">
+<span>Products</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span>Furniture</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary">Eames Lounge Chair</span>
+</nav>
+<h2 class="text-3xl font-bold text-on-surface tracking-tight">Eames Lounge Chair &amp; Ottoman</h2>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2 text-sm font-semibold text-on-surface hover:bg-surface-container-highest rounded-lg transition-all border border-outline-variant/20">
+                    Discard
+                </button>
+<button class="px-6 py-2 text-sm font-bold bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-lg shadow-lg shadow-primary-container/20 active:scale-95 transition-all">
+                    Publish Changes
+                </button>
+</div>
+</div>
+<!-- Left Column: Core Data & Form Sections -->
+<div class="col-span-8 flex flex-col gap-6">
+<!-- Section: General Information -->
+<section class="bg-surface-container-low rounded-xl p-6 border border-outline-variant/5">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">info</span>
+                        General Information
+                    </h3>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">expand_less</span>
+</div>
+<div class="grid grid-cols-2 gap-x-8 gap-y-6">
+<div class="flex flex-col gap-2">
+<label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-tighter">Product Name</label>
+<input class="bg-surface-container-highest border-b border-outline-variant/30 text-on-surface px-0 py-2 focus:ring-0 focus:border-primary transition-colors text-sm font-medium outline-none" type="text" value="Eames Lounge Chair &amp; Ottoman"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-tighter">SKU Base</label>
+<input class="bg-surface-container-highest border-b border-outline-variant/30 text-on-surface px-0 py-2 focus:ring-0 focus:border-primary transition-colors text-sm font-medium outline-none" type="text" value="HER-EAM-LOU-70"/>
+</div>
+<div class="col-span-2 flex flex-col gap-2">
+<label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-tighter">Description</label>
+<textarea class="bg-surface-container-highest border-b border-outline-variant/30 text-on-surface px-0 py-2 focus:ring-0 focus:border-primary transition-colors text-sm font-medium outline-none resize-none" rows="3">A timeless classic, the Eames Lounge Chair and Ottoman represent the culmination of Charles and Ray Eames' efforts to create comfortable and handsome seating by using production techniques that combine technology and handcraftsmanship.</textarea>
+</div>
+</div>
+</section>
+<!-- Section: Variant Table -->
+<section class="bg-surface-container-low rounded-xl border border-outline-variant/5 overflow-hidden">
+<div class="p-6 flex items-center justify-between border-b border-outline-variant/10">
+<h3 class="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">layers</span>
+                        Variants &amp; Inventory
+                    </h3>
+<button class="text-[11px] font-bold text-primary px-3 py-1 bg-primary/10 rounded-full hover:bg-primary/20 transition-all uppercase tracking-widest">
+                        + Add Variant
+                    </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-high/50 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+<tr>
+<th class="px-6 py-4">Finish</th>
+<th class="px-6 py-4">Upholstery</th>
+<th class="px-6 py-4 text-right">Price</th>
+<th class="px-6 py-4 text-center">Stock</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5 text-sm">
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-6 py-4 font-medium">Walnut</td>
+<td class="px-6 py-4">Black Leather</td>
+<td class="px-6 py-4 text-right font-mono">$7,495.00</td>
+<td class="px-6 py-4 text-center font-mono">12</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-tighter">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant/40 hover:text-on-surface cursor-pointer">more_vert</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-6 py-4 font-medium">Santos Palisander</td>
+<td class="px-6 py-4">Mclaram Leather</td>
+<td class="px-6 py-4 text-right font-mono">$9,250.00</td>
+<td class="px-6 py-4 text-center font-mono">4</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-tighter">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant/40 hover:text-on-surface cursor-pointer">more_vert</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high/30 transition-colors">
+<td class="px-6 py-4 font-medium">White Ash</td>
+<td class="px-6 py-4">Parchment Leather</td>
+<td class="px-6 py-4 text-right font-mono">$7,895.00</td>
+<td class="px-6 py-4 text-center font-mono text-error">0</td>
+<td class="px-6 py-4">
+<span class="px-2 py-0.5 rounded-full bg-error/10 text-error text-[10px] font-bold uppercase tracking-tighter">Backorder</span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant/40 hover:text-on-surface cursor-pointer">more_vert</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Right Column: Media & Meta -->
+<div class="col-span-4 flex flex-col gap-6">
+<!-- DAM Asset Picker -->
+<section class="bg-surface-container-low rounded-xl border border-outline-variant/5 p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">image</span>
+                        Media Assets
+                    </h3>
+<button class="text-[18px] text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">add_photo_alternate</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="relative group aspect-square rounded-lg overflow-hidden border border-outline-variant/20">
+<img alt="Eames Chair Main" class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500" data-alt="Close-up of a classic Eames lounge chair in black leather and walnut wood against a minimalist white architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2qakQAEY6cDOn7gC-Ar-8tOnP1lEOAr3pjNuL7uEWd-MdaY-IXaXInAHQMCKWM9ygFulv-Fb4S_hm-DN9mYdsFaAszL5opazqy--Qlgsr6qDEz8akynVQCSvGzy_ybg49-gocCN_ERcPEy3P5M7PjCrOOeq7-BgKpTQcvOZG4BxAd8ONGNKo7qDgLIOFgfCT_BQrR_mXnERPtNfCGEmG_AxlBpgYKT9uZ3YGPPCGtqS-h11h_4IaeQq0ax1XVFfVAwuUX7Eou_w"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity">
+<span class="material-symbols-outlined text-white cursor-pointer hover:scale-110">edit</span>
+<span class="material-symbols-outlined text-white cursor-pointer hover:scale-110">delete</span>
+</div>
+</div>
+<div class="relative group aspect-square rounded-lg overflow-hidden border border-outline-variant/20">
+<img alt="Eames Ottoman" class="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-500" data-alt="Detailed shot of a matching ottoman for a lounge chair, showing fine stitching and polished wood veneer texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvg7t30fB-rM6FxhxwVSZkZ5iYF9VpHip3whkW6WH_FCMSYviAlTVofgdPz-iCv_fqpSJvkYhlu7ri-o3ZOp1pSTnSUMA6FyDwURh4AJT-0bPMSpTrpAIDidREyHl_uNPUftNhe85P4_ZsDigAIJXgmBvvoIp0UGKXjS1lSoEV3uPyTblSOmJlWYVEdlNrvOI-fHy84ZZdlL_qIzBPtpybbIheOtx6v1Fm3NkliUm3h5nLpqY35huS8XOp3uLCWoxQ5xySU833Ew"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity">
+<span class="material-symbols-outlined text-white cursor-pointer hover:scale-110">edit</span>
+</div>
+</div>
+<div class="relative aspect-square rounded-lg border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">upload_file</span>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Browse DAM</span>
+</div>
+</div>
+</section>
+<!-- Metadata & Hierarchy -->
+<section class="bg-surface-container-low rounded-xl border border-outline-variant/5 p-6">
+<h3 class="text-sm font-bold uppercase tracking-wider text-primary flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-lg">schema</span>
+                    Classification
+                </h3>
+<div class="space-y-5">
+<div class="flex flex-col gap-2">
+<label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-tighter">Category</label>
+<div class="relative">
+<select class="w-full bg-surface-container-highest border-b border-outline-variant/30 text-on-surface px-0 py-2 appearance-none focus:ring-0 focus:border-primary transition-colors text-sm font-medium outline-none">
+<option>Living Room Furniture</option>
+<option>Office Seating</option>
+<option>Lounge Chairs</option>
+</select>
+<span class="material-symbols-outlined absolute right-0 bottom-2 text-on-surface-variant pointer-events-none">unfold_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-[11px] font-bold text-on-surface-variant uppercase tracking-tighter">Tags</label>
+<div class="flex flex-wrap gap-2 pt-1">
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-[10px] font-bold rounded-full border border-secondary-container/50">Mid-Century</span>
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-[10px] font-bold rounded-full border border-secondary-container/50">Iconic</span>
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-[10px] font-bold rounded-full border border-secondary-container/50">Herman Miller</span>
+<button class="w-6 h-6 flex items-center justify-center rounded-full border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+<div class="pt-4 mt-4 border-t border-outline-variant/10">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-tighter">Visibility</span>
+<div class="w-10 h-5 bg-primary/20 rounded-full relative cursor-pointer flex items-center px-1">
+<div class="w-3.5 h-3.5 bg-primary rounded-full absolute right-1"></div>
+</div>
+</div>
+<p class="text-[10px] text-on-surface-variant/60 mt-2 italic">Visible on storefront and CMS channels.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Asymmetric Footer / Bottom Bar (Spacer) -->
+<div class="col-span-12 h-20"></div>
+</main>
+<!-- Floating Action Rail (Contextual Rail) -->
+<div class="fixed right-6 bottom-8 flex flex-col gap-3 z-50">
+<button class="w-12 h-12 flex items-center justify-center bg-surface-container-highest border border-outline-variant/20 rounded-xl shadow-xl hover:text-primary transition-all duration-300">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center bg-surface-container-highest border border-outline-variant/20 rounded-xl shadow-xl hover:text-primary transition-all duration-300">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl shadow-2xl shadow-primary/20 active:scale-90 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">save</span>
+</button>
+</div>
+</body></html>

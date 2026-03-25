@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS | Content Tree Browser</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "error-container": "#93000a",
+                        "inverse-primary": "#0058cc",
+                        "surface-variant": "#353534",
+                        "secondary-fixed": "#dae2ff",
+                        "surface-dim": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary": "#ffb59b",
+                        "on-primary-fixed-variant": "#00419c",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary-container": "#cbd8ff",
+                        "on-surface-variant": "#c3c6d6",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-on-surface": "#313030",
+                        "on-secondary-fixed": "#001847",
+                        "outline-variant": "#424654",
+                        "on-tertiary-fixed": "#380d00",
+                        "tertiary-container": "#a93802",
+                        "secondary": "#b3c5fd",
+                        "surface-container": "#201f1f",
+                        "background": "#131313",
+                        "primary": "#b0c6ff",
+                        "on-primary": "#002d6f",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#e5e2e1",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "outline": "#8d90a0",
+                        "on-secondary-container": "#a1b4eb",
+                        "surface-container-low": "#1c1b1b",
+                        "on-error": "#690005",
+                        "secondary-container": "#324575",
+                        "primary-container": "#0058cc",
+                        "on-primary-fixed": "#001945",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "on-tertiary": "#5c1a00",
+                        "surface-bright": "#393939",
+                        "surface-container-highest": "#353534",
+                        "surface-tint": "#b0c6ff",
+                        "primary-fixed": "#d9e2ff",
+                        "surface": "#131313",
+                        "tertiary-fixed": "#ffdbcf",
+                        "on-secondary": "#1a2e5d",
+                        "on-secondary-fixed-variant": "#324575",
+                        "on-tertiary-container": "#ffcebd",
+                        "error": "#ffb4ab"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #424654; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container antialiased">
+<header class="bg-[#131313]/80 backdrop-blur-xl text-[#b0c6ff] font-['Inter'] antialiased text-sm fixed top-0 w-full z-50 shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-8">
+<div class="text-xl font-bold tracking-tight text-[#b0c6ff]">FlexCMS</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-gray-400 hover:text-gray-200 transition-colors transition-all duration-200" href="#">Dashboard</a>
+<a class="text-[#b0c6ff] border-b-2 border-[#b0c6ff] pb-1 transition-all duration-200" href="#">Content</a>
+<a class="text-gray-400 hover:text-gray-200 transition-colors transition-all duration-200" href="#">Media</a>
+<a class="text-gray-400 hover:text-gray-200 transition-colors transition-all duration-200" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined p-2 text-gray-400 hover:bg-[#2a2a2a] rounded-lg cursor-pointer transition-all duration-200 active:scale-95">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-background"></span>
+</div>
+<span class="material-symbols-outlined p-2 text-gray-400 hover:bg-[#2a2a2a] rounded-lg cursor-pointer transition-all duration-200 active:scale-95">help_outline</span>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-2 ring-1 ring-outline-variant/30">
+<img alt="User profile" data-alt="close-up portrait of a professional man with a neutral expression in a dark studio setting with cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsSKObWmhqojgtW50S4j4AgWMYu3en-JiFufjWaMNQgPeXRwBaGAXF4AMvyzkK7gyJliVI0xn8I6STa8wxpBhCiVrlliKWK7H15mzECou4_Tor35EDdMlwelzmm2F-Lin-EdnZQ8d3dw5mJ4QT6kNE6xqYA8AzBjvyWtqApSV3vnKkN5EofuJa2FOtwtyia2_jsIhmmoSC0CjQ28vamfBO81hh2oN8apj2et1f8cRkiFxeUEnYf2PaKr_e-XvuY4nKNeAWocCPKA"/>
+</div>
+</div>
+</header>
+<aside class="h-screen w-64 fixed left-0 top-16 bg-[#1c1b1b] font-['Inter'] text-[0.875rem] font-medium flex flex-col py-4 px-3 gap-2 overflow-y-auto">
+<div class="px-3 py-2 mb-2">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm">account_tree</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-[#b0c6ff] leading-none">Content Tree</h2>
+<p class="text-[0.6875rem] text-on-surface-variant uppercase tracking-wider mt-1">Orchestration Mode</p>
+</div>
+</div>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 font-semibold mb-6 hover:opacity-90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[1.2rem]">add_circle</span>
+            Create New Page
+        </button>
+<div class="space-y-1">
+<div class="text-[#b0c6ff] font-bold bg-[#201f1f] rounded-lg flex items-center gap-3 px-3 py-2 cursor-pointer transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[1.2rem]">account_tree</span>
+                Pages
+            </div>
+<div class="text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] transition-colors flex items-center gap-3 px-3 py-2 cursor-pointer rounded-lg transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[1.2rem]">layers</span>
+                Collections
+            </div>
+<div class="text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] transition-colors flex items-center gap-3 px-3 py-2 cursor-pointer rounded-lg transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[1.2rem]">label</span>
+                Taxonomy
+            </div>
+<div class="text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] transition-colors flex items-center gap-3 px-3 py-2 cursor-pointer rounded-lg transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[1.2rem]">alt_route</span>
+                Workflows
+            </div>
+<div class="text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] transition-colors flex items-center gap-3 px-3 py-2 cursor-pointer rounded-lg transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[1.2rem]">image</span>
+                Assets
+            </div>
+</div>
+<div class="mt-auto pt-4 space-y-1">
+<div class="text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] transition-colors flex items-center gap-3 px-3 py-2 cursor-pointer rounded-lg transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[1.2rem]">archive</span>
+                Archive
+            </div>
+<div class="text-gray-500 hover:text-gray-300 hover:bg-[#2a2a2a] transition-colors flex items-center gap-3 px-3 py-2 cursor-pointer rounded-lg transition-all duration-200 ease-in-out">
+<span class="material-symbols-outlined text-[1.2rem]">delete</span>
+                Trash
+            </div>
+</div>
+</aside>
+<main class="ml-64 pt-16 min-h-screen bg-surface-container">
+<div class="p-8 max-w-7xl mx-auto">
+<nav class="flex items-center gap-2 mb-6">
+<span class="text-label-sm text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Workspace</span>
+<span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
+<span class="text-label-sm text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Sites</span>
+<span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
+<span class="text-label-sm text-on-surface-variant hover:text-primary cursor-pointer transition-colors">Corporate Global</span>
+<span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
+<span class="text-label-sm text-on-surface font-semibold">Pages</span>
+</nav>
+<header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div class="space-y-1">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface leading-tight">Content Tree</h1>
+<p class="text-on-surface-variant text-sm max-w-lg">Manage and organize your multi-language site pages and hierarchical structure.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex bg-surface-container-high rounded-lg p-1">
+<button class="p-2 bg-surface-container-highest text-primary rounded shadow-sm">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">view_list</span>
+</button>
+</div>
+</div>
+</header>
+<section class="mb-8 flex flex-wrap items-center gap-4 bg-surface-container-low p-4 rounded-xl ring-1 ring-outline-variant/10">
+<div class="flex-1 min-w-[280px] relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-highest border-none border-b border-outline-variant/20 rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-0 focus:border-primary transition-all placeholder:text-outline" placeholder="Search pages, authors, or IDs..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-high hover:bg-surface-container-highest rounded-lg text-sm text-on-surface transition-all">
+<span class="material-symbols-outlined text-lg">filter_alt</span>
+                            Status
+                            <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+<div class="relative">
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-high hover:bg-surface-container-highest rounded-lg text-sm text-on-surface transition-all">
+<span class="material-symbols-outlined text-lg">sort</span>
+                            Recently Modified
+                            <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<div class="group bg-surface-container-high rounded-xl overflow-hidden hover:ring-2 hover:ring-primary/40 transition-all duration-300 flex flex-col cursor-pointer shadow-xl">
+<div class="aspect-video relative overflow-hidden bg-surface-container-highest">
+<img alt="Homepage" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100" data-alt="modern corporate website hero section mockup with abstract blue gradients and clean typography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuGGf9hJd2Ntnv0qc9KVOrMX5SAM828R1nYXkuqWYiROMvqNpebBZBdye2WYNXy5LqNVFL_vMV2CWRKF8CuUVzYA648cBkV5jH0msIhhPaapT3BMg6lviWLXahAVCvN4gL57OAcopty_cGuAUGvn1nosfBqp0i3dFkSJQeNlpWQ6Trw_fwSBS71c2fQI604qDDch4h_5Xn5R2gHRv5NH-79Ivlhcz7TfCynAltqVM_3slROwhTazjXwY_Y1U_77wXZk7WczCi6mQ"/>
+<div class="absolute top-3 left-3">
+<span class="px-2 py-1 bg-green-500/10 text-green-400 text-[10px] font-bold uppercase tracking-wider rounded backdrop-blur-md ring-1 ring-green-500/30">Published</span>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors truncate">Global Homepage</h3>
+<p class="text-xs text-on-surface-variant mt-1 line-clamp-2">The primary landing page for all regional subdomains and corporate identity.</p>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden ring-1 ring-outline-variant/30">
+<img alt="Alex" data-alt="headshot of a creative designer with a small smile and soft warm lighting on face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKtjAx0GemVHTs3bETCOwDkXx7g2_6FvF7twGVozFYtYdhDIRnwX04q1r-dcQTqfFzJkC-5gNJEkzAe7-c-cA9rT3Y8f-AaFbI0ZAbw9u5KT_ez3uFgmO-SS_dZpnKzA2TQYCccq5XlPCYndQYxa1KSax8IiYu8SNHM94kuG7P0ELBw8OF0ANkssMm62I-HFoEpwcAFkxMvOCKIM2uusqzrQ4Y_sHNKcfskNwQZG_rIHwuT_AKyqt6UaRGPG2bY3bK5W8FWhzx6Q"/>
+</div>
+<span class="text-[11px] text-on-surface-variant">Alex Rivera</span>
+</div>
+<span class="text-[10px] text-outline">2h ago</span>
+</div>
+</div>
+</div>
+<div class="group bg-surface-container-high rounded-xl overflow-hidden hover:ring-2 hover:ring-primary/40 transition-all duration-300 flex flex-col cursor-pointer shadow-xl">
+<div class="aspect-video relative overflow-hidden bg-surface-container-highest">
+<img alt="Services" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100" data-alt="professional workplace setting with blurred office equipment and warm sunlight streaming through large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN-pLGbTpsI4uI6-Yf7aeO3XlLAqYJjBsFNwQLuUFAed4B62hTYf_kPayh3453Wfcw2BoxuQ_likVKI5jQUoM0GY_TEgu34sCCi_QWq6v5jUiEVCIw_HiMKul8wzbqd6a4Rp-IdNXw0dUudgURfJ6ecUyNqEp5PujLHH2rVxhXub0Cx-B94yxGT0f_P3oeLTU_Lb7xjJ3KIudi1_RJCTW-E22AKekeCMeS_WsSWkQg1dUlZRTUqUdc3gEUoULFWG2rwTlTiBNdBg"/>
+<div class="absolute top-3 left-3">
+<span class="px-2 py-1 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider rounded backdrop-blur-md ring-1 ring-primary/30">Draft</span>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors truncate">Enterprise Solutions</h3>
+<p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Detailing the B2B offerings and strategic consulting frameworks.</p>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden ring-1 ring-outline-variant/30">
+<img alt="Sarah" data-alt="close up profile of a confident woman looking towards the future with natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHU3ugvU7e1glNx_Au5l7Ff3HxEbLrFapoOJIvs-rNlCe-g9_L6b6V7gLD90zreoYnJ_hJqtnB_trXeDIS47EQxa_6f9VaTpBO555DT-C6xhPGr6nu7RmorGmODfmstnkCKO3OeG53nxQjm9C11eM3Rsk6rdS0UqU9to4W9elJ6teEHqpF_i8uUvzngXKYrN2lG0HiPKFzLmo-9vNlp1NlB9ebvKFH-LdLOhzBpxFMWQJyGMluVMWUsdL_sXRyeJUG-lqYPIpbHg"/>
+</div>
+<span class="text-[11px] text-on-surface-variant">Sarah Chen</span>
+</div>
+<span class="text-[10px] text-outline">Yesterday</span>
+</div>
+</div>
+</div>
+<div class="group bg-surface-container-high rounded-xl overflow-hidden hover:ring-2 hover:ring-primary/40 transition-all duration-300 flex flex-col cursor-pointer shadow-xl">
+<div class="aspect-video relative overflow-hidden bg-surface-container-highest">
+<img alt="About" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100" data-alt="minimalist architecture interior with clean lines, white space, and subtle grey textures" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh21jqeWDnO62AlJjtxUVUSMph9WIg7CuR-pIxw-PBK6J2E040IyJxw81jMyTVZ6pBOvJmqca7hIXXjgQrqi-gV97H4bxyjIMJVt2YkWrz-Yl_SoTOK2R5o6dN_kO-GqoqiciurErc1wjst2x1e-CXfwodjrCtKtQA7cSQ2JjeRQG7_8Mewp2oxnK1Tym-VSo8mWtvV4VBXHCL-mKTgNrv2uxG5VM9hCEyTWLEE5I7_7DLHVY6iAWV6VAiOxgcedrsJhfOf5skJA"/>
+<div class="absolute top-3 left-3">
+<span class="px-2 py-1 bg-green-500/10 text-green-400 text-[10px] font-bold uppercase tracking-wider rounded backdrop-blur-md ring-1 ring-green-500/30">Published</span>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors truncate">Our Heritage</h3>
+<p class="text-xs text-on-surface-variant mt-1 line-clamp-2">The company history, mission values, and executive leadership profiles.</p>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden ring-1 ring-outline-variant/30">
+<img alt="James" data-alt="man in a dark sweater with a warm and friendly expression in an urban environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_Z0Ys9srhxcXqglEOJjSvUzey1xY-ScUVLf0QphhdByyd6JprMljep-Q3qk-4wpOvHJidQl5auk_JUT-KzbyNl7sxXRlR_iSQkZGgJNrAkQEuGARTfcdyez55zRP0EzT-9ouBDNNT-xoPIy5BN8CP4ppqliprAVcjEH43kkxDmFPGIXD6xPwFretU7Fb4OXeRqq_hIYo74M5TwoSYoNIrW2QgjdTQbX_qIBHcah3dI9vNStuOpukWdTBfwxKLOXm1YvnXvkcDjw"/>
+</div>
+<span class="text-[11px] text-on-surface-variant">James Wilson</span>
+</div>
+<span class="text-[10px] text-outline">Oct 24</span>
+</div>
+</div>
+</div>
+<div class="group bg-surface-container-high rounded-xl overflow-hidden hover:ring-2 hover:ring-primary/40 transition-all duration-300 flex flex-col cursor-pointer shadow-xl">
+<div class="aspect-video relative overflow-hidden bg-surface-container-highest">
+<img alt="Legacy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100" data-alt="vintage library with dark wood shelves and warm glowing lamps, soft atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaOa3kAbVlfZCKC_XvmXhmhIbCPuU5VbNhNbmq1AAnBPCMXK9iJzf9Y9Ua7T139mRR_irQNOXm5NKws_SxOFc7ByGqfgUiY_32sGnJ1bUVmHvuFTMZHOoeujn3nAeL1xWcdkp4Pn9g9E2GQnj7mOoHTbkUMy9eOyojOdbQJZ0jkaGaLbpq6qfkOvt4lZ6EAdhhr_NOS6QKhwGEvwqtjfTg3V6KanxMA1cu-U6FaJUl28iG-jBSgbcfZfuKYWZGsLUZXmIh-4CwrA"/>
+<div class="absolute top-3 left-3">
+<span class="px-2 py-1 bg-surface-variant text-outline text-[10px] font-bold uppercase tracking-wider rounded backdrop-blur-md ring-1 ring-outline/30">Archived</span>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors truncate">Legacy Blog 2019</h3>
+<p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Historical articles and news releases from the previous fiscal platform.</p>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden ring-1 ring-outline-variant/30 text-[8px] font-bold">SY</div>
+<span class="text-[11px] text-on-surface-variant">System</span>
+</div>
+<span class="text-[10px] text-outline">1y ago</span>
+</div>
+</div>
+</div>
+<div class="group bg-surface-container-high rounded-xl overflow-hidden hover:ring-2 hover:ring-primary/40 transition-all duration-300 flex flex-col cursor-pointer shadow-xl">
+<div class="aspect-video relative overflow-hidden bg-surface-container-highest">
+<img alt="Contact" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100" data-alt="modern minimalist office desk with a laptop and a steaming cup of coffee, early morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgF_LmcWpYZ0E41Hmcft2nU_6Nh4EICODpNAcRqz0RzfxntwOhabdnYpjDt0ZkzOb8wUUcrCM4EZ9ge0zCtcFlBcd-nGU4vPUcviVao9w4QjujsNRX6SF0_3rELFVCHf-IW0YktLWp93Kwal8hz7JvnsFfOzs4cuMh5elbP1-zsF70oQYa9NomihnGtY_wH52yQeKe-m8e9q2r_-MXVAJqhst8bLxYWV1SqVC4GwBkic2l5xa8VQ5H3PQx5tHpzy2RlkSlTgWikw"/>
+<div class="absolute top-3 left-3">
+<span class="px-2 py-1 bg-green-500/10 text-green-400 text-[10px] font-bold uppercase tracking-wider rounded backdrop-blur-md ring-1 ring-green-500/30">Published</span>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<h3 class="font-bold text-on-surface group-hover:text-primary transition-colors truncate">Contact Us</h3>
+<p class="text-xs text-on-surface-variant mt-1 line-clamp-2">Support portals, office location maps, and departmental directory.</p>
+<div class="mt-auto pt-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden ring-1 ring-outline-variant/30">
+<img alt="Sarah" data-alt="professional businesswoman portrait in profile view, clear focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH7FGsoNjNRAhicq-mwu5_KwE0MXSM-DeJzpB8xmupW_t3-3E-y3bPJU2sHEoRm_GjzdeQFkMP7wGp3jJgVXQNRL7FTvcB6HCOeqF3ADKfxSd1ZYi3BUr6HmLIEjFpwBH3-2OHT4TJJkKBnG51DZmzamSopnf8ZxpkmOoiS4nEM4Oqb9UPFYAaBLS2LDWIU8mtCmjGbMoL1tkeePaTnIMeshyrOOBOHoAd1CV8Fvz0ZtwYnlkfJuJOwlS_lKvNDIoEHeQdMzcYXA"/>
+</div>
+<span class="text-[11px] text-on-surface-variant">Sarah Chen</span>
+</div>
+<span class="text-[10px] text-outline">Oct 20</span>
+</div>
+</div>
+</div>
+<div class="group bg-surface-container-high rounded-xl border-2 border-dashed border-outline-variant/30 hover:border-primary/50 hover:bg-surface-container-highest transition-all duration-300 flex flex-col items-center justify-center cursor-pointer min-h-[280px]">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-3xl">add</span>
+</div>
+<span class="text-on-surface-variant font-medium text-sm">New Section Template</span>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed right-6 bottom-6 z-40 hidden md:block">
+<button class="w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-2xl flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-2xl">rocket_launch</span>
+</button>
+</div>
+</body></html>

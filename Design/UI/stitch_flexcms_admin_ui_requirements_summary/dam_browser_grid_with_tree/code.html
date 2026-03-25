@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS Admin - DAM Browser</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed": "#d9e2ff",
+              "primary": "#b0c6ff",
+              "outline": "#8d90a0",
+              "on-surface-variant": "#c3c6d6",
+              "surface-container-high": "#2a2a2a",
+              "surface-container": "#201f1f",
+              "surface-container-lowest": "#0e0e0e",
+              "on-tertiary": "#5c1a00",
+              "inverse-on-surface": "#313030",
+              "surface": "#131313",
+              "on-error-container": "#ffdad6",
+              "surface-container-low": "#1c1b1b",
+              "secondary-fixed": "#dae2ff",
+              "tertiary-container": "#a93802",
+              "on-tertiary-fixed": "#380d00",
+              "on-secondary-fixed-variant": "#324575",
+              "surface-tint": "#b0c6ff",
+              "surface-variant": "#353534",
+              "inverse-primary": "#0058cc",
+              "on-background": "#e5e2e1",
+              "on-surface": "#e5e2e1",
+              "inverse-surface": "#e5e2e1",
+              "on-error": "#690005",
+              "background": "#131313",
+              "tertiary": "#ffb59b",
+              "on-primary-container": "#cbd8ff",
+              "on-secondary-fixed": "#001847",
+              "secondary-container": "#324575",
+              "secondary": "#b3c5fd",
+              "on-secondary": "#1a2e5d",
+              "on-primary": "#002d6f",
+              "outline-variant": "#424654",
+              "on-tertiary-fixed-variant": "#812800",
+              "on-tertiary-container": "#ffcebd",
+              "on-primary-fixed": "#001945",
+              "on-secondary-container": "#a1b4eb",
+              "primary-fixed-dim": "#b0c6ff",
+              "tertiary-fixed-dim": "#ffb59b",
+              "secondary-fixed-dim": "#b3c5fd",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "primary-container": "#0058cc",
+              "tertiary-fixed": "#ffdbcf",
+              "surface-dim": "#131313",
+              "surface-container-highest": "#353534",
+              "on-primary-fixed-variant": "#00419c",
+              "surface-bright": "#393939"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #424654; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 antialiased overflow-hidden h-screen">
+<!-- Top Navigation Bar -->
+<header class="bg-[#131313]/80 backdrop-blur-xl text-[#b0c6ff] font-['Inter'] antialiased text-sm docked full-width top-0 sticky z-50 shadow-2xl shadow-black/20 flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-white">FlexCMS Admin</span>
+<div class="hidden md:flex items-center gap-6">
+<nav class="flex items-center gap-4">
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Dashboard</a>
+<a class="text-[#b0c6ff] font-semibold border-b-2 border-[#0058cc] pb-1" href="#">DAM Assets</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">PIM Products</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Media Library</a>
+</nav>
+</div>
+</div>
+<div class="flex-1 max-w-xl px-8">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+<input class="w-full bg-surface-container-highest/50 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary focus:bg-surface-container-highest transition-all outline-none" placeholder="Search global assets, tags, or metadata..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 rounded-full hover:bg-white/5 transition-all duration-200">notifications</button>
+<button class="material-symbols-outlined p-2 rounded-full hover:bg-white/5 transition-all duration-200">settings</button>
+<button class="material-symbols-outlined p-2 rounded-full hover:bg-white/5 transition-all duration-200">help_outline</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-2 bg-primary-container flex items-center justify-center">
+<img alt="Admin User Profile" class="w-full h-full object-cover" data-alt="professional portrait of a young male creative director with glasses in a dark studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzlBd-MtXPS3ykeZkifNBEVbySK4EfOd-PoEYsqK6wg5fdnrzhYURqiDyDyhdAapiaU_fpz5-mv0S_9zuKR0IdHKTvfJ8WQBZX8TuQCw-dAKohNiNZ4UtDv9BxzjIsjJXiliEk-KNeyISJRUbPJMpQLCZ6Q3z7j7DFI4kTxRRj0_6DcDl94T-a_qadtmfAnbLL5I7Y0NHBl45aeCh9sJO6eFttxUhYiyXpz1cDQLcZaDqchMZUBE9p4xq_6RanW95n0sLKOv6Rkg"/>
+</div>
+</div>
+</header>
+<div class="flex h-[calc(100vh-64px)] overflow-hidden">
+<!-- Side Navigation Drawer -->
+<aside class="bg-[#1c1b1b] text-[#b0c6ff] font-['Inter'] text-[0.875rem] leading-relaxed h-full w-64 overflow-y-auto flex flex-col gap-1 p-4 border-r border-outline-variant/10">
+<div class="mb-6 px-2">
+<h3 class="text-xs font-bold uppercase tracking-widest text-outline mb-1">Navigation</h3>
+<p class="text-[0.6875rem] text-on-surface-variant/60">Enterprise Content</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] text-[#002d6f] font-medium rounded-md cursor-pointer active:scale-98" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">folder_shared</span> DAM Assets
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-xl">inventory_2</span> PIM Products
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-xl">account_tree</span> Category Tree
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-xl">perm_media</span> Media Library
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-xl">group_work</span> User Roles
+                </a>
+</nav>
+<div class="mt-8 px-2">
+<h3 class="text-xs font-bold uppercase tracking-widest text-outline mb-3">Folders</h3>
+<div class="space-y-1">
+<div class="flex items-center gap-2 px-2 py-1 text-on-surface-variant hover:text-white cursor-pointer group">
+<span class="material-symbols-outlined text-base">expand_more</span>
+<span class="material-symbols-outlined text-base text-primary/70">folder_open</span>
+<span class="text-sm">Campaigns 2024</span>
+</div>
+<div class="ml-4 space-y-1">
+<div class="flex items-center gap-2 px-2 py-1 text-on-surface-variant hover:text-white cursor-pointer">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="material-symbols-outlined text-base text-outline">folder</span>
+<span class="text-sm">Spring Launch</span>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 bg-surface-container-high/40 text-white cursor-pointer rounded">
+<span class="material-symbols-outlined text-base">expand_more</span>
+<span class="material-symbols-outlined text-base text-primary">folder_open</span>
+<span class="text-sm font-medium">Summer Editorial</span>
+</div>
+<div class="ml-6 flex items-center gap-2 px-2 py-1 text-outline hover:text-white cursor-pointer">
+<span class="material-symbols-outlined text-base text-outline/50">folder</span>
+<span class="text-sm italic">High Res</span>
+</div>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 text-on-surface-variant hover:text-white cursor-pointer">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+<span class="material-symbols-outlined text-base text-outline">folder</span>
+<span class="text-sm">Brand Identity</span>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-2.5 rounded-md font-semibold text-sm shadow-lg shadow-primary/10 hover:opacity-90 active:scale-95 transition-all mb-4">
+                    Create New Asset
+                </button>
+<div class="space-y-1 border-t border-outline-variant/10 pt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-white text-xs" href="#">
+<span class="material-symbols-outlined text-lg">analytics</span> System Status
+                    </a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-white text-xs" href="#">
+<span class="material-symbols-outlined text-lg">menu_book</span> Documentation
+                    </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 bg-surface-container overflow-y-auto">
+<!-- Contextual Filter Bar -->
+<div class="sticky top-0 z-10 bg-surface-container/95 backdrop-blur-md px-8 py-4 flex items-center justify-between border-b border-outline-variant/10">
+<div class="flex items-center gap-6">
+<h1 class="text-2xl font-bold text-white tracking-tight">Summer Editorial</h1>
+<div class="h-6 w-px bg-outline-variant/30"></div>
+<div class="flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-0.5 rounded-full text-[0.6875rem] font-medium tracking-wide">124 ASSETS</span>
+<span class="text-outline text-xs">Filtered by: <span class="text-on-surface">Images, Active</span></span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex bg-surface-container-high rounded-lg p-0.5">
+<button class="p-1.5 bg-surface-variant text-primary rounded-md shadow-sm">
+<span class="material-symbols-outlined text-xl">grid_view</span>
+</button>
+<button class="p-1.5 text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-xl">view_list</span>
+</button>
+</div>
+<button class="flex items-center gap-2 bg-surface-container-highest px-4 py-2 rounded-lg text-sm font-medium hover:bg-surface-bright transition-colors border border-outline-variant/20">
+<span class="material-symbols-outlined text-lg">filter_list</span> Filter
+                    </button>
+<button class="flex items-center gap-2 bg-primary px-4 py-2 rounded-lg text-sm font-bold text-on-primary shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg">upload</span> Upload
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Asset Browser -->
+<div class="p-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+<!-- Asset Card 1 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<img alt="Summer Collection Hero" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="high fashion editorial shot of colorful linen clothing hanging on a minimalist rack against a soft cream background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApryozeskPQgmuWw7vOAWcz5t16F33e1L_0ELqUnPgoO_VdOMe-zC9rwTM3cmru4mQC6E5eVPwyu8bryp2Yrb-s7P3BXcoXF3nv_3pw7sQKzS6inbHHgKdPaHpSzYM-1kiNauutcaVctGNvuMJRNGJkD9aQf1gtrG8hCqLQmclimxEE3w0oNWnzosg2HRIhKE-YJGa8PjzcCbStrQrWlUOrXRx17OexqkkR4nMylSB3xKqmkYpe3G04xFf651v81QtEQZ8wL8xDQ"/>
+<div class="absolute top-2 right-2 flex gap-1">
+<span class="bg-black/60 backdrop-blur-md text-[10px] text-white px-2 py-0.5 rounded uppercase font-bold tracking-tighter">RAW</span>
+<button class="w-6 h-6 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="text-[10px] text-primary font-medium">8.4 MB • 4000 x 6000 px</p>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">Hero_Summer_V1.jpg</h4>
+<span class="w-2 h-2 rounded-full bg-green-500 mt-1.5 shrink-0" title="Active"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">Campaign</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">Updated 2h ago</span>
+</div>
+</div>
+</div>
+<!-- Asset Card 2 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<img alt="Urban Lifestyle Concept" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="dramatic wide angle shot of modern neon-lit urban street at night with wet pavement and vibrant light reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDBUIpH83FkkcAoGNHlafxPAYfkXn_1vV74-xvHrS3frc8h3R-ldNifjxmdwVOpPdqFUF9-BLfm4fSH5EF7k-I0K0db3ICZdRn--7CP-9bXqwC4cKcGORTAEK_M_nds5_eiF3xu4gmFYMkmnBzjd8y4mibXupkp2qcO3-6EO6wOwdcY2W4YbkqPEsy6E4yUu-70ayAjzC3zgZ-sb9WZxI0VeGjMMUljWxRSPVRA0rydiLBR8SZU-WnrLSiOYCx2lmaqZsYI9dVQA"/>
+<div class="absolute top-2 right-2 flex gap-1">
+<span class="bg-black/60 backdrop-blur-md text-[10px] text-white px-2 py-0.5 rounded uppercase font-bold tracking-tighter">JPG</span>
+<button class="w-6 h-6 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">Lifestyle_Night_02.jpg</h4>
+<span class="w-2 h-2 rounded-full bg-yellow-500 mt-1.5 shrink-0" title="Reviewing"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">Editorial</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">Yesterday</span>
+</div>
+</div>
+</div>
+<!-- Asset Card 3 (Video) -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<img alt="Nature Clip" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="cinematic close up of raindrops on a lush green leaf with soft blurred forest background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2MTj-tXAoBmu3Sfs4z3dupoVfnoW8qAAK8ctV-dIB0F_PuptFe1IEqxmgbHog5tb2E51uOgne6tW-QPhDRJZyP-gE4W3JGLQRliZjLOZiJ1pPLP65zdFSLF5d1wVNH6HuFz6p869VaGnljeUtyeA8WornynfM7nkOsyY7a4C67nqFssLrSX5IT2n3SjYJN8WiHhP1MDc8oBOyJ4NkmLTKtSx_IWPOE02dW2cAxpnCMtnwMjYueIQK_OCDtHjjQBCfiZjUDehYtA"/>
+<div class="absolute inset-0 flex items-center justify-center bg-black/20">
+<span class="material-symbols-outlined text-4xl text-white drop-shadow-lg">play_circle</span>
+</div>
+<div class="absolute top-2 right-2 flex gap-1">
+<span class="bg-blue-600/60 backdrop-blur-md text-[10px] text-white px-2 py-0.5 rounded uppercase font-bold tracking-tighter">MP4</span>
+<button class="w-6 h-6 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">B-Roll_Forest_Rain.mp4</h4>
+<span class="w-2 h-2 rounded-full bg-green-500 mt-1.5 shrink-0"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">Social</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">0:15 Sec</span>
+</div>
+</div>
+</div>
+<!-- Asset Card 4 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<img alt="Model Portrait" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="professional fashion photography of a model in avant-garde black attire with strong highlights and deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZEIZOnPn3TNQwHfxUXBNCrMFF2r1XzygaC1PxtNZtNW6IEWHT0SRiK83RErFbH4Y2I3S_toYr0T06ugvoaAfOb5GeMU-XETLgdMrJM7cAffOYXXZdl1aQ_w_s-CUS9aMgJFZBuEQvm9MFBuy01_6xesZMPs2PyHSI69p4tPrlR2uECv0NcLENMZRRGkQ_Go_FcbbaYodNunuYzhEHZuywPqx0oyapIpzn2s-l_f6Z1jNlRUQlC2wCJLCO0t109Zw6W3RBsT7QHg"/>
+<div class="absolute top-2 right-2 flex gap-1">
+<span class="bg-black/60 backdrop-blur-md text-[10px] text-white px-2 py-0.5 rounded uppercase font-bold tracking-tighter">TIFF</span>
+<button class="w-6 h-6 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">Lookbook_A_045.tiff</h4>
+<span class="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" title="Archived"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">Legacy</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">Jan 2024</span>
+</div>
+</div>
+</div>
+<!-- Asset Card 5 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<img alt="Retail Display" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="luxury boutique interior with minimalist displays and warm ambient lighting through large glass windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-sLBu94QyLcTK0ifhY-syQ697NLgYL2h3UWzPBeX8zZkO4bfRQVQ6MP3-9CPaZ5FxK6zTMVzjCknQyiZohZpzCpjILJc49_pJn7i9YGwY-2yhNX7kq3kSG5UnAs_guLWOpTOrczovfu760fhKaA9vXz3Yo0Bzt_WJ74J0nq2DhuTdSV4186nmYUcKIS8om-iu2ioOV7j46IFq6jqF0Y6jZvl5UrMSvCCKbN59moC0CK4vGn86gVjwfxbiLgn45e4naxLJe7cl4g"/>
+<div class="absolute top-2 right-2 flex gap-1">
+<span class="bg-black/60 backdrop-blur-md text-[10px] text-white px-2 py-0.5 rounded uppercase font-bold tracking-tighter">PNG</span>
+<button class="w-6 h-6 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">Store_Interior_Wide.png</h4>
+<span class="w-2 h-2 rounded-full bg-green-500 mt-1.5 shrink-0"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">Retail</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">Active</span>
+</div>
+</div>
+</div>
+<!-- Asset Card 6 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<div class="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+<span class="material-symbols-outlined text-5xl text-outline-variant/40 mb-2">description</span>
+<span class="text-[10px] font-bold text-outline-variant uppercase tracking-widest">PDF Document</span>
+</div>
+<div class="absolute top-2 right-2 flex gap-1">
+<span class="bg-red-900/40 backdrop-blur-md text-[10px] text-white px-2 py-0.5 rounded uppercase font-bold tracking-tighter">PDF</span>
+<button class="w-6 h-6 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+<span class="material-symbols-outlined text-sm">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">Brand_Guidelines_2024.pdf</h4>
+<span class="w-2 h-2 rounded-full bg-green-500 mt-1.5 shrink-0"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">Legal</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">12.2 MB</span>
+</div>
+</div>
+</div>
+<!-- Asset Card 7 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<img alt="Accessories Flatlay" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="aesthetic flatlay of fashion accessories like watches, sunglasses, and leather notebooks on a clean gray surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHjA4JGreoQzWUfSkiaa51gI-gM7MyiK__GBisBc0kZ0A0dZBvB_RJXCaDNrtjkT_xkoIOwPIVjORGfNw9QYNAvWvyy3I0aF5Nwxm8O3v_8y1_LCpVtu5Q7xD6axoZcgHUc0EBC08ReNgEKBsaaZZNwrzIAwezZINunqzcBq3ns7sbI6jQB8oIhU--WLkc8cMZYG_9OUb6PJWYdeMST9ypIj0NMFp7MQF5esu3JrKRHK14N4MpfPhFO-Ctr5gV0QCA4aXwmiTaPA"/>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">Product_Flatlay_09.jpg</h4>
+<span class="w-2 h-2 rounded-full bg-yellow-500 mt-1.5 shrink-0"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">E-com</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">Draft</span>
+</div>
+</div>
+</div>
+<!-- Asset Card 8 -->
+<div class="group bg-surface-container-low rounded-xl overflow-hidden hover:bg-surface-container-high transition-all duration-300 border border-transparent hover:border-primary/20 cursor-pointer">
+<div class="aspect-[4/3] relative overflow-hidden bg-black/40">
+<img alt="Street Style" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="portrait of a trendy person in urban street style clothing standing in front of a textured concrete wall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvjCDG5orSqors6xuJ9La-WXuFo0jjqqP2IKtK-9B2PdM7iidOAvyUHKfGdfRu4Sri6_Wb00kkiz91TfSWTc81Pb5hc8LU-LWHcfzOEgmm50u-lTrIwiXfJzIxFQu7vPpa34coejIVfqb6aTfFKcJvO26wgCDI1PZ0Rbz1WZI72H12m2goulHkurLRxO8kCO72Da_O8X6Z9ijHlw6csU-1U58ZHESuV7orYWhBZbWWR5Fh25J8F9MfITqweiJKXFOX_VwJUFD9Sg"/>
+</div>
+<div class="p-4">
+<div class="flex items-start justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-on-surface pr-2">Street_Vibe_A_01.jpg</h4>
+<span class="w-2 h-2 rounded-full bg-green-500 mt-1.5 shrink-0"></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline font-medium">Influencer</span>
+<span class="text-[10px] text-outline/40">•</span>
+<span class="text-[10px] text-outline font-medium">Yesterday</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Rail (Metadata Toggle) -->
+<aside class="w-12 bg-surface-container-lowest flex flex-col items-center py-6 gap-6 border-l border-outline-variant/5">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer" title="Info">info</button>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer" title="History">history</button>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer" title="Tags">label</button>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors cursor-pointer" title="Share">share</button>
+<div class="mt-auto flex flex-col gap-6">
+<button class="material-symbols-outlined text-outline hover:text-error transition-colors cursor-pointer" title="Delete">delete</button>
+</div>
+</aside>
+</div>
+<!-- Floating Mobile Nav Overlay (Suppressed via design rules, but here's a FAB for logic check) -->
+<!-- Suppressed: We are on a high-level destination, but the FAB doesn't match a specific unique screen action other than "Upload" which is in the header -->
+</body></html>

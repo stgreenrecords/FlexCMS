@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PIM Import Wizard | FlexCMS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#a1b4eb",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-surface-variant": "#c3c6d6",
+                        "surface-container-highest": "#353534",
+                        "secondary-container": "#324575",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "tertiary-fixed": "#ffdbcf",
+                        "tertiary-container": "#a93802",
+                        "on-secondary-fixed-variant": "#324575",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#5c1a00",
+                        "surface-tint": "#b0c6ff",
+                        "inverse-on-surface": "#313030",
+                        "background": "#131313",
+                        "on-background": "#e5e2e1",
+                        "on-primary": "#002d6f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "primary": "#b0c6ff",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-fixed": "#dae2ff",
+                        "on-primary-fixed": "#001945",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface-dim": "#131313",
+                        "outline-variant": "#424654",
+                        "on-secondary-fixed": "#001847",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#380d00",
+                        "inverse-primary": "#0058cc",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-container": "#cbd8ff",
+                        "on-secondary": "#1a2e5d",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "tertiary": "#ffb59b",
+                        "surface-container": "#201f1f",
+                        "surface": "#131313",
+                        "secondary": "#b3c5fd",
+                        "primary-fixed": "#d9e2ff",
+                        "on-tertiary-container": "#ffcebd",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "outline": "#8d90a0",
+                        "error-container": "#93000a",
+                        "primary-container": "#0058cc",
+                        "error": "#ffb4ab"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        .wizard-step-active { color: #b0c6ff; border-color: #0058cc; }
+        .glass-panel { background: rgba(53, 53, 52, 0.8); backdrop-filter: blur(12px); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary/30">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tight text-[#b0c6ff]">FlexCMS</span>
+<div class="hidden md:flex gap-6 ml-8">
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-3 py-1 rounded" href="#">Asset Library</a>
+<a class="text-[#b0c6ff] font-semibold" href="#">Import Wizard</a>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden ml-2 border border-outline-variant/20">
+<img alt="User profile" data-alt="clean professional headshot of a software engineer in soft studio lighting high contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-BIucJ5AZHQ4SghK1H-M9_WF9I8ceqzjA-C0x5Y5WPjNifUs0H0-zMWe9U9A9hCD43T4JqZUpwhSuHK8g8_AQpX6Ul0PN6JHiJSl_wOTrnGvfkUV0Lxd-ltKS5kCNgFCVG84MbjpfI4eKUltcAPTcrLBf-IZn7gya8EO7IGzQOQFOblJrRKLr8dbA2qAVOOv2NZctQ7p87xySMFbU8VoPHIPY5xHz4ZVV9wrfNQQv-APo43YkPtevPAmMFIxsucQ50PNftm2VRA"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 bg-[#1c1b1b] flex flex-col py-4 pr-4 hidden md:flex">
+<div class="px-6 py-4">
+<div class="text-lg font-black text-white">PIM Central</div>
+<div class="text-xs text-on-surface-variant/60 font-medium">Enterprise Edition</div>
+</div>
+<nav class="mt-4 flex-grow">
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">DAM Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-sm font-medium">Asset Library</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#b0c6ff] bg-[#2a2a2a] rounded-r-lg border-l-4 border-[#0056D2] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+<span class="text-sm font-medium">Import Wizard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-sm font-medium">Job History</span>
+</a>
+</nav>
+<div class="mt-auto px-4 pb-4">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Asset
+            </button>
+<div class="mt-6 border-t border-outline-variant/10 pt-4">
+<a class="flex items-center gap-3 px-6 py-2 text-[#c3c6d6] hover:text-white text-xs" href="#">
+<span class="material-symbols-outlined text-sm">contact_support</span>
+                    Support
+                </a>
+<a class="flex items-center gap-3 px-6 py-2 text-[#c3c6d6] hover:text-white text-xs" href="#">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+                    Documentation
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-16 min-h-screen bg-surface-container">
+<div class="max-w-6xl mx-auto px-8 py-10">
+<!-- Header Section -->
+<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2 font-headline">Import Wizard</h1>
+<p class="text-on-surface-variant max-w-lg">Orchestrate your enterprise data ingestion with automated mapping and structural validation.</p>
+</div>
+<div class="flex items-center gap-2 text-sm font-medium bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant/10">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-primary">Step 3 of 5: Map Fields</span>
+</div>
+</header>
+<!-- Wizard Progress Stepper -->
+<div class="grid grid-cols-5 gap-4 mb-12">
+<div class="flex flex-col gap-2">
+<div class="h-1 bg-primary rounded-full"></div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-primary">01 Upload</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="h-1 bg-primary rounded-full"></div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-primary">02 Format</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="h-1 bg-primary rounded-full shadow-[0_0_12px_rgba(176,198,255,0.4)]"></div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-primary">03 Mapping</span>
+</div>
+<div class="flex flex-col gap-2 opacity-30">
+<div class="h-1 bg-outline-variant rounded-full"></div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">04 Preview</span>
+</div>
+<div class="flex flex-col gap-2 opacity-30">
+<div class="h-1 bg-outline-variant rounded-full"></div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">05 Execute</span>
+</div>
+</div>
+<!-- Wizard Content Card (Mapping UI) -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden shadow-2xl border border-outline-variant/5">
+<div class="p-8 border-b border-outline-variant/10 flex justify-between items-center">
+<div>
+<h2 class="text-lg font-bold text-white">Attribute Mapping</h2>
+<p class="text-sm text-on-surface-variant">Map CSV columns to PIM destination properties</p>
+</div>
+<div class="flex gap-4">
+<button class="text-xs text-primary font-bold px-3 py-1.5 rounded-lg border border-primary/20 hover:bg-primary/5 transition-colors">Auto-Match 82%</button>
+</div>
+</div>
+<div class="p-0">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50">
+<th class="px-8 py-4 text-[10px] uppercase tracking-wider font-bold text-on-surface-variant">Source Column (CSV)</th>
+<th class="px-4 py-4 text-center">
+<span class="material-symbols-outlined text-outline">trending_flat</span>
+</th>
+<th class="px-8 py-4 text-[10px] uppercase tracking-wider font-bold text-on-surface-variant">PIM Property</th>
+<th class="px-8 py-4 text-[10px] uppercase tracking-wider font-bold text-on-surface-variant">Sample Data</th>
+<th class="px-8 py-4 text-[10px] uppercase tracking-wider font-bold text-on-surface-variant text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-highest/30 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">table_chart</span>
+<span class="text-sm font-semibold">SKU_ID</span>
+</div>
+</td>
+<td class="text-center"><span class="material-symbols-outlined text-outline/30 text-sm">chevron_right</span></td>
+<td class="px-8 py-5">
+<select class="bg-surface-container-highest border-none rounded-lg text-sm w-full focus:ring-1 focus:ring-primary text-primary font-medium cursor-pointer">
+<option>Unique Identifier (SKU)</option>
+<option>Product Name</option>
+<option>Base Price</option>
+</select>
+</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-surface-container rounded text-[11px] font-mono text-on-surface-variant">PRD-99201-X</span>
+</td>
+<td class="px-8 py-5 text-right">
+<span class="w-2 h-2 inline-block rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/30 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">table_chart</span>
+<span class="text-sm font-semibold">Product_Name_EN</span>
+</div>
+</td>
+<td class="text-center"><span class="material-symbols-outlined text-outline/30 text-sm">chevron_right</span></td>
+<td class="px-8 py-5">
+<select class="bg-surface-container-highest border-none rounded-lg text-sm w-full focus:ring-1 focus:ring-primary text-white font-medium cursor-pointer">
+<option>Display Title (Localized)</option>
+<option>Description</option>
+<option>Manufacturer</option>
+</select>
+</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-surface-container rounded text-[11px] font-mono text-on-surface-variant">Ergonomic Office Chair</span>
+</td>
+<td class="px-8 py-5 text-right">
+<span class="w-2 h-2 inline-block rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/30 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-sm">table_chart</span>
+<span class="text-sm font-semibold">Price_USD</span>
+</div>
+</td>
+<td class="text-center"><span class="material-symbols-outlined text-outline/30 text-sm">chevron_right</span></td>
+<td class="px-8 py-5">
+<select class="bg-surface-container-highest border-none rounded-lg text-sm w-full focus:ring-1 focus:ring-primary text-white font-medium cursor-pointer">
+<option>MSRP (Price)</option>
+<option>Discount Price</option>
+<option>Wholesale Cost</option>
+</select>
+</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-surface-container rounded text-[11px] font-mono text-on-surface-variant">299.00</span>
+</td>
+<td class="px-8 py-5 text-right">
+<span class="w-2 h-2 inline-block rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/30 transition-colors">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">warning</span>
+<span class="text-sm font-semibold">Inventory_Count</span>
+</div>
+</td>
+<td class="text-center"><span class="material-symbols-outlined text-outline/30 text-sm">chevron_right</span></td>
+<td class="px-8 py-5">
+<select class="bg-surface-container-highest border border-tertiary/20 rounded-lg text-sm w-full focus:ring-1 focus:ring-tertiary text-tertiary font-medium cursor-pointer">
+<option disabled="" selected="">Unmapped</option>
+<option>Warehouse Quantity</option>
+<option>Reserved Stock</option>
+</select>
+</td>
+<td class="px-8 py-5">
+<span class="px-2 py-1 bg-surface-container rounded text-[11px] font-mono text-on-surface-variant">142</span>
+</td>
+<td class="px-8 py-5 text-right">
+<span class="w-2 h-2 inline-block rounded-full bg-tertiary"></span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-8 bg-surface-container-high/20 flex items-center justify-between border-t border-outline-variant/10">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-xs font-semibold text-white">3 Mapped</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-sm" style="font-variation-settings: 'FILL' 1;">error</span>
+<span class="text-xs font-semibold text-white">1 Remaining</span>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 rounded-lg text-sm font-bold text-on-surface hover:bg-surface-container-highest transition-colors flex items-center gap-2 active:scale-95">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+                            Back
+                        </button>
+<button class="px-8 py-2.5 rounded-lg text-sm font-bold bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-lg shadow-primary/10 flex items-center gap-2 active:scale-95 transition-all">
+                            Next
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Contextual Insights / Help Panel (Asymmetric Placement) -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 glass-panel p-6 rounded-xl border border-outline-variant/5">
+<div class="flex items-start gap-4">
+<div class="p-3 bg-secondary-container rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container">psychology</span>
+</div>
+<div>
+<h3 class="font-bold text-white text-sm mb-1">Mapping Insights</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed">Our AI suggests mapping <span class="text-primary font-bold">Inventory_Count</span> to <span class="text-primary font-bold">Warehouse Quantity</span> based on your previous 12 imports. This would increase accuracy to 100%.</p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl border border-outline-variant/5 flex flex-col justify-center">
+<h4 class="text-[10px] uppercase font-bold tracking-widest text-on-surface-variant mb-3">Validation Summary</h4>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Schema Match</span>
+<span class="text-primary font-mono">94%</span>
+</div>
+<div class="w-full bg-surface-container h-1 rounded-full">
+<div class="bg-primary w-[94%] h-full rounded-full"></div>
+</div>
+<div class="flex justify-between items-center text-xs">
+<span class="text-on-surface-variant">Data Integrity</span>
+<span class="text-primary font-mono">OK</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Rail (Sidebar right-side actions) -->
+<div class="fixed right-6 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-2 p-1 bg-surface-container-lowest rounded-full border border-outline-variant/5">
+<button class="p-3 text-on-surface-variant hover:text-primary transition-colors" title="View History">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:text-primary transition-colors" title="Download Template">
+<span class="material-symbols-outlined">download</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:text-primary transition-colors" title="Help Center">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<!-- Mobile Navigation Shell -->
+<footer class="md:hidden fixed bottom-0 left-0 w-full bg-[#131313]/90 backdrop-blur-xl border-t border-outline-variant/10 flex justify-around items-center h-16 px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-[#c3c6d6]">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#b0c6ff]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+<span class="text-[10px]">Import</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#c3c6d6]">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-[10px]">Assets</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#c3c6d6]">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">Settings</span>
+</button>
+</footer>
+</body></html>

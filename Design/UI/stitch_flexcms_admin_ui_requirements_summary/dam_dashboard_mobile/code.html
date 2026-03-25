@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS | DAM Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#E2E2E2",
+                        "on-primary": "#1A1A1A",
+                        "primary-container": "#2D2D2D",
+                        "on-primary-container": "#F5F5F5",
+                        "secondary": "#A6A6A6",
+                        "on-secondary": "#000000",
+                        "secondary-container": "#3D3D3D",
+                        "on-secondary-container": "#E0E0E0",
+                        "tertiary": "#8C8C8C",
+                        "on-tertiary": "#FFFFFF",
+                        "tertiary-container": "#4A4A4A",
+                        "on-tertiary-container": "#D1D1D1",
+                        "error": "#CF6679",
+                        "on-error": "#000000",
+                        "error-container": "#B1384E",
+                        "on-error-container": "#F9DEDC",
+                        "background": "#121212",
+                        "on-background": "#E2E2E2",
+                        "surface": "#1A1A1A",
+                        "on-surface": "#E2E2E2",
+                        "surface-variant": "#2D2D2D",
+                        "on-surface-variant": "#A6A6A6",
+                        "outline": "#4A4A4A",
+                        "outline-variant": "#3D3D3D",
+                        "surface-container-lowest": "#0D0D0D",
+                        "surface-container-low": "#151515",
+                        "surface-container": "#1C1C1C",
+                        "surface-container-high": "#232323",
+                        "surface-container-highest": "#2B2B2B"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(8px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased min-h-screen">
+<!-- Top Header -->
+<header class="fixed top-0 w-full z-50 bg-surface/95 backdrop-blur-md border-b border-outline-variant h-14 flex items-center justify-between px-4">
+<div class="flex items-center gap-3">
+<button class="p-1.5 -ml-1 text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="text-lg font-bold tracking-tight text-primary font-headline">FlexCMS</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[22px]">search</span>
+</button>
+<button class="p-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-outline ml-1" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlHzWm_lMqs3VFGtbEHgJGuGOmMEAMBULNITCzoL2N-st9_QqoXSNCYEU1VZHHp0pE80SO8xbWRvKESwY34lWY3aVEvDr9ccI2vlnSYx-NFp_arY20RwzXOc-gxn1qZnk6_NoL7DAFAO6yCNBJLsYWV_PoJL-cElXBjAvnzgynmhUugtlZwtKl5IegNMS-lJuU0UsgI0vI4n1IBfB1RSv7k5a4blb15A8la0C-TSG_Z3YsI8i5GS2UX1up0VxrMc7Gybi0FBRNtA"/>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-20 px-4 pb-24 max-w-full overflow-x-hidden">
+<!-- Page Header -->
+<div class="mb-8">
+<h1 class="text-3xl font-black font-headline tracking-tighter text-on-surface mb-1 uppercase">DAM Dashboard</h1>
+<p class="text-sm text-on-surface-variant">Manage your enterprise content library.</p>
+<div class="flex gap-2 mt-4">
+<button class="flex-1 py-2.5 bg-surface-container-high border border-outline text-xs font-bold uppercase tracking-wider">
+                    Report
+                </button>
+<button class="flex-1 py-2.5 bg-primary text-on-primary text-xs font-bold uppercase tracking-wider">
+                    Sync
+                </button>
+</div>
+</div>
+<!-- Mobile Stacked Stats Section -->
+<div class="flex flex-col gap-4 mb-10">
+<!-- Storage Card -->
+<div class="bg-surface-container-low border border-outline-variant p-5">
+<div class="flex justify-between items-center mb-4">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">Storage</span>
+<span class="material-symbols-outlined text-primary text-lg">cloud_done</span>
+</div>
+<div class="flex items-baseline gap-2 mb-1">
+<span class="text-4xl font-black text-on-surface">1.2</span>
+<span class="text-xl font-bold text-on-surface-variant uppercase">TB</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-6">of 2.0 TB plan utilized</p>
+<div class="space-y-2">
+<div class="h-1 w-full bg-surface-container-highest">
+<div class="h-full bg-primary w-[60%]"></div>
+</div>
+<div class="flex justify-between text-[9px] font-bold text-on-surface-variant uppercase tracking-widest">
+<span>60% Used</span>
+<span>40% Free</span>
+</div>
+</div>
+</div>
+<!-- Asset Distribution (Simplified for Mobile) -->
+<div class="bg-surface-container-low border border-outline-variant p-5">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase block mb-6">Asset Distribution</span>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-[11px] mb-1.5 uppercase font-semibold">
+<span>Images</span>
+<span class="text-primary">8.4k</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest">
+<div class="h-full bg-primary w-[85%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[11px] mb-1.5 uppercase font-semibold">
+<span>Video</span>
+<span class="text-secondary">1.2k</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest">
+<div class="h-full bg-secondary w-[45%]"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[11px] mb-1.5 uppercase font-semibold">
+<span>Docs</span>
+<span class="text-on-surface-variant">0.8k</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest">
+<div class="h-full bg-on-surface-variant w-[25%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Health Stat Card -->
+<div class="bg-surface-container-high border border-primary p-5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full border-2 border-primary flex items-center justify-center">
+<span class="text-primary font-bold text-[10px]">99%</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface uppercase tracking-tight">Healthy</h4>
+<p class="text-[10px] text-on-surface-variant uppercase">All nodes active</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+</div>
+<!-- Recent Uploads Horizontal Scroll -->
+<div class="mb-4 flex justify-between items-center">
+<h3 class="text-sm font-bold uppercase tracking-widest text-on-surface">Recent Uploads</h3>
+<button class="text-primary text-[10px] font-black tracking-widest uppercase">View All</button>
+</div>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar -mx-4 px-4 pb-4">
+<!-- Asset 1 -->
+<div class="flex-none w-48 group">
+<div class="aspect-square bg-surface-container-low border border-outline-variant overflow-hidden mb-2 relative">
+<img alt="Nature scene" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1FetZAgLVHC_HsPALo94Fsoy6KJ3HeGvSwO0dpHwR5JxcWgWIQorZ8aMLm6NtsMrHCNtgtPziZRjMivruKUQnSjFk4Pb76s7w73--XdxGBqOEC16ukqbHIU3e_GphuCMb8jJ0hbbJEDIs5pf-sIBGJaiX1ZhURhSdu-E9-k9lVyG9jUWwn3dkGseyBTfnHdrplYN1Z0mQggvyIvySa2soApo0A2bUiQhMatJXHgSJBcKPvTvnJLDrYl9UZTwuyEp5gCAutDDZ_A"/>
+</div>
+<h5 class="text-xs font-bold text-on-surface truncate uppercase tracking-tighter">valley_hero_final.jpg</h5>
+<p class="text-[9px] text-on-surface-variant uppercase font-medium">14.2 MB • JPG</p>
+</div>
+<!-- Asset 2 -->
+<div class="flex-none w-48">
+<div class="aspect-square bg-surface-container-low border border-outline-variant overflow-hidden mb-2 relative">
+<img alt="Tech workspace" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwv-rW19zWBbw7MiY05maHnN6gwGi9YO_51qXcGCDq3X0w0RwS6ry6tpYpYcpV5dZXy2Z2P9mUJTYD6RHCBIGGD4AJFNjAGlgqYiLoxH3CAPodpS3uzMVafqaN44Mi5mHeqQaT4arZ5wyROzfEdMBuCtY8pU94t3w_B70MB9lRsE_xdVd-aeekcNa8s2KoZvx809V8y9rH-bPZOB4kpC01eKYKNUx3b8AAbonbWZcIF2VwZSTzqPSIbOEE8mRphO6VBnaUymCl6Q"/>
+<div class="absolute top-1.5 right-1.5 bg-on-background text-background px-1.5 py-0.5 text-[8px] font-black uppercase">Locked</div>
+</div>
+<h5 class="text-xs font-bold text-on-surface truncate uppercase tracking-tighter">dev_workspace_v2.png</h5>
+<p class="text-[9px] text-on-surface-variant uppercase font-medium">8.5 MB • PNG</p>
+</div>
+<!-- Asset 3 -->
+<div class="flex-none w-48">
+<div class="aspect-square bg-surface-container-low border border-outline-variant flex items-center justify-center mb-2 overflow-hidden relative">
+<img alt="Video asset" class="absolute inset-0 w-full h-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC83iFdpZhQd7mCOffQ8owUdZYTcrZtgHPFsd3cwUQ8vlitjrRigSg4AJ4_V90RaZiBYJx3nRK6QT3BSgva7f0Le7ALGEPYySr5jj5lauHD2YhgUXH9TeKZ0A5RC9wNmjAUbqL4xUwxgSwZ08kzXNmMug_rBmQAFIgAwNsbeMGlrPAnou5XWPVDybfU-chjubzRPXP5aGFzl5b9MFTocN6qBxcgLKhEL9bLZC9UEBtuSZp_DSkMBMavqbqubzVfXCuEwOnR7FmRHQ"/>
+<span class="material-symbols-outlined text-white text-3xl z-10">play_circle</span>
+</div>
+<h5 class="text-xs font-bold text-on-surface truncate uppercase tracking-tighter">commercial_edit_rev.mp4</h5>
+<p class="text-[9px] text-on-surface-variant uppercase font-medium">256.0 MB • MP4</p>
+</div>
+</div>
+<!-- Ledger - Horizontal Scroll Table -->
+<div class="mt-8">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Event Ledger</h3>
+<span class="text-[9px] font-bold text-primary flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 bg-primary animate-pulse"></span> LIVE
+                </span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant overflow-x-auto">
+<table class="w-full text-left min-w-[500px]">
+<thead>
+<tr class="bg-surface-container-highest/50 border-b border-outline-variant">
+<th class="px-4 py-3 text-[9px] font-black text-on-surface-variant uppercase tracking-widest">Event</th>
+<th class="px-4 py-3 text-[9px] font-black text-on-surface-variant uppercase tracking-widest">Entity</th>
+<th class="px-4 py-3 text-[9px] font-black text-on-surface-variant uppercase tracking-widest">User</th>
+<th class="px-4 py-3 text-[9px] font-black text-on-surface-variant uppercase tracking-widest">Time</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr>
+<td class="px-4 py-3 text-[11px] font-bold uppercase tracking-tighter">Upload</td>
+<td class="px-4 py-3 text-[10px] font-mono text-on-surface-variant">valley_hero.jpg</td>
+<td class="px-4 py-3 text-[11px]">m.rossi</td>
+<td class="px-4 py-3 text-[9px] text-on-surface-variant">14:02:11</td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-[11px] font-bold uppercase tracking-tighter">Update</td>
+<td class="px-4 py-3 text-[10px] font-mono text-on-surface-variant">comm_edit.mp4</td>
+<td class="px-4 py-3 text-[11px]">a.chen</td>
+<td class="px-4 py-3 text-[9px] text-on-surface-variant">13:58:45</td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-[11px] font-bold uppercase tracking-tighter text-error">Denied</td>
+<td class="px-4 py-3 text-[10px] font-mono text-on-surface-variant">admin_conf.pdf</td>
+<td class="px-4 py-3 text-[11px]">guest_74</td>
+<td class="px-4 py-3 text-[9px] text-on-surface-variant">13:55:01</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+<!-- Bottom App Bar -->
+<nav class="fixed bottom-0 left-0 right-0 glass-panel border-t border-outline flex justify-between items-center px-6 h-16 z-50">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[8px] font-black uppercase tracking-widest">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-[8px] font-black uppercase tracking-widest text-on-surface-variant">Library</span>
+</button>
+<button class="w-12 h-12 bg-primary flex items-center justify-center text-on-primary -mt-8 border border-on-primary">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="text-[8px] font-black uppercase tracking-widest text-on-surface-variant">Import</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[8px] font-black uppercase tracking-widest text-on-surface-variant">Jobs</span>
+</button>
+</nav>
+</body></html>

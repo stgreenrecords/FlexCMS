@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed": "#d9e2ff",
+              "primary": "#b0c6ff",
+              "outline": "#8d90a0",
+              "on-surface-variant": "#c3c6d6",
+              "surface-container-high": "#2a2a2a",
+              "surface-container": "#201f1f",
+              "surface-container-lowest": "#0e0e0e",
+              "on-tertiary": "#5c1a00",
+              "inverse-on-surface": "#313030",
+              "surface": "#131313",
+              "on-error-container": "#ffdad6",
+              "surface-container-low": "#1c1b1b",
+              "secondary-fixed": "#dae2ff",
+              "tertiary-container": "#a93802",
+              "on-tertiary-fixed": "#380d00",
+              "on-secondary-fixed-variant": "#324575",
+              "surface-tint": "#b0c6ff",
+              "surface-variant": "#353534",
+              "inverse-primary": "#0058cc",
+              "on-background": "#e5e2e1",
+              "on-surface": "#e5e2e1",
+              "inverse-surface": "#e5e2e1",
+              "on-error": "#690005",
+              "background": "#131313",
+              "tertiary": "#ffb59b",
+              "on-primary-container": "#cbd8ff",
+              "on-secondary-fixed": "#001847",
+              "secondary-container": "#324575",
+              "secondary": "#b3c5fd",
+              "on-secondary": "#1a2e5d",
+              "on-primary": "#002d6f",
+              "outline-variant": "#424654",
+              "on-tertiary-fixed-variant": "#812800",
+              "on-tertiary-container": "#ffcebd",
+              "on-primary-fixed": "#001945",
+              "on-secondary-container": "#a1b4eb",
+              "primary-fixed-dim": "#b0c6ff",
+              "tertiary-fixed-dim": "#ffb59b",
+              "secondary-fixed-dim": "#b3c5fd",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "primary-container": "#0058cc",
+              "tertiary-fixed": "#ffdbcf",
+              "surface-dim": "#131313",
+              "surface-container-highest": "#353534",
+              "on-primary-fixed-variant": "#00419c",
+              "surface-bright": "#393939"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #424654; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Implementation -->
+<header class="bg-[#131313]/80 backdrop-blur-xl text-[#b0c6ff] font-['Inter'] antialiased text-sm sticky top-0 z-50 flex justify-between items-center px-6 h-16 w-full shadow-2xl shadow-black/20">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-white">FlexCMS Admin</span>
+<div class="hidden md:flex items-center bg-surface-container-highest px-3 py-1.5 rounded-lg gap-2 group border border-transparent focus-within:border-primary-container/50 transition-all">
+<span class="material-symbols-outlined text-outline text-[18px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-64 placeholder:text-outline" placeholder="Search assets..." type="text"/>
+<span class="text-[10px] bg-surface-container-low px-1.5 py-0.5 rounded text-outline">CMD+K</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-white/5 transition-all duration-200 rounded-lg active:opacity-80 transition-transform scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-white/5 transition-all duration-200 rounded-lg active:opacity-80 transition-transform scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 hover:bg-white/5 transition-all duration-200 rounded-lg active:opacity-80 transition-transform scale-95">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-gradient-to-tr from-primary to-primary-container p-[1px]">
+<img alt="Admin User Profile" class="h-full w-full rounded-full object-cover" data-alt="Professional headshot of a female executive with confident expression, soft studio lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBby892IjkpmwUWNeKo0-QqLGrDDmd7QJvFs5kACha0thujNoVjt2S9Pyc2Vyreh7bhnYKzzjXkdeFlYPuWp0kT8Ywjaxx9oaGIGYsrEaYh7A9v7v2Sxlj0hOgt8tgQLmsFgs1ATZjGyXoVGmlTJ-Db0PyVtdOBB2nvxcEXFdtTzYVZuLvm7vNFkukJRG7NY0wb56EsFQ998U7AYsrJqgiAI2_2-PhwXSsX0Ofq_ne1POGqelbhouo8O3YT0i9vCUTa61Sdl5Ollw"/>
+</div>
+</div>
+</header>
+<div class="flex min-h-[calc(100vh-64px)] overflow-hidden">
+<!-- SideNavBar Implementation -->
+<aside class="bg-[#1c1b1b] text-[#b0c6ff] font-['Inter'] text-[0.875rem] leading-relaxed h-screen w-64 fixed left-0 top-0 overflow-y-auto flex flex-col gap-1 p-4 pt-20 z-40">
+<div class="px-2 mb-4">
+<h3 class="text-xs font-bold uppercase tracking-widest text-outline">Navigation</h3>
+<p class="text-[10px] text-outline/60">Enterprise Content</p>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] text-[#002d6f] font-medium rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_shared</span>
+<span>DAM Assets</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+<span>PIM Products</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+<span>Category Tree</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">perm_media</span>
+<span>Media Library</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md cursor-pointer active:scale-98 transition-colors duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">group_work</span>
+<span>User Roles</span>
+</a>
+</nav>
+<button class="mt-6 mx-2 bg-primary text-on-primary py-2 rounded-md font-semibold text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                Create New Asset
+            </button>
+<div class="mt-auto pt-8 pb-4 border-t border-outline-variant/10 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<span>System Status</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-[#2a2a2a] hover:text-white rounded-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">menu_book</span>
+<span>Documentation</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col bg-surface-container overflow-hidden">
+<!-- Secondary Context Toolbar -->
+<div class="h-14 border-b border-outline-variant/10 flex items-center justify-between px-8 bg-surface-container/50 backdrop-blur-md sticky top-16 z-30">
+<div class="flex items-center gap-4">
+<h1 class="text-xl font-bold text-on-surface">Digital Assets</h1>
+<div class="flex items-center gap-1 text-xs text-outline bg-surface-container-high px-2 py-1 rounded">
+<span>Root</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary">Marketing_Campaigns_2024</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-on-surface hover:bg-surface-container-highest rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+<button class="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-on-surface hover:bg-surface-container-highest rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]">view_module</span>
+                        Grid View
+                    </button>
+<div class="h-4 w-[1px] bg-outline-variant/30 mx-2"></div>
+<button class="bg-primary-container text-on-primary-container px-4 py-1.5 rounded-lg text-xs font-bold hover:opacity-90 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+                        Upload Asset
+                    </button>
+</div>
+</div>
+<div class="flex flex-1 overflow-hidden">
+<!-- Collapsible Folder Tree Sidebar (Contextual) -->
+<div class="w-72 bg-surface-container-low border-r border-outline-variant/10 overflow-y-auto p-4 flex flex-col gap-4">
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-outline/60 ml-2 mb-2 block">Libraries</span>
+<div class="space-y-1">
+<div class="group flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary">folder_open</span>
+<span class="font-medium">Campaign Assets</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline opacity-0 group-hover:opacity-100">more_vert</span>
+</div>
+<div class="ml-4 pl-4 border-l border-outline-variant/20 space-y-1">
+<div class="flex items-center gap-2 px-2 py-1 text-xs text-on-surface-variant hover:text-on-surface cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">folder</span>
+<span>Q1_Spring_Launch</span>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 text-xs text-primary bg-primary/10 rounded-md cursor-pointer">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">folder</span>
+<span class="font-semibold">Q2_Global_Branding</span>
+</div>
+<div class="flex items-center gap-2 px-2 py-1 text-xs text-on-surface-variant hover:text-on-surface cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">folder</span>
+<span>Archived_2023</span>
+</div>
+</div>
+<div class="group flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors">
+<div class="flex items-center gap-2 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">folder</span>
+<span>Social Media</span>
+</div>
+</div>
+<div class="group flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-surface-container-high cursor-pointer transition-colors text-on-surface-variant">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-[18px]">folder</span>
+<span>Brand Guidelines</span>
+</div>
+</div>
+</div>
+</div>
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-outline/60 ml-2 mb-2 block">Tags</span>
+<div class="flex flex-wrap gap-2 px-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded-full text-outline border border-outline-variant/20">#HighRes</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded-full text-outline border border-outline-variant/20">#Videos</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded-full text-outline border border-outline-variant/20">#PNGs</span>
+</div>
+</div>
+</div>
+<!-- Detailed Asset List (Table) -->
+<div class="flex-1 overflow-x-auto bg-surface-container">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead class="sticky top-0 bg-surface-container-low/95 backdrop-blur z-20">
+<tr class="text-[11px] uppercase tracking-wider text-outline border-b border-outline-variant/10">
+<th class="px-6 py-4 font-semibold w-12">
+<input class="rounded border-outline-variant bg-surface-container focus:ring-primary text-primary" type="checkbox"/>
+</th>
+<th class="px-4 py-4 font-semibold">Name</th>
+<th class="px-4 py-4 font-semibold">Type</th>
+<th class="px-4 py-4 font-semibold">Size</th>
+<th class="px-4 py-4 font-semibold">Last Modified</th>
+<th class="px-4 py-4 font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Asset Row 1 -->
+<tr class="group hover:bg-surface-container-high/50 transition-all cursor-default">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant bg-surface-container focus:ring-primary text-primary" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 bg-surface-container-highest rounded-lg overflow-hidden border border-outline-variant/20">
+<img alt="Abstract Blue Wave" class="h-full w-full object-cover" data-alt="Abstract fluid background with deep blue and soft purple gradients, clean digital art style, high resolution detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUnMkC1i_RPDDmdBWiGrbUK3ldNk45FjRkpnJ2IiqVBdPKVywMr4DhDP0YhMlwuISHsjKj3KdTqKsAcbn1kxJ0n61uMk8tFc4AZmtJD6-LmYSVmXj4cd_g8WAN2i80USpQS9ULN2yr5QQvfL340EPaM4t63vefFQ7S9qQxb311t8yY5ZBX_WIhNtaQ6gAGEyCtwXH5eKkF9X3kHOmWnqmApshP17_l4n3FnA9QuTFE1MaWYpEPGaq5znZl0C26F3hnRP125HysmA"/>
+</div>
+<div>
+<div class="text-sm font-medium text-on-surface">Hero_Campaign_Background_V2.jpg</div>
+<div class="text-[10px] text-outline">Resolution: 6000x4000</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 bg-secondary-container/30 text-secondary text-[10px] font-bold rounded uppercase">Image</span>
+</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">12.4 MB</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">Oct 24, 2023 • 14:22</td>
+<td class="px-4 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">download</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Asset Row 2 -->
+<tr class="group hover:bg-surface-container-high/50 transition-all cursor-default">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant bg-surface-container focus:ring-primary text-primary" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 bg-surface-container-highest rounded-lg flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-tertiary">movie</span>
+</div>
+<div>
+<div class="text-sm font-medium text-on-surface">Brand_Video_Anthem_Final.mp4</div>
+<div class="text-[10px] text-outline">Duration: 00:45</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 bg-tertiary-container/30 text-tertiary text-[10px] font-bold rounded uppercase">Video</span>
+</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">248.0 MB</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">Oct 23, 2023 • 09:15</td>
+<td class="px-4 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">play_circle</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">download</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Asset Row 3 -->
+<tr class="group hover:bg-surface-container-high/50 transition-all cursor-default">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant bg-surface-container focus:ring-primary text-primary" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 bg-surface-container-highest rounded-lg flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary">description</span>
+</div>
+<div>
+<div class="text-sm font-medium text-on-surface">Product_Specs_Whitepaper.pdf</div>
+<div class="text-[10px] text-outline">Owner: Marketing Team</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 bg-surface-variant text-on-surface-variant text-[10px] font-bold rounded uppercase">Document</span>
+</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">2.1 MB</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">Oct 20, 2023 • 16:45</td>
+<td class="px-4 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">download</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Asset Row 4 -->
+<tr class="group hover:bg-surface-container-high/50 transition-all cursor-default">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant bg-surface-container focus:ring-primary text-primary" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 bg-surface-container-highest rounded-lg overflow-hidden border border-outline-variant/20">
+<img alt="High Tech Setup" class="h-full w-full object-cover" data-alt="Macro shot of modern computer components with neon lighting, crisp focus on circuit textures, sleek dark aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApw2aJq2hPgqZ9ULtaeDN2hy8SM3sqKp65rMMyDQh4gc-6pj-RPyaZy-FInOOquxcj7eNAFQmsVgMBtFj7TKr7D11-qoibmxLamBNvq_mzNZ1pTZR9L2kstLF-shPFxQ8sV_4U0xtOdQ6-f-6YMeTTV9YmEL8PrZMcMDW-h73w59ZeskZu-vL-_7iuLg7NiQKSQAYhGV-DVXBr1geKhSCIeB_IZ3kGyngDjiYvd1LHpz-5uG2q9eEY6YHpKuUt3gaLBYGCErPLJg"/>
+</div>
+<div>
+<div class="text-sm font-medium text-on-surface">Tech_Series_Header_04.png</div>
+<div class="text-[10px] text-outline">Transparent Background</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 bg-secondary-container/30 text-secondary text-[10px] font-bold rounded uppercase">Image</span>
+</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">8.9 MB</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">Oct 19, 2023 • 11:30</td>
+<td class="px-4 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">download</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Asset Row 5 -->
+<tr class="group hover:bg-surface-container-high/50 transition-all cursor-default">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant bg-surface-container focus:ring-primary text-primary" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 bg-surface-container-highest rounded-lg flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-outline">inventory_2</span>
+</div>
+<div>
+<div class="text-sm font-medium text-on-surface">Historical_Archives_Batch.zip</div>
+<div class="text-[10px] text-outline">154 files inside</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 bg-surface-variant text-on-surface-variant text-[10px] font-bold rounded uppercase">Archive</span>
+</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">1.4 GB</td>
+<td class="px-4 py-3 text-xs text-on-surface-variant">Oct 15, 2023 • 18:05</td>
+<td class="px-4 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">unarchive</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-primary"><span class="material-symbols-outlined text-[18px]">download</span></button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-outline hover:text-error"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Detail Panel (Contextual/Collapsible) -->
+<div class="w-80 bg-surface-container-low border-l border-outline-variant/10 overflow-y-auto p-6 hidden lg:flex flex-col gap-6">
+<div class="space-y-4">
+<div class="aspect-square rounded-xl bg-surface-container-highest border border-outline-variant/20 overflow-hidden shadow-xl">
+<img alt="Asset Preview" class="h-full w-full object-cover" data-alt="High quality preview of a fluid abstract digital painting with soft color transitions and professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnsEpUe7u565SR7MF00HvidGHQZWNFSkwQZXUMVuvQ7Q1SgSWf6IObNu82t7WTTqTOe6AD6x4cIrLr-yQu4gE8gl4we40dbey6nKucnpyAnZmbd2fPVVZeZEN8yI55J6Py-8VaM3PcmPQ-UyKPFri6_deWIXZ7yziFYaCUbugqnU-H50v7dw8b0SCjRa-TgGSk47ENQsAg84bgS4_zOtUWiz96HrEfapMup41sDGNItQN7CcxLqyesS07WW6rYQyR1gxL_emzt-Q"/>
+</div>
+<div>
+<h2 class="text-md font-bold text-on-surface leading-tight">Hero_Campaign_Background_V2.jpg</h2>
+<p class="text-xs text-outline">Last edited by Sarah Miller</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-xs">
+<span class="text-outline">File Information</span>
+<button class="text-primary font-bold">Details</button>
+</div>
+<div class="grid grid-cols-2 gap-y-3">
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider">Format</p>
+<p class="text-xs text-on-surface-variant">JPEG Image</p>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider">DPI</p>
+<p class="text-xs text-on-surface-variant">300 DPI</p>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider">Created</p>
+<p class="text-xs text-on-surface-variant">Oct 12, 2023</p>
+</div>
+<div>
+<p class="text-[10px] text-outline uppercase tracking-wider">Status</p>
+<p class="text-xs text-primary flex items-center gap-1">
+<span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+                                    Published
+                                </p>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<p class="text-[10px] text-outline uppercase tracking-wider">Permissions</p>
+<div class="flex -space-x-2">
+<div class="h-7 w-7 rounded-full border-2 border-surface-container-low bg-surface-container-highest">
+<img alt="Team 1" class="rounded-full" data-alt="Male professional headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX4D7IJgc9GXu-WmbvqxNufGv1o4Yy8XScYS2Qhc4Lzq_NqKIHh6ob0yLYrDI2KhXUgy4UxAvaHovtISGSYmbf_yhPEvKyKa3L_YRfYQEXqyqu0qtYGc9IT7TSREJYjO3grNT4AVZjCcla5aYbItYFTVHjIr4s71WHC6jPNqSLEWPW4AIQUcmhbqsS3gtaRSlc0olLwW1x24ETCxnHzBuy3IC_LKDHOAKQKbHj_43ImJ0XJRD3bw--0INTwm0J-MgCvK9qfZDidQ"/>
+</div>
+<div class="h-7 w-7 rounded-full border-2 border-surface-container-low bg-surface-container-highest">
+<img alt="Team 2" class="rounded-full" data-alt="Female professional headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWK91VPOZFTlUEYZ2dyKRDF3O6JW5CKEii3fOC4_qzq7wJyqpYvtq6cRnYmLQ4lvudu14QVm6F7RDImN7B4pBBUzvjyp4ic9aPoRnnA6cbDsuFE6AYPTjIHtzdDnR7L_zTKcYwFGXkU6BBrwhFvN0KxZoO1Ipcua3BwNBS5_S-LJL1WlpB5_CjXAfBj-vHypX92VE_IlF3wqXr_Du2XMf7eFS7x6hTPM9S2UDhNCyuyMqKskIKhmcE3gfH9W_Yy4Tm2Z8BrWCQvQ"/>
+</div>
+<div class="h-7 w-7 rounded-full border-2 border-surface-container-low bg-surface-container-highest flex items-center justify-center text-[10px] text-outline">
+                                +4
+                            </div>
+</div>
+</div>
+<button class="mt-auto w-full border border-outline-variant/30 py-2.5 rounded-lg text-xs font-bold hover:bg-surface-container-highest transition-colors">
+                        Manage Versions
+                    </button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

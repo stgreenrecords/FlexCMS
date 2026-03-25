@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS - Asset Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#a1b4eb",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-surface-variant": "#c3c6d6",
+                        "surface-container-highest": "#353534",
+                        "secondary-container": "#324575",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "tertiary-fixed": "#ffdbcf",
+                        "tertiary-container": "#a93802",
+                        "on-secondary-fixed-variant": "#324575",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#5c1a00",
+                        "surface-tint": "#b0c6ff",
+                        "inverse-on-surface": "#313030",
+                        "background": "#131313",
+                        "on-background": "#e5e2e1",
+                        "on-primary": "#002d6f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "primary": "#b0c6ff",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container": "#201f1f",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-fixed": "#dae2ff",
+                        "on-primary-fixed": "#001945",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface-dim": "#131313",
+                        "outline-variant": "#424654",
+                        "on-secondary-fixed": "#001847",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#380d00",
+                        "inverse-primary": "#0058cc",
+                        "on-primary-container": "#cbd8ff",
+                        "on-secondary": "#1a2e5d",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "tertiary": "#ffb59b",
+                        "secondary": "#b3c5fd",
+                        "primary-fixed": "#d9e2ff",
+                        "on-tertiary-container": "#ffcebd",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "outline": "#8d90a0",
+                        "error-container": "#93000a",
+                        "primary-container": "#0058cc",
+                        "error": "#ffb4ab"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-8">
+<div class="text-xl font-bold tracking-tight text-[#b0c6ff]">FlexCMS</div>
+<nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Dashboard</a>
+<a class="text-[#b0c6ff] font-semibold px-3 py-2 rounded-lg" href="#">Asset Library</a>
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-3 py-2 rounded-lg" href="#">Workflows</a>
+</nav>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative group">
+<span class="material-symbols-outlined p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full transition-colors cursor-pointer" data-icon="notifications">notifications</span>
+</div>
+<span class="material-symbols-outlined p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full transition-colors cursor-pointer" data-icon="settings">settings</span>
+<span class="material-symbols-outlined p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full transition-colors cursor-pointer" data-icon="help">help</span>
+<div class="h-8 w-8 rounded-full ml-2 overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional male editor in a modern studio setting with soft ambient blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaXQB1KZ_hnEbd9e8buOb2wC0nFyWe1XqkCxwbyFNzH_sPyu6w593FXK9Q3Cp9yPyCQNaDDEqH7EXpvANrrWo2M7dRPeFHjL9CSJZd2dki9KxDXZiDUgBMERY-NhDkjH_FqnJxYw84sIN62K3er2w3Xdok_oJYyOSinT6sbTC42Jav3I4gu605OWKDEapPu84neWh1PHGCENSJgJmlLpZ4FtXHU8_1m6wYhkWyUlUspU9OUpQvZKlLCbfJiZvd2Jt1H3UcnUJzag"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 bg-[#1c1b1b] flex flex-col py-4 pr-4 z-40">
+<div class="px-6 py-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-sm" data-icon="dashboard">dashboard</span>
+</div>
+<div>
+<div class="text-lg font-black text-white leading-none">PIM Central</div>
+<div class="text-[10px] uppercase tracking-widest text-[#c3c6d6] mt-1 font-bold">Enterprise Edition</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">DAM Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#b0c6ff] bg-[#2a2a2a] rounded-r-lg border-l-4 border-[#0058cc] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="text-sm font-medium">Asset Library</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="upload_file">upload_file</span>
+<span class="text-sm font-medium">Import Wizard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="text-sm font-medium">Job History</span>
+</a>
+</nav>
+<div class="mt-auto px-6 space-y-4">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                New Asset
+            </button>
+<div class="pt-4 border-t border-outline-variant/20 space-y-1">
+<a class="flex items-center gap-3 py-2 text-[#c3c6d6] hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="contact_support">contact_support</span>
+<span class="text-xs">Support</span>
+</a>
+<a class="flex items-center gap-3 py-2 text-[#c3c6d6] hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="menu_book">menu_book</span>
+<span class="text-xs">Documentation</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-64 pt-16 min-h-screen bg-surface-container">
+<!-- Action Header -->
+<div class="h-14 flex items-center justify-between px-8 bg-surface-container-low/50 backdrop-blur-md sticky top-16 z-30">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-on-surface flex items-center gap-1 text-sm font-medium">
+<span class="material-symbols-outlined text-lg" data-icon="arrow_back">arrow_back</span>
+                    Back to Library
+                </button>
+<div class="h-4 w-[1px] bg-outline-variant/30"></div>
+<h1 class="text-sm font-semibold tracking-wide text-on-surface">ASSET_ID: IMG_2024_082.JPG</h1>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider">Published</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-1.5 text-xs font-bold text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors">Discard</button>
+<button class="px-5 py-1.5 text-xs font-bold bg-primary text-on-primary rounded-lg shadow-md hover:brightness-110 active:scale-95 transition-all">Save Changes</button>
+</div>
+</div>
+<div class="p-8 grid grid-cols-12 gap-8">
+<!-- Left Column: Asset Preview & Analysis -->
+<div class="col-span-12 lg:col-span-7 xl:col-span-8 space-y-6">
+<!-- Main Preview Surface -->
+<section class="bg-surface-container-lowest rounded-xl overflow-hidden aspect-video relative flex items-center justify-center group shadow-2xl">
+<img class="max-w-full max-h-full object-contain" data-alt="Modern abstract digital landscape with flowing organic curves in deep blue and iridescent neon accents, professional studio composition" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOV04zlBST3tF2guz0F6DsA83kw41AbQk_OUzfOlzOaStfzCYb-zdB3JrKe7s7qtICiwz805tmueg9KfeDnOMc1FdJoB50r1AuPkwx_Wj_d20-O6XMPAyV6okY2Js2OKgHPJOMdKw6AVDXJV-bKsUTPi0Py_yxpwY2ZJdEvUAdmT4W3qhKgUoyN9lpty2GNy8YIV3F3dLE-T1E6VExWq7Qu0lsq_mZJCWMhGr4tZQ_oMX4fKeqzB0LO9u8NATVz8Z9J_RQgTpR3w"/>
+<!-- Preview Toolbar -->
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 bg-surface-container-highest/60 backdrop-blur-xl rounded-full border border-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-2 hover:bg-white/10 rounded-full text-white"><span class="material-symbols-outlined" data-icon="zoom_in">zoom_in</span></button>
+<button class="p-2 hover:bg-white/10 rounded-full text-white"><span class="material-symbols-outlined" data-icon="zoom_out">zoom_out</span></button>
+<div class="w-[1px] h-4 bg-white/20 mx-1"></div>
+<button class="p-2 hover:bg-white/10 rounded-full text-white"><span class="material-symbols-outlined" data-icon="crop">crop</span></button>
+<button class="p-2 hover:bg-white/10 rounded-full text-white"><span class="material-symbols-outlined" data-icon="palette">palette</span></button>
+<div class="w-[1px] h-4 bg-white/20 mx-1"></div>
+<button class="p-2 hover:bg-white/10 rounded-full text-white"><span class="material-symbols-outlined" data-icon="fullscreen">fullscreen</span></button>
+</div>
+</section>
+<!-- Analysis/Renditions Grid (Bento Style) -->
+<div class="grid grid-cols-3 gap-6">
+<!-- Renditions Panel -->
+<div class="col-span-2 bg-surface-container-low p-6 rounded-xl space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="layers">layers</span>
+                                Generated Renditions
+                            </h3>
+<button class="text-xs font-bold text-primary">Regenerate All</button>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="flex items-center gap-4 p-3 bg-surface-container rounded-lg group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Thumbnail version of abstract digital art" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAXNg8nsNg0ISFhqmJX0Q4xZrGePs8Pxb71w-y8-_r7AZbCt7sHVv8NqJRayMzGODdk4-n98VXfJaN68vWhZYHI0ERYZXN66Dy4L1Sqd2ahn70aM2pr4Oxjb0Ed29vLh2zsJ3Z0XjThOD37m6rYic3XunaEqLycxP6NI7gLZJ2qBWOpA9aSi4-vAAZt8RfYZ1ZF_W0HYG2prlXvOYR1L6CM0cVFTF-o-dxjEKa79P1v9oNr_Ps-R85urSFV_HSYxvJnUAQui9Wnw"/>
+</div>
+<div>
+<div class="text-xs font-bold">Thumbnail</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">250x250 • WebP • 12kb</div>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 bg-surface-container rounded-lg group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden border border-primary/20">
+<span class="material-symbols-outlined text-primary" data-icon="social_distance">social_distance</span>
+</div>
+<div>
+<div class="text-xs font-bold">Social Hero</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">1200x630 • PNG • 450kb</div>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 bg-surface-container rounded-lg group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="smartphone">smartphone</span>
+</div>
+<div>
+<div class="text-xs font-bold">Mobile App</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">800x1200 • JPG • 180kb</div>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 bg-surface-container rounded-lg group hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="print">print</span>
+</div>
+<div>
+<div class="text-xs font-bold">Print High-Res</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">300 DPI • TIFF • 24MB</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Usage Stats Panel -->
+<div class="bg-surface-container-low p-6 rounded-xl space-y-4">
+<h3 class="text-sm font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="link">link</span>
+                            Usage References
+                        </h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">CMS Pages</span>
+<span class="text-xs font-bold bg-surface-container-high px-2 py-0.5 rounded">12</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Product Gallery</span>
+<span class="text-xs font-bold bg-surface-container-high px-2 py-0.5 rounded">4</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-on-surface-variant">Email Campaigns</span>
+<span class="text-xs font-bold bg-surface-container-high px-2 py-0.5 rounded">2</span>
+</div>
+<button class="w-full mt-2 py-2 text-[10px] uppercase font-black tracking-widest bg-surface-container hover:bg-surface-container-high text-primary rounded-lg transition-colors">
+                                View Full Report
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Metadata Editor Form -->
+<div class="col-span-12 lg:col-span-5 xl:col-span-4">
+<div class="sticky top-32 space-y-6">
+<!-- Metadata Form Card -->
+<div class="bg-surface-container-low rounded-xl p-8 shadow-xl">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="edit_note" style="font-variation-settings: 'FILL' 1;">edit_note</span>
+<h2 class="text-lg font-bold text-white tracking-tight">Metadata Editor</h2>
+</div>
+<form class="space-y-6">
+<!-- Title Input -->
+<div class="space-y-2">
+<label class="text-[10px] uppercase font-black tracking-widest text-on-surface-variant">Asset Title</label>
+<input class="w-full bg-surface-container-highest border-none border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary text-sm font-medium transition-all py-3 rounded-t-lg" type="text" value="Abstract Flow #82 - Deep Blue"/>
+</div>
+<!-- Alt Text Input -->
+<div class="space-y-2">
+<label class="text-[10px] uppercase font-black tracking-widest text-on-surface-variant">Alt Text (Accessibility)</label>
+<textarea class="w-full bg-surface-container-highest border-none border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary text-sm transition-all py-3 rounded-t-lg resize-none" rows="3">Digital abstract artwork featuring deep blue organic waves and iridescent glowing lines in a professional composition.</textarea>
+</div>
+<!-- Tags Input -->
+<div class="space-y-2">
+<label class="text-[10px] uppercase font-black tracking-widest text-on-surface-variant">Tags</label>
+<div class="flex flex-wrap gap-2 p-3 bg-surface-container-highest rounded-lg min-h-[80px]">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[11px] font-bold rounded flex items-center gap-1">
+                                        Abstract <span class="material-symbols-outlined text-[12px] cursor-pointer" data-icon="close">close</span>
+</span>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[11px] font-bold rounded flex items-center gap-1">
+                                        Digital Art <span class="material-symbols-outlined text-[12px] cursor-pointer" data-icon="close">close</span>
+</span>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[11px] font-bold rounded flex items-center gap-1">
+                                        Hero Image <span class="material-symbols-outlined text-[12px] cursor-pointer" data-icon="close">close</span>
+</span>
+<button class="px-2 py-1 border border-dashed border-outline text-[11px] font-bold rounded text-on-surface-variant">+ Add</button>
+</div>
+</div>
+<!-- Copyright Info -->
+<div class="space-y-2">
+<label class="text-[10px] uppercase font-black tracking-widest text-on-surface-variant">Copyright Holder</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary text-sm font-medium transition-all py-3 rounded-t-lg pl-10" type="text" value="FlexCorp Media Ltd."/>
+<span class="material-symbols-outlined absolute left-3 top-3 text-on-surface-variant text-lg" data-icon="copyright">copyright</span>
+</div>
+</div>
+<!-- Advanced Settings Toggle -->
+<div class="pt-4 border-t border-outline-variant/20 flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" data-icon="tune">tune</span>
+<span class="text-xs font-bold text-on-surface-variant group-hover:text-on-surface transition-colors">Advanced IPTC/XMP Data</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="chevron_right">chevron_right</span>
+</div>
+</form>
+</div>
+<!-- Technical Specs Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/10">
+<div class="grid grid-cols-2 gap-y-4">
+<div>
+<div class="text-[10px] text-on-surface-variant uppercase font-bold">Format</div>
+<div class="text-xs font-bold">JPEG Image</div>
+</div>
+<div>
+<div class="text-[10px] text-on-surface-variant uppercase font-bold">Color Space</div>
+<div class="text-xs font-bold">Display P3</div>
+</div>
+<div>
+<div class="text-[10px] text-on-surface-variant uppercase font-bold">Dimensions</div>
+<div class="text-xs font-bold">6000 x 4000 px</div>
+</div>
+<div>
+<div class="text-[10px] text-on-surface-variant uppercase font-bold">File Size</div>
+<div class="text-xs font-bold">8.4 MB</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Contextual Rail (Right-aligned actions) -->
+<div class="fixed right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 p-2 bg-surface-container-lowest/80 backdrop-blur rounded-full border border-outline-variant/20 z-50">
+<button class="p-3 hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-primary transition-all" title="Version History">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+<button class="p-3 hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-primary transition-all relative" title="Asset Comments">
+<span class="material-symbols-outlined" data-icon="comment">comment</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-3 hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-primary transition-all" title="Share Asset">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+<div class="w-full h-[1px] bg-outline-variant/30"></div>
+<button class="p-3 hover:bg-error-container/20 rounded-full text-error transition-all" title="Delete Asset">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</body></html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PIM Import Wizard | FlexCMS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#a1b4eb",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-surface-variant": "#c3c6d6",
+                        "surface-container-highest": "#353534",
+                        "secondary-container": "#324575",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "tertiary-fixed": "#ffdbcf",
+                        "tertiary-container": "#a93802",
+                        "on-secondary-fixed-variant": "#324575",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#5c1a00",
+                        "surface-tint": "#b0c6ff",
+                        "inverse-on-surface": "#313030",
+                        "background": "#131313",
+                        "on-background": "#e5e2e1",
+                        "on-primary": "#002d6f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "primary": "#b0c6ff",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-fixed": "#dae2ff",
+                        "on-primary-fixed": "#001945",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface-dim": "#131313",
+                        "outline-variant": "#424654",
+                        "on-secondary-fixed": "#001847",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#380d00",
+                        "inverse-primary": "#0058cc",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-container": "#cbd8ff",
+                        "on-secondary": "#1a2e5d",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "tertiary": "#ffb59b",
+                        "surface-container": "#201f1f",
+                        "surface": "#131313",
+                        "secondary": "#b3c5fd",
+                        "primary-fixed": "#d9e2ff",
+                        "on-tertiary-container": "#ffcebd",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "outline": "#8d90a0",
+                        "error-container": "#93000a",
+                        "primary-container": "#0058cc",
+                        "error": "#ffb4ab"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        .glass-panel { background: rgba(53, 53, 52, 0.8); backdrop-filter: blur(12px); }
+        .step-success { color: #4ade80; }
+        .connector-line { background: repeating-linear-gradient(90deg, #424654 0, #424654 4px, transparent 4px, transparent 8px); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary/30">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex items-center justify-between px-6 h-16">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tight text-[#b0c6ff]">FlexCMS</span>
+<div class="hidden md:flex gap-6 ml-8">
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-3 py-1 rounded" href="#">Asset Library</a>
+<a class="text-[#b0c6ff] font-semibold" href="#">Import Wizard</a>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 rounded-full active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden ml-2 border border-outline-variant/20">
+<img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-BIucJ5AZHQ4SghK1H-M9_WF9I8ceqzjA-C0x5Y5WPjNifUs0H0-zMWe9U9A9hCD43T4JqZUpwhSuHK8g8_AQpX6Ul0PN6JHiJSl_wOTrnGvfkUV0Lxd-ltKS5kCNgFCVG84MbjpfI4eKUltcAPTcrLBf-IZn7gya8EO7IGzQOQFOblJrRKLr8dbA2qAVOOv2NZctQ7p87xySMFbU8VoPHIPY5xHz4ZVV9wrfNQQv-APo43YkPtevPAmMFIxsucQ50PNftm2VRA"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 bg-[#1c1b1b] flex flex-col py-4 pr-4 hidden md:flex">
+<div class="px-6 py-4">
+<div class="text-lg font-black text-white">PIM Central</div>
+<div class="text-xs text-on-surface-variant/60 font-medium">Enterprise Edition</div>
+</div>
+<nav class="mt-4 flex-grow">
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-sm">dashboard</span>
+<span class="text-sm font-medium">DAM Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-sm">inventory_2</span>
+<span class="text-sm font-medium">Asset Library</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#b0c6ff] bg-[#2a2a2a] rounded-r-lg border-l-4 border-[#0056D2] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+<span class="text-sm font-medium">Import Wizard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-sm">history</span>
+<span class="text-sm font-medium">Job History</span>
+</a>
+</nav>
+<div class="mt-auto px-4 pb-4">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Asset
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-16 min-h-screen bg-surface-container">
+<div class="max-w-7xl mx-auto px-8 py-10">
+<!-- Header Section -->
+<header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2 font-headline">Import Wizard</h1>
+<p class="text-on-surface-variant max-w-lg">Orchestrate your enterprise data ingestion with automated mapping and structural validation.</p>
+</div>
+<div class="flex items-center gap-3 text-sm font-bold bg-primary/10 px-5 py-2.5 rounded-full border border-primary/20">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+</span>
+<span class="text-primary tracking-wide">STEP 3 OF 5: MAP ATTRIBUTES</span>
+</div>
+</header>
+<!-- Wizard Progress Stepper -->
+<div class="grid grid-cols-5 gap-4 mb-10">
+<div class="relative">
+<div class="h-1.5 w-full bg-primary rounded-full mb-3"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm step-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[10px] uppercase tracking-widest font-black text-on-surface/50">01 Upload</span>
+</div>
+</div>
+<div class="relative">
+<div class="h-1.5 w-full bg-primary rounded-full mb-3"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm step-success" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[10px] uppercase tracking-widest font-black text-on-surface/50">02 Format</span>
+</div>
+</div>
+<div class="relative">
+<div class="h-1.5 w-full bg-primary rounded-full mb-3 shadow-[0_0_12px_rgba(176,198,255,0.4)]"></div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-4 rounded-full bg-primary flex items-center justify-center text-[10px] text-on-primary font-bold">3</span>
+<span class="text-[10px] uppercase tracking-widest font-black text-primary">03 Mapping</span>
+</div>
+</div>
+<div class="relative opacity-40">
+<div class="h-1.5 w-full bg-outline-variant rounded-full mb-3"></div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-4 rounded-full border border-on-surface-variant flex items-center justify-center text-[10px] font-bold">4</span>
+<span class="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">04 Preview</span>
+</div>
+</div>
+<div class="relative opacity-40">
+<div class="h-1.5 w-full bg-outline-variant rounded-full mb-3"></div>
+<div class="flex items-center gap-2">
+<span class="w-4 h-4 rounded-full border border-on-surface-variant flex items-center justify-center text-[10px] font-bold">5</span>
+<span class="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">05 Execute</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+<!-- Main Mapping UI -->
+<div class="lg:col-span-3 space-y-6">
+<section class="bg-surface-container-low rounded-xl overflow-hidden shadow-2xl border border-outline-variant/10">
+<div class="px-8 py-6 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low">
+<div>
+<h2 class="text-xl font-bold text-white tracking-tight">Attribute Mapping</h2>
+<p class="text-sm text-on-surface-variant">Sync CSV columns to destination properties</p>
+</div>
+<button class="text-xs text-primary font-bold px-4 py-2 rounded-lg border border-primary/30 hover:bg-primary/5 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">auto_fix_high</span>
+                                Re-run Auto-Match
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/30">
+<th class="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-on-surface-variant w-1/3">Source Column</th>
+<th class="px-2 py-4 text-center w-12"></th>
+<th class="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-on-surface-variant w-1/3">PIM Destination</th>
+<th class="px-8 py-4 text-[10px] uppercase tracking-widest font-black text-on-surface-variant">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-highest/20 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary text-sm">table_chart</span>
+</div>
+<div>
+<div class="text-sm font-bold text-white">SKU_ID</div>
+<div class="text-[10px] font-mono text-on-surface-variant mt-0.5">e.g. PRD-99201</div>
+</div>
+</div>
+</td>
+<td class="px-0 py-6 text-center">
+<div class="h-[1px] w-full connector-line opacity-30"></div>
+</td>
+<td class="px-8 py-6">
+<div class="relative group/select">
+<select class="appearance-none bg-surface-container-highest border border-outline-variant/20 rounded-lg text-sm w-full px-4 py-2.5 focus:ring-2 focus:ring-primary/40 focus:border-primary text-primary font-bold cursor-pointer transition-all">
+<option>Unique Identifier (SKU)</option>
+<option>Product Name</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-sm">expand_more</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></span>
+<span class="text-[10px] font-bold text-primary uppercase">Mapped</span>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-highest/20 transition-colors group">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined text-primary text-sm">table_chart</span>
+</div>
+<div>
+<div class="text-sm font-bold text-white">Product_Name_EN</div>
+<div class="text-[10px] font-mono text-on-surface-variant mt-0.5">e.g. Ergonomic Office Chair</div>
+</div>
+</div>
+</td>
+<td class="px-0 py-6 text-center">
+<div class="h-[1px] w-full connector-line opacity-30"></div>
+</td>
+<td class="px-8 py-6">
+<div class="relative group/select">
+<select class="appearance-none bg-surface-container-highest border border-outline-variant/20 rounded-lg text-sm w-full px-4 py-2.5 focus:ring-2 focus:ring-primary/40 focus:border-primary text-white font-bold cursor-pointer transition-all">
+<option>Display Title (Localized)</option>
+<option>Long Description</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-sm">expand_more</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></span>
+<span class="text-[10px] font-bold text-primary uppercase">Mapped</span>
+</div>
+</td>
+</tr>
+<!-- Row 3 (Unmapped) -->
+<tr class="hover:bg-surface-container-highest/20 transition-colors group bg-tertiary/5">
+<td class="px-8 py-6">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-tertiary/10 rounded-lg group-hover:bg-tertiary/20 transition-colors">
+<span class="material-symbols-outlined text-tertiary text-sm">warning</span>
+</div>
+<div>
+<div class="text-sm font-bold text-white">Inventory_Count</div>
+<div class="text-[10px] font-mono text-on-surface-variant mt-0.5">e.g. 142</div>
+</div>
+</div>
+</td>
+<td class="px-0 py-6 text-center">
+<div class="h-[1px] w-full connector-line opacity-30"></div>
+</td>
+<td class="px-8 py-6">
+<div class="relative group/select">
+<select class="appearance-none bg-surface-container-highest border border-tertiary/30 rounded-lg text-sm w-full px-4 py-2.5 focus:ring-2 focus:ring-tertiary/40 focus:border-tertiary text-tertiary font-bold cursor-pointer transition-all">
+<option disabled="" selected="">Unmapped Field</option>
+<option>Warehouse Quantity</option>
+<option>Buffer Stock</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-tertiary pointer-events-none text-sm">expand_more</span>
+</div>
+</td>
+<td class="px-8 py-6">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-[10px] font-bold text-tertiary uppercase">Action Required</span>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Sticky Bottom Action Bar -->
+<div class="px-8 py-6 bg-surface-container-high border-t border-outline-variant/10 flex items-center justify-between sticky bottom-0 z-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-base" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+<div>
+<div class="text-[10px] uppercase font-black text-on-surface-variant tracking-wider leading-none mb-1">Status</div>
+<div class="text-sm font-bold text-white">12/14 Fields Mapped</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 rounded-xl text-sm font-black text-on-surface border-2 border-outline-variant/20 hover:bg-surface-container-highest transition-all flex items-center gap-2 active:scale-95">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+                                    BACK
+                                </button>
+<button class="px-10 py-3 rounded-xl text-sm font-black bg-white text-background shadow-[0_8px_20px_rgba(255,255,255,0.15)] hover:shadow-[0_12px_24px_rgba(255,255,255,0.25)] transition-all flex items-center gap-2 active:scale-95 group">
+                                    CONTINUE TO PREVIEW
+                                    <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Mapping Insights Panel -->
+<div class="bg-surface-container-highest/40 border border-outline-variant/10 rounded-xl p-6">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">lightbulb</span>
+<h3 class="font-bold text-white">Mapping Insights</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest/50 p-4 rounded-lg border border-outline-variant/5">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-black uppercase text-primary tracking-widest">Auto-Match logic</span>
+<span class="text-[10px] font-mono text-on-surface-variant">Conf: 98%</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+<span class="text-white font-bold">SKU_ID</span> was matched to <span class="text-white font-bold">Unique Identifier</span> because the column contains unique alphanumeric patterns (PRD-XXXX) found in 1,240 existing records.
+                                </p>
+</div>
+<div class="bg-surface-container-lowest/50 p-4 rounded-lg border border-outline-variant/5">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-black uppercase text-tertiary tracking-widest">Uncertainty Alert</span>
+<span class="text-[10px] font-mono text-on-surface-variant">Conf: 42%</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+<span class="text-white font-bold">Inventory_Count</span> remains unmapped as it shares naming patterns with both <span class="text-primary hover:underline cursor-pointer">Warehouse Qty</span> and <span class="text-primary hover:underline cursor-pointer">Reserved Stock</span>.
+                                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Validation Summary Sidebar -->
+<aside class="lg:col-span-1 space-y-6">
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/10 overflow-hidden sticky top-24">
+<div class="p-5 border-b border-outline-variant/10 bg-surface-container-high/50">
+<h4 class="text-xs font-black uppercase tracking-widest text-white">Validation Summary</h4>
+</div>
+<div class="p-5 space-y-6">
+<!-- Schema Match -->
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-xs text-on-surface-variant font-medium">Schema Match</span>
+<span class="text-sm font-bold text-primary">94%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary w-[94%] h-full rounded-full"></div>
+</div>
+</div>
+<!-- Integrity Issues -->
+<div class="space-y-4">
+<div class="flex items-center gap-2 text-[10px] font-black text-on-surface-variant uppercase tracking-tighter">
+                                    Potential Issues
+                                </div>
+<div class="space-y-2">
+<div class="flex gap-3 p-3 bg-error-container/10 border border-error/10 rounded-lg">
+<span class="material-symbols-outlined text-error text-sm">error</span>
+<div>
+<div class="text-[11px] font-bold text-on-background">Data Type Mismatch</div>
+<div class="text-[10px] text-on-surface-variant leading-tight mt-0.5">3 rows in 'Price_USD' contain non-numeric characters.</div>
+</div>
+</div>
+<div class="flex gap-3 p-3 bg-tertiary-container/10 border border-tertiary/10 rounded-lg">
+<span class="material-symbols-outlined text-tertiary text-sm">priority_high</span>
+<div>
+<div class="text-[11px] font-bold text-on-background">Missing Values</div>
+<div class="text-[10px] text-on-surface-variant leading-tight mt-0.5">12 records are missing 'Product_Name'.</div>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-2">
+<button class="w-full py-2.5 bg-surface-container-highest border border-outline-variant/20 rounded-lg text-[10px] font-black text-on-surface-variant hover:text-white transition-colors uppercase tracking-widest">
+                                    Download Full Report
+                                </button>
+</div>
+</div>
+</div>
+<!-- Help Card -->
+<div class="bg-primary-container/20 border border-primary/10 rounded-xl p-5">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-sm">help</span>
+<span class="text-xs font-bold text-white">Need help mapping?</span>
+</div>
+<p class="text-[11px] text-on-surface-variant leading-relaxed mb-4">
+                            You can export your current mapping as a reusable template for future imports.
+                        </p>
+<a class="text-[11px] font-bold text-primary hover:underline" href="#">View Mapping Guide →</a>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- Contextual Rail -->
+<div class="fixed right-6 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-3 p-1.5 bg-surface-container-lowest/80 backdrop-blur rounded-full border border-outline-variant/20 shadow-xl">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-primary/10" title="View History">
+<span class="material-symbols-outlined text-lg">history</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-primary/10" title="Download Template">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-primary/10" title="Help Center">
+<span class="material-symbols-outlined text-lg">help</span>
+</button>
+</div>
+<!-- Mobile Navigation -->
+<footer class="md:hidden fixed bottom-0 left-0 w-full bg-[#131313]/95 backdrop-blur-xl border-t border-outline-variant/10 flex justify-around items-center h-16 px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-[#c3c6d6]">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#b0c6ff]">
+<span class="material-symbols-filled">upload_file</span>
+<span class="text-[10px]">Import</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#c3c6d6]">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-[10px]">Assets</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-[#c3c6d6]">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px]">Settings</span>
+</button>
+</footer>
+</body></html>

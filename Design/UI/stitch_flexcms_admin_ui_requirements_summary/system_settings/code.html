@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#324575",
+                        "on-primary": "#002d6f",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "tertiary-container": "#a93802",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface-bright": "#393939",
+                        "on-primary-fixed": "#001945",
+                        "primary-fixed": "#d9e2ff",
+                        "outline-variant": "#424654",
+                        "on-tertiary": "#5c1a00",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "secondary-fixed": "#dae2ff",
+                        "on-primary-container": "#cbd8ff",
+                        "surface-dim": "#131313",
+                        "surface-tint": "#b0c6ff",
+                        "on-tertiary-fixed": "#380d00",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "on-background": "#e5e2e1",
+                        "secondary": "#b3c5fd",
+                        "primary-container": "#0058cc",
+                        "on-primary-fixed-variant": "#00419c",
+                        "surface-container-highest": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed": "#001847",
+                        "surface-container": "#201f1f",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "primary": "#b0c6ff",
+                        "on-surface-variant": "#c3c6d6",
+                        "inverse-primary": "#0058cc",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary": "#ffb59b",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "secondary-container": "#324575",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "on-tertiary-container": "#ffcebd",
+                        "on-secondary": "#1a2e5d",
+                        "error-container": "#93000a",
+                        "background": "#131313",
+                        "on-secondary-container": "#a1b4eb",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "outline": "#8d90a0"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] h-16 flex items-center justify-between px-6">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-white">FlexCMS</span>
+<nav class="hidden md:flex items-center gap-6 text-sm font-['Inter']">
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Dashboard</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Analytics</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Support</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-[#2a2a2a] rounded-full transition-all active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+<button class="p-2 hover:bg-[#2a2a2a] rounded-full transition-all active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User profile" data-alt="Close-up professional headshot of a person with friendly expression in a modern office environment with soft bokeh background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCB6NCrqQf-OPXo4hsPf_zmX-IsY5RMGSowmCRsf8GsyIRGwQuoR9bmoGyncea7Ppv7xsRPVOnI_0Oy1etUfcORJTXqj5-k8A5YZ27CSxcf0USkseM655XSBu1DBKgp7sIGBV5I286YmSti3OWs1KiHy5gpm5jf_5fkJxHyNVGbXW4kJvrjpH7mysRy_ux8OFeyrj4dHeRjwxlMiwTjHFchb0nbfyH91v_P3Euy-Xmgs8sglb4HGO3l9gLcs59s95aColujav4Mrg"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 z-40 bg-[#1c1b1b] flex flex-col py-4 gap-2">
+<div class="px-6 py-4 mb-2">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-sm">admin_panel_settings</span>
+</div>
+<div>
+<p class="text-[0.875rem] font-bold text-white leading-tight">System Admin</p>
+<p class="text-[0.7rem] text-on-surface-variant uppercase tracking-widest">Enterprise Tier</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="text-gray-400 px-4 py-2 hover:text-white flex items-center gap-3 mx-2 transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span>Content</span>
+</a>
+<a class="text-gray-400 px-4 py-2 hover:text-white flex items-center gap-3 mx-2 transition-all" href="#">
+<span class="material-symbols-outlined">perm_media</span>
+<span>Media</span>
+</a>
+<a class="text-gray-400 px-4 py-2 hover:text-white flex items-center gap-3 mx-2 transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Users</span>
+</a>
+<a class="text-gray-400 px-4 py-2 hover:text-white flex items-center gap-3 mx-2 transition-all" href="#">
+<span class="material-symbols-outlined">palette</span>
+<span>Themes</span>
+</a>
+<a class="bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] text-[#002d6f] font-bold rounded-r-full mr-4 px-4 py-2 flex items-center gap-3 scale-102 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_suggest</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-auto px-2 flex flex-col gap-1">
+<a class="text-gray-400 px-4 py-2 hover:text-white flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Documentation</span>
+</a>
+<a class="text-gray-400 px-4 py-2 hover:text-white flex items-center gap-3 transition-all" href="#">
+<span class="material-symbols-outlined text-error">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-64 pt-16 min-h-screen bg-surface-container">
+<div class="max-w-6xl mx-auto p-8">
+<!-- Editorial Header -->
+<div class="mb-12 flex items-end justify-between">
+<div>
+<h1 class="text-[2.5rem] font-extrabold tracking-tight text-white mb-2 leading-none">System Settings</h1>
+<p class="text-on-surface-variant text-lg max-w-xl">Configure your enterprise CMS environment, manage global variables, and orchestration preferences.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-md transition-all font-semibold text-sm">Discard Changes</button>
+<button class="px-6 py-2.5 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-md shadow-lg shadow-primary-container/20 transition-all font-bold text-sm">Save Configuration</button>
+</div>
+</div>
+<!-- Tabbed Navigation -->
+<div class="flex gap-8 mb-8 border-b border-outline-variant/10">
+<button class="pb-4 text-primary font-semibold border-b-2 border-primary flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-[20px]">tune</span> General
+                </button>
+<button class="pb-4 text-on-surface-variant hover:text-white transition-colors flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-[20px]">palette</span> Themes
+                </button>
+<button class="pb-4 text-on-surface-variant hover:text-white transition-colors flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-[20px]">group</span> Users
+                </button>
+<button class="pb-4 text-on-surface-variant hover:text-white transition-colors flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-[20px]">key</span> API Keys
+                </button>
+</div>
+<!-- Settings Grid -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Left Column: Primary Config -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<!-- Global Configuration Card -->
+<section class="bg-surface-container-low rounded-xl p-8 transition-all hover:bg-surface-container">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">public</span>
+<h2 class="text-xl font-bold text-white tracking-tight">Global Configuration</h2>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<div class="col-span-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Platform Instance Name</label>
+<input class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface rounded-t-md px-4 py-3 transition-all" type="text" value="FlexCMS Corporate Instance"/>
+</div>
+<div class="col-span-1">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Base URL</label>
+<input class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface rounded-t-md px-4 py-3 transition-all" type="text" value="https://cms.enterprise.com"/>
+</div>
+<div class="col-span-1">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Admin Email</label>
+<input class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface rounded-t-md px-4 py-3 transition-all" type="email" value="admin@flexcms.io"/>
+</div>
+<div class="col-span-2">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Platform Description</label>
+<textarea class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface rounded-t-md px-4 py-3 transition-all" rows="3">The central orchestrator for all omnichannel content delivery across the enterprise.</textarea>
+</div>
+</div>
+</section>
+<!-- SEO Settings Card -->
+<section class="bg-surface-container-low rounded-xl p-8 transition-all hover:bg-surface-container">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">search</span>
+<h2 class="text-xl font-bold text-white tracking-tight">Search Engine Optimization</h2>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between p-4 bg-surface-container-high rounded-lg">
+<div>
+<h4 class="font-bold text-white">Enable Robots.txt Generation</h4>
+<p class="text-sm text-on-surface-variant">Automatically manage crawling directives for search engines.</p>
+</div>
+<div class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div>
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Meta Title Template</label>
+<input class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface rounded-t-md px-4 py-3 transition-all" type="text" value="{{page_title}} | FlexCMS"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2">Sitemap Refresh Rate</label>
+<select class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface rounded-t-md px-4 py-3 transition-all">
+<option>Every 24 Hours</option>
+<option>Weekly</option>
+<option>On Every Publish</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Status & Maintenance -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<!-- Maintenance Status Card -->
+<section class="bg-surface-container-low rounded-xl p-8 border border-primary/10 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" style="background-color: #4ade80;"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-success" style="background-color: #22c55e;"></span>
+</span>
+</div>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">engineering</span>
+<h2 class="text-xl font-bold text-white tracking-tight">System Status</h2>
+</div>
+<div class="space-y-4">
+<div class="bg-surface-container-high p-4 rounded-lg">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-semibold text-white">Maintenance Mode</span>
+<span class="text-[0.65rem] bg-error-container text-on-error-container px-2 py-0.5 rounded uppercase font-bold">Offline</span>
+</div>
+<p class="text-xs text-on-surface-variant mb-4">When enabled, only administrators can access the frontend of the site.</p>
+<button class="w-full py-2 bg-surface-container-highest hover:bg-surface-bright text-white rounded font-bold text-xs transition-colors">Activate Maintenance</button>
+</div>
+<div class="space-y-3 pt-2">
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Memory Usage</span>
+<span class="text-white font-mono">1.2GB / 4GB</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[30%]"></div>
+</div>
+<div class="flex justify-between text-xs pt-2">
+<span class="text-on-surface-variant">Storage Capacity</span>
+<span class="text-white font-mono">82% Full</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-[82%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Actions / Assets -->
+<section class="bg-surface-container-low rounded-xl p-8 transition-all hover:bg-surface-container">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h2 class="text-xl font-bold text-white tracking-tight">Data Integrity</h2>
+</div>
+<div class="grid grid-cols-1 gap-3">
+<button class="flex items-center justify-between p-3 bg-surface-container-high hover:bg-surface-container-highest rounded-lg group transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">cloud_upload</span>
+<span class="text-sm font-medium">Clear Cache</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+<button class="flex items-center justify-between p-3 bg-surface-container-high hover:bg-surface-container-highest rounded-lg group transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">database</span>
+<span class="text-sm font-medium">Database Backup</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+<button class="flex items-center justify-between p-3 bg-surface-container-high hover:bg-surface-container-highest rounded-lg group transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">restore</span>
+<span class="text-sm font-medium">Rebuild Indices</span>
+</div>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Banner / Visual Placeholder -->
+<div class="rounded-xl overflow-hidden aspect-[4/3] relative group shadow-2xl">
+<img alt="Tech Background" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700" data-alt="Abstract futuristic digital network background with glowing blue nodes and fiber optic connections in deep space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaseDx2lwWrNAmaLAB4C69oPzC0H-lQUCcp8m0k4fObb3ylyPFErjpx5h749yhgfQnJ1dRnu0QcP7J90FmhI7pPpShqG9FntaRTWDXhXe4RgISjAgFsC8wc03uexN7-AVu0es-tYENFCpKRBJRLhfC55SBYTaSnwFRCoDXsSInJ1WwMDYybrkOCh2FQ6a-NHWG9ypVo5PgFc9HfZvC_tA-LazTyPj6tSvk2aJejX3-K6U0-lhATzHwdJfJo5me71gpA8bX40ROjQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent flex flex-col justify-end p-6">
+<h3 class="text-white font-bold text-lg mb-1">Documentation Hub</h3>
+<p class="text-xs text-on-surface-variant mb-4">Need help configuring advanced server variables?</p>
+<a class="text-primary text-xs font-bold uppercase tracking-wider flex items-center gap-2" href="#">View Guides <span class="material-symbols-outlined text-xs">open_in_new</span></a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Restricted to relevant screens) -->
+<!-- Suppressed on Settings as per Shell Visibility Rules -->
+</body></html>

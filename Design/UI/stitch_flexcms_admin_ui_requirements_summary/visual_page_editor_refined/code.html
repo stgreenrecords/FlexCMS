@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#131313",
+              "error-container": "#93000a",
+              "tertiary-fixed": "#ffdbcf",
+              "on-tertiary-fixed": "#380d00",
+              "on-surface": "#e5e2e1",
+              "inverse-surface": "#e5e2e1",
+              "on-secondary-container": "#a1b4eb",
+              "tertiary": "#ffb59b",
+              "surface": "#131313",
+              "secondary-fixed": "#dae2ff",
+              "on-secondary-fixed-variant": "#324575",
+              "surface-container-low": "#1c1b1b",
+              "surface-tint": "#b0c6ff",
+              "surface-variant": "#353534",
+              "on-secondary-fixed": "#001847",
+              "error": "#ffb4ab",
+              "tertiary-fixed-dim": "#ffb59b",
+              "primary": "#b0c6ff",
+              "on-tertiary": "#5c1a00",
+              "on-primary-fixed-variant": "#00419c",
+              "primary-fixed": "#d9e2ff",
+              "primary-fixed-dim": "#b0c6ff",
+              "tertiary-container": "#a93802",
+              "secondary-fixed-dim": "#b3c5fd",
+              "outline": "#8d90a0",
+              "on-primary": "#002d6f",
+              "on-tertiary-fixed-variant": "#812800",
+              "outline-variant": "#424654",
+              "on-primary-container": "#cbd8ff",
+              "on-surface-variant": "#c3c6d6",
+              "on-tertiary-container": "#ffcebd",
+              "surface-container-highest": "#353534",
+              "inverse-primary": "#0058cc",
+              "inverse-on-surface": "#313030",
+              "on-error-container": "#ffdad6",
+              "surface-bright": "#393939",
+              "on-primary-fixed": "#001945",
+              "secondary": "#b3c5fd",
+              "surface-container-high": "#2a2a2a",
+              "surface-container-lowest": "#0e0e0e",
+              "on-secondary": "#1a2e5d",
+              "surface-container": "#201f1f",
+              "on-background": "#e5e2e1",
+              "surface-dim": "#131313",
+              "secondary-container": "#324575",
+              "primary-container": "#0058cc",
+              "on-error": "#690005"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .canvas-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #424654; border-radius: 10px; }
+        
+        /* Focus Mode Transitions */
+        .panel-transition {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .focus-mode aside { transform: translateX(-100%); }
+        .focus-mode aside:last-of-type { transform: translateX(100%); }
+        .focus-mode main section { margin-left: 0 !important; margin-right: 0 !important; }
+        
+        .property-section-header {
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .property-section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 24px;
+            height: 2px;
+            background: #b0c6ff;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar Shell -->
+<header class="h-14 flex items-center justify-between px-6 border-b border-outline-variant/15 bg-surface-container-lowest z-50 shadow-2xl shadow-black/20 shrink-0">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black text-primary tracking-tighter">FlexCMS</span>
+<nav class="hidden md:flex items-center gap-6 font-medium">
+<button class="text-on-surface-variant hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Desktop</button>
+<button class="text-primary border-b-2 border-primary pb-1 text-xs font-bold uppercase tracking-widest">Tablet</button>
+<button class="text-on-surface-variant hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">Mobile</button>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<!-- Focus Mode Toggle -->
+<button class="p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant hover:text-primary transition-all active:scale-95" onclick="document.body.classList.toggle('focus-mode')" title="Toggle Focus Mode">
+<span class="material-symbols-outlined text-[22px]">center_focus_strong</span>
+</button>
+<div class="flex items-center gap-1 px-3 py-1 bg-surface-container-high rounded-lg border border-outline-variant/10">
+<button class="p-1 hover:bg-[#2a2a2a] rounded transition-all active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">undo</span>
+</button>
+<button class="p-1 hover:bg-[#2a2a2a] rounded transition-all active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">redo</span>
+</button>
+<!-- History Quick Access -->
+<button class="p-1 hover:bg-[#2a2a2a] rounded transition-all active:scale-95 text-primary ml-1" title="History">
+<span class="material-symbols-outlined text-[18px]">history</span>
+</button>
+<div class="w-px h-4 bg-outline-variant/30 mx-1"></div>
+<button class="p-1 hover:bg-[#2a2a2a] rounded transition-all active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+<button class="p-1 hover:bg-[#2a2a2a] rounded transition-all active:scale-95 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-1.5 rounded-lg text-sm font-bold text-on-surface hover:bg-[#2a2a2a] transition-all active:scale-95">Save</button>
+<button class="px-5 py-1.5 rounded-lg text-sm font-bold text-on-primary bg-gradient-to-br from-primary to-primary-container shadow-lg shadow-primary/10 transition-all active:scale-95">Publish</button>
+</div>
+</div>
+</header>
+<!-- Main Editor Layout -->
+<div class="flex-1 flex overflow-hidden relative">
+<!-- SideNavBar (Left Panel: Component Palette) -->
+<aside class="w-64 flex flex-col border-r border-outline-variant/15 bg-surface-container-lowest z-40 panel-transition shrink-0">
+<div class="p-4 border-b border-outline-variant/10 flex items-center justify-between">
+<div>
+<h2 class="text-white text-sm font-bold">Editor</h2>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">v2.4.0</p>
+</div>
+<span class="material-symbols-outlined text-primary">category</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- Navigation Tabs -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2 text-primary bg-secondary-container rounded-lg cursor-pointer transition-all">
+<span class="material-symbols-outlined text-[20px]">category</span>
+<span class="text-sm font-medium">Components</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-md cursor-pointer transition-all">
+<span class="material-symbols-outlined text-[20px]">layers</span>
+<span class="text-sm font-medium">Layers</span>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high rounded-md cursor-pointer transition-all">
+<span class="material-symbols-outlined text-[20px]">image</span>
+<span class="text-sm font-medium">Assets</span>
+</div>
+</div>
+<!-- Categories -->
+<div class="space-y-6">
+<!-- Basics Category -->
+<div class="space-y-3">
+<p class="text-[10px] font-black text-outline uppercase tracking-[0.2em] px-1">Structure</p>
+<div class="grid grid-cols-2 gap-2">
+<div class="relative flex flex-col items-center justify-center p-3 bg-surface-container rounded-lg border border-outline-variant/10 hover:border-primary/50 transition-all cursor-grab group overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mb-2">title</span>
+<span class="text-[11px] text-on-surface-variant">Text Block</span>
+<!-- Hover Preview Hint -->
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+</div>
+<div class="relative flex flex-col items-center justify-center p-3 bg-surface-container rounded-lg border border-outline-variant/10 hover:border-primary/50 transition-all cursor-grab group overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mb-2">grid_view</span>
+<span class="text-[11px] text-on-surface-variant">Container</span>
+</div>
+</div>
+</div>
+<!-- Rich Media Category -->
+<div class="space-y-3">
+<p class="text-[10px] font-black text-outline uppercase tracking-[0.2em] px-1">Rich Media</p>
+<div class="grid grid-cols-2 gap-2">
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container-high rounded-lg border border-primary/40 ring-1 ring-primary/20 cursor-grab group">
+<span class="material-symbols-outlined text-primary mb-2">auto_awesome</span>
+<span class="text-[11px] text-primary font-medium">Hero Section</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container rounded-lg border border-outline-variant/10 hover:border-primary/50 transition-all cursor-grab group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mb-2">image</span>
+<span class="text-[11px] text-on-surface-variant">Gallery</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container rounded-lg border border-outline-variant/10 hover:border-primary/50 transition-all cursor-grab group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mb-2">play_circle</span>
+<span class="text-[11px] text-on-surface-variant">Video Player</span>
+</div>
+<div class="flex flex-col items-center justify-center p-3 bg-surface-container rounded-lg border border-outline-variant/10 hover:border-primary/50 transition-all cursor-grab group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mb-2">widgets</span>
+<span class="text-[11px] text-on-surface-variant">Interactive</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full py-2.5 bg-secondary-container text-on-secondary-container rounded-lg text-sm font-bold flex items-center justify-center gap-2 hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Explore More
+            </button>
+</div>
+</aside>
+<!-- Center Canvas -->
+<section class="flex-1 bg-surface-container p-8 overflow-y-auto flex flex-col items-center panel-transition">
+<!-- Content Canvas Shell -->
+<div class="w-full max-w-4xl bg-background canvas-shadow min-h-[1200px] relative">
+<!-- Hero Component (Active) -->
+<div class="relative group cursor-pointer border-2 border-primary ring-4 ring-primary/5">
+<!-- Component Toolbar overlay -->
+<div class="absolute -top-10 left-0 bg-primary px-3 py-1 flex items-center gap-4 rounded-t-lg text-on-primary text-[11px] font-bold">
+<span>Hero Banner</span>
+<div class="flex gap-2 border-l border-on-primary/20 pl-2 ml-2">
+<span class="material-symbols-outlined text-[14px] cursor-move hover:text-white">drag_indicator</span>
+<span class="material-symbols-outlined text-[14px] hover:text-white">content_copy</span>
+<span class="material-symbols-outlined text-[14px] hover:text-white">delete</span>
+</div>
+</div>
+<section class="h-[480px] relative overflow-hidden flex items-center px-12">
+<div class="absolute inset-0 z-0">
+<img alt="Modern architectural office interior" class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARV7lwgtttxparqWHBE_qTJ9cOxoAsYkJ8Skhmw2uFR2syNZc5POpTEBfYMHp2grfSddBSgpZD4RB8QUM0O3wresX8nF9QiMQGXe21-ZWPp1vcnzJcb_Gu1oQUOmN2C10HhhJkLDVZ3jbcOatyI8IeicGMy09kDsTDLJLopnO5OW5zaS9Sl-cyWQStR3EAtymDA3gMNNG1sIc_yn1npJC5cQCtCD6Kw6lMV2VzkdOAHkAw39veePIGR88l9Qwz_7nPmgJNS3MRbw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+</div>
+<div class="relative z-10 space-y-6 max-w-xl">
+<div class="inline-block px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+<span class="text-primary text-[10px] font-bold uppercase tracking-widest">Innovation Hub</span>
+</div>
+<h1 class="text-5xl font-black tracking-tight leading-[0.9] text-white">REDEFINING THE WORKSPACE</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed">Experience the architectural precision of a curated digital environment where content meets form.</p>
+<button class="bg-white text-black px-8 py-3 font-bold text-sm tracking-tighter uppercase rounded-none hover:bg-primary transition-colors">Explore Now</button>
+</div>
+</section>
+</div>
+<!-- Drop Zone -->
+<div class="h-16 flex items-center justify-center border-2 border-dashed border-outline-variant/30 m-6 rounded-xl hover:border-primary/40 hover:bg-primary/5 transition-all group">
+<p class="text-on-surface-variant text-xs font-medium group-hover:text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                    Drag component here
+                </p>
+</div>
+<!-- Text Section -->
+<div class="px-12 py-20 group relative border border-transparent hover:border-primary/30 transition-all cursor-pointer">
+<div class="max-w-2xl">
+<h2 class="text-2xl font-bold text-white mb-6">Built for Curators</h2>
+<div class="space-y-4 text-on-surface-variant leading-loose">
+<p>Our philosophy is rooted in the belief that digital tools should be as elegant as the content they manage. The Architectural Curator design system eliminates visual noise, replacing traditional clutter with intentional depth and tonal layering.</p>
+<p>Every pixel is weighted. Every surface is considered. Welcome to the new standard of professional content orchestration.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Panel (Property Panel) -->
+<aside class="w-80 bg-surface-container-lowest border-l border-outline-variant/15 z-40 flex flex-col panel-transition shrink-0">
+<div class="p-4 border-b border-outline-variant/10">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+<h3 class="text-sm font-bold text-white uppercase tracking-wider">Properties</h3>
+</div>
+<p class="text-[11px] text-on-surface-variant">Hero Banner Component</p>
+</div>
+<div class="flex-1 overflow-y-auto p-5 space-y-10">
+<!-- Property Group: Content -->
+<section class="space-y-6">
+<div class="property-section-header">
+<h4 class="text-[11px] font-black text-white uppercase tracking-widest">Main Content</h4>
+</div>
+<div class="space-y-4">
+<label class="block">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1.5">Headline Title</span>
+<input class="w-full bg-surface-container border border-outline-variant/20 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary/20 text-sm text-white px-3 py-2.5 transition-all" type="text" value="REDEFINING THE WORKSPACE"/>
+</label>
+<label class="block">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1.5">Description</span>
+<textarea class="w-full h-24 bg-surface-container border border-outline-variant/20 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary/20 text-sm text-white px-3 py-2.5 transition-all resize-none">Experience the architectural precision of a curated digital environment where content meets form.</textarea>
+</label>
+</div>
+</section>
+<!-- Property Group: Visuals -->
+<section class="space-y-6">
+<div class="property-section-header">
+<h4 class="text-[11px] font-black text-white uppercase tracking-widest">Visual Styles</h4>
+</div>
+<div class="space-y-5">
+<label class="block">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1.5">Color Theme</span>
+<div class="relative">
+<select class="w-full bg-surface-container border border-outline-variant/20 rounded-lg text-sm text-on-surface py-2.5 pl-3 pr-10 focus:ring-1 focus:ring-primary appearance-none">
+<option>Architectural Dark</option>
+<option>Minimalist Light</option>
+<option>Enterprise Blue</option>
+<option>High Contrast</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</label>
+<div class="p-3 bg-surface-container rounded-lg border border-outline-variant/10">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider">Full Height Hero</span>
+<button class="w-10 h-5 bg-primary rounded-full relative transition-all">
+<div class="absolute right-1 top-1 w-3 h-3 bg-on-primary rounded-full"></div>
+</button>
+</div>
+</div>
+<div class="space-y-2">
+<span class="text-[10px] font-bold text-outline uppercase tracking-wider block mb-1.5">Background Image</span>
+<div class="aspect-video bg-surface-container-high rounded-lg border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center gap-2 hover:border-primary/40 hover:bg-surface-container transition-all cursor-pointer group relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARV7lwgtttxparqWHBE_qTJ9cOxoAsYkJ8Skhmw2uFR2syNZc5POpTEBfYMHp2grfSddBSgpZD4RB8QUM0O3wresX8nF9QiMQGXe21-ZWPp1vcnzJcb_Gu1oQUOmN2C10HhhJkLDVZ3jbcOatyI8IeicGMy09kDsTDLJLopnO5OW5zaS9Sl-cyWQStR3EAtymDA3gMNNG1sIc_yn1npJC5cQCtCD6Kw6lMV2VzkdOAHkAw39veePIGR88l9Qwz_7nPmgJNS3MRbw"/>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary z-10">upload</span>
+<span class="text-[10px] text-on-surface-variant z-10 font-medium">Replace Image</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Property Group: Layout -->
+<section class="space-y-6">
+<div class="property-section-header">
+<h4 class="text-[11px] font-black text-white uppercase tracking-widest">Layout &amp; Spacing</h4>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<label class="block">
+<span class="text-[10px] text-on-surface-variant mb-1.5 block">Padding Top (px)</span>
+<input class="w-full bg-surface-container border border-outline-variant/10 rounded-lg text-xs py-2 px-3 focus:ring-1 focus:ring-primary text-white" type="number" value="120"/>
+</label>
+<label class="block">
+<span class="text-[10px] text-on-surface-variant mb-1.5 block">Padding Bottom (px)</span>
+<input class="w-full bg-surface-container border border-outline-variant/10 rounded-lg text-xs py-2 px-3 focus:ring-1 focus:ring-primary text-white" type="number" value="120"/>
+</label>
+</div>
+</section>
+</div>
+<div class="p-4 bg-surface-container-lowest border-t border-outline-variant/15">
+<button class="w-full py-2.5 bg-surface-container-high hover:bg-error/10 hover:text-error text-on-surface-variant rounded-lg text-[10px] font-black uppercase tracking-[0.2em] transition-all">
+                Reset to Defaults
+            </button>
+</div>
+</aside>
+</div>
+<!-- Footer Status Bar -->
+<footer class="h-8 flex items-center justify-between px-4 border-t border-outline-variant/15 bg-surface-container-lowest shrink-0 z-50">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant">Sync: Active</span>
+</div>
+<div class="h-3 w-px bg-outline-variant/20"></div>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant">Last saved 2 min ago</span>
+<div class="h-3 w-px bg-outline-variant/20"></div>
+<span class="text-[10px] uppercase tracking-widest text-primary font-bold">Draft Mode</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant">Region: US-East-1</span>
+<div class="h-3 w-px bg-outline-variant/20"></div>
+<span class="text-[10px] uppercase tracking-widest text-white font-bold opacity-70">FlexCMS v3.0.4-core</span>
+</div>
+</footer>
+</body></html>

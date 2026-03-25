@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS | Site Manager</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed": "#dae2ff",
+                        "tertiary": "#ffb59b",
+                        "surface": "#131313",
+                        "on-secondary-container": "#a1b4eb",
+                        "on-surface": "#e5e2e1",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-fixed": "#ffdbcf",
+                        "on-tertiary-fixed": "#380d00",
+                        "background": "#131313",
+                        "error-container": "#93000a",
+                        "outline": "#8d90a0",
+                        "on-primary": "#002d6f",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "tertiary-container": "#a93802",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "primary": "#b0c6ff",
+                        "on-tertiary": "#5c1a00",
+                        "on-primary-fixed-variant": "#00419c",
+                        "primary-fixed": "#d9e2ff",
+                        "surface-variant": "#353534",
+                        "on-secondary-fixed": "#001847",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-tint": "#b0c6ff",
+                        "on-secondary-fixed-variant": "#324575",
+                        "surface-bright": "#393939",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#353534",
+                        "inverse-primary": "#0058cc",
+                        "inverse-on-surface": "#313030",
+                        "on-surface-variant": "#c3c6d6",
+                        "on-tertiary-container": "#ffcebd",
+                        "outline-variant": "#424654",
+                        "on-primary-container": "#cbd8ff",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "primary-container": "#0058cc",
+                        "on-error": "#690005",
+                        "surface-container": "#201f1f",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "secondary-container": "#324575",
+                        "on-secondary": "#1a2e5d",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary": "#b3c5fd",
+                        "on-primary-fixed": "#001945"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-glass {
+            background: rgba(53, 53, 52, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%);
+        }
+        .sidebar-active {
+            color: #b0c6ff;
+            background-color: #2a2a2a;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- SideNavBar (Execution from JSON) -->
+<aside class="fixed left-0 top-0 h-full z-40 bg-[#1c1b1b] dark:bg-[#1c1b1b] h-screen w-20 flex flex-col items-center py-6">
+<div class="mb-10">
+<span class="text-[#b0c6ff] font-bold text-xl uppercase tracking-tighter">FC</span>
+</div>
+<nav class="flex flex-col gap-4 flex-1">
+<!-- Active: Content (Semantic Mapping for CMS Management) -->
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">dashboard</span>
+</button>
+<button class="text-[#b0c6ff] bg-[#2a2a2a] rounded-xl p-3 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">description</span>
+</button>
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">image</span>
+</button>
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">group</span>
+</button>
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">analytics</span>
+</button>
+</nav>
+<button class="text-[#c3c6d6] p-3 mt-auto hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</aside>
+<!-- TopNavBar (Execution from JSON) -->
+<header class="fixed top-0 right-0 left-20 z-30 h-16 bg-[#131313]/80 backdrop-blur-md border-b border-[#424654]/15 flex items-center justify-between px-8">
+<div class="flex items-center gap-4 w-1/3">
+<div class="flex items-center bg-surface-container-highest rounded-full px-4 py-1.5 w-full focus-within:ring-1 focus-within:ring-[#b0c6ff] transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-sm mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full text-on-surface placeholder:text-outline" placeholder="Search projects..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<button class="hover:bg-[#2a2a2a] rounded-full p-2 transition-all text-[#b0c6ff]">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-[#2a2a2a] rounded-full p-2 transition-all text-[#c3c6d6]">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<button class="hover:bg-[#2a2a2a] rounded-full p-2 transition-all text-[#c3c6d6]">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-20 pt-16 min-h-screen bg-surface-container">
+<div class="p-8 max-w-6xl mx-auto">
+<!-- Hero Header Section -->
+<header class="mb-10 flex items-end justify-between">
+<div>
+<span class="text-primary font-bold tracking-widest uppercase text-xs mb-2 block">Enterprise Management</span>
+<h1 class="text-headline-lg font-extrabold text-on-surface text-4xl tracking-tight">Site Manager</h1>
+</div>
+<button class="primary-gradient text-on-primary px-6 py-2.5 rounded-full font-bold flex items-center gap-2 scale-95 active:scale-90 transition-transform shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Create New Site
+                </button>
+</header>
+<!-- Site Cards Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1: Active Production -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden group hover:bg-surface-container-high transition-all duration-300">
+<div class="h-40 overflow-hidden relative">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" data-alt="Modern minimalist workspace with large desk and dual monitors showing clean dashboard interface in a bright office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb7r64uBi4PuK3inV2y7vDRFY8hr0Sn3PSxHRw27S0UbkxLZ7dRrPsMwaX6K7k_U1SrJpHJ88sh1hLHnojdrcc4OrnXBZ6Alzkzhri9uIse7tpOchmDNximhLKl6DTVOOZmHy-kaPovQncyWv5iFf9emzuKNyLOzTf5dd1M06hH3zVfXIrfoYylNDGe5iEYDlcAsjQVqQ9P5A8mR3vYDlsLbONZUVmvnAVSXI1K_cRqiaBH9VPDpRtaq3a0q9LCDa95E_r-HScPQ"/>
+<div class="absolute top-4 right-4 bg-glass rounded-full px-3 py-1 flex items-center gap-1.5 border border-outline-variant/20">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface">Live</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-title-md font-bold text-on-surface">Alpha Portfolio</h3>
+<p class="text-label-sm text-on-surface-variant">alpha-design.co</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex items-center gap-6 py-4 border-t border-outline-variant/10">
+<div>
+<p class="text-[10px] uppercase tracking-tighter text-outline mb-0.5">Pages</p>
+<p class="text-xl font-bold text-on-surface">24</p>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-tighter text-outline mb-0.5">Storage</p>
+<p class="text-xl font-bold text-on-surface">1.2<span class="text-xs font-normal">GB</span></p>
+</div>
+<div class="ml-auto flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-surface-container-low bg-surface-variant flex items-center justify-center text-[10px] font-bold">JD</div>
+<div class="w-6 h-6 rounded-full border-2 border-surface-container-low bg-primary text-on-primary flex items-center justify-center text-[10px] font-bold">AS</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Staging -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden group hover:bg-surface-container-high transition-all duration-300">
+<div class="h-40 overflow-hidden relative">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" data-alt="Clean architectural shot of concrete stairs and shadows creating dramatic geometric patterns in a corporate building" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZNJie1QfG3Mg_OQgWxE1d0zigaKfZFTYXkgXdtqEZJ_mas84SnLN1433hHfUNmpYcojCy9VYDezUHuRgnIr-O6zGRvOZ-iqRJu-55RAkFifgU_TKX5nVQDf7O0QX73obvgeBuXGj8iApMtLpa9n9kzDEGuxZ1Vzn4nD4c_rwZB9mMlRwB8aV27LLAvzppzG9v21Y8zlkcIfytIpSZzeu__ijHwDyfd1IBqSQEdpRq6iM2hcQe6tLbHcTql4pFEnE0Xc0Kt6e33A"/>
+<div class="absolute top-4 right-4 bg-glass rounded-full px-3 py-1 flex items-center gap-1.5 border border-outline-variant/20">
+<span class="w-2 h-2 rounded-full bg-amber-400"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface">Staging</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-title-md font-bold text-on-surface">Nexus Retail</h3>
+<p class="text-label-sm text-on-surface-variant">nexus-shop.staging.flex</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex items-center gap-6 py-4 border-t border-outline-variant/10">
+<div>
+<p class="text-[10px] uppercase tracking-tighter text-outline mb-0.5">Pages</p>
+<p class="text-xl font-bold text-on-surface">112</p>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-tighter text-outline mb-0.5">Storage</p>
+<p class="text-xl font-bold text-on-surface">8.4<span class="text-xs font-normal">GB</span></p>
+</div>
+<div class="ml-auto">
+<span class="material-symbols-outlined text-outline">verified_user</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3: Draft -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden group hover:bg-surface-container-high transition-all duration-300">
+<div class="h-40 overflow-hidden relative">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" data-alt="Interior of a large contemporary workspace with industrial lighting and rows of sleek desks and ergonomic chairs" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByvvK2TtyZVqgg6JOqYi1BsJRMRWqZ_JUfr0yMUsW3TOctEauWYk0r4NuQFBkGZw6N157C-LGAwD4hnCzbOeKvSz6CGoXg83-hQceuJGEL0wJIcxfatDlzRNuoriYQzq1XXLmNg_25E7XrIPrWDGKhQu8aWYkgLeKp17clSEn4b51r9Bkx7qBOGRiQJl-KbmMTon383v9FLICRIRWB6R8UCpNy-gvhzgEVTNmbYD9dcN2-mRjAF-M0pP_fhRhK4L-SJ09YueF0lQ"/>
+<div class="absolute top-4 right-4 bg-glass rounded-full px-3 py-1 flex items-center gap-1.5 border border-outline-variant/20">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface">Draft</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-title-md font-bold text-on-surface">Velo Blog</h3>
+<p class="text-label-sm text-on-surface-variant">velo-internal.draft</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="flex items-center gap-6 py-4 border-t border-outline-variant/10">
+<div>
+<p class="text-[10px] uppercase tracking-tighter text-outline mb-0.5">Pages</p>
+<p class="text-xl font-bold text-on-surface">8</p>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-tighter text-outline mb-0.5">Storage</p>
+<p class="text-xl font-bold text-on-surface">0.4<span class="text-xs font-normal">GB</span></p>
+</div>
+<div class="ml-auto">
+<span class="material-symbols-outlined text-outline">history</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Create New Site Visual Placeholder -->
+<div class="bg-surface-container-lowest border-2 border-dashed border-outline-variant/30 rounded-xl p-8 flex flex-col items-center justify-center text-center group hover:border-primary/50 transition-all cursor-pointer">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-3xl text-outline group-hover:text-primary">add_circle</span>
+</div>
+<h4 class="text-on-surface font-bold text-lg">Provision New Instance</h4>
+<p class="text-on-surface-variant text-sm mt-2 max-w-[200px]">Deploy a pre-configured template or start from scratch.</p>
+</div>
+</div>
+<!-- Contextual Quick Actions Rails (Editorial Layout) -->
+<section class="mt-16 bg-surface-container-low rounded-2xl p-8 flex flex-col md:flex-row gap-8 items-center border border-outline-variant/5">
+<div class="flex-1">
+<h2 class="text-2xl font-bold text-on-surface mb-2">Global Settings &amp; Infrastructure</h2>
+<p class="text-on-surface-variant max-w-md">Manage your CDN nodes, custom domains, and enterprise-level SSL certificates across all active sites.</p>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface-container rounded-lg p-4 flex flex-col items-center w-24 border border-outline-variant/10 hover:border-primary/30 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-primary mb-2">dns</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface">DNS</span>
+</div>
+<div class="bg-surface-container rounded-lg p-4 flex flex-col items-center w-24 border border-outline-variant/10 hover:border-primary/30 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-primary mb-2">vpn_key</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface">SSL</span>
+</div>
+<div class="bg-surface-container rounded-lg p-4 flex flex-col items-center w-24 border border-outline-variant/10 hover:border-primary/30 cursor-pointer transition-all">
+<span class="material-symbols-outlined text-primary mb-2">speed</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface">Edge</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Contextual FAB (Execution Logic: Suppressed on Tablet/Details but kept if it's the Primary Task Page) -->
+<div class="fixed bottom-8 right-8 z-50 md:hidden">
+<button class="w-14 h-14 primary-gradient text-on-primary rounded-full shadow-2xl flex items-center justify-center">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</body></html>

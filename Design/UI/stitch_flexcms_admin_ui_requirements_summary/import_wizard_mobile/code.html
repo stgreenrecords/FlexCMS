@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PIM Import Wizard | FlexCMS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#131313",
+              "on-surface": "#e5e2e1",
+              "surface-container-highest": "#353534",
+              "surface-bright": "#393939",
+              "tertiary-fixed-dim": "#ffb59b",
+              "on-secondary": "#1a2e5d",
+              "on-tertiary-fixed-variant": "#812800",
+              "primary-fixed": "#d9e2ff",
+              "outline-variant": "#424654",
+              "tertiary-fixed": "#ffdbcf",
+              "surface-variant": "#353534",
+              "on-error": "#690005",
+              "tertiary": "#ffb59b",
+              "secondary-container": "#324575",
+              "surface-container-low": "#1c1b1b",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-container": "#201f1f",
+              "on-primary-container": "#cbd8ff",
+              "background": "#131313",
+              "on-tertiary-fixed": "#380d00",
+              "on-secondary-container": "#a1b4eb",
+              "tertiary-container": "#a93802",
+              "on-secondary-fixed-variant": "#324575",
+              "outline": "#8d90a0",
+              "inverse-primary": "#0058cc",
+              "on-secondary-fixed": "#001847",
+              "inverse-on-surface": "#313030",
+              "error": "#ffb4ab",
+              "primary-container": "#0058cc",
+              "on-primary-fixed-variant": "#00419c",
+              "surface-container-high": "#2a2a2a",
+              "surface-tint": "#b0c6ff",
+              "on-primary-fixed": "#001945",
+              "surface-dim": "#131313",
+              "primary-fixed-dim": "#b0c6ff",
+              "secondary-fixed": "#dae2ff",
+              "primary": "#b0c6ff",
+              "on-tertiary-container": "#ffcebd",
+              "on-surface-variant": "#c3c6d6",
+              "on-primary": "#002d6f",
+              "secondary-fixed-dim": "#b3c5fd",
+              "error-container": "#93000a",
+              "on-background": "#e5e2e1",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#b3c5fd",
+              "on-tertiary": "#5c1a00",
+              "on-error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #131313;
+            color: #e5e2e1;
+            -webkit-font-smoothing: antialiased;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-md flex items-center justify-between px-4 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#b0c6ff]">menu</span>
+<h1 class="text-xl font-bold bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] bg-clip-text text-transparent font-['Inter'] headline-lg tracking-tight">FlexCMS</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center border border-outline-variant/15">
+<span class="material-symbols-outlined text-xs text-[#b0c6ff]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-20 pb-24 px-4 overflow-y-auto">
+<!-- Wizard Progress Header -->
+<section class="mb-8">
+<div class="flex items-center gap-2 mb-2">
+<span class="text-primary font-bold text-sm tracking-wider font-['Inter']">STEP 02</span>
+<div class="h-[1px] flex-grow bg-outline-variant/20"></div>
+<span class="text-on-surface-variant text-xs font-medium">Data Mapping</span>
+</div>
+<h2 class="text-2xl font-extrabold text-on-surface leading-tight mb-2">Configure Import</h2>
+<p class="text-on-surface-variant text-sm leading-relaxed">Map your CSV columns to the FlexCMS product schema for automated synchronization.</p>
+</section>
+<!-- Vertical Stepper (Simplified for Mobile) -->
+<div class="relative pl-8 mb-10 space-y-8">
+<!-- Stepper Line -->
+<div class="absolute left-[11px] top-2 bottom-2 w-[2px] bg-outline-variant/20"></div>
+<!-- Step 1: Completed -->
+<div class="relative">
+<div class="absolute -left-[29px] w-6 h-6 rounded-full bg-primary flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-on-primary text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface opacity-60">Source Selection</h3>
+<p class="text-xs text-on-surface-variant">catalog_v2_final.csv • 4.2 MB</p>
+</div>
+</div>
+<!-- Step 2: Active -->
+<div class="relative">
+<div class="absolute -left-[29px] w-6 h-6 rounded-full bg-primary-container border-2 border-primary flex items-center justify-center z-10 shadow-[0_0_15px_rgba(0,88,204,0.4)]">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl border-l-4 border-primary">
+<h3 class="text-sm font-bold text-primary">Column Mapping</h3>
+<p class="text-xs text-on-primary-container/70 mb-4">12 columns detected, 8 auto-mapped.</p>
+<!-- Mapping Card Bento Style -->
+<div class="space-y-3">
+<div class="p-3 bg-surface-container rounded-lg border-b border-outline-variant/15 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">CSV Header</span>
+<span class="text-sm font-medium">sku_id</span>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">arrow_forward</span>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-primary font-bold uppercase tracking-widest">System Field</span>
+<span class="text-sm font-bold text-primary">ProductID</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container rounded-lg border-b border-outline-variant/15 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">CSV Header</span>
+<span class="text-sm font-medium">prod_desc_en</span>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">arrow_forward</span>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-primary font-bold uppercase tracking-widest">System Field</span>
+<span class="text-sm font-bold text-primary">Description</span>
+</div>
+</div>
+<div class="p-3 bg-surface-container-high rounded-lg border border-dashed border-outline-variant/40 flex justify-between items-center">
+<div class="flex flex-col">
+<span class="text-[10px] text-error font-bold uppercase tracking-widest">Unmapped</span>
+<span class="text-sm font-medium">warehouse_loc</span>
+</div>
+<button class="bg-secondary-container text-on-secondary-container px-3 py-1.5 rounded-full text-[10px] font-bold uppercase">Map Field</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 3: Pending -->
+<div class="relative">
+<div class="absolute -left-[29px] w-6 h-6 rounded-full bg-surface-container flex items-center justify-center z-10 border border-outline-variant/30 text-on-surface-variant">
+<span class="text-[10px] font-bold">3</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface-variant">Validation &amp; Rules</h3>
+<p class="text-xs text-on-surface-variant/50">Run integrity checks before import.</p>
+</div>
+</div>
+</div>
+<!-- Async Notification Area -->
+<div class="mt-4 p-4 rounded-xl bg-surface-container-high/50 border border-outline-variant/10 flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" style="font-variation-settings: 'FILL' 1;">info</span>
+<div>
+<p class="text-xs font-bold text-on-surface">Pro Tip</p>
+<p class="text-xs text-on-surface-variant">Enable 'Auto-Correction' in Step 3 to fix minor encoding issues automatically during the ingestion process.</p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Controls (Wizard Actions) -->
+<div class="fixed bottom-0 left-0 right-0 z-50 p-4 bg-[#131313]/90 backdrop-blur-xl border-t border-[#424654]/15 flex items-center justify-between gap-4">
+<button class="flex-1 py-3 px-6 rounded-lg bg-surface-container-high text-on-surface font-bold text-sm transition-all active:scale-95 border border-outline-variant/10">
+            Back
+        </button>
+<button class="flex-[2] py-3 px-6 rounded-lg bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] text-on-primary font-black text-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+            Continue to Step 3
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<!-- Hidden Navigation Shell Logic (Suppressed per task context of focused journey) -->
+<!-- The BottomNavBar and SideNav are hidden to prioritize the Import Wizard Task Canvas -->
+<div class="hidden md:block fixed right-4 bottom-24 z-40">
+<div class="flex flex-col gap-2">
+<div class="w-12 h-12 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center shadow-xl">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">help</span>
+</div>
+</div>
+</div>
+</body></html>

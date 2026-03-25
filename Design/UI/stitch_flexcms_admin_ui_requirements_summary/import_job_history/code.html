@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#a1b4eb",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-surface-variant": "#c3c6d6",
+                        "surface-container-highest": "#353534",
+                        "secondary-container": "#324575",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "tertiary-fixed": "#ffdbcf",
+                        "tertiary-container": "#a93802",
+                        "on-secondary-fixed-variant": "#324575",
+                        "surface-variant": "#353534",
+                        "on-tertiary": "#5c1a00",
+                        "surface-tint": "#b0c6ff",
+                        "inverse-on-surface": "#313030",
+                        "background": "#131313",
+                        "on-background": "#e5e2e1",
+                        "on-primary": "#002d6f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "primary": "#b0c6ff",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary-container": "#cbd8ff",
+                        "on-secondary": "#1a2e5d",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "tertiary": "#ffb59b",
+                        "surface-container": "#201f1f",
+                        "surface": "#131313",
+                        "secondary": "#b3c5fd",
+                        "primary-fixed": "#d9e2ff",
+                        "on-tertiary-container": "#ffcebd",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-bright": "#393939",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "outline": "#8d90a0",
+                        "error-container": "#93000a",
+                        "primary-container": "#0058cc",
+                        "error": "#ffb4ab",
+                        "surface-container-high": "#2a2a2a",
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #131313; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #424654; }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased selection:bg-primary/30">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.06)] flex items-center justify-between px-6 h-16">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-[#b0c6ff]">FlexCMS</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-3 py-1.5 rounded-lg text-sm font-medium" href="#">Assets</a>
+<a class="text-[#b0c6ff] font-semibold px-3 py-1.5 rounded-lg text-sm" href="#">PIM Central</a>
+<a class="text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 px-3 py-1.5 rounded-lg text-sm font-medium" href="#">Workflows</a>
+</nav>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1 mr-4">
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full transition-all active:scale-95">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-outline-variant/30" data-alt="professional portrait of a system administrator in a high-tech environment with soft blue rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzGks9GXuRKDbdyZIK_nYfZEaQKSTHlQWNpSylPeufZ6pyzLAe6ihiKxBCc9x-AyMKDe1EeXWy_V5FL2lsr-ibRw2-WI6kPQS7DE4-8gjrC72SE7Iero7sKu9Mdgd8WQDLGkwDgnQd-pjs7KBThvyy_3Ex3nCz2M4CvzUTqoN0f_xCG2xPrSepT1TJN2hlKBix_xkfSfo3H-Jfb5wrT0YvcuLe3V2vT6lXkEj57s3dihbmIirR6iJReqt5MZ5mgDcHu4mItCslbQ"/>
+</div>
+</header>
+<!-- Side Navigation Bar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-16 bg-[#1c1b1b] flex flex-col py-4 pr-4 transition-all duration-200 ease-in-out">
+<div class="px-6 py-6 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">database</span>
+</div>
+<div>
+<h2 class="text-lg font-black text-white leading-none">PIM Central</h2>
+<p class="text-[10px] uppercase tracking-widest text-outline mt-1">Enterprise Edition</p>
+</div>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] rounded-r-lg transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">DAM Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] rounded-r-lg transition-all" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-sm font-medium">Asset Library</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] rounded-r-lg transition-all" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="text-sm font-medium">Import Wizard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#b0c6ff] bg-[#2a2a2a] rounded-r-lg border-l-4 border-[#0056D2] transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-sm font-medium">Job History</span>
+</a>
+</nav>
+<div class="px-4 py-4 mt-auto border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-4 py-2 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-sm">contact_support</span>
+<span class="text-xs">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#c3c6d6] hover:text-white hover:bg-[#201f1f] rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+<span class="text-xs">Documentation</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-16 min-h-screen bg-surface-container overflow-x-hidden">
+<div class="p-8 max-w-[1600px] mx-auto">
+<!-- Editorial Header -->
+<div class="mb-10 flex items-end justify-between">
+<div>
+<nav class="flex items-center gap-2 text-xs text-outline mb-4">
+<span>PIM Central</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span>Imports</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-primary">History</span>
+</nav>
+<h1 class="text-4xl font-extrabold tracking-tighter text-on-surface">Job History</h1>
+<p class="text-on-surface-variant mt-2 max-w-xl">Audit log of all catalog import operations. Monitor execution status, data integrity reports, and error stacks.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 bg-surface-container-high hover:bg-surface-bright text-on-surface text-sm font-medium rounded-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        Filter
+                    </button>
+<button class="px-6 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary text-sm font-bold rounded-lg transition-all active:scale-95 flex items-center gap-2 shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined text-sm">add</span>
+                        New Import Job
+                    </button>
+</div>
+</div>
+<!-- Dashboard Stats Summary (Bento-lite) -->
+<div class="grid grid-cols-4 gap-4 mb-8">
+<div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between border-l-2 border-primary">
+<span class="text-xs font-semibold text-outline tracking-wider">TOTAL JOBS</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-3xl font-black text-on-surface">1,284</span>
+<span class="text-xs text-green-400">+12%</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between border-l-2 border-green-500/50">
+<span class="text-xs font-semibold text-outline tracking-wider">SUCCESS RATE</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-3xl font-black text-on-surface">98.2%</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between border-l-2 border-error/50">
+<span class="text-xs font-semibold text-outline tracking-wider">FAILED JOBS</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-3xl font-black text-on-surface">24</span>
+<span class="text-xs text-error">-2%</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl flex flex-col justify-between border-l-2 border-secondary">
+<span class="text-xs font-semibold text-outline tracking-wider">AVG RUNTIME</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-3xl font-black text-on-surface">4m 12s</span>
+</div>
+</div>
+</div>
+<!-- High Density Job Table -->
+<div class="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-2xl">
+<div class="p-4 bg-surface-container-low/50 flex items-center justify-between">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary placeholder:text-outline/50" placeholder="Search by job ID, source, or user..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-xs text-outline">
+<span>Showing 1-10 of 1,284</span>
+<div class="flex items-center gap-1">
+<button class="p-1 hover:bg-surface-container-high rounded"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="p-1 hover:bg-surface-container-high rounded"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/30 text-[10px] uppercase tracking-widest text-outline font-bold">
+<th class="px-6 py-4">Job Details</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Records</th>
+<th class="px-6 py-4">Timestamp</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Running Job -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-secondary-container/20 rounded-lg">
+<span class="material-symbols-outlined text-secondary text-xl">sync</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">JB-9204-CATALOG</div>
+<div class="text-xs text-outline">Source: Shopify_Webhook_Feed</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                                    Running
+                                </span>
+</td>
+<td class="px-6 py-5">
+<div class="text-sm font-medium text-on-surface">4,502 / 12,000</div>
+<div class="w-32 h-1 bg-surface-container-highest rounded-full mt-2 overflow-hidden">
+<div class="bg-secondary h-full w-[37%]"></div>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs font-medium text-on-surface">Today, 10:42 AM</div>
+<div class="text-[10px] text-outline italic">Started by System</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-xs text-error font-semibold hover:underline">Cancel Job</button>
+</td>
+</tr>
+<!-- Failed Job with Expandable -->
+<tr class="bg-error-container/5 hover:bg-error-container/10 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-error-container/20 rounded-lg">
+<span class="material-symbols-outlined text-error text-xl">report</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">JB-9201-GLOBAL</div>
+<div class="text-xs text-outline">Source: SAP_S4HANA_Nightly</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-error-container text-on-error-container text-[10px] font-bold uppercase tracking-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                    Failed
+                                </span>
+</td>
+<td class="px-6 py-5">
+<div class="text-sm font-medium text-on-surface">842 / 45,000</div>
+<div class="text-xs text-error mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">warning</span>
+                                    Schema mismatch
+                                </div>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs font-medium text-on-surface">Yesterday, 11:30 PM</div>
+<div class="text-[10px] text-outline">Trigger: CRON Schedule</div>
+</td>
+<td class="px-6 py-5 text-right space-x-4">
+<button class="text-xs text-primary font-bold tracking-tight hover:text-white transition-colors">RE-RUN</button>
+<button class="text-outline hover:text-white transition-colors">
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</td>
+</tr>
+<!-- Error Log Detail Section -->
+<tr class="bg-surface-container-lowest">
+<td class="px-12 py-6" colspan="5">
+<div class="bg-black/40 rounded-xl p-6 border-l-4 border-error overflow-hidden">
+<div class="flex items-start justify-between mb-4">
+<h4 class="text-xs font-bold text-error uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span>
+                                            Execution Error Log
+                                        </h4>
+<button class="text-[10px] text-outline hover:text-white flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+                                            Copy Stack
+                                        </button>
+</div>
+<div class="font-mono text-xs leading-relaxed text-on-surface-variant/80 space-y-2">
+<p><span class="text-outline">[23:30:11]</span> Initializing connection to SAP Endpoint...</p>
+<p><span class="text-outline">[23:30:14]</span> Payload received. Validation phase started.</p>
+<p class="text-error"><span class="text-outline">[23:31:45]</span> Critical Error: Field 'Legacy_SKU_Ref' is non-nullable but received NULL on record 843.</p>
+<p class="text-error"><span class="text-outline">[23:31:45]</span> Operation aborted by validator service. Transaction rolled back.</p>
+<p><span class="text-outline">[23:31:46]</span> Log generated: logs/errors/jb-9201.json</p>
+</div>
+</div>
+</td>
+</tr>
+<!-- Complete Job -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">JB-9188-MEDIA</div>
+<div class="text-xs text-outline">Source: S3_Bucket_Sync</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface text-[10px] font-bold uppercase tracking-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                    Complete
+                                </span>
+</td>
+<td class="px-6 py-5">
+<div class="text-sm font-medium text-on-surface">1,250 / 1,250</div>
+<div class="text-[10px] text-green-400 mt-1">100% verified</div>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs font-medium text-on-surface">Jan 24, 09:15 AM</div>
+<div class="text-[10px] text-outline">User: adm_j_smith</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-xs text-outline font-bold tracking-tight hover:text-primary transition-colors">RE-RUN</button>
+</td>
+</tr>
+<!-- Complete Job -->
+<tr class="hover:bg-surface-container-low/40 transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">JB-9175-PRICING</div>
+<div class="text-xs text-outline">Source: Manual_CSV_Upload</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface text-[10px] font-bold uppercase tracking-tight">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                    Complete
+                                </span>
+</td>
+<td class="px-6 py-5">
+<div class="text-sm font-medium text-on-surface">12,400 / 12,400</div>
+<div class="text-[10px] text-green-400 mt-1">100% verified</div>
+</td>
+<td class="px-6 py-5">
+<div class="text-xs font-medium text-on-surface">Jan 23, 04:30 PM</div>
+<div class="text-[10px] text-outline">User: cat_manager_01</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="text-xs text-outline font-bold tracking-tight hover:text-primary transition-colors">RE-RUN</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Contextual Insight Footer -->
+<div class="mt-8 flex gap-6">
+<div class="flex-1 bg-surface-container-low p-6 rounded-2xl relative overflow-hidden group">
+<div class="relative z-10 flex items-start gap-4">
+<div class="p-3 bg-primary-container/20 rounded-xl">
+<span class="material-symbols-outlined text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface mb-1">Optimization Insight</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">System detected frequent failures on SAP nightly jobs due to non-matching SKU patterns. We recommend enabling the "Pre-validation" flag in Import Settings to catch these before execution.</p>
+<button class="mt-3 text-xs font-bold text-primary hover:underline">View Settings</button>
+</div>
+</div>
+<div class="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
+</div>
+<div class="w-80 bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10">
+<h4 class="text-xs font-bold text-outline uppercase tracking-widest mb-4">Export History</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-outline">description</span>
+<span class="text-xs text-on-surface font-medium">Monthly_Report_Jan.pdf</span>
+</div>
+<span class="material-symbols-outlined text-sm text-primary cursor-pointer">download</span>
+</div>
+<div class="flex items-center justify-between opacity-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-outline">description</span>
+<span class="text-xs text-on-surface font-medium">Error_Audit_JB9201.csv</span>
+</div>
+<span class="material-symbols-outlined text-sm text-primary cursor-pointer">download</span>
+</div>
+</div>
+<button class="w-full mt-6 py-2 bg-surface-container-high rounded-lg text-[10px] font-bold uppercase text-outline tracking-widest hover:text-on-surface transition-colors">
+                        Generate Full Audit
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Rail (Floating) -->
+<div class="fixed right-6 top-24 w-12 flex flex-col gap-4 py-6 bg-surface-container-lowest rounded-full items-center shadow-xl border border-outline-variant/10">
+<button class="p-2 text-outline hover:text-primary transition-all" title="Activity Timeline">
+<span class="material-symbols-outlined">timeline</span>
+</button>
+<button class="p-2 text-outline hover:text-primary transition-all" title="Cloud Logs">
+<span class="material-symbols-outlined">cloud_done</span>
+</button>
+<button class="p-2 text-outline hover:text-primary transition-all" title="Refresh Data">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<div class="w-6 h-px bg-outline-variant/30 my-2"></div>
+<button class="p-2 text-outline hover:text-primary transition-all" title="Quick Notes">
+<span class="material-symbols-outlined">notes</span>
+</button>
+</div>
+</body></html>

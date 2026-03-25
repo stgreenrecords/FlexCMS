@@ -27,6 +27,10 @@ FlexCMS has three independent pillars: Content (CMS), Digital Assets (DAM), and 
 ### During Work
 - Follow ALL key patterns from `README.md` §9 "Key Patterns to Follow".
 - If touching frontend: follow ALL 27 rules in `Design/DesignerPrompt.md` §8 — no exceptions.
+- **UI implementation MANDATORY rule:** Before implementing ANY admin UI page or component, look for its reference design in `Design/UI/stitch_flexcms_admin_ui_requirements_summary/<page-name>/`. Each subfolder contains:
+  - `screen.png` — visual screenshot (read this with the image-reading tool)
+  - `code.html` — reference HTML implementation
+  - **Both files MUST be read before writing any UI code.** Implement based on the provided HTML structure and the visual screenshot. If no matching folder exists for the page/component you are implementing, **STOP and ask the user to provide the design files before proceeding.**
 - If creating Flyway migrations: CMS migrations go in `flexcms-app/src/main/resources/db/migration/`. PIM migrations go in `flexcms-pim/src/main/resources/db/pim/`.
 - If creating new Java classes: follow existing package structure in the target module.
 - If adding dependencies: add to both the module `pom.xml` and the parent `pom.xml` dependency management.

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-high": "#2a2a2a",
+              "inverse-on-surface": "#313030",
+              "on-secondary-fixed": "#001847",
+              "outline-variant": "#424654",
+              "on-tertiary-fixed": "#380d00",
+              "tertiary-container": "#a93802",
+              "secondary": "#b3c5fd",
+              "surface-container": "#201f1f",
+              "background": "#131313",
+              "primary": "#b0c6ff",
+              "on-primary": "#002d6f",
+              "on-error-container": "#ffdad6",
+              "on-surface": "#e5e2e1",
+              "secondary-fixed-dim": "#b3c5fd",
+              "primary-fixed-dim": "#b0c6ff",
+              "outline": "#8d90a0",
+              "on-secondary-container": "#a1b4eb",
+              "tertiary-fixed-dim": "#ffb59b",
+              "error-container": "#93000a",
+              "inverse-primary": "#0058cc",
+              "surface-variant": "#353534",
+              "secondary-fixed": "#dae2ff",
+              "surface-dim": "#131313",
+              "surface-container-lowest": "#0e0e0e",
+              "tertiary": "#ffb59b",
+              "on-primary-fixed-variant": "#00419c",
+              "inverse-surface": "#e5e2e1",
+              "on-primary-container": "#cbd8ff",
+              "on-surface-variant": "#c3c6d6",
+              "on-background": "#e5e2e1",
+              "surface-bright": "#393939",
+              "surface-container-highest": "#353534",
+              "surface-tint": "#b0c6ff",
+              "primary-fixed": "#d9e2ff",
+              "surface": "#131313",
+              "tertiary-fixed": "#ffdbcf",
+              "on-secondary": "#1a2e5d",
+              "on-secondary-fixed-variant": "#324575",
+              "on-tertiary-container": "#ffcebd",
+              "error": "#ffb4ab",
+              "surface-container-low": "#1c1b1b",
+              "on-error": "#690005",
+              "secondary-container": "#324575",
+              "primary-container": "#0058cc",
+              "on-primary-fixed": "#001945",
+              "on-tertiary-fixed-variant": "#812800",
+              "on-tertiary": "#5c1a00"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #131313; color: #e5e2e1; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-panel { background: rgba(53, 53, 52, 0.8); backdrop-filter: blur(12px); }
+        .gradient-button { background: linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%); }
+    </style>
+</head>
+<body class="bg-surface overflow-hidden">
+<!-- SideNavBar (Collapsed per Tablet Specs) -->
+<aside class="h-full w-16 fixed left-0 top-0 overflow-y-auto bg-[#1c1b1b] flex flex-col items-center py-4 z-50 transition-all duration-300">
+<div class="mb-8">
+<span class="text-[#b0c6ff] font-bold text-xl tracking-tighter">FC</span>
+</div>
+<nav class="flex flex-col gap-4 flex-1">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90">
+<span class="material-symbols-outlined">dashboard</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90">
+<span class="material-symbols-outlined">description</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90">
+<span class="material-symbols-outlined">inventory_2</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+<!-- Users Active State -->
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-[#b0c6ff] border-r-2 border-[#b0c6ff] bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90">
+<span class="material-symbols-outlined">group</span>
+</button>
+</nav>
+<div class="flex flex-col gap-4 mt-auto">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-16 h-14 bg-[#131313]/80 backdrop-blur-md flex justify-between items-center px-6 w-auto z-40 border-b border-[#424654]/15">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-highest border-none border-b border-outline-variant/15 text-sm py-1.5 pl-10 pr-4 focus:ring-0 focus:border-primary transition-all rounded-sm" placeholder="Search users..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-white transition-all scale-95 active:scale-90">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-white transition-all scale-95 active:scale-90">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-container overflow-hidden border border-outline-variant/30">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="professional portrait of a tech executive in dark studio lighting, minimalist and modern aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU8_wMZYXd3aGaFu7BtdUP7E2wY5-hVPP7keQLoQgHEqYsaI-6m3IQrG4Di2Q3rtIPEN8me5YUJDurQxaTC5UnCp19SbV-e9o53ozTqHRNsmWifgwlSORW2Qc1TdQM0D3xNZL3fFrnc_tWa_n4kYI7oJLeBgCDkUMdmpnJji6ze4TmmGow2QmlQKKBjjzNaKZJXiNb7JLTBG9lx-AcqrdisgOrEWMD7uIUy16yr7vMCa7ND8zY07m0aV102E-EhAm5Mz17JHBNaA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-16 mt-14 p-6 bg-surface-container min-h-[calc(100vh-3.5rem)]">
+<!-- Header Section with Actions -->
+<section class="flex flex-col gap-6 mb-8">
+<div class="flex justify-between items-end">
+<div>
+<h1 class="text-headline-lg font-extrabold tracking-tight text-on-surface mb-1">Users</h1>
+<p class="text-on-surface-variant text-sm">Manage administrative access and roles for FlexCMS.</p>
+</div>
+<button class="gradient-button text-on-primary font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+<span class="text-sm">Invite User</span>
+</button>
+</div>
+<!-- Filters Bar -->
+<div class="flex items-center justify-between gap-4 bg-surface-container-low p-2 rounded-xl border border-outline-variant/5">
+<div class="flex items-center gap-2">
+<button class="px-4 py-1.5 bg-secondary-container text-on-secondary-container text-xs font-semibold rounded-full flex items-center gap-2">
+                        All Users <span class="bg-primary/20 px-1.5 rounded-full text-[10px]">42</span>
+</button>
+<button class="px-4 py-1.5 hover:bg-surface-container-high text-on-surface-variant text-xs font-semibold rounded-full transition-colors">
+                        Admins
+                    </button>
+<button class="px-4 py-1.5 hover:bg-surface-container-high text-on-surface-variant text-xs font-semibold rounded-full transition-colors">
+                        Editors
+                    </button>
+</div>
+<div class="flex items-center gap-3 pr-2">
+<button class="text-on-surface-variant flex items-center gap-1 text-xs hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter
+                    </button>
+<div class="w-px h-4 bg-outline-variant/20"></div>
+<button class="text-on-surface-variant flex items-center gap-1 text-xs hover:text-white transition-colors">
+<span class="material-symbols-outlined text-sm">sort</span> Sort
+                    </button>
+</div>
+</div>
+</section>
+<!-- Data Table Section (Horizontal Scroll Enabled) -->
+<section class="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant/5 shadow-2xl">
+<div class="overflow-x-auto no-scrollbar">
+<table class="w-full min-w-[900px] text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-highest/50">
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">User</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Role</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider">Last Active</th>
+<th class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex-shrink-0 overflow-hidden">
+<img alt="User 1" class="w-full h-full object-cover" data-alt="close up headshot of a creative professional woman with glasses, soft cinematic lighting, neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxMzJa47ORLBSOu4eU_DUeEK5X9w7shb3blmwY0OD0ZMwzkYsWg7zVLX4mgDa4cCmp0U1Pvz9h1MHRC5qQlO4yJJ0Udc_dVjW4Ir6Xz0SZ7dOuX9BNzSMEiQtIJLKwoMPU4flJVN8e31M1rf76wjmTjoAKiVfbwNvxImHeT_7trEg3VmnSF24PhTA5EsdBX6p5l9IuR_l62XcQn05n49Ebl15S4_b54vCd6FmUX3mHSUilPN6cgEHjVX7AnYyxQVsLV22tiYhiag"/>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Alex Morgan</div>
+<div class="text-xs text-on-surface-variant">alex.m@flexcms.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface bg-surface-variant px-2.5 py-1 rounded-md border border-outline-variant/20">Administrator</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></div>
+<span class="text-xs text-on-surface">Active</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs text-on-surface-variant">2 mins ago</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex-shrink-0 overflow-hidden">
+<img alt="User 2" class="w-full h-full object-cover" data-alt="portrait of a young designer with curly hair in a bright modern office setting, shallow depth of field" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSdlwHL65IZKxFsOuyHt0hwcTb8j4sIljxtp4Per0r9sj4Sn6vg6YkUsQj8mN4_6GJRrjoiNv44szVtpR1424mLkjPUeZK3QpfQFMMdLQkQNaBCBr2W4gyI24-WwWnndhTre0oY_m7lQe-HsZm90ECUvzLqwm8aK1ndJriEk8rtQmIsISNU-kR9ttMCIu0_8hA5CD-QJPnl40ZzzIsOyQR_xWLOFs92YWNVjIuztdON2gO88uOiyl-J5--zfpaEC-cFuDs83yZRw"/>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Sarah Chen</div>
+<div class="text-xs text-on-surface-variant">s.chen@flexcms.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface bg-surface-variant px-2.5 py-1 rounded-md border border-outline-variant/20">Editor</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></div>
+<span class="text-xs text-on-surface">Active</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs text-on-surface-variant">1 hour ago</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex-shrink-0 overflow-hidden">
+<img alt="User 3" class="w-full h-full object-cover" data-alt="professional male portrait with minimalist aesthetic, clean lines, wearing a dark turtleneck, soft studio light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP4FHOkUBKTx_y5dbZI9R3m4yIzV-yFhw41yem4p5TYYD-xnFRklqjFByrZ2OR9VfIyBxnEJkidvjgMt7VLwDtZiEsVemncipYFZ7YG-E1Pr6ihMz0Sba0gzR68_lLOdIY7eG7ibhJh6R36sHqPcmlI3jp-FkAiZsYeiLFJNhUY_2fVXh3pmVZWOZLR5kpKgWJbEGbaqsP3pLIZxsbt5VoNKBVKkIxViEornyRJrrE056IAIJP2St2HtKjNydiSIXC_d1ImqD_Wg"/>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">James Holt</div>
+<div class="text-xs text-on-surface-variant">j.holt@flexcms.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface bg-surface-variant px-2.5 py-1 rounded-md border border-outline-variant/20">Viewer</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+<span class="text-xs text-on-surface-variant">Offline</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs text-on-surface-variant">2 days ago</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex-shrink-0 overflow-hidden">
+<img alt="User 4" class="w-full h-full object-cover" data-alt="close up of a professional man with a beard in a bright high-tech workspace, focused expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpB-QixlIFFzT0UJs2tYFC-jzIMR329m1aEhxYaiPm9x9kNGKo6-_m4gtlHH8qqFSDGhqy1fo4GXHy0eI-NpuZFUX_ogduAgsUJGaiyfFarvDf8xCkk9u4ioRMVMLDcP3jo2aL3qSuX_ZbtWHS5xidXgn8tGSVA-j4qjN-Y1cFFeAFCuuDxaCxTRRz5ygUkZj1o0INz6FfRnX3UqE7XNAPsUc40LzyFpYIPI3ZBUmCc3SvnLoCyEXZ9-Zx0TXohgnyyhqnDXAl8A"/>
+</div>
+<div>
+<div class="text-sm font-semibold text-on-surface">Marcus Reed</div>
+<div class="text-xs text-on-surface-variant">m.reed@flexcms.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-xs text-on-surface bg-surface-variant px-2.5 py-1 rounded-md border border-outline-variant/20">Editor</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></div>
+<span class="text-xs text-on-surface">Active</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-xs text-on-surface-variant">Just now</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-6 py-4 bg-surface-container-lowest/30 flex items-center justify-between border-t border-outline-variant/10">
+<span class="text-xs text-on-surface-variant">Showing 1 to 4 of 42 users</span>
+<div class="flex items-center gap-2">
+<button class="p-1.5 text-on-surface-variant hover:bg-surface-container-high rounded transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary-container text-on-primary-container text-xs font-bold rounded">1</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-high text-on-surface-variant text-xs font-bold rounded">2</button>
+<button class="w-8 h-8 flex items-center justify-center hover:bg-surface-container-high text-on-surface-variant text-xs font-bold rounded">3</button>
+<button class="p-1.5 text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Stats Grid (Asymmetric) -->
+<section class="mt-8 grid grid-cols-12 gap-6">
+<div class="col-span-8 bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5">
+<h3 class="text-sm font-bold text-on-surface mb-4">Role Distribution</h3>
+<div class="flex items-end gap-1 h-32">
+<div class="flex-1 bg-primary/20 rounded-t-lg group relative h-[80%]">
+<div class="absolute inset-x-0 bottom-0 bg-primary h-[40%] rounded-t-lg"></div>
+</div>
+<div class="flex-1 bg-primary/20 rounded-t-lg group relative h-[60%]">
+<div class="absolute inset-x-0 bottom-0 bg-primary h-[25%] rounded-t-lg"></div>
+</div>
+<div class="flex-1 bg-primary/20 rounded-t-lg group relative h-[100%]">
+<div class="absolute inset-x-0 bottom-0 bg-primary h-[65%] rounded-t-lg"></div>
+</div>
+<div class="flex-1 bg-primary/20 rounded-t-lg group relative h-[40%]">
+<div class="absolute inset-x-0 bottom-0 bg-primary h-[15%] rounded-t-lg"></div>
+</div>
+</div>
+<div class="flex justify-between mt-3">
+<span class="text-[10px] text-on-surface-variant">Admins</span>
+<span class="text-[10px] text-on-surface-variant">Editors</span>
+<span class="text-[10px] text-on-surface-variant">Viewers</span>
+<span class="text-[10px] text-on-surface-variant">Contributors</span>
+</div>
+</div>
+<div class="col-span-4 flex flex-col gap-6">
+<div class="flex-1 bg-primary-container p-5 rounded-2xl border border-primary/20 relative overflow-hidden">
+<div class="relative z-10">
+<div class="text-[10px] uppercase font-bold text-on-primary-container tracking-wider mb-1">Active Now</div>
+<div class="text-2xl font-extrabold text-on-primary-container">12</div>
+</div>
+<span class="material-symbols-outlined absolute -right-2 -bottom-2 text-6xl text-on-primary-container/10">radar</span>
+</div>
+<div class="flex-1 bg-surface-container-high p-5 rounded-2xl border border-outline-variant/10">
+<div class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider mb-1">Total Invites</div>
+<div class="text-2xl font-extrabold text-on-surface">158</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Contextual FAB (Suppressed based on guidelines - but used for tablet-friendly invite toggle if needed) -->
+<!-- Suppressing as per instruction: "suppress the FAB on Settings, Profile, Details, and Transactional screens" and focusing on table actions -->
+</body></html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Architectural Curator - Product Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              "primary": "#b0c6ff",
+              "on-primary": "#002d6f",
+              "on-error-container": "#ffdad6",
+              "secondary-fixed-dim": "#b3c5fd",
+              "primary-fixed-dim": "#b0c6ff",
+              "outline": "#8d90a0",
+              "on-secondary-container": "#a1b4eb",
+              "outline-variant": "#424654",
+              "on-tertiary-fixed": "#380d00",
+              "surface-container-high": "#2a2a2a",
+              "inverse-on-surface": "#313030",
+              "on-secondary-fixed": "#001847",
+              "tertiary-container": "#a93802",
+              "secondary": "#b3c5fd",
+              "surface-container": "#201f1f",
+              "background": "#131313",
+              "inverse-surface": "#e5e2e1",
+              "on-primary-container": "#cbd8ff",
+              "tertiary": "#ffb59b",
+              "on-primary-fixed-variant": "#00419c",
+              "on-background": "#e5e2e1",
+              "on-surface-variant": "#c3c6d6",
+              "surface-variant": "#353534",
+              "tertiary-fixed-dim": "#ffb59b",
+              "error-container": "#93000a",
+              "inverse-primary": "#0058cc",
+              "surface-container-lowest": "#0e0e0e",
+              "secondary-fixed": "#dae2ff",
+              "surface-dim": "#131313",
+              "tertiary-fixed": "#ffdbcf",
+              "on-secondary-fixed-variant": "#324575",
+              "on-tertiary-container": "#ffcebd",
+              "error": "#ffb4ab",
+              "on-secondary": "#1a2e5d",
+              "surface-container-highest": "#353534",
+              "surface-tint": "#b0c6ff",
+              "surface-bright": "#393939",
+              "primary-fixed": "#d9e2ff",
+              "surface": "#131313",
+              "primary-container": "#0058cc",
+              "on-primary-fixed": "#001945",
+              "secondary-container": "#324575",
+              "on-tertiary-fixed-variant": "#812800",
+              "on-tertiary": "#5c1a00",
+              "on-error": "#690005",
+              "surface-container-low": "#1c1b1b"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #131313;
+        color: #e5e2e1;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .custom-gradient-btn {
+        background: linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl flex items-center justify-between px-6 h-16 w-full shadow-2xl shadow-black/20 font-['Inter'] antialiased">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+<span class="text-lg font-bold tracking-tight text-[#b0c6ff]">Architectural Curator</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 p-2 rounded-full active:scale-95 duration-100">notifications</span>
+<span class="material-symbols-outlined text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 p-2 rounded-full active:scale-95 duration-100">settings</span>
+</div>
+</header>
+<main class="pt-20 pb-28 px-4 max-w-[375px] mx-auto min-h-screen">
+<!-- Editorial Header -->
+<div class="mb-8 pl-2">
+<span class="text-[10px] uppercase tracking-widest text-primary font-bold">Editor / Core</span>
+<h1 class="text-3xl font-extrabold tracking-tighter text-on-surface mt-1 italic">Eames Molded Shell</h1>
+<p class="text-on-surface-variant text-sm mt-2 leading-relaxed">Refine architectural assets, managed variants, and global content links for the 2024 Collection.</p>
+</div>
+<!-- Form Sections -->
+<div class="space-y-4">
+<!-- Basic Details -->
+<section class="bg-surface-container-low p-5 rounded-xl border-b border-outline-variant/15">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-sm font-bold uppercase tracking-widest text-on-surface">General Info</h2>
+<span class="material-symbols-outlined text-primary">expand_more</span>
+</div>
+<div class="space-y-6">
+<div class="relative">
+<label class="block text-[10px] font-medium text-on-surface-variant uppercase mb-1 ml-1">Product Title</label>
+<input class="w-full bg-surface-container-highest border-0 border-b border-outline-variant/30 px-3 py-2 text-sm focus:ring-0 focus:border-primary transition-all text-on-surface" type="text" value="Eames Molded Shell Chair"/>
+</div>
+<div class="relative">
+<label class="block text-[10px] font-medium text-on-surface-variant uppercase mb-1 ml-1">Identifier</label>
+<input class="w-full bg-surface-container-highest border-0 border-b border-outline-variant/30 px-3 py-2 text-sm focus:ring-0 focus:border-primary transition-all text-on-surface font-mono" type="text" value="ARCH-EMS-2024"/>
+</div>
+<div class="relative">
+<label class="block text-[10px] font-medium text-on-surface-variant uppercase mb-1 ml-1">Editorial Description</label>
+<textarea class="w-full bg-surface-container-highest border-0 border-b border-outline-variant/30 px-3 py-2 text-sm focus:ring-0 focus:border-primary transition-all text-on-surface h-24 resize-none leading-relaxed">A cornerstone of mid-century modern design, the molded shell chair continues to define contemporary workspace aesthetics.</textarea>
+</div>
+</div>
+</section>
+<!-- Variants Section (Asymmetric Bento Cards) -->
+<section class="bg-surface-container-low p-5 rounded-xl border-b border-outline-variant/15">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-sm font-bold uppercase tracking-widest text-on-surface">Variants</h2>
+<button class="text-[10px] font-bold text-primary uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">add</span> Add New
+                    </button>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="col-span-1 bg-surface-container-high p-3 rounded-lg flex flex-col gap-2">
+<div class="w-full h-20 rounded-md bg-background overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-80" data-alt="Modern shell chair in deep matte black finish with wooden dowel legs in a minimalist studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRCexe_sr0Gkpl6m60hRxi7fpvw9Tc-Ebe2102WY0bGIP-JDVg4b9W5cEJcp6okLpkBrlTwb0g2GQuqsQhGIq-RsqrxMPu2zJ3eYJ7y4JHRhC6KyLl8US3zPU2kjlx3Mza6yIXo2lwzJqhi_uMIIhzMd_xABsScykaWOdn9PHbyHsYG0g2FQPku9UEZ6Karsqlbu19nG0rQ5X7LNDTERkdFdzwMY5dl0OZ8A_Yq2FqHjV2UhsVEE3dOrZ2Ha3BppwX4i3sOLUCFQ"/>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Matte Obsidian</span>
+<span class="text-[8px] text-on-surface-variant font-mono">EMS-BLK-01</span>
+</div>
+<div class="col-span-1 bg-surface-container-high p-3 rounded-lg flex flex-col gap-2 border-l-2 border-primary/40">
+<div class="w-full h-20 rounded-md bg-background overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-80" data-alt="Molded plastic chair in soft bone white with chrome legs against a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5tZ0R9t6Mhj1U2sFGz5Gp_J0BMHKNYB2AGA9rbuwPq1_kf3KeIurJva0Lc6W3xasEnAywuj7tPoTIbazsHszmDGIudvMbniAudoCd2Z2qPqUlG1lVPJY4d8N_0WMTF2RD6DhSUJJbtPIgT3q8l1TuGodjDmsy6J_0j_lMJWOL21ll1srqbabgTaCGU9P7F5UeVMwDmfXTJ8PuxtFk0uJ1ProOKk6aT6oTAjF1fBt2S2Qsa_BtMCuoYCBxn1djQp8JHEzuWn71xw"/>
+</div>
+<span class="text-[10px] font-bold text-on-surface">Alabaster / Chrome</span>
+<span class="text-[8px] text-on-surface-variant font-mono">EMS-WHT-02</span>
+</div>
+</div>
+</section>
+<!-- Asset Linking (Horizontal Scroll) -->
+<section class="bg-surface-container p-5 rounded-xl border-b border-outline-variant/15">
+<h2 class="text-sm font-bold uppercase tracking-widest text-on-surface mb-4">Linked Assets</h2>
+<div class="flex gap-4 overflow-x-auto no-scrollbar -mx-2 px-2">
+<div class="flex-shrink-0 w-24 aspect-[3/4] bg-surface-container-lowest rounded-lg overflow-hidden relative group">
+<img class="w-full h-full object-cover" data-alt="Close up of high quality wood grain texture from an architectural material sample" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAf9OkO_2BZXcelGX40_By3_jgFeI76GwGdDzw9lXPYqlJzagHuTjlxme3dzNl7dFjKUmbeAtzfI9CUVYjxzR7x190tfjW-c-9FzrpHz70l_kdLAOKyeG_MLp4GqN9dPy5OvTX4z3z_yzEC5aMJtPKggoNsbSUeTKi2GDcWh7bGiepIgurIgPHNoLQ9ek4IWpUifBHv52tBu2so8Cv3AQrlrkvs-ViM9w_4sTZTztCoEEk1hYRTOOOqTHK9fHB9VfuY9hf7kefeA"/>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-active:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white">link</span>
+</div>
+</div>
+<div class="flex-shrink-0 w-24 aspect-[3/4] bg-surface-container-lowest rounded-lg overflow-hidden relative group">
+<img class="w-full h-full object-cover" data-alt="Detailed technical drawing and blueprint of a designer chair on architect's drafting table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4JS9Gyen-gQl4nXjCb2jroDJYpLtOlajRSTrC1XYHiks2H_A-Okr5J1dBpzPUO4Ftk_BR_-tQt7sAGkRX228zXebD_N_GK9r4WBycCTMsm069zlm4njGrrECylsh1ulOVV7UVJirBNvE7ALp9BdTKD01ZElaM-XoTCDWhUZoeJds0n0bsrY9RHJb_Y9P_bkoldQkJm2_zjDj-vbJ9L-MjzwYz7LMJH3Kf4SzGdjtWkCUkSoPo7C2vJypyMPFSxmD1d07a5ckFqw"/>
+</div>
+<div class="flex-shrink-0 w-24 aspect-[3/4] bg-surface-container-lowest rounded-lg border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant">add_photo_alternate</span>
+<span class="text-[8px] uppercase tracking-tighter text-on-surface-variant">Upload</span>
+</div>
+</div>
+</section>
+<!-- Metadata & Hierarchy -->
+<section class="bg-surface-container-low p-5 rounded-xl">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-sm font-bold uppercase tracking-widest text-on-surface">Taxonomy</h2>
+<span class="material-symbols-outlined text-on-surface-variant">info</span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center p-3 bg-surface-container rounded-lg">
+<span class="text-[10px] text-on-surface-variant uppercase">Collection</span>
+<span class="text-xs font-semibold text-primary">Mid-Century Icons</span>
+</div>
+<div class="flex justify-between items-center p-3 bg-surface-container rounded-lg">
+<span class="text-[10px] text-on-surface-variant uppercase">Visibility</span>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="text-xs font-semibold text-on-surface">Published</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Primary Action -->
+<div class="mt-8">
+<button class="custom-gradient-btn w-full py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/10 active:scale-[0.98] transition-all">
+<span class="text-sm font-bold uppercase tracking-widest text-on-primary">Publish Updates</span>
+<span class="material-symbols-outlined text-[18px] text-on-primary">publish</span>
+</button>
+<button class="w-full mt-4 py-3 rounded-xl border border-outline-variant/20 text-on-surface-variant text-[10px] uppercase font-bold tracking-widest hover:bg-surface-container transition-colors">
+                Discard Changes
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-2xl bg-[#131313]/90 backdrop-blur-md flex justify-around items-center h-20 px-4 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.4)] border-t border-[#424654]/15">
+<a class="flex flex-col items-center justify-center text-[#c3c6d6] p-3 active:bg-[#2a2a2a] tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined mb-1">database</span>
+<span class="text-[10px] font-medium tracking-wide uppercase font-['Inter']">Assets</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#324575] text-[#b0c6ff] rounded-full p-3 active:bg-[#2a2a2a] tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined mb-1">layers</span>
+<span class="text-[10px] font-medium tracking-wide uppercase font-['Inter']">Editor</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c3c6d6] p-3 active:bg-[#2a2a2a] tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined mb-1">format_list_bulleted</span>
+<span class="text-[10px] font-medium tracking-wide uppercase font-['Inter']">Tree</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#c3c6d6] p-3 active:bg-[#2a2a2a] tap-highlight-transparent" href="#">
+<span class="material-symbols-outlined mb-1">menu</span>
+<span class="text-[10px] font-medium tracking-wide uppercase font-['Inter']">Menu</span>
+</a>
+</nav>
+</body></html>

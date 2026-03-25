@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS Workflow Inbox</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-fixed": "#dae2ff",
+                        "tertiary": "#ffb59b",
+                        "surface": "#131313",
+                        "on-secondary-container": "#a1b4eb",
+                        "on-surface": "#e5e2e1",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-fixed": "#ffdbcf",
+                        "on-tertiary-fixed": "#380d00",
+                        "background": "#131313",
+                        "error-container": "#93000a",
+                        "outline": "#8d90a0",
+                        "on-primary": "#002d6f",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "tertiary-container": "#a93802",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "primary": "#b0c6ff",
+                        "on-tertiary": "#5c1a00",
+                        "on-primary-fixed-variant": "#00419c",
+                        "primary-fixed": "#d9e2ff",
+                        "surface-variant": "#353534",
+                        "on-secondary-fixed": "#001847",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-tint": "#b0c6ff",
+                        "on-secondary-fixed-variant": "#324575",
+                        "surface-bright": "#393939",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-highest": "#353534",
+                        "inverse-primary": "#0058cc",
+                        "inverse-on-surface": "#313030",
+                        "on-surface-variant": "#c3c6d6",
+                        "on-tertiary-container": "#ffcebd",
+                        "outline-variant": "#424654",
+                        "on-primary-container": "#cbd8ff",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "primary-container": "#0058cc",
+                        "on-error": "#690005",
+                        "surface-container": "#201f1f",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "secondary-container": "#324575",
+                        "on-secondary": "#1a2e5d",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary": "#b3c5fd",
+                        "on-primary-fixed": "#001945"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #131313; color: #e5e2e1; }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%);
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full z-40 bg-[#1c1b1b] dark:bg-[#1c1b1b] h-screen w-20 flex flex-col items-center py-6 font-['Inter'] body-md antialiased transition-all">
+<div class="mb-10 text-[#b0c6ff] font-bold text-xl tracking-tighter">
+            F.
+        </div>
+<nav class="flex flex-col gap-4 items-center w-full">
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">dashboard</span>
+</button>
+<!-- Content Active State -->
+<button class="text-[#b0c6ff] bg-[#2a2a2a] rounded-xl p-3 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">description</span>
+</button>
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">image</span>
+</button>
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">group</span>
+</button>
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">analytics</span>
+</button>
+</nav>
+<div class="mt-auto">
+<button class="text-[#c3c6d6] p-3 hover:bg-[#201f1f] hover:text-[#ffffff] transition-colors scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 left-20 z-30 flex items-center justify-between px-8 bg-[#131313]/80 backdrop-blur-md docked full-width top-0 h-16 border-b border-[#424654]/15 font-['Inter'] title-md uppercase tracking-wider">
+<div class="flex items-center gap-6 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-highest border-none border-b border-outline-variant/15 text-sm py-2 pl-10 pr-4 focus:ring-1 focus:ring-[#b0c6ff] transition-all outline-none rounded-lg" placeholder="Search tasks or content..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4 ml-6">
+<button class="text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full p-2 transition-all flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-[#c3c6d6] hover:bg-[#2a2a2a] rounded-full p-2 transition-all flex items-center justify-center">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden ml-2 ring-1 ring-outline-variant/30">
+<img class="h-full w-full object-cover" data-alt="Close up professional portrait of a male creative director with soft lighting and minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP7AT0-bkojfidqUwlxTHJtgwNTqgG51GIi3pfhjc-0LzySID617E8v26fRvPJciLZKGZsxzu9-6qX8XK6iYfQuAt1eHYCH7i_H1LJPItGzJCn4tbHEmJxGV_HaJa_Am6aRPcuL_yTQT6IkixbvTnbmcgj06iwCV6dALLWpIhVOwD_DXTKxhxsKVhr2VmaY6-Aeom0K_juRzHtDLEy8CZ0VK-y-ovotZepHqdxY-oorM23lXoalL7Dlr17j2fbOvDGp_c5uDDHNg"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pl-20 pt-16 h-screen overflow-hidden bg-surface">
+<div class="h-full flex flex-col p-8">
+<!-- Header Section -->
+<div class="flex flex-col mb-8 gap-2">
+<div class="flex items-center justify-between">
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface">Workflow Inbox</h1>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high text-on-surface rounded-lg hover:bg-surface-container-highest transition-colors text-sm font-medium">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                            Filter
+                        </button>
+<button class="flex items-center gap-2 px-5 py-2 primary-gradient text-on-primary rounded-lg font-bold text-sm shadow-xl shadow-primary/10">
+<span class="material-symbols-outlined text-sm">add</span>
+                            New Task
+                        </button>
+</div>
+</div>
+<p class="text-on-surface-variant max-w-2xl text-sm italic">Manage pending approvals and content orchestration across the ecosystem.</p>
+</div>
+<!-- Status Tabs -->
+<div class="flex items-center gap-8 border-b border-outline-variant/15 mb-6">
+<button class="pb-4 text-sm font-bold border-b-2 border-primary text-primary transition-all px-2">
+                    Pending
+                    <span class="ml-2 bg-primary/20 text-primary text-[10px] px-1.5 py-0.5 rounded-full">12</span>
+</button>
+<button class="pb-4 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all px-2">
+                    Approved
+                </button>
+<button class="pb-4 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-all px-2">
+                    Rejected
+                </button>
+</div>
+<!-- Task Grid / List -->
+<div class="flex-1 overflow-y-auto pr-4 -mr-4 space-y-3 custom-scrollbar">
+<!-- Task Card 1: Critical -->
+<div class="group flex items-center bg-surface-container hover:bg-surface-container-high transition-all p-4 rounded-xl gap-6 border-l-4 border-error shadow-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-error">priority_high</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-3 mb-1">
+<h3 class="text-sm font-bold text-on-surface truncate">Homepage Hero Banner Refresh - Q3 Campaign</h3>
+<span class="px-2 py-0.5 bg-error-container text-on-error-container text-[10px] rounded-full uppercase tracking-widest font-bold">Urgent</span>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> Requested by Sarah Jenkins</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">calendar_today</span> Due: Today, 5:00 PM</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex -space-x-2">
+<img class="h-6 w-6 rounded-full border border-surface" data-alt="Close up of smiling woman with warm lighting and blurred professional office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-rdUZ8ndIEQa7p9RHFjBneTvvZtI6PP9Djcr4a6aVRNydD1USQOSIbChLdzNIC99l28L7vpCbgaD_V1tEpa-C-BNcRXTVPUkiCVvGTQ7j94TS2IfEEViBeAQ8DMOeANbSWimkHGq0OJxMfDP4oIMhfqbSD8_fPJzXZ_y0WY_7NdQp620TpflpUd8Wdedm4HTywZY2Xe7Eb6uSbczibJukTESRyCxdhyf68zr9GW7qbbpW3zgU0daCOM0XrowmJ4XrEzzHwdRCzA"/>
+<img class="h-6 w-6 rounded-full border border-surface" data-alt="Portrait of man with beard in creative studio setting with natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvNIh9sZ9c7Ycc8pWh01CE_zaG9XchC8i2xBuQa8Q9xQtIjvjqP_mywHyRjUv7TtuFR1WlbGihugxW3egW6jAW8REnMCQWqr1s_Vs-ejZN7LixH78FSpnvJNKH_QDOS1UlaGY2Ox2S6EYMr71bTQgxND_FnMbrpEdW-j6OCkO6h9kysjPnG86h1eJN4YQ_p4kTu0A920nOu3U8qu9LWLRjrDEo3uqKhaInrBZFZvoKTOqktu7WrViA_UJyJVJZDyJ3LREd7ZQ6Eg"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">cancel</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Task Card 2 -->
+<div class="group flex items-center bg-surface-container-low hover:bg-surface-container transition-all p-4 rounded-xl gap-6 border-l-4 border-primary shadow-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">article</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-3 mb-1">
+<h3 class="text-sm font-bold text-on-surface truncate">Technical Documentation: API V2 Integration</h3>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] rounded-full uppercase tracking-widest font-bold">Medium</span>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> Requested by David Chen</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">calendar_today</span> Due: Tomorrow</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex -space-x-2">
+<img class="h-6 w-6 rounded-full border border-surface" data-alt="Professional headshot of a young man with dark hair in a brightly lit studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApS23h-pT16d7quO5TSejUSWmYqkGrJeUZBTEVXBWL--15430jU3Vsg4DqlY8pMLQVUylDtg2CFNgu1fXPMqS2G5rgwpRN8mcUf3E9rwegGyrtdzyuonmDaos7Pd_E2U8gDI64jzPrTVElslYa_JAvYfnwWrkczdGMaObfkopAtm73IE2SMjn0ERSbO5nVG5NNo1nkM3axye4OxGSP3AcGQt71tgNmpoZM6Rkg1j_3GWuc9uVilxRcKoMdN3uPWoZl59AvS0Iu1w"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">cancel</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Task Card 3 -->
+<div class="group flex items-center bg-surface-container-low hover:bg-surface-container transition-all p-4 rounded-xl gap-6 border-l-4 border-outline-variant/30 shadow-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">image_search</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-3 mb-1">
+<h3 class="text-sm font-bold text-on-surface truncate">Media Asset Approval: Spring Lifestyle Set</h3>
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] rounded-full uppercase tracking-widest font-bold">Low</span>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> Requested by Elena Russo</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">calendar_today</span> Due: Oct 24, 2023</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex -space-x-2">
+<img class="h-6 w-6 rounded-full border border-surface" data-alt="Portrait of a woman with glasses in a soft natural light environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIvHY4zTD7juQlw3WE0lng-dqkM9edOwbUSSn0mgovZkZRMqh_lEkng4NQGhto1nahg35p3Agtiv8KohiJ2eMTTLs9uGMdzjJJ6S6CPzpYctrR7VCsvpQpO8E5nYGac-n_8nlDeuKLdQwuF6ypXmJgFgsYaDkjGb9prxorLXe0o2DnGlMuHtCu9tvx0RRJ-YcZrMa1m1HplQ_UANZtkYjG5VnjzLI5_PmED9T32H7en-26DfCGpzovF8BtLcIoiZXY3bUSpFZEUQ"/>
+<img class="h-6 w-6 rounded-full border border-surface" data-alt="Close up of a man smiling with cinematic backlighting and urban blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5xuVVn0B-nYo97_Gn5J1m_24DxfJC2MPd4nN7pL8RdwxLcr24J7tjS7yov7DTJqLqabbzOVlityH0yVpHYlK3XLv3tk5-yNoT_KVPKBi7S0GDiuVIYiOP0CXW5GSS2cLigCv6FxJO7502kxDtjMyYMNNW_XolzpJwmmGZ83Rufg6ntNXxknIkVp9bYqK7ulQ8Ne4yinabXtOC0e8TAlOt20c6GZUgzGG_ZcMuxqchI5xu9VU7PXTeiHMpkCH9jsCO_bUWkttIzg"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">cancel</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Task Card 4: Bento Layout Variant for Information Density -->
+<div class="grid grid-cols-12 gap-3">
+<div class="col-span-8 group flex items-center bg-surface-container hover:bg-surface-container-high transition-all p-4 rounded-xl gap-6 border-l-4 border-primary shadow-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">mail</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-3 mb-1">
+<h3 class="text-sm font-bold text-on-surface truncate">Newsletter Draft: Product Launch Announcement</h3>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] rounded-full uppercase tracking-widest font-bold">Medium</span>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> Requested by Marketing Team</span>
+</div>
+</div>
+</div>
+<div class="col-span-4 bg-surface-container-highest/40 rounded-xl p-4 flex flex-col justify-center border border-outline-variant/10">
+<div class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Estimated Effort</div>
+<div class="flex items-end gap-1">
+<span class="text-xl font-extrabold text-primary">4.5</span>
+<span class="text-[10px] text-on-surface-variant mb-1">Hours</span>
+</div>
+</div>
+</div>
+<!-- Task Card 5 -->
+<div class="group flex items-center bg-surface-container-low hover:bg-surface-container transition-all p-4 rounded-xl gap-6 border-l-4 border-primary shadow-sm">
+<div class="flex-shrink-0 w-12 h-12 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">policy</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-3 mb-1">
+<h3 class="text-sm font-bold text-on-surface truncate">GDPR Compliance Policy Update - Final Review</h3>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] rounded-full uppercase tracking-widest font-bold">Medium</span>
+</div>
+<div class="flex items-center gap-4 text-xs text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span> Requested by Legal Dept</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">calendar_today</span> Due: Oct 26, 2023</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">check_circle</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">cancel</span>
+</button>
+</div>
+</div>
+<!-- Empty State Filler / Decoration -->
+<div class="pt-12 text-center">
+<p class="text-[10px] uppercase tracking-[0.2em] text-outline/40 font-bold">End of pending list</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Hidden on Tablet but provided for completeness) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 rounded-2xl primary-gradient text-on-primary flex items-center justify-center shadow-2xl shadow-primary/40 md:flex hidden">
+<span class="material-symbols-outlined text-3xl">bolt</span>
+</button>
+</body></html>

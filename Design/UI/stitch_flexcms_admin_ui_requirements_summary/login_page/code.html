@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS | Enterprise Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#324575",
+                        "on-primary": "#002d6f",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "tertiary-container": "#a93802",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface-bright": "#393939",
+                        "on-primary-fixed": "#001945",
+                        "primary-fixed": "#d9e2ff",
+                        "outline-variant": "#424654",
+                        "on-tertiary": "#5c1a00",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "secondary-fixed": "#dae2ff",
+                        "on-primary-container": "#cbd8ff",
+                        "surface-dim": "#131313",
+                        "surface-tint": "#b0c6ff",
+                        "on-tertiary-fixed": "#380d00",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "on-background": "#e5e2e1",
+                        "secondary": "#b3c5fd",
+                        "primary-container": "#0058cc",
+                        "on-primary-fixed-variant": "#00419c",
+                        "surface-container-highest": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed": "#001847",
+                        "surface-container": "#201f1f",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "primary": "#b0c6ff",
+                        "on-surface-variant": "#c3c6d6",
+                        "inverse-primary": "#0058cc",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary": "#ffb59b",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "secondary-container": "#324575",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "on-tertiary-container": "#ffcebd",
+                        "on-secondary": "#1a2e5d",
+                        "error-container": "#93000a",
+                        "background": "#131313",
+                        "on-secondary-container": "#a1b4eb",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "outline": "#8d90a0"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #131313;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(32, 31, 31, 0.8);
+            backdrop-filter: blur(16px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center p-6 selection:bg-primary/30">
+<!-- Auth Background Ambient Decor -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]"></div>
+<div class="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-primary-container/10 blur-[120px]"></div>
+</div>
+<main class="relative w-full max-w-[440px] z-10">
+<!-- Logo Section -->
+<div class="flex flex-col items-center mb-10">
+<div class="w-12 h-12 primary-gradient rounded-xl flex items-center justify-center mb-4 shadow-2xl shadow-primary/20">
+<span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<h1 class="text-2xl font-extrabold tracking-tight text-white mb-1">FlexCMS</h1>
+<p class="text-on-surface-variant text-sm font-medium tracking-wide">ENTERPRISE CONTENT ORCHESTRATION</p>
+</div>
+<!-- Login Card -->
+<div class="surface-container-low rounded-xl p-8 shadow-[0_32px_64px_rgba(0,0,0,0.4)] relative overflow-hidden">
+<!-- Subtle internal glow -->
+<div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+<div class="space-y-6">
+<div class="space-y-1">
+<h2 class="text-xl font-semibold text-white">Sign In</h2>
+<p class="text-on-surface-variant text-sm">Enter your credentials to access the console</p>
+</div>
+<!-- Form -->
+<form action="#" class="space-y-5" method="POST">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1" for="email">Email Address</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest border-none border-b-2 border-transparent focus:border-primary transition-all duration-300 text-on-surface py-3 px-4 rounded-lg placeholder:text-outline/50 focus:ring-0" id="email" name="email" placeholder="name@company.com" type="email"/>
+<div class="absolute inset-x-0 bottom-0 h-px bg-outline-variant/20"></div>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center ml-1">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant" for="password">Password</label>
+<a class="text-[11px] font-bold text-primary hover:text-primary-fixed-dim transition-colors uppercase tracking-tight" href="#">Forgot Password?</a>
+</div>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest border-none border-b-2 border-transparent focus:border-primary transition-all duration-300 text-on-surface py-3 px-4 rounded-lg placeholder:text-outline/50 focus:ring-0" id="password" name="password" placeholder="••••••••" type="password"/>
+<div class="absolute inset-x-0 bottom-0 h-px bg-outline-variant/20"></div>
+</div>
+</div>
+<!-- CTA Button -->
+<button class="w-full primary-gradient text-on-primary font-bold py-3.5 rounded-lg active:scale-[0.98] transition-all shadow-lg shadow-primary/10 flex items-center justify-center gap-2 mt-4 group" type="submit">
+<span>Sign In</span>
+<span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<!-- Divider -->
+<div class="relative flex items-center py-2">
+<div class="flex-grow h-px bg-outline-variant/15"></div>
+<span class="flex-shrink mx-4 text-[10px] font-bold text-on-surface-variant tracking-[0.2em] uppercase">Enterprise SSO</span>
+<div class="flex-grow h-px bg-outline-variant/15"></div>
+</div>
+<!-- SSO Login -->
+<button class="w-full surface-container-high border border-outline-variant/10 hover:bg-surface-container-highest text-on-surface font-semibold py-3 rounded-lg flex items-center justify-center gap-3 transition-all duration-200">
+<svg class="w-5 h-5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span>Continue with Okta</span>
+</button>
+</div>
+</div>
+<!-- Footer Links -->
+<footer class="mt-8 flex justify-center gap-6 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+<a class="hover:text-white transition-colors" href="#">Privacy Policy</a>
+<span class="w-1 h-1 rounded-full bg-outline-variant/30 mt-1.5"></span>
+<a class="hover:text-white transition-colors" href="#">Service Status</a>
+<span class="w-1 h-1 rounded-full bg-outline-variant/30 mt-1.5"></span>
+<a class="hover:text-white transition-colors" href="#">Contact Support</a>
+</footer>
+</main>
+<!-- Side Image Ornament (Desktop Only) -->
+<div class="hidden lg:block fixed right-0 top-0 w-1/3 h-screen opacity-40">
+<div class="w-full h-full relative">
+<div class="absolute inset-0 bg-gradient-to-l from-transparent via-surface to-surface z-10"></div>
+<img class="w-full h-full object-cover grayscale" data-alt="abstract architectural forms with dramatic shadows and deep blue highlights in a futuristic minimalist style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWjyXbJfdkgpLzb2mFaQgqGNtmlSYfI0VrRNoNL-P1dC94SiX_PQRwGkz2iUH8EUvHcbwzfyGht_HBm56Zf77E5xBe35btsrY9n9zNqCEL1xtSovh6rc008HTJne3p79X2Un0BBz_9cXAdvFPjwSfq_-xZsKLPsozyJ-nz7_8IO6MTdr8KfNYmzZsPA_q0aMoHj_iVzlrkWWqeQOMEvUnVS2XiCvP9DvxreQanlVySN4H66jdYmm2MswZbwGEHD5fWsx-fIs1vGw"/>
+</div>
+</div>
+</body></html>

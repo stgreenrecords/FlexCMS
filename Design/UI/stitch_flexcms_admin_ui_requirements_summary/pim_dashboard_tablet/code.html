@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS Admin - PIM Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-high": "#2a2a2a",
+              "inverse-on-surface": "#313030",
+              "on-secondary-fixed": "#001847",
+              "outline-variant": "#424654",
+              "on-tertiary-fixed": "#380d00",
+              "tertiary-container": "#a93802",
+              "secondary": "#b3c5fd",
+              "surface-container": "#201f1f",
+              "background": "#131313",
+              "primary": "#b0c6ff",
+              "on-primary": "#002d6f",
+              "on-error-container": "#ffdad6",
+              "on-surface": "#e5e2e1",
+              "secondary-fixed-dim": "#b3c5fd",
+              "primary-fixed-dim": "#b0c6ff",
+              "outline": "#8d90a0",
+              "on-secondary-container": "#a1b4eb",
+              "tertiary-fixed-dim": "#ffb59b",
+              "error-container": "#93000a",
+              "inverse-primary": "#0058cc",
+              "surface-variant": "#353534",
+              "secondary-fixed": "#dae2ff",
+              "surface-dim": "#131313",
+              "surface-container-lowest": "#0e0e0e",
+              "tertiary": "#ffb59b",
+              "on-primary-fixed-variant": "#00419c",
+              "inverse-surface": "#e5e2e1",
+              "on-primary-container": "#cbd8ff",
+              "on-surface-variant": "#c3c6d6",
+              "on-background": "#e5e2e1",
+              "surface-bright": "#393939",
+              "surface-container-highest": "#353534",
+              "surface-tint": "#b0c6ff",
+              "primary-fixed": "#d9e2ff",
+              "surface": "#131313",
+              "tertiary-fixed": "#ffdbcf",
+              "on-secondary": "#1a2e5d",
+              "on-secondary-fixed-variant": "#324575",
+              "on-tertiary-container": "#ffcebd",
+              "error": "#ffb4ab",
+              "surface-container-low": "#1c1b1b",
+              "on-error": "#690005",
+              "secondary-container": "#324575",
+              "primary-container": "#0058cc",
+              "on-primary-fixed": "#001945",
+              "on-tertiary-fixed-variant": "#812800",
+              "on-tertiary": "#5c1a00"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(53, 53, 52, 0.4);
+            backdrop-filter: blur(12px);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #424654; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary/30 selection:text-primary min-h-screen overflow-x-hidden">
+<!-- SideNavBar (Collapsed per Tablet Requirement) -->
+<aside class="h-full w-16 fixed left-0 top-0 overflow-y-auto bg-[#1c1b1b] dark:bg-[#1c1b1b] flex flex-col items-center py-4 z-50 transition-all duration-300">
+<div class="mb-8">
+<span class="text-[#b0c6ff] font-bold text-xl tracking-tighter">FC</span>
+</div>
+<nav class="flex flex-col gap-6 flex-1">
+<button class="flex flex-col items-center p-2 text-[#b0c6ff] border-r-2 border-[#b0c6ff] hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90" title="Dashboard">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+</button>
+<button class="flex flex-col items-center p-2 text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90" title="Content">
+<span class="material-symbols-outlined">description</span>
+</button>
+<button class="flex flex-col items-center p-2 text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90" title="Assets">
+<span class="material-symbols-outlined">inventory_2</span>
+</button>
+<button class="flex flex-col items-center p-2 text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90" title="Products">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+<button class="flex flex-col items-center p-2 text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90" title="Users">
+<span class="material-symbols-outlined">group</span>
+</button>
+</nav>
+<div class="flex flex-col gap-6 mt-auto">
+<button class="flex flex-col items-center p-2 text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90" title="Settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="flex flex-col items-center p-2 text-[#c3c6d6] opacity-70 hover:bg-[#2a2a2a] transition-colors duration-200 scale-95 active:scale-90" title="Support">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-16 h-14 bg-[#131313]/80 backdrop-blur-md dark:bg-[#131313]/80 border-b border-[#424654]/15 flex justify-between items-center px-6 w-auto z-40">
+<div class="flex items-center gap-4">
+<h1 class="text-[#b0c6ff] font-extrabold tracking-tight text-lg">FlexCMS Admin</h1>
+<div class="relative ml-4">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-high border-none rounded-lg pl-10 pr-4 py-1.5 text-xs w-64 focus:ring-1 focus:ring-[#b0c6ff] transition-all" placeholder="Quick search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#c3c6d6] hover:text-white transition-all focus-within:ring-1 focus-within:ring-[#b0c6ff] p-1 rounded">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-[#c3c6d6] hover:text-white transition-all focus-within:ring-1 focus-within:ring-[#b0c6ff] p-1 rounded">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/30">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="professional corporate headshot of a technical manager with neutral lighting and blurred office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9sXTujm24P6q24SH8s_nntQd69pXnIfu9jZvco7sxDHZUKXe9lg3okCbIMxgcPccErbBnXV6dQvGeJmeJRWSrHKFBH1oiABq0xMrRQZ7Hh4xHVneCSb1kVhRY7kHb9p_kCbJrwPD50rsyM_8nMJcQloeokel-booSiI5HtZ0yWZ1UGQealYuRRGvgPmTfU-iKEzDuqPPyOPeJgBu1yf8WTG5kwL_1i2GTq8HQpq0YD3zV74ZGawrlThFQQ6QaY_TcS8IrdoFdzg"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-20 pl-24 pr-8 pb-10 bg-surface-container min-h-screen">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-8">
+<div class="space-y-1">
+<h2 class="text-3xl font-extrabold tracking-tight text-on-surface">PIM Dashboard</h2>
+<p class="text-on-surface-variant text-sm">Product Information Management &amp; Catalog Health</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">add</span>
+                Create Product
+            </button>
+</div>
+<!-- Layout Grid: 2 Columns for Stats (Tablet View) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Metrics & Main Stats -->
+<div class="lg:col-span-7 space-y-6">
+<!-- Stat Cards Grid (2 Columns) -->
+<div class="grid grid-cols-2 gap-4">
+<div class="p-5 bg-surface-container-low rounded-xl border-l-4 border-primary">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant text-xs font-medium uppercase tracking-wider">Total SKUs</span>
+<span class="text-primary text-xs flex items-center gap-1 font-bold">+12% <span class="material-symbols-outlined text-xs">trending_up</span></span>
+</div>
+<div class="text-2xl font-bold text-on-surface">24,582</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%]"></div>
+</div>
+</div>
+<div class="p-5 bg-surface-container-low rounded-xl border-l-4 border-secondary">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant text-xs font-medium uppercase tracking-wider">Catalog Health</span>
+<span class="text-secondary text-xs flex items-center gap-1 font-bold">Stable <span class="material-symbols-outlined text-xs">check_circle</span></span>
+</div>
+<div class="text-2xl font-bold text-on-surface">94.2%</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[94%]"></div>
+</div>
+</div>
+<div class="p-5 bg-surface-container-low rounded-xl border-l-4 border-tertiary">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant text-xs font-medium uppercase tracking-wider">Enrichment Gap</span>
+<span class="text-tertiary text-xs flex items-center gap-1 font-bold">-2.4% <span class="material-symbols-outlined text-xs">trending_down</span></span>
+</div>
+<div class="text-2xl font-bold text-on-surface">1,204</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-tertiary w-[30%]"></div>
+</div>
+</div>
+<div class="p-5 bg-surface-container-low rounded-xl border-l-4 border-error">
+<div class="flex justify-between items-start mb-2">
+<span class="text-on-surface-variant text-xs font-medium uppercase tracking-wider">Validation Errors</span>
+<span class="text-error text-xs flex items-center gap-1 font-bold">Action Required</span>
+</div>
+<div class="text-2xl font-bold text-on-surface">43</div>
+<div class="mt-4 h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-error w-[15%]"></div>
+</div>
+</div>
+</div>
+<!-- Catalog Health Breakdown - Bento Style -->
+<div class="p-6 bg-surface-container-low rounded-xl relative overflow-hidden group">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-bold text-on-surface">Inventory Distribution</h3>
+<div class="flex gap-2">
+<button class="bg-surface-container-highest px-3 py-1 rounded-full text-[10px] font-bold text-on-surface-variant">MONTHLY</button>
+<button class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold">QUARTERLY</button>
+</div>
+</div>
+<div class="flex items-end gap-2 h-48 mb-4">
+<div class="flex-1 bg-surface-container-high rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[60%]"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[45%]"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[85%] border-t-2 border-primary"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[30%]"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[70%]"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[55%]"></div>
+<div class="flex-1 bg-surface-container-high rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[90%]"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all duration-500 hover:bg-primary/40 h-[75%] border-t-2 border-primary"></div>
+</div>
+<div class="grid grid-cols-4 gap-4 pt-6 border-t border-outline-variant/15">
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Active</p>
+<p class="text-sm font-bold">18,402</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Draft</p>
+<p class="text-sm font-bold">4,110</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Archived</p>
+<p class="text-sm font-bold">2,070</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-on-surface-variant mb-1">New</p>
+<p class="text-sm font-bold text-primary">+84</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Vertical Stack (Recent Activity & Import Jobs) -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<!-- Import Jobs Summary -->
+<div class="p-6 bg-surface-container-low rounded-xl glass-card border border-outline-variant/10">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-bold text-on-surface">Data Import Hub</h3>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">sync</span>
+</div>
+<div class="space-y-4">
+<!-- Job 1 -->
+<div class="p-3 rounded-lg bg-surface-container-highest border-b-2 border-primary">
+<div class="flex justify-between mb-1">
+<span class="text-xs font-bold text-on-surface">ERP_Catalog_Sync_V2</span>
+<span class="text-[10px] text-primary bg-primary-container/20 px-2 py-0.5 rounded">PROCESSING</span>
+</div>
+<div class="flex justify-between items-center text-[10px] text-on-surface-variant mb-2">
+<span>8,400 items total</span>
+<span>65%</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full">
+<div class="w-[65%] h-full bg-primary"></div>
+</div>
+</div>
+<!-- Job 2 -->
+<div class="p-3 rounded-lg bg-surface-container-highest border-b-2 border-outline-variant/30">
+<div class="flex justify-between mb-1">
+<span class="text-xs font-bold text-on-surface">Shopify_Attributes_Export</span>
+<span class="text-[10px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded uppercase">Queued</span>
+</div>
+<div class="flex justify-between items-center text-[10px] text-on-surface-variant">
+<span>Manual trigger</span>
+<span>-</span>
+</div>
+</div>
+<!-- Job 3 -->
+<div class="p-3 rounded-lg bg-surface-container-highest border-b-2 border-error">
+<div class="flex justify-between mb-1">
+<span class="text-xs font-bold text-on-surface">Marketplace_Inventory</span>
+<span class="text-[10px] text-error bg-error-container/20 px-2 py-0.5 rounded uppercase">Failed</span>
+</div>
+<div class="text-[10px] text-error">Timeout error: Service unavailable</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-outline-variant/30 rounded-lg text-xs font-bold hover:bg-surface-container-high transition-colors">View All Imports</button>
+</div>
+<!-- Recent Activity -->
+<div class="p-6 bg-surface-container-low rounded-xl flex-1">
+<h3 class="text-lg font-bold text-on-surface mb-6">Recent Activity</h3>
+<div class="space-y-6 custom-scrollbar overflow-y-auto max-h-[400px] pr-2">
+<div class="flex gap-4 relative">
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0 shadow-[0_0_8px_rgba(176,198,255,0.6)]"></div>
+<div>
+<p class="text-xs text-on-surface"><span class="font-bold">Admin Sarah</span> updated <span class="text-primary font-medium underline decoration-primary/30">SKU-9042-XL</span></p>
+<p class="text-[10px] text-on-surface-variant mt-1">2 minutes ago • Channel: Webstore</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 shrink-0"></div>
+<div>
+<p class="text-xs text-on-surface"><span class="font-bold">System</span> completed bulk attribute validation</p>
+<p class="text-[10px] text-on-surface-variant mt-1">1 hour ago • 1,420 SKUs affected</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-1.5 h-1.5 rounded-full bg-tertiary mt-1.5 shrink-0"></div>
+<div>
+<p class="text-xs text-on-surface"><span class="font-bold">Product Team</span> approved Summer '24 Collection</p>
+<p class="text-[10px] text-on-surface-variant mt-1">4 hours ago • Marketing Status: Ready</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant mt-1.5 shrink-0"></div>
+<div>
+<p class="text-xs text-on-surface"><span class="font-bold">Bot API</span> refreshed stock levels from Warehouse C</p>
+<p class="text-[10px] text-on-surface-variant mt-1">6 hours ago • Source: SAP ERP</p>
+</div>
+</div>
+<div class="flex gap-4 relative opacity-60">
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant mt-1.5 shrink-0"></div>
+<div>
+<p class="text-xs text-on-surface"><span class="font-bold">Admin Marcus</span> deleted deprecated product tags</p>
+<p class="text-[10px] text-on-surface-variant mt-1">Yesterday • Settings</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Featured Product Preview Section - Horizontal Bento Layout -->
+<div class="mt-8 grid grid-cols-1 gap-6">
+<div class="bg-surface-container-low p-6 rounded-xl flex items-center gap-8 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
+<div class="w-40 h-40 rounded-lg bg-surface-container-high overflow-hidden border border-outline-variant/15 flex-shrink-0">
+<img alt="Premium Tech Product" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="high-end sleek smartphone design with iridescent glass back resting on dark textured architectural surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0vWH4IebEFq516rJ2FmWNaYpThuI1Ax_kLMHS1hQczhz7FV-2hvBMvRiN-ZnYTvdPtofmPKSrBQGcbcTeWOVCDY7POx7PbX_QYvgtXWOUWr3mXXH3sOrkyY-KhWYg7SCbOpRMq3fHp16csO3TrCm3iSJORQCMuCO5lzaqT227uN4tJydpxJnWRa0UyzweDoQEvDeqoJVfdmSJvJWohMld7IYP3s9pDmgBxNyoV1h9t-e9INe0n7mnew7PhvU6bxyEwmdrRUWNhw"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-2">
+<span class="text-[10px] bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Flagship</span>
+<span class="text-[10px] text-on-surface-variant">ID: 884-PKL-02</span>
+</div>
+<h4 class="text-xl font-bold text-on-surface mb-2">Ultra-Vision Pro Display X1</h4>
+<p class="text-sm text-on-surface-variant max-w-2xl leading-relaxed">
+                        The latest catalog addition requiring final SEO meta-description review before publishing to global regions. Translation pending for FR, DE, and JP markets.
+                    </p>
+<div class="mt-6 flex gap-3">
+<button class="text-xs font-bold text-primary hover:underline underline-offset-4">Edit Content</button>
+<button class="text-xs font-bold text-on-surface-variant">Duplicate</button>
+<button class="text-xs font-bold text-on-surface-variant">History</button>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2 pr-4">
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant font-bold">AVAILABILITY</p>
+<p class="text-lg font-bold text-on-surface">82% Stocked</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant font-bold">LIST PRICE</p>
+<p class="text-lg font-bold text-primary">$1,299.00</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Restricted to Dashboard per instructions) -->
+<div class="fixed bottom-8 right-8 z-50">
+<button class="w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+</div>
+</body></html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PIM Schema Browser | Orchestrator Enterprise</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface-bright": "#393939",
+                        "tertiary-container": "#a93802",
+                        "primary-fixed": "#d9e2ff",
+                        "outline-variant": "#424654",
+                        "on-tertiary": "#5c1a00",
+                        "on-primary-fixed": "#001945",
+                        "secondary-fixed": "#dae2ff",
+                        "on-primary-container": "#cbd8ff",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "surface-dim": "#131313",
+                        "on-primary": "#002d6f",
+                        "on-secondary-fixed-variant": "#324575",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "secondary": "#b3c5fd",
+                        "primary-container": "#0058cc",
+                        "on-primary-fixed-variant": "#00419c",
+                        "surface-container-highest": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#380d00",
+                        "surface-tint": "#b0c6ff",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary": "#ffb59b",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "on-secondary-fixed": "#001847",
+                        "primary": "#b0c6ff",
+                        "surface-container": "#201f1f",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "on-surface-variant": "#c3c6d6",
+                        "inverse-primary": "#0058cc",
+                        "on-secondary": "#1a2e5d",
+                        "error-container": "#93000a",
+                        "background": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-container": "#a1b4eb",
+                        "surface-container-low": "#1c1b1b",
+                        "outline": "#8d90a0",
+                        "secondary-container": "#324575",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "on-tertiary-container": "#ffcebd"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+            vertical-align: middle;
+            font-size: 1.25rem;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary/30">
+<!-- TopNavBar -->
+<header class="bg-[#131313]/80 backdrop-blur-xl text-[#f2f0ef] flex justify-between items-center w-full px-6 h-14 z-50 sticky top-0 shadow-2xl shadow-black/20">
+<div class="flex items-center gap-8">
+<span class="text-lg font-bold tracking-tighter text-[#f2f0ef]">Orchestrator Enterprise</span>
+<nav class="hidden md:flex gap-6 items-center font-['Inter'] text-sm tracking-tight">
+<a class="text-[#c3c6d6] hover:text-[#f2f0ef] transition-colors" href="#">CMS</a>
+<a class="text-[#c3c6d6] hover:text-[#f2f0ef] transition-colors" href="#">DAM</a>
+<a class="text-[#b0c6ff] border-b-2 border-[#b0c6ff] pb-1" href="#">PIM</a>
+<a class="text-[#c3c6d6] hover:text-[#f2f0ef] transition-colors" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-high border-none rounded-lg pl-10 pr-4 py-1.5 text-xs w-64 focus:ring-1 focus:ring-primary transition-all" placeholder="Search resources..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-[#2a2a2a] transition-all duration-200 rounded-full active:scale-[0.98]">
+<span class="material-symbols-outlined text-[#c3c6d6]">notifications</span>
+</button>
+<button class="p-2 hover:bg-[#2a2a2a] transition-all duration-200 rounded-full active:scale-[0.98]">
+<span class="material-symbols-outlined text-[#c3c6d6]">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden ml-2 border border-outline-variant/30">
+<img alt="User Profile" class="h-full w-full object-cover" data-alt="professional headshot of a system administrator in a dark studio setting with soft rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUPVCjk55MazMFvLqxSKV1t19Ed_LKJ44H-91ADVejWC4EfYgF98nlDof0mHGsZVudneRdlZBxUloS21QXey1upRH8foG4860hC08j3-zQIO3QpVJ0-i-k42MFVBo7T-GmXmhs8mcYDPYik_N_EZQbU6W84mm5nDPeWAXCmjsozDYBiXggkrLon_RLtSAoWZXDNRn4xJeTOWbrDB_M5ifogJPNJzhcPrPVX6NwL3u4VR060ElZZBYJUkjWSU5lo_l4AfAmawtfbw"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex min-h-[calc(100vh-3.5rem)]">
+<!-- SideNavBar -->
+<aside class="bg-[#1c1b1b] flex flex-col py-4 gap-y-1 w-64 border-r border-transparent sticky top-14 h-[calc(100vh-3.5rem)]">
+<div class="px-4 mb-6">
+<div class="flex items-center gap-3 p-2 bg-[#131313] rounded-xl">
+<div class="h-10 w-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">inventory_2</span>
+</div>
+<div>
+<div class="font-['Inter'] text-[0.8125rem] font-bold text-on-surface">System Admin</div>
+<div class="font-['Inter'] text-[0.7rem] text-on-surface-variant">Global Orchestrator</div>
+</div>
+</div>
+</div>
+<div class="flex-1 space-y-1 px-2">
+<button class="flex items-center w-full gap-3 px-3 py-2 text-[#c3c6d6] hover:bg-[#201f1f] hover:text-[#f2f0ef] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</button>
+<button class="flex items-center w-full gap-3 px-3 py-2 text-[#c3c6d6] hover:bg-[#201f1f] hover:text-[#f2f0ef] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">folder_special</span>
+<span>Content Library</span>
+</button>
+<button class="flex items-center w-full gap-3 px-3 py-2 text-[#c3c6d6] hover:bg-[#201f1f] hover:text-[#f2f0ef] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">image_search</span>
+<span>Assets</span>
+</button>
+<button class="flex items-center w-full gap-3 px-3 py-2 bg-[#2a2a2a] text-[#b0c6ff] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Product Data</span>
+</button>
+<button class="flex items-center w-full gap-3 px-3 py-2 text-[#c3c6d6] hover:bg-[#201f1f] hover:text-[#f2f0ef] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">account_tree</span>
+<span>Workflows</span>
+</button>
+<button class="flex items-center w-full gap-3 px-3 py-2 text-[#c3c6d6] hover:bg-[#201f1f] hover:text-[#f2f0ef] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">history</span>
+<span>Audit Logs</span>
+</button>
+</div>
+<div class="mt-auto px-4 pb-4 space-y-4">
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-2 rounded-lg font-semibold text-xs flex items-center justify-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                    New Entry
+                </button>
+<div class="pt-4 border-t border-outline-variant/10">
+<button class="flex items-center w-full gap-3 px-3 py-2 text-[#c3c6d6] hover:bg-[#201f1f] hover:text-[#f2f0ef] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">contact_support</span>
+<span>Support</span>
+</button>
+<button class="flex items-center w-full gap-3 px-3 py-2 text-[#c3c6d6] hover:bg-[#201f1f] hover:text-[#f2f0ef] transition-all duration-150 rounded-lg font-['Inter'] text-[0.8125rem] font-medium">
+<span class="material-symbols-outlined">dns</span>
+<span>System Status</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 bg-surface-container overflow-y-auto">
+<div class="max-w-[1600px] mx-auto p-8">
+<!-- Breadcrumb & Header -->
+<div class="mb-8">
+<nav class="flex items-center gap-2 text-on-surface-variant text-xs mb-3 font-medium uppercase tracking-widest">
+<span>PIM</span>
+<span class="material-symbols-outlined !text-xs">chevron_right</span>
+<span class="text-primary">Schemas</span>
+</nav>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2">Schema Browser</h1>
+<p class="text-on-surface-variant text-sm max-w-2xl">Define and manage architectural data structures for global product distribution. Ensure strict validation rules across multi-channel endpoints.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">upload_file</span>
+                                Import Schema
+                            </button>
+<button class="px-5 py-2.5 bg-gradient-to-br from-primary to-primary-container text-on-primary text-sm font-bold rounded-lg transition-all shadow-lg shadow-primary-container/20 active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                                Create New Version
+                            </button>
+</div>
+</div>
+</div>
+<!-- Bento Data Grid Shell -->
+<div class="bg-surface-container-low rounded-xl overflow-hidden shadow-sm border border-outline-variant/5">
+<!-- Toolbar -->
+<div class="p-4 flex flex-col md:flex-row gap-4 items-center justify-between bg-surface-container-low border-b border-outline-variant/10">
+<div class="flex items-center gap-3 w-full md:w-auto">
+<div class="relative w-full md:w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
+<input class="w-full bg-surface-container-highest/50 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary placeholder:text-outline/60" placeholder="Filter by schema name or ID..." type="text"/>
+</div>
+<button class="p-2 bg-surface-container-high rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex bg-surface-container-high p-1 rounded-lg">
+<button class="px-3 py-1 bg-surface-container-highest text-primary rounded-md text-xs font-bold">Table</button>
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface text-xs font-bold transition-colors">Visual</button>
+</div>
+<div class="text-xs text-on-surface-variant font-medium">
+                                Showing <span class="text-on-surface">1-12</span> of 148 schemas
+                            </div>
+</div>
+</div>
+<!-- Data Grid / Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-bold text-[0.7rem] uppercase tracking-wider">
+<th class="px-6 py-4">Schema Name</th>
+<th class="px-6 py-4 text-center">Version</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Entities</th>
+<th class="px-6 py-4">Modified</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded bg-[#a93802]/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">schema</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Global_SKU_Master</div>
+<div class="text-[0.6875rem] text-on-surface-variant">ID: scm_01HF92JK</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="px-2.5 py-1 bg-secondary-container/30 text-secondary text-[0.6875rem] font-bold rounded-full">v2.4.1</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></div>
+<span class="text-[0.8125rem] font-medium text-on-surface">Published</span>
+</div>
+</td>
+<td class="px-6 py-5 text-[0.8125rem] font-mono text-on-surface-variant">1,248 Items</td>
+<td class="px-6 py-5">
+<div class="text-[0.8125rem] text-on-surface">Oct 12, 2023</div>
+<div class="text-[0.6875rem] text-on-surface-variant">by Alex Rivera</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="bg-surface-container-low hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded bg-[#0058cc]/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Consumer_Electronics_V4</div>
+<div class="text-[0.6875rem] text-on-surface-variant">ID: scm_01HF92PX</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="px-2.5 py-1 bg-outline-variant/20 text-on-surface-variant text-[0.6875rem] font-bold rounded-full">v4.0.0-rc1</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 rounded-full bg-outline shadow-[0_0_8px_rgba(141,144,160,0.6)]"></div>
+<span class="text-[0.8125rem] font-medium text-on-surface">Draft</span>
+</div>
+</td>
+<td class="px-6 py-5 text-[0.8125rem] font-mono text-on-surface-variant">842 Items</td>
+<td class="px-6 py-5">
+<div class="text-[0.8125rem] text-on-surface">Oct 11, 2023</div>
+<div class="text-[0.6875rem] text-on-surface-variant">by Sarah Chen</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome_motion</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Lifestyle_Spring_Collection</div>
+<div class="text-[0.6875rem] text-on-surface-variant">ID: scm_01HF93AQ</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="px-2.5 py-1 bg-secondary-container/30 text-secondary text-[0.6875rem] font-bold rounded-full">v1.2.0</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(176,198,255,0.6)]"></div>
+<span class="text-[0.8125rem] font-medium text-on-surface">Published</span>
+</div>
+</td>
+<td class="px-6 py-5 text-[0.8125rem] font-mono text-on-surface-variant">3,120 Items</td>
+<td class="px-6 py-5">
+<div class="text-[0.8125rem] text-on-surface">Oct 09, 2023</div>
+<div class="text-[0.6875rem] text-on-surface-variant">by System Bot</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="bg-surface-container-low hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-5">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Legacy_Furniture_Export</div>
+<div class="text-[0.6875rem] text-on-surface-variant">ID: scm_01HF94MM</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 text-center">
+<span class="px-2.5 py-1 bg-error-container/30 text-error text-[0.6875rem] font-bold rounded-full">v0.9.4</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-1.5 rounded-full bg-error shadow-[0_0_8px_rgba(255,180,171,0.6)]"></div>
+<span class="text-[0.8125rem] font-medium text-on-surface">Deprecated</span>
+</div>
+</td>
+<td class="px-6 py-5 text-[0.8125rem] font-mono text-on-surface-variant">52 Items</td>
+<td class="px-6 py-5">
+<div class="text-[0.8125rem] text-on-surface">Oct 05, 2023</div>
+<div class="text-[0.6875rem] text-on-surface-variant">by Marcus Aurelius</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 hover:bg-surface-container-highest rounded-full transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant/10 flex flex-col md:flex-row gap-4 items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="text-xs text-on-surface-variant font-medium">Rows per page:</span>
+<div class="relative">
+<select class="bg-surface-container-high border-none rounded-lg text-xs font-bold pl-3 pr-8 py-1.5 appearance-none focus:ring-1 focus:ring-primary">
+<option>10</option>
+<option selected="">25</option>
+<option>50</option>
+<option>100</option>
+</select>
+<span class="material-symbols-outlined absolute right-1.5 top-1/2 -translate-y-1/2 text-xs pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined">first_page</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-1 px-4">
+<span class="text-sm font-bold text-primary">1</span>
+<span class="text-sm font-medium text-on-surface-variant">of 6</span>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-all">
+<span class="material-symbols-outlined">last_page</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Secondary Layout Action Bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+<div class="bg-surface-container-high p-6 rounded-xl flex items-center gap-5 border border-outline-variant/10 hover:border-primary/20 transition-all cursor-pointer">
+<div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">insights</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface">Usage Analytics</h3>
+<p class="text-xs text-on-surface-variant">View which systems consume these schemas</p>
+</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl flex items-center gap-5 border border-outline-variant/10 hover:border-primary/20 transition-all cursor-pointer">
+<div class="h-12 w-12 rounded-full bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl">api</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface">Webhooks &amp; Listeners</h3>
+<p class="text-xs text-on-surface-variant">Trigger events on schema versioning</p>
+</div>
+</div>
+<div class="bg-surface-container-high p-6 rounded-xl flex items-center gap-5 border border-outline-variant/10 hover:border-primary/20 transition-all cursor-pointer">
+<div class="h-12 w-12 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-3xl">lock_open</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface">Permissions Matrix</h3>
+<p class="text-xs text-on-surface-variant">Manage role-based field accessibility</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

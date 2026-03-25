@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS PIM - Product Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#393939",
+              "outline": "#8d90a0",
+              "on-primary": "#002d6f",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary": "#5c1a00",
+              "on-secondary-fixed-variant": "#324575",
+              "surface-dim": "#131313",
+              "surface-variant": "#353534",
+              "surface-tint": "#b0c6ff",
+              "on-primary-fixed": "#001945",
+              "on-primary-container": "#cbd8ff",
+              "inverse-primary": "#0058cc",
+              "primary-container": "#0058cc",
+              "surface-container-highest": "#353534",
+              "secondary": "#b3c5fd",
+              "on-primary-fixed-variant": "#00419c",
+              "surface-container": "#201f1f",
+              "surface": "#131313",
+              "primary-fixed": "#d9e2ff",
+              "outline-variant": "#424654",
+              "on-tertiary-fixed": "#380d00",
+              "on-secondary-container": "#a1b4eb",
+              "tertiary-container": "#a93802",
+              "on-tertiary-container": "#ffcebd",
+              "primary-fixed-dim": "#b0c6ff",
+              "primary": "#b0c6ff",
+              "inverse-on-surface": "#313030",
+              "secondary-fixed": "#dae2ff",
+              "on-secondary": "#1a2e5d",
+              "error": "#ffb4ab",
+              "tertiary-fixed": "#ffdbcf",
+              "on-secondary-fixed": "#001847",
+              "on-background": "#e5e2e1",
+              "inverse-surface": "#e5e2e1",
+              "secondary-container": "#324575",
+              "tertiary": "#ffb59b",
+              "on-error-container": "#ffdad6",
+              "surface-container-lowest": "#0e0e0e",
+              "tertiary-fixed-dim": "#ffb59b",
+              "on-surface": "#e5e2e1",
+              "on-tertiary-fixed-variant": "#812800",
+              "error-container": "#93000a",
+              "secondary-fixed-dim": "#b3c5fd",
+              "on-surface-variant": "#c3c6d6",
+              "background": "#131313",
+              "on-error": "#690005",
+              "surface-container-low": "#1c1b1b"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .glass-panel {
+        background: rgba(53, 53, 52, 0.8);
+        backdrop-filter: blur(12px);
+      }
+      .primary-gradient {
+        background: linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%);
+      }
+    </style>
+</head>
+<body class="bg-surface text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 w-full z-50 bg-[#131313]/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full shadow-2xl shadow-black/20 font-['Inter'] antialiased">
+<div class="flex items-center gap-8">
+<div class="text-xl font-bold tracking-tight text-[#b0c6ff]">FlexCMS PIM</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-[#c3c6d6] hover:text-[#b0c6ff] transition-colors text-sm font-medium" href="#">Dashboard</a>
+<a class="text-[#b0c6ff] border-b-2 border-[#b0c6ff] pb-1 text-sm font-medium" href="#">Products</a>
+<a class="text-[#c3c6d6] hover:text-[#b0c6ff] transition-colors text-sm font-medium" href="#">Digital Assets</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-high rounded-lg group hover:bg-[#2a2a2a] transition-all duration-200">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 text-on-surface placeholder:text-outline/50" placeholder="Search SKU..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-[#2a2a2a] p-2 rounded-full transition-all duration-200 active:scale-95">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-[#2a2a2a] p-2 rounded-full transition-all duration-200 active:scale-95">settings</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close up headshot portrait of professional man with friendly expression in studio setting with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIzAFmCNToVCqppNX6x0BX-90aT69YEFC_loGwO3BJQtttSwOlgd-7tU8tksjfzkxc9frp_Sl-41jLtATPTdSa4UGSZdhXPJ_cjDyG1rXbCO_I5nsHfZ0T3o8wNmC3rztDhhBhes4MFvkbgl55RP0YfH7WhJbmkRLLDr3dDOw1o2drp0qf-3zcAOpo5YCf1Lahu3QWXzwsDzIIbxl_hoX2rbkwSy2qMIyelY7JnETvogNcWcs_B0hAwk77N-p3qoMrlqgOh5Ftow"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-[#1c1b1b] flex flex-col py-4 z-40">
+<div class="px-6 mb-8">
+<div class="text-lg font-black text-white">Admin Console</div>
+<div class="text-xs text-[#c3c6d6] opacity-70">PIM Module</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] opacity-70 hover:bg-[#201f1f] hover:opacity-100 transition-all ease-in-out duration-200 text-sm font-medium font-['Inter']" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 bg-[#2a2a2a] text-[#b0c6ff] border-r-4 border-[#b0c6ff] transition-all ease-in-out duration-200 text-sm font-medium font-['Inter']" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span>Products</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] opacity-70 hover:bg-[#201f1f] hover:opacity-100 transition-all ease-in-out duration-200 text-sm font-medium font-['Inter']" href="#">
+<span class="material-symbols-outlined">perm_media</span>
+<span>Digital Assets</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] opacity-70 hover:bg-[#201f1f] hover:opacity-100 transition-all ease-in-out duration-200 text-sm font-medium font-['Inter']" href="#">
+<span class="material-symbols-outlined">layers</span>
+<span>Collections</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-[#c3c6d6] opacity-70 hover:bg-[#201f1f] hover:opacity-100 transition-all ease-in-out duration-200 text-sm font-medium font-['Inter']" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Analytics</span>
+</a>
+</nav>
+<div class="mt-auto px-6 space-y-4">
+<button class="w-full py-2.5 rounded-lg primary-gradient text-on-primary font-bold text-sm shadow-lg shadow-primary/10 active:scale-95 transition-transform">
+                New Product
+            </button>
+<div class="pt-4 border-t border-outline-variant/10 space-y-1">
+<a class="flex items-center gap-3 py-2 text-[#c3c6d6] opacity-70 hover:opacity-100 text-sm font-medium font-['Inter']" href="#">
+<span class="material-symbols-outlined text-sm">history</span>
+<span>Version History</span>
+</a>
+<a class="flex items-center gap-3 py-2 text-[#c3c6d6] opacity-70 hover:opacity-100 text-sm font-medium font-['Inter']" href="#">
+<span class="material-symbols-outlined text-sm">contact_support</span>
+<span>Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-16 p-8 bg-surface-container min-h-[calc(100vh-64px)]">
+<!-- Sticky Editor Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm mb-2">
+<span>Products</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Electronics</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary">X-Series OLED</span>
+</div>
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface">SKU: OLED-992-PX</h1>
+<p class="text-on-surface-variant mt-1">Last modified: 2 hours ago by <span class="text-on-surface">Alex Rivera</span></p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-5 py-2.5 rounded-lg bg-surface-container-highest text-on-surface font-medium hover:bg-surface-bright transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">history</span>
+                    Version History
+                </button>
+<button class="px-5 py-2.5 rounded-lg bg-surface-container-highest text-on-surface font-medium hover:bg-surface-bright transition-all active:scale-95">
+                    Save Draft
+                </button>
+<button class="px-6 py-2.5 rounded-lg primary-gradient text-on-primary font-bold shadow-xl shadow-primary/20 active:scale-95 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">publish</span>
+                    Publish
+                </button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<!-- Form Section -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<!-- General Info Section -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-6 text-left group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">info</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-on-surface">General Info</h2>
+<p class="text-xs text-on-surface-variant">Basic product identification and identity</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface transition-colors">expand_more</span>
+</button>
+<div class="px-6 pb-8 grid grid-cols-2 gap-6">
+<div class="col-span-2">
+<label class="block text-xs font-bold uppercase tracking-wider text-outline mb-2">Product Name</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface transition-all rounded-t-lg px-4 py-3" type="text" value="Quantum X-Series Ultra OLED 55"/>
+<div class="absolute right-3 top-3 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary-container/30 text-secondary text-[10px] font-bold">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+                                    INHERITED
+                                </div>
+</div>
+</div>
+<div class="col-span-1">
+<label class="block text-xs font-bold uppercase tracking-wider text-outline mb-2">Brand</label>
+<select class="w-full bg-surface-container-highest border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 text-on-surface rounded-t-lg px-4 py-3">
+<option>Quantum Electronics</option>
+<option>Aether Home</option>
+</select>
+</div>
+<div class="col-span-1">
+<label class="block text-xs font-bold uppercase tracking-wider text-outline mb-2">Primary Category</label>
+<div class="flex items-center gap-2 px-4 py-3 bg-surface-container-highest rounded-t-lg text-on-surface">
+<span class="material-symbols-outlined text-sm text-outline">folder</span>
+<span class="text-sm">Home Theater / Displays</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Specs Section -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-6 text-left group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">memory</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-on-surface">Technical Specs</h2>
+<p class="text-xs text-on-surface-variant">Performance metrics and hardware details</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-on-surface transition-colors">expand_more</span>
+</button>
+<div class="px-6 pb-8 grid grid-cols-3 gap-4">
+<div class="p-4 bg-surface-container-highest rounded-lg flex flex-col gap-2">
+<span class="text-[10px] font-black text-outline uppercase">Resolution</span>
+<span class="text-on-surface font-semibold">3840 x 2160 (4K)</span>
+</div>
+<div class="p-4 bg-surface-container-highest rounded-lg flex flex-col gap-2">
+<span class="text-[10px] font-black text-outline uppercase">Refresh Rate</span>
+<span class="text-on-surface font-semibold">120Hz Native</span>
+</div>
+<div class="p-4 bg-surface-container-highest rounded-lg flex flex-col gap-2 border-l-2 border-primary/40">
+<span class="text-[10px] font-black text-primary uppercase">Panel Type</span>
+<input class="bg-transparent border-0 p-0 text-on-surface font-semibold focus:ring-0" type="text" value="True-Black OLED"/>
+</div>
+</div>
+</section>
+<!-- Asset Linker (DAM Picker) -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden">
+<div class="flex items-center justify-between p-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-on-secondary-fixed-variant/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">perm_media</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-on-surface">Asset Linker</h2>
+<p class="text-xs text-on-surface-variant">Manage linked media from central DAM</p>
+</div>
+</div>
+<button class="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                            Open DAM Picker
+                        </button>
+</div>
+<div class="px-6 pb-8">
+<div class="grid grid-cols-4 gap-4">
+<div class="aspect-square rounded-lg bg-surface-container-highest relative group overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="high quality product shot of a slim 4k oled television in a modern dark living room setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgdOncZuzy-bqk7UyS2foBA3CwMt-YwKXt36nNR2n-xzkyuIOdQeS9oi9AvxMkqbkTUTkD5Y5xQSesJ1xanYc67TQfPk8clwL_4nAdQyUu5lXIwfK0xCGkFtP0xoetTavMyt53Cho5N5yoYTXgMEtDIa8Ss626Dm_6kzseWByM0j-oLXwP884hoi3BeDkLXExIByDC_P9HyAxdy5OdlfN3MVF0CFjoxgkGwyT3uV7QaBXuzgh0PjlO1c8_94mE8MfqSqyde4-fdw"/>
+<div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="p-2 bg-surface-bright rounded-full text-white"><span class="material-symbols-outlined text-sm">visibility</span></button>
+<button class="p-2 bg-error-container rounded-full text-white"><span class="material-symbols-outlined text-sm">delete</span></button>
+</div>
+<div class="absolute top-2 left-2 px-2 py-0.5 bg-primary rounded text-[9px] font-black text-on-primary">HERO</div>
+</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest relative group overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close up of electronic components and glowing circuit boards representing high performance technology" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2HePFtokzMPLyIi6rn9BoC8yP_oGVD9MoR4QX9va-8COcOop45NKC9Ug2fWVGitf9duClQtMX7Q9SCK6xBQn3xun0EoMx2cec0uLJQuh5mhu2i596U-g4zF4VMVg4W7_8JxxbdpDXMchFO8mhJPySrhzl-9tCBTnJdjqOPhJYacWKUELIgbbVHe23aiGdgZCG29mOTgCer-nN8SS8hi_vrUBZAIVt1UmlMwcBtDeP2N61BaQq27rncsZbxCA8FuKqipUDwOesSg"/>
+<div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="p-2 bg-surface-bright rounded-full text-white"><span class="material-symbols-outlined text-sm">visibility</span></button>
+<button class="p-2 bg-error-container rounded-full text-white"><span class="material-symbols-outlined text-sm">delete</span></button>
+</div>
+</div>
+<button class="aspect-square rounded-lg border-2 border-dashed border-outline/20 hover:border-primary/50 transition-colors flex flex-col items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">upload_file</span>
+<span class="text-[10px] font-bold text-outline uppercase group-hover:text-primary transition-colors">Add Media</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Variants Sub-table -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden">
+<div class="p-6 border-b border-outline-variant/5 flex items-center justify-between">
+<h2 class="text-lg font-bold text-on-surface">Product Variants</h2>
+<span class="px-2.5 py-1 rounded bg-surface-container-highest text-on-surface-variant text-[10px] font-black">4 ACTIVE VARIANTS</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-highest/50">
+<tr>
+<th class="px-6 py-4 text-[11px] font-black text-outline uppercase tracking-widest">SKU Suffix</th>
+<th class="px-6 py-4 text-[11px] font-black text-outline uppercase tracking-widest">Region</th>
+<th class="px-6 py-4 text-[11px] font-black text-outline uppercase tracking-widest">Stock</th>
+<th class="px-6 py-4 text-[11px] font-black text-outline uppercase tracking-widest">Status</th>
+<th class="px-6 py-4 text-[11px] font-black text-outline uppercase tracking-widest">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-highest/30 transition-colors">
+<td class="px-6 py-4 text-sm font-medium">-NA-BLK</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">North America</td>
+<td class="px-6 py-4 text-sm font-semibold">1,240</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary shadow-sm shadow-primary"></div>
+<span class="text-xs font-bold text-on-surface uppercase">Live</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary">edit_square</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/30 transition-colors">
+<td class="px-6 py-4 text-sm font-medium">-EU-SLV</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">Europe</td>
+<td class="px-6 py-4 text-sm font-semibold">412</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-error shadow-sm shadow-error"></div>
+<span class="text-xs font-bold text-on-surface uppercase">OOS</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary">edit_square</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Side Panel (Quick Nav / Status Summary) -->
+<aside class="col-span-12 lg:col-span-4 space-y-6">
+<!-- Completeness Score Card -->
+<div class="bg-surface-container-low p-6 rounded-xl relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-sm font-bold text-outline uppercase tracking-widest">Data Health</h3>
+<span class="text-primary font-black text-2xl">84%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded-full mb-6">
+<div class="bg-primary h-full rounded-full" style="width: 84%"></div>
+</div>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                Schema validation passed
+                            </li>
+<li class="flex items-center gap-3 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                Assets linked (2/2)
+                            </li>
+<li class="flex items-center gap-3 text-xs text-error">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                                Missing meta tags for SEO
+                            </li>
+</ul>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-[120px]">health_and_safety</span>
+</div>
+</div>
+<!-- Navigation Rail -->
+<div class="bg-surface-container-low rounded-xl py-4">
+<div class="px-6 mb-4">
+<h3 class="text-xs font-black text-outline uppercase tracking-widest">Quick Navigation</h3>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center justify-between px-6 py-3 border-l-4 border-primary bg-primary/5 text-on-surface" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">info</span>
+<span class="text-sm font-semibold">General Info</span>
+</div>
+<span class="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded">AUTO-FILLED</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-on-surface">memory</span>
+<span class="text-sm font-medium group-hover:text-on-surface">Technical Specs</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-on-surface">alt_route</span>
+<span class="text-sm font-medium group-hover:text-on-surface">Variants</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-on-surface">image</span>
+<span class="text-sm font-medium group-hover:text-on-surface">Asset Linker</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-highest transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-on-surface">language</span>
+<span class="text-sm font-medium group-hover:text-on-surface">Localization</span>
+</a>
+</nav>
+</div>
+<!-- Live Preview Context -->
+<div class="bg-surface-container-low p-4 rounded-xl">
+<div class="aspect-video rounded-lg bg-surface-container-highest mb-4 overflow-hidden relative group">
+<img class="w-full h-full object-cover" data-alt="modern web store product page mockup showing a high end television with clean white interface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYcpfxR_Xi9B7OeU7Z8VnEBYa0-2jkzjZ1KNcncpIp3XSMPqAsB0izrp9hZAeTXA-pnoovdYe0LMvXNKErFhQNa_aJU1J03QpavLcpTUgVkKkYj8mtYTLblgbDkq1cJb-ckeBm1ppsybxTBRWaFbUTwpWNbWIzOLflpwdQOwbv6aNUmOlLUQKzGh8pmPVWU5jIFC9Awpx1FceAUr1jCiGhCnrE2xgtTVfF_bzE1FxmQxwsQZBeaPgRJBqehV-qlEseM8T2j2TZ-Q"/>
+<div class="absolute inset-0 bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="bg-surface px-4 py-2 rounded-full text-xs font-bold text-primary shadow-lg">Preview Live Store</button>
+</div>
+</div>
+<h4 class="text-sm font-bold text-on-surface">Digital Storefront Sync</h4>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">This product is currently mapped to the 'Premium Home' storefront channel.</p>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

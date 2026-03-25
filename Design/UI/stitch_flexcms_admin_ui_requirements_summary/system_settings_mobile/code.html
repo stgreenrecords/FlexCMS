@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS - System Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#131313",
+              "on-surface": "#e5e2e1",
+              "surface-container-highest": "#353534",
+              "surface-bright": "#393939",
+              "tertiary-fixed-dim": "#ffb59b",
+              "on-secondary": "#1a2e5d",
+              "on-tertiary-fixed-variant": "#812800",
+              "primary-fixed": "#d9e2ff",
+              "outline-variant": "#424654",
+              "tertiary-fixed": "#ffdbcf",
+              "surface-variant": "#353534",
+              "on-error": "#690005",
+              "tertiary": "#ffb59b",
+              "secondary-container": "#324575",
+              "surface-container-low": "#1c1b1b",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-container": "#201f1f",
+              "on-primary-container": "#cbd8ff",
+              "background": "#131313",
+              "on-tertiary-fixed": "#380d00",
+              "on-secondary-container": "#a1b4eb",
+              "tertiary-container": "#a93802",
+              "on-secondary-fixed-variant": "#324575",
+              "outline": "#8d90a0",
+              "inverse-primary": "#0058cc",
+              "on-secondary-fixed": "#001847",
+              "inverse-on-surface": "#313030",
+              "error": "#ffb4ab",
+              "primary-container": "#0058cc",
+              "on-primary-fixed-variant": "#00419c",
+              "surface-container-high": "#2a2a2a",
+              "surface-tint": "#b0c6ff",
+              "on-primary-fixed": "#001945",
+              "surface-dim": "#131313",
+              "primary-fixed-dim": "#b0c6ff",
+              "secondary-fixed": "#dae2ff",
+              "primary": "#b0c6ff",
+              "on-tertiary-container": "#ffcebd",
+              "on-surface-variant": "#c3c6d6",
+              "on-primary": "#002d6f",
+              "secondary-fixed-dim": "#b3c5fd",
+              "error-container": "#93000a",
+              "on-background": "#e5e2e1",
+              "inverse-surface": "#e5e2e1",
+              "secondary": "#b3c5fd",
+              "on-tertiary": "#5c1a00",
+              "on-error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopAppBar Shell -->
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-4 h-16 w-full bg-[#131313]/80 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<button class="text-[#b0c6ff] active:scale-95 duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Inter'] text-xl font-bold bg-gradient-to-r from-[#b0c6ff] to-[#0058cc] bg-clip-text text-transparent tracking-tight">FlexCMS</h1>
+</div>
+<div class="h-8 w-8 rounded-full bg-surface-container-high border border-outline-variant/15 overflow-hidden">
+<img alt="User Profile" class="h-full w-full object-cover" data-alt="Close up portrait of a professional system administrator in a clean modern office setting with soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUytvWUhLdWDpSLEFb3-O52hBPaoI62cSZPIwvAAUYRb3vwgFhLsKi05427MKxA9Ly32hNGXk5_lj0o-4PfSDIm-a1gQ1LKXY32umOOlvlMz_WyFIMfOmoukkMUsLeeIwUB1mLruWtX7adLyGO13IvFuB4n6Ulpfv7IISNQqGW88pbq6FsthNyfPTXai9wnx-QkgCkvtWI5SirynO2YjvfpBMa69MaA18kILlfD2cBE8mDUcVsKtG8_Jcqk6_73GOiAIbzC37IEg"/>
+</div>
+</header>
+<main class="pt-20 pb-24 px-4 max-w-[375px] mx-auto min-h-screen">
+<!-- Header Section -->
+<header class="mb-8">
+<h2 class="font-headline text-3xl font-extrabold tracking-tight text-on-surface mb-1">Settings</h2>
+<p class="text-on-surface-variant font-label text-sm uppercase tracking-widest">Configuration Console</p>
+</header>
+<!-- Search Bar (Custom Component) -->
+<div class="relative mb-6">
+<div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">search</span>
+</div>
+<input class="w-full bg-surface-container-high border-b border-outline-variant/30 py-3 pl-10 pr-4 rounded-t-lg focus:outline-none focus:border-primary transition-colors text-sm placeholder:text-on-surface-variant/50" placeholder="Search parameters..." type="text"/>
+</div>
+<!-- Vertical Expandable List -->
+<div class="space-y-4">
+<!-- General Settings Category -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-5 active:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-secondary-container/30 text-primary">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div class="text-left">
+<h3 class="font-headline font-bold text-on-surface">General</h3>
+<p class="text-xs text-on-surface-variant">Locale, timezone, core engine</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+</section>
+<!-- Themes Settings Category (Open State Simulation) -->
+<section class="bg-surface-container rounded-xl overflow-hidden outline outline-1 outline-outline-variant/10 shadow-xl">
+<button class="w-full flex items-center justify-between p-5 bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">palette</span>
+</div>
+<div class="text-left">
+<h3 class="font-headline font-bold text-primary">Themes</h3>
+<p class="text-xs text-on-primary-container/70">UI aesthetic &amp; brand tokens</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary rotate-180 transition-transform">expand_more</span>
+</button>
+<!-- Detailed Form View -->
+<div class="p-5 space-y-6 bg-surface-container">
+<!-- Switch Control -->
+<div class="flex items-center justify-between">
+<div>
+<label class="block font-headline text-sm font-semibold text-on-surface">Dark Mode</label>
+<span class="text-xs text-on-surface-variant">Force architectural dark theme</span>
+</div>
+<button class="w-12 h-6 bg-primary rounded-full relative">
+<div class="absolute right-1 top-1 w-4 h-4 bg-on-primary rounded-full shadow-sm"></div>
+</button>
+</div>
+<!-- Choice Grid -->
+<div>
+<label class="block font-headline text-sm font-semibold text-on-surface mb-3">Accent Palette</label>
+<div class="grid grid-cols-4 gap-3">
+<div class="h-10 rounded-lg bg-primary border-2 border-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-sm">check</span>
+</div>
+<div class="h-10 rounded-lg bg-tertiary border border-outline-variant/20"></div>
+<div class="h-10 rounded-lg bg-[#b3fdc5] border border-outline-variant/20"></div>
+<div class="h-10 rounded-lg bg-[#fdb3f3] border border-outline-variant/20"></div>
+</div>
+</div>
+<!-- Number Input -->
+<div>
+<label class="block font-headline text-sm font-semibold text-on-surface mb-1">Backdrop Blur</label>
+<div class="flex items-center gap-4">
+<input class="flex-grow accent-primary h-1 bg-surface-container-highest rounded-lg appearance-none cursor-pointer" type="range"/>
+<span class="font-mono text-xs text-primary">12px</span>
+</div>
+</div>
+<!-- Form Action -->
+<button class="w-full py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold rounded-lg active:scale-95 transition-transform shadow-lg shadow-primary/10">
+                        Apply Changes
+                    </button>
+</div>
+</section>
+<!-- API Settings Category -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-5 active:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-secondary-container/30 text-primary">
+<span class="material-symbols-outlined">api</span>
+</div>
+<div class="text-left">
+<h3 class="font-headline font-bold text-on-surface">API</h3>
+<p class="text-xs text-on-surface-variant">Endpoints, keys, &amp; webhooks</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+</section>
+<!-- Users Settings Category -->
+<section class="bg-surface-container-low rounded-xl overflow-hidden">
+<button class="w-full flex items-center justify-between p-5 active:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 flex items-center justify-center rounded-lg bg-secondary-container/30 text-primary">
+<span class="material-symbols-outlined">group_add</span>
+</div>
+<div class="text-left">
+<h3 class="font-headline font-bold text-on-surface">Permissions</h3>
+<p class="text-xs text-on-surface-variant">Role mapping and access</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</button>
+</section>
+</div>
+<!-- System Status Banner (Small Bento-style info) -->
+<div class="mt-8 p-4 bg-[#b0c6ff]/5 rounded-xl border border-primary/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">info</span>
+<div>
+<h4 class="text-sm font-bold text-primary">Cloud Sync Active</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">System is currently synchronizing with the master repository. Some changes may take up to 60s to propagate.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-[#131313]/90 backdrop-blur-xl border-t border-[#424654]/15 flex justify-around items-center h-16 px-2">
+<div class="flex flex-col items-center justify-center text-[#c3c6d6] opacity-70 hover:opacity-100 transition-transform active:scale-90">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-['Inter'] text-[10px] font-semibold">Catalog</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#c3c6d6] opacity-70 hover:opacity-100 transition-transform active:scale-90">
+<span class="material-symbols-outlined">history</span>
+<span class="font-['Inter'] text-[10px] font-semibold">History</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#c3c6d6] opacity-70 hover:opacity-100 transition-transform active:scale-90">
+<span class="material-symbols-outlined">upload_file</span>
+<span class="font-['Inter'] text-[10px] font-semibold">Import</span>
+</div>
+<!-- Active Tab: Admin/Settings -->
+<div class="flex flex-col items-center justify-center bg-[#324575] text-[#b0c6ff] rounded-full px-4 py-1 transition-transform active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+<span class="font-['Inter'] text-[10px] font-semibold">Admin</span>
+</div>
+</nav>
+<!-- FAB Suppression: On Detail/Settings pages FAB is suppressed per the Shell Visibility rules -->
+</body></html>

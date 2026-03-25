@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FlexCMS - User Management (Mobile)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#324575",
+                        "on-primary": "#002d6f",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "tertiary-container": "#a93802",
+                        "tertiary-fixed": "#ffdbcf",
+                        "surface-bright": "#393939",
+                        "on-primary-fixed": "#001945",
+                        "primary-fixed": "#d9e2ff",
+                        "outline-variant": "#424654",
+                        "on-tertiary": "#5c1a00",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "secondary-fixed": "#dae2ff",
+                        "on-primary-container": "#cbd8ff",
+                        "surface-dim": "#131313",
+                        "surface-tint": "#b0c6ff",
+                        "on-tertiary-fixed": "#380d00",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "on-background": "#e5e2e1",
+                        "secondary": "#b3c5fd",
+                        "primary-container": "#0058cc",
+                        "on-primary-fixed-variant": "#00419c",
+                        "surface-container-highest": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed": "#001847",
+                        "surface-container": "#201f1f",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "primary": "#b0c6ff",
+                        "on-surface-variant": "#c3c6d6",
+                        "inverse-primary": "#0058cc",
+                        "surface-container-high": "#2a2a2a",
+                        "tertiary": "#ffb59b",
+                        "surface-variant": "#353534",
+                        "surface": "#131313",
+                        "secondary-container": "#324575",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "on-tertiary-container": "#ffcebd",
+                        "on-secondary": "#1a2e5d",
+                        "error-container": "#93000a",
+                        "background": "#131313",
+                        "on-secondary-container": "#a1b4eb",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-container-low": "#1c1b1b",
+                        "outline": "#8d90a0"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Mobile Header -->
+<nav class="fixed top-0 w-full z-50 bg-[#131313]/90 backdrop-blur-xl flex items-center justify-between px-4 h-16 shadow-[0_4px_24px_rgba(0,0,0,0.1)] border-b border-outline-variant/10">
+<div class="flex items-center gap-3">
+<button class="p-2 -ml-2 text-gray-400 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<span class="text-lg font-bold tracking-tight text-white">FlexCMS</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-gray-400 hover:bg-[#2a2a2a] transition-all rounded-md">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full bg-surface-container-highest border border-outline-variant/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIvRiBeeJt-A1apIm5_9O1t8Ij8Uixybd38WedRWgUzz6x2XyrygMjFtS0XhMyqj-vjfbdkhplNwaznnPofLdCBY26IRNAtrNr8RDsT17Apz0AvB7FwZ_4-18O24ZmaW0XPkvWkRpts5UE11LuAle4ldOlF5xQnnySDIfPOUqfl-dhGgtqlMjVBH-KIq_4_GFIcgY1IcuZ0vTlc2ruUc91ZFx_b6NkQDf7bBJBBLEI7T8jcwI9MV7_2AEklpfKiaoQ-lCWvf3UAw"/>
+</div>
+</nav>
+<main class="pt-16 min-h-screen bg-surface-container">
+<div class="p-4 flex flex-col gap-6">
+<header>
+<div class="flex items-start justify-between mb-2">
+<h1 class="text-2xl font-extrabold tracking-tight text-on-surface font-headline">User Management</h1>
+</div>
+<p class="text-sm text-on-surface-variant mb-4">Manage permissions and monitor access logs.</p>
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.98] shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-xl" data-icon="person_add">person_add</span>
+                    Invite User
+                </button>
+</header>
+<!-- Search and Filter -->
+<div class="flex flex-col gap-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="w-full bg-surface-container-high border border-outline-variant/10 focus:border-primary focus:ring-1 focus:ring-primary/20 rounded-lg pl-10 pr-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 transition-all" placeholder="Search users..." type="text"/>
+</div>
+<div class="flex gap-2">
+<div class="relative flex-grow">
+<select class="w-full bg-surface-container-high border border-outline-variant/10 focus:border-primary focus:ring-1 focus:ring-primary/20 rounded-lg px-4 py-2.5 text-sm text-on-surface appearance-none cursor-pointer">
+<option>All Roles</option>
+<option>Administrator</option>
+<option>Editor</option>
+<option>Viewer</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-sm" data-icon="expand_more">expand_more</span>
+</div>
+<button class="p-2.5 bg-surface-container-high border border-outline-variant/10 rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Mobile List of Expandable Cards -->
+<div class="space-y-3">
+<!-- User Card 1 -->
+<div class="bg-surface-container-high rounded-xl border border-outline-variant/5 overflow-hidden shadow-sm">
+<div class="p-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-primary/10 flex-shrink-0">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJNdZt7Bhrw342MUiITpKHcsJxr0U6pF1SuTscF3OscprjfxSC1dKCYa8yUE-CqCEX4qu3zJ69sEsr4cjBeuumFUNgeGjjM7hhPV5LI7bVpUbWS31-v68Qs9RaJ-vxkKugxFxh34FRqAQg3CRnxIlGP6ShECCTysLlxr6wGdXQaCHejjMinjEn7TMAC6D1MA_VVL8uSmLiwtl9XYievDCp0wjaWiTx785J5hlaBcKMbAwQG5-KZ1ZgM-7PE9lM_FGgmWg72MsN1Q"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center justify-between mb-0.5">
+<h3 class="text-sm font-bold text-on-surface leading-none">Alex Rivers</h3>
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+<span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Active</span>
+</div>
+</div>
+<p class="text-[11px] text-on-surface-variant/70 mb-2 truncate">alex.rivers@flexcms.io</p>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-md">Administrator</span>
+</div>
+<button class="p-2 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+<!-- User Card 2 -->
+<div class="bg-surface-container-high rounded-xl border border-outline-variant/5 overflow-hidden shadow-sm">
+<div class="p-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-primary/10 flex-shrink-0">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTNQKNX-xXGtleC_A76I8rIZEkxbET-cZfKC9me7Tfvp_wS08ztPjeHr1gtAnjcOfJyYosZEFmxrJLMVrUmeP_xmtLffOc6iR3dfy0Wnbw54KTrrswzB642ZePF-oHNyr0ZwrOFLlch7rG1aNAUudG7cI6fEi5XEzX1POjVLAnxsielEc4pU3WKpXp_fEs6nxwDG8AZRNgAJabv3kxbpeQd18Fke3AzY96FdqnOvA0nB40-JsMgb2xFJ4C9K8bjTrtTZlxxEC7gg"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center justify-between mb-0.5">
+<h3 class="text-sm font-bold text-on-surface leading-none">Elena Vance</h3>
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+<span class="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Active</span>
+</div>
+</div>
+<p class="text-[11px] text-on-surface-variant/70 mb-2 truncate">elena.v@flexcms.io</p>
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded-md">Editor</span>
+</div>
+<button class="p-2 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+<!-- User Card 3 (Expanded Example State Simulation) -->
+<div class="bg-surface-container-high rounded-xl border border-primary/20 overflow-hidden shadow-md">
+<div class="p-4 flex items-center gap-4 border-b border-outline-variant/5">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-primary/10 flex-shrink-0">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl2dlCaMdw1Wsdku8UuqJIj2mwdFkUCsS9i_cosMvCZ6YiOnR_TKyUJvEUWK3svc6OsncwF5lrwGc-6ZqtQzKIdyK5uJSjcIwXEAq8aYQ3y6zv1c-Fd7tZBHvoZrqMgmg_Hd3QGDXw-3mY6fBUmO9o5KXWJ8eePALGwVXyDHyVJdGV1G8YhLqNaGhhyNLmbTvEJnLLalDicHHQvadRndg-g2er0U3lF-z37zVBCTK11AY2ypSOAY69oj_JJBtxiI0z1PQKZZnbOw"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center justify-between mb-0.5">
+<h3 class="text-sm font-bold text-on-surface leading-none">Marcus Thorne</h3>
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-on-surface-variant/30"></div>
+<span class="text-[10px] uppercase font-bold text-on-surface-variant/50 tracking-wider">Offline</span>
+</div>
+</div>
+<p class="text-[11px] text-on-surface-variant/70 mb-2 truncate">m.thorne@partner.com</p>
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded-md">Viewer</span>
+</div>
+<button class="p-2 text-primary rotate-180 transition-transform">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<div class="bg-surface-container-highest/10 p-4 space-y-4">
+<div class="flex items-center justify-between text-xs">
+<span class="text-on-surface-variant">Last Login</span>
+<span class="text-on-surface font-medium">Yesterday</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-on-surface-variant">Member Since</span>
+<span class="text-on-surface font-medium">Jan 12, 2024</span>
+</div>
+<div class="flex gap-2 pt-2">
+<button class="flex-grow bg-surface-container-highest text-on-surface text-xs font-bold py-2 rounded-md flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="edit">edit</span> Edit
+                            </button>
+<button class="flex-grow bg-error-container/20 text-error text-xs font-bold py-2 rounded-md flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="block">block</span> Block
+                            </button>
+</div>
+</div>
+</div>
+<!-- User Card 4 (Deactivated) -->
+<div class="bg-surface-container-high rounded-xl border border-outline-variant/5 overflow-hidden shadow-sm opacity-80">
+<div class="p-4 flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-error-container/10 flex-shrink-0 grayscale">
+<img alt="User" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlY3y26lDYB-2LNVJMjjJOvMQHyLZ-uWQdHdsk1Z_Wth8Ea8MTphysMfCfODyBM2FcqJ1KpKgt8d7D6DrF5invYMKN0JBedV_txxuNTwCPgY5ofQz6LMiHnNkSBNbbjfeSNqK18sxVEE-I-nASr39HraWgcagSUkZl1toM6yOqd1e_w0cR9u0M8o9E_u3z1_QSDY7kQ7rcFXQuHhagz7f7Wds5h4n7oIonlJGijYnbmmO0KnIZPAoSdUwyCqzO2jggPnzlc0FlKw"/>
+</div>
+<div class="flex-grow">
+<div class="flex items-center justify-between mb-0.5">
+<h3 class="text-sm font-bold text-on-surface leading-none">Sarah Connor</h3>
+<div class="flex items-center gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-error"></div>
+<span class="text-[10px] uppercase font-bold text-error tracking-wider">Deactivated</span>
+</div>
+</div>
+<p class="text-[11px] text-on-surface-variant/70 mb-2 truncate">sarah.c@flexcms.io</p>
+<span class="px-2 py-0.5 bg-surface-container-highest text-on-surface-variant text-[10px] font-bold rounded-md">Editor</span>
+</div>
+<button class="p-2 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Pagination Mobile -->
+<div class="flex items-center justify-between bg-surface-container-high p-4 rounded-xl border border-outline-variant/5">
+<span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Showing 1-4 of 128</span>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface-variant" disabled="">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary text-xs font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-lg bg-surface-container-highest text-on-surface-variant">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Info Cards Section (Mobile Layout) -->
+<div class="grid grid-cols-1 gap-4 mt-4">
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl" data-icon="security" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<h3 class="font-bold text-on-surface text-sm">Security Audit</h3>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">Review recent authentication attempts and permission changes across the system.</p>
+<a class="text-primary text-[11px] font-bold flex items-center gap-1" href="#">
+                        VIEW AUDIT LOG <span class="material-symbols-outlined text-[14px]" data-icon="open_in_new">open_in_new</span>
+</a>
+</div>
+<div class="bg-surface-container-low p-5 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-xl" data-icon="admin_panel_settings" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+</div>
+<h3 class="font-bold text-on-surface text-sm">Role Editor</h3>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">Customize permission sets and create custom user roles for your organization.</p>
+<a class="text-secondary text-[11px] font-bold flex items-center gap-1" href="#">
+                        MANAGE ROLES <span class="material-symbols-outlined text-[14px]" data-icon="open_in_new">open_in_new</span>
+</a>
+</div>
+</div>
+<footer class="mt-8 pb-12 text-center">
+<p class="text-[10px] text-on-surface-variant opacity-40 uppercase tracking-[0.2em]">FlexCMS Enterprise v2.4.0</p>
+</footer>
+</div>
+</main>
+<!-- Navigation Overlay (Simulated hidden state) -->
+<div class="fixed inset-0 bg-black/60 z-[60] opacity-0 pointer-events-none transition-opacity"></div>
+<aside class="fixed top-0 left-0 h-full w-[280px] bg-[#1c1b1b] z-[70] transform -translate-x-full transition-transform duration-300 flex flex-col pt-4">
+<div class="px-6 py-4 mb-4 border-b border-outline-variant/10">
+<h2 class="text-[#b0c6ff] font-bold text-xl leading-tight">FlexCMS</h2>
+<p class="text-on-surface-variant text-xs">System Administration</p>
+</div>
+<div class="flex flex-col gap-1 px-4">
+<a class="text-gray-400 px-4 py-3 hover:text-white rounded-lg flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-gray-400 px-4 py-3 hover:text-white rounded-lg flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                Content
+            </a>
+<a class="text-gray-400 px-4 py-3 hover:text-white rounded-lg flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="perm_media">perm_media</span>
+                Media
+            </a>
+<a class="bg-primary/10 text-primary font-bold rounded-lg px-4 py-3 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+                Users
+            </a>
+<a class="text-gray-400 px-4 py-3 hover:text-white rounded-lg flex items-center gap-3" href="#">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+                Themes
+            </a>
+</div>
+<div class="mt-auto p-4 border-t border-outline-variant/10">
+<a class="text-gray-400 px-4 py-3 flex items-center gap-3 text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                Logout
+            </a>
+</div>
+</aside>
+</body></html>

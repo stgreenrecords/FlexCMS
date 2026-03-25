@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Enterprise Admin - DAM Browser</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#001945",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-tertiary": "#5c1a00",
+                        "on-primary": "#002d6f",
+                        "background": "#131313",
+                        "on-error": "#690005",
+                        "outline": "#8d90a0",
+                        "on-secondary-fixed-variant": "#324575",
+                        "inverse-primary": "#0058cc",
+                        "primary-fixed": "#d9e2ff",
+                        "on-tertiary-container": "#ffcebd",
+                        "tertiary-container": "#a93802",
+                        "surface": "#131313",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed": "#001847",
+                        "on-secondary": "#1a2e5d",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-bright": "#393939",
+                        "secondary-fixed": "#dae2ff",
+                        "on-background": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#812800",
+                        "outline-variant": "#424654",
+                        "error": "#ffb4ab",
+                        "error-container": "#93000a",
+                        "surface-tint": "#b0c6ff",
+                        "primary-container": "#0058cc",
+                        "on-primary-container": "#cbd8ff",
+                        "surface-container-highest": "#353534",
+                        "surface-container": "#201f1f",
+                        "on-tertiary-fixed": "#380d00",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary-fixed-dim": "#b3c5fd",
+                        "on-primary-fixed-variant": "#00419c",
+                        "tertiary-fixed": "#ffdbcf",
+                        "tertiary": "#ffb59b",
+                        "surface-variant": "#353534",
+                        "on-secondary-container": "#a1b4eb",
+                        "inverse-surface": "#e5e2e1",
+                        "primary": "#b0c6ff",
+                        "on-surface-variant": "#c3c6d6",
+                        "surface-dim": "#131313",
+                        "tertiary-fixed-dim": "#ffb59b",
+                        "secondary-container": "#324575",
+                        "secondary": "#b3c5fd",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "inverse-on-surface": "#313030",
+                        "on-error-container": "#ffdad6"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1c1b1b; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #424654; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary/30 antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313] backdrop-blur-xl bg-opacity-80 border-b border-[#424654]/15 shadow-[0_8px_32px_rgba(0,0,0,0.06)] font-['Inter'] antialiased">
+<div class="flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tight text-[#b0c6ff]">Enterprise Admin</span>
+<div class="hidden md:flex items-center bg-surface-container-high rounded-lg px-3 py-1.5 gap-2 border border-outline-variant/10">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">search</span>
+<input class="bg-transparent border-none text-sm focus:ring-0 text-on-surface placeholder-on-surface-variant w-64" placeholder="Search assets..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-lg text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 rounded-lg text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 rounded-lg text-[#c3c6d6] hover:bg-[#2a2a2a] transition-colors duration-200 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary-container overflow-hidden border border-primary/20">
+<img alt="User profile" data-alt="Close-up professional portrait of a tech executive with a neutral expression and clean studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBufzU-HPYHPJwsHnDyhruUoTOYnPGqAmHP8pakWEXpPQUKOJjYYYDLYMjleBJucWhzODHvyvLWe3QitiJnUpV71YaRn4-pdjFbSsTkveEQpCwOtSf7RBPpi1R_dhS3Q4tO_gGNwHY4N1J8rkUSdHUvsJjbM_69h8t_f3XKJ5sH63FI2icGznP0o9xwk0sjGkUIxhMkuxlnWdJD0fgXhyCznhIJhzrQeOCJwXuLZIEnkbijOlCOviXrLnZNR9Oqdv5RuPpC6pYSwg"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 bg-[#1c1b1b] flex flex-col py-6 px-4 gap-2 pt-20">
+<div class="px-4 mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">inventory_2</span>
+</div>
+<div>
+<h2 class="text-lg font-black text-white leading-none">System Core</h2>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">v4.2.0</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#c3c6d6] hover:text-white hover:bg-[#2a2a2a] rounded-md transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 bg-[#b0c6ff] text-[#002d6f] rounded-md transition-all duration-150 ease-in-out font-semibold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span>Inventory</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#c3c6d6] hover:text-white hover:bg-[#2a2a2a] rounded-md transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#c3c6d6] hover:text-white hover:bg-[#2a2a2a] rounded-md transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Users</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#c3c6d6] hover:text-white hover:bg-[#2a2a2a] rounded-md transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span>Compliance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-[#c3c6d6] hover:text-white hover:bg-[#2a2a2a] rounded-md transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">archive</span>
+<span>Archive</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant/10 pt-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-[#c3c6d6] hover:text-white hover:bg-[#2a2a2a] rounded-md transition-all" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-[#c3c6d6] hover:text-white hover:bg-[#2a2a2a] rounded-md transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="pl-64 pt-16 min-h-screen bg-surface-container">
+<!-- Contextual Header -->
+<div class="px-8 py-6 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<div>
+<h1 class="text-3xl font-extrabold tracking-tight text-white">DAM Browser</h1>
+<p class="text-on-surface-variant text-sm mt-1">Manage and orchestrate your digital assets across the enterprise.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-md transition-colors text-sm font-medium">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                        Filter
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-md shadow-lg shadow-primary/10 transition-transform active:scale-95 text-sm font-bold">
+<span class="material-symbols-outlined text-lg">upload</span>
+                        Upload Asset
+                    </button>
+</div>
+</div>
+<!-- Dashboard Sub-Navigation / Filter Bar -->
+<div class="flex items-center justify-between bg-surface-container-low p-2 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-1">
+<button class="px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-lg text-xs font-semibold uppercase tracking-wider">All Assets</button>
+<button class="px-4 py-1.5 text-on-surface-variant hover:text-on-surface text-xs font-semibold uppercase tracking-wider transition-colors">Images</button>
+<button class="px-4 py-1.5 text-on-surface-variant hover:text-on-surface text-xs font-semibold uppercase tracking-wider transition-colors">Videos</button>
+<button class="px-4 py-1.5 text-on-surface-variant hover:text-on-surface text-xs font-semibold uppercase tracking-wider transition-colors">Documents</button>
+</div>
+<div class="flex items-center gap-4 px-2">
+<div class="flex bg-surface-container rounded-lg p-0.5 border border-outline-variant/10">
+<button class="p-1.5 text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-lg">grid_view</span>
+</button>
+<button class="p-1.5 bg-surface-container-highest text-primary rounded-md shadow-sm">
+<span class="material-symbols-outlined text-lg">format_list_bulleted</span>
+</button>
+</div>
+</div>
+</div>
+<!-- High Density Data Table -->
+<div class="bg-surface-container-low rounded-2xl overflow-hidden shadow-2xl shadow-black/20 border border-outline-variant/5">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50 text-on-surface-variant text-[11px] font-bold uppercase tracking-widest border-b border-outline-variant/10">
+<th class="px-6 py-4 w-10">
+<input class="rounded border-outline-variant/30 bg-surface-container text-primary focus:ring-primary/20" type="checkbox"/>
+</th>
+<th class="px-4 py-4 w-16 text-center">Preview</th>
+<th class="px-4 py-4">Asset Name</th>
+<th class="px-4 py-4">Type</th>
+<th class="px-4 py-4">Size</th>
+<th class="px-4 py-4">Dimensions</th>
+<th class="px-4 py-4">Last Modified</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/5">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant/30 bg-surface-container text-primary focus:ring-primary/20" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="w-10 h-10 rounded bg-surface-container-highest overflow-hidden border border-outline-variant/20">
+<img alt="Asset Preview" class="w-full h-full object-cover" data-alt="Abstract 3D digital art rendering with flowing organic curves in deep blue and purple metallic finish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKBNj7VkizjOfPDp1L6jhTvyDwLNehRp4VyIhQkuxf4xEvKGtOSp6HPdj0fbMdVavbyslOKj0kQpLKMO_TP7ginKvxV9YdAArEyewUZijPuTvEFDD4pLmipijmT0fi_Mt51XnBc584bzyq2twcYU7RD4Z6Nko-S3h3q50TRduCX-KdP27r67O58ti1pPszg3w6HClhD03enj2FJPpazGeM04o-_Eetn42UwO8Bp2Y7WQO1WKcCJXhTP_pjz2UIWwdP1mksLyV6mQ"/>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="text-sm font-semibold text-white">campaign_hero_v2.jpg</span>
+<span class="block text-[10px] text-on-surface-variant">path/marketing/2024/winter</span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container/30 text-secondary uppercase tracking-tight">Image/JPEG</span>
+</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">4.2 MB</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">3840 × 2160</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">2 hours ago</td>
+<td class="px-6 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-3">
+<input checked="" class="rounded border-outline-variant/30 bg-surface-container text-primary focus:ring-primary/20" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="w-10 h-10 rounded bg-surface-container-highest flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-xl">description</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="text-sm font-semibold text-white">brand_guidelines_2024.pdf</span>
+<span class="block text-[10px] text-on-surface-variant">path/design/internal</span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-tertiary-container/30 text-tertiary uppercase tracking-tight">PDF</span>
+</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">12.8 MB</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">—</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">Oct 12, 2023</td>
+<td class="px-6 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant/30 bg-surface-container text-primary focus:ring-primary/20" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="w-10 h-10 rounded bg-surface-container-highest overflow-hidden border border-outline-variant/20">
+<img alt="Asset Preview" class="w-full h-full object-cover" data-alt="High-tech workspace with multiple monitors showing code and cyber security dashboard in a futuristic neon lit room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlwFuFbVkXL6QGGu29DIeGYnO8F_c5dQVIUat1P3cL0f1ff7UGyJ5D4C2OI4fyddDvl86nHX8Lk0JINCZK_5_APIyXf7swFDX2FnYLwmkuASPfZWAMbdLT55ZV7gqU19CPL8NdgBor-uzrcQW76yEvf_1kXw8BNMeaR_kPOxWLHGxRC01H4aHhHLKb0_Hfu3tobfLsQZS5XnACIUSKVrOJby1_uopoLVsJlhLaqBY0Tpm61Vnp4hO13VdpgRQ3iq0t8XY2P5edSA"/>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="text-sm font-semibold text-white">web_background_main.webp</span>
+<span class="block text-[10px] text-on-surface-variant">path/web/assets/static</span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container/30 text-secondary uppercase tracking-tight">WebP</span>
+</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">842 KB</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">1920 × 1080</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">Yesterday</td>
+<td class="px-6 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant/30 bg-surface-container text-primary focus:ring-primary/20" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="w-10 h-10 rounded bg-surface-container-highest flex items-center justify-center border border-outline-variant/20">
+<span class="material-symbols-outlined text-primary text-xl">movie</span>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="text-sm font-semibold text-white">product_teaser_v1.mp4</span>
+<span class="block text-[10px] text-on-surface-variant">path/marketing/videos/social</span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-primary-container/30 text-primary uppercase tracking-tight">MP4</span>
+</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">45.2 MB</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">1080 × 1920</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">Oct 10, 2023</td>
+<td class="px-6 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-high/40 transition-colors group">
+<td class="px-6 py-3">
+<input class="rounded border-outline-variant/30 bg-surface-container text-primary focus:ring-primary/20" type="checkbox"/>
+</td>
+<td class="px-4 py-3">
+<div class="w-10 h-10 rounded bg-surface-container-highest overflow-hidden border border-outline-variant/20">
+<img alt="Asset Preview" class="w-full h-full object-cover" data-alt="Close-up of high-performance server hardware with glowing LEDs in a dark data center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIOK4XhYuVliRg0V_fDXT85Y91347zyFeRK2IEaHRNEdSIkaA6bNceyZ4n_fA-wqwQQYyZBkJ_ttrh8IOzKPkQvwv7Dx00_27g7qEfwX7LKylZhRkVGxK10M1ZkWz9otl3pnRFpJyssdY0f7i5OyDGACQe5A_oQLo9F4A6cP3oFDEx6Kyer4Ziq2s4mgLrTiV6wIxwzxEyu8LIjewCya1Cdp4ZQxFjkAgCsghT9SefKCLFqnm2fDnGpm6yvIxO3sC_yaKVLA7ezA"/>
+</div>
+</td>
+<td class="px-4 py-3">
+<span class="text-sm font-semibold text-white">datacenter_architecture.png</span>
+<span class="block text-[10px] text-on-surface-variant">path/ops/diagrams</span>
+</td>
+<td class="px-4 py-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-secondary-container/30 text-secondary uppercase tracking-tight">PNG</span>
+</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">2.1 MB</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">2400 × 1600</td>
+<td class="px-4 py-3 text-sm text-on-surface-variant">Sep 28, 2023</td>
+<td class="px-6 py-3 text-right">
+<div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-highest rounded text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination & Table Footer -->
+<div class="px-6 py-4 flex items-center justify-between bg-surface-container-high/30 border-t border-outline-variant/10">
+<span class="text-xs text-on-surface-variant">Showing 1-5 of 1,284 assets</span>
+<div class="flex items-center gap-2">
+<button class="p-1 rounded hover:bg-surface-container-highest text-on-surface-variant disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<div class="flex items-center gap-1">
+<button class="w-7 h-7 flex items-center justify-center rounded bg-primary text-on-primary text-xs font-bold">1</button>
+<button class="w-7 h-7 flex items-center justify-center rounded hover:bg-surface-container-highest text-on-surface-variant text-xs font-bold">2</button>
+<button class="w-7 h-7 flex items-center justify-center rounded hover:bg-surface-container-highest text-on-surface-variant text-xs font-bold">3</button>
+<span class="text-on-surface-variant px-1">...</span>
+<button class="w-7 h-7 flex items-center justify-center rounded hover:bg-surface-container-highest text-on-surface-variant text-xs font-bold">257</button>
+</div>
+<button class="p-1 rounded hover:bg-surface-container-highest text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Status Footer -->
+<footer class="mt-12 px-8 py-4 bg-surface-container-low border-t border-outline-variant/10 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs font-medium text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                    System Synchronized
+                </div>
+<div class="h-4 w-[1px] bg-outline-variant/20"></div>
+<span>Storage: 42.8 GB / 100 GB</span>
+<div class="h-4 w-[1px] bg-outline-variant/20"></div>
+<span>Sync Node: US-EAST-1</span>
+</div>
+<div class="flex items-center gap-6">
+<a class="text-[10px] uppercase tracking-widest text-on-surface-variant hover:text-white transition-colors" href="#">API Docs</a>
+<a class="text-[10px] uppercase tracking-widest text-on-surface-variant hover:text-white transition-colors" href="#">Terms of Service</a>
+<span class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-50">© 2024 System Core</span>
+</div>
+</footer>
+</main>
+<!-- Floating Action Rail (Simplified for internal pages) -->
+<div class="fixed right-6 bottom-6 flex flex-col gap-3">
+<button class="w-12 h-12 rounded-xl bg-surface-container-highest text-on-surface shadow-2xl border border-outline-variant/10 flex items-center justify-center hover:bg-surface-bright transition-colors active:scale-95">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</body></html>
