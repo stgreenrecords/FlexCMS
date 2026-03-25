@@ -128,6 +128,13 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Gatling load testing — Java DSL (highcharts bundle includes core + http) -->
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -137,6 +144,19 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <skip>false</skip>
+                </configuration>
+            </plugin>
+            <!-- Gatling Maven plugin — run with: mvn gatling:test -pl flexcms-app -->
+            <plugin>
+                <groupId>io.gatling</groupId>
+                <artifactId>gatling-maven-plugin</artifactId>
+                <version>${gatling-plugin.version}</version>
+                <configuration>
+                    <!-- Run all simulations under com.flexcms.app.perf -->
+                    <simulationsFolder>src/test/java</simulationsFolder>
+                    <resultsFolder>${project.build.directory}/gatling</resultsFolder>
+                    <!-- Do NOT run during normal mvn test — only on explicit mvn gatling:test -->
+                    <runMultipleSimulations>true</runMultipleSimulations>
                 </configuration>
             </plugin>
         </plugins>
