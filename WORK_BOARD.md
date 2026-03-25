@@ -576,6 +576,30 @@ output_files:
 
 ---
 
+### P3-07 — Design system: FileUpload/Dropzone, TagInput, ColorPicker
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `FileUpload`: drag-and-drop dropzone, `onDragOver`/`onDragLeave`/`onDrop` handlers, keyboard accessible (Enter/Space opens picker), `accept`/`multiple`/`maxSize`/`maxFiles` validation, error state with AlertIcon, `activeContent` slot for custom drag-over overlay
+  - [x] `FileUploadList`: renders selected files with file icon, name, size (`formatBytes`), per-file error, remove button with aria-label
+  - [x] `useFileUpload()` hook: manages `UploadedFile[]` state, `addFiles` (with `URL.createObjectURL` image previews), `removeFile` (with `URL.revokeObjectURL`), `clear`
+  - [x] `TagInput`: controlled + uncontrolled, configurable delimiters (default: Enter + comma), paste support (splits by comma/newline/tab), Backspace removes last tag, `maxTags` + `validate` callbacks, duplicate detection, focus-forward on container click
+  - [x] `ColorPicker`: hex color popover trigger showing swatch + hex value, native `<input type="color">` wheel inside popover, preset swatches grid (14 colors), hex text input with validation, outside-click dismiss, controlled + uncontrolled
+  - [x] `ColorSwatchGroup`: compact row of swatch buttons for inline use
+  - [x] All components: zero hardcoded colors — only `var(--color-*)` tokens
+  - [x] All exported from `packages/ui/src/index.ts`
+  - [x] `@flexcms/ui` rebuilt — `npm run build` → BUILD SUCCESS (140.84 KB CJS, 121.88 KB ESM, DTS generated)
+**Files Changed:**
+  - `frontend/packages/ui/src/components/FileUpload.tsx` — new
+  - `frontend/packages/ui/src/components/TagInput.tsx` — new
+  - `frontend/packages/ui/src/components/ColorPicker.tsx` — new
+  - `frontend/packages/ui/src/index.ts` — added exports for FileUpload, TagInput, ColorPicker
+**Build Verified:** Yes — `npm run build` in `frontend/packages/ui` → BUILD SUCCESS (CJS + ESM + DTS)
+**Notes:** P3-14 (DAM browser page) is now fully unblocked — all its deps (P3-09 ✅, P3-03 ✅, P3-07 ✅) are done.
+
+---
+
 ### P3-04 — Design system: TreeView, Sidebar, Breadcrumb
 **Status:** ✅ DONE
 **Agent:** Claude Sonnet 4.6
