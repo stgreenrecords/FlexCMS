@@ -2,6 +2,7 @@ package com.flexcms.core.service;
 
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
+import com.flexcms.core.model.BulkOperationResult;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
@@ -239,6 +240,62 @@ public class ContentNodeService {
      */
     public Page<ContentNode> search(String siteId, String locale, String query, Pageable pageable) {
         return nodeRepository.searchContent(siteId, locale, query, pageable);
+    }
+
+    // ── Bulk operations ────────────────────────────────────────────────────────
+
+    /**
+     * Bulk status update (e.g. publish or archive multiple nodes at once).
+     * Each path is processed independently — one failure does not abort others.
+     */
+    @Transactional
+    public BulkOperationResult bulkUpdateStatus(List<String> paths, NodeStatus status, String userId) {
+        BulkOperationResult result = new BulkOperationResult();
+        for (String path : paths) {
+            try {
+                updateStatus(path, status, userId);
+                result.incrementSucceeded();
+            } catch (Exception e) {
+                result.addError(path, e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Bulk delete — deletes each path and its descendants.
+     * Each path is processed independently.
+     */
+    @Transactional
+    public BulkOperationResult bulkDelete(List<String> paths, String userId) {
+        BulkOperationResult result = new BulkOperationResult();
+        for (String path : paths) {
+            try {
+                delete(path);
+                result.incrementSucceeded();
+            } catch (Exception e) {
+                result.addError(path, e.getMessage());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Bulk move — moves each path to the same target parent.
+     * Each path is processed independently.
+     */
+    @Transactional
+    public BulkOperationResult bulkMove(List<String> paths, String targetParentPath, String userId) {
+        BulkOperationResult result = new BulkOperationResult();
+        for (String path : paths) {
+            try {
+                move(path, targetParentPath, userId);
+                result.incrementSucceeded();
+            } catch (Exception e) {
+                result.addError(path, e.getMessage());
+            }
+        }
+        return result;
     }
 
     // --- Private helpers ---

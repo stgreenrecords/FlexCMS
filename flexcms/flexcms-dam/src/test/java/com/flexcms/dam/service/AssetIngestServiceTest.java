@@ -199,9 +199,9 @@ class AssetIngestServiceTest {
                 eq("/dam/images"), eq(AssetStatus.ACTIVE), any(Pageable.class)))
                 .thenReturn(page);
 
-        List<Asset> result = assetIngestService.listFolder("/dam/images", "corporate");
+        Page<Asset> result = assetIngestService.listFolder("/dam/images", "corporate", 0, 50);
 
-        assertThat(result).hasSize(1).containsExactly(a);
+        assertThat(result.getContent()).hasSize(1).containsExactly(a);
     }
 
     // ── searchAssets ──────────────────────────────────────────────────────────
@@ -213,8 +213,8 @@ class AssetIngestServiceTest {
         when(assetRepository.search(eq("corporate"), eq("logo"), any(Pageable.class)))
                 .thenReturn(page);
 
-        List<Asset> result = assetIngestService.searchAssets("corporate", "logo");
+        Page<Asset> result = assetIngestService.searchAssets("corporate", "logo", 0, 50);
 
-        assertThat(result).containsExactly(a);
+        assertThat(result.getContent()).containsExactly(a);
     }
 }

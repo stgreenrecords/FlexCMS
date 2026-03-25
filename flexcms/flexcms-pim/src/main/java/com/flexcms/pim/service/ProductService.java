@@ -4,6 +4,7 @@ import com.flexcms.pim.model.*;
 import com.flexcms.pim.repository.CatalogRepository;
 import com.flexcms.pim.repository.ProductRepository;
 import com.flexcms.pim.repository.ProductSchemaRepository;
+import com.flexcms.pim.repository.ProductVersionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ public class ProductService {
     @Autowired private ProductRepository productRepo;
     @Autowired private CatalogRepository catalogRepo;
     @Autowired private ProductSchemaRepository schemaRepo;
+    @Autowired private ProductVersionRepository productVersionRepo;
     @Autowired private SchemaValidationService schemaValidationService;
 
     // -------------------------------------------------------------------------
@@ -71,7 +73,9 @@ public class ProductService {
         schemaValidationService.validateOrThrow(catalog.getSchema(), attributes);
         product.setAttributes(attributes);
 
-        return productRepo.save(product);
+        product = productRepo.save(product);
+        productVersionRepo.save(ProductVersion.fromProduct(product));
+        return product;
     }
 
     /**
@@ -100,7 +104,9 @@ public class ProductService {
 
         product.getAttributes().putAll(newAttributes);
         product.setUpdatedBy(userId);
-        return productRepo.save(product);
+        product = productRepo.save(product);
+        productVersionRepo.save(ProductVersion.fromProduct(product));
+        return product;
     }
 
     // -------------------------------------------------------------------------
@@ -161,7 +167,46 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
         product.setStatus(status);
         product.setUpdatedBy(userId);
-        return productRepo.save(product);
+        product = productRepo.save(product);
+        productVersionRepo.save(ProductVersion.fromProduct(product));
+        return product;
+    }
+
+    // -------------------------------------------------------------------------
+    // Version history
+    // -------------------------------------------------------------------------
+
+    /**
+     * Return all saved versions for a product, newest first.
+     */
+    @Transactional(value = "pimTransactionManager", readOnly = true)
+    public List<ProductVersion> getVersionHistory(UUID productId) {
+        return productVersionRepo.findByProductIdOrderByVersionNumberDesc(productId);
+    }
+
+    /**
+     * Restore a product to a specific historical version.
+     * Creates a new version snapshot after restoring.
+     */
+    @Transactional("pimTransactionManager")
+    public Product restoreVersion(UUID productId, Long versionNumber, String userId) {
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
+        ProductVersion snapshot = productVersionRepo.findByProductIdAndVersionNumber(productId, versionNumber)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Version " + versionNumber + " not found for product " + productId));
+
+        product.setAttributes(new HashMap<>(snapshot.getAttributes()));
+        product.setName(snapshot.getName());
+        product.setUpdatedBy(userId);
+        product = productRepo.save(product);
+
+        ProductVersion restoredSnapshot = ProductVersion.fromProduct(product);
+        restoredSnapshot.setChangeSummary("Restored from version " + versionNumber);
+        productVersionRepo.save(restoredSnapshot);
+
+        log.info("Restored product {} to version {} (new version: {})", productId, versionNumber, product.getVersion());
+        return product;
     }
 
     // -------------------------------------------------------------------------

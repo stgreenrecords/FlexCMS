@@ -1,10 +1,13 @@
 package com.flexcms.author.controller;
 
 import com.flexcms.core.exception.NotFoundException;
+import com.flexcms.core.model.BulkOperationResult;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.service.ContentNodeService;
+import com.flexcms.replication.model.ReplicationEvent;
+import com.flexcms.replication.service.ReplicationAgent;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,8 +19,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.flexcms.author.service.ScheduledPublishingService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,6 +37,7 @@ import java.util.UUID;
  *   <li>CONTENT_PUBLISHER — update status (publish/unpublish), read</li>
  * </ul>
  */
+@Tag(name = "Author Content", description = "Content node CRUD, versioning, locking, and scheduled publishing")
 @RestController
 @RequestMapping("/api/author/content")
 public class AuthorContentController {
@@ -41,6 +47,9 @@ public class AuthorContentController {
 
     @Autowired
     private ScheduledPublishingService scheduledPublishingService;
+
+    @Autowired
+    private ReplicationAgent replicationAgent;
 
     /** Get a content node by path. */
     @GetMapping("/node")
@@ -155,6 +164,48 @@ public class AuthorContentController {
         return ResponseEntity.ok().build();
     }
 
+    // ── Bulk operations ────────────────────────────────────────────────────────
+
+    /** Bulk publish: publish all listed paths and trigger replication for each. */
+    @PostMapping("/bulk/publish")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
+    public ResponseEntity<BulkOperationResult> bulkPublish(@Valid @RequestBody BulkPathsRequest req) {
+        BulkOperationResult result = nodeService.bulkUpdateStatus(
+                req.paths().stream().map(this::toContentPath).toList(),
+                NodeStatus.PUBLISHED, req.userId());
+        // Trigger replication for each successfully published path
+        req.paths().forEach(path -> {
+            try {
+                replicationAgent.replicate(toContentPath(path),
+                        ReplicationEvent.ReplicationAction.ACTIVATE, req.userId());
+            } catch (Exception e) {
+                result.addError(path, "replication failed: " + e.getMessage());
+            }
+        });
+        return ResponseEntity.ok(result);
+    }
+
+    /** Bulk delete: delete all listed paths and their descendants. */
+    @DeleteMapping("/bulk")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
+    public ResponseEntity<BulkOperationResult> bulkDelete(@Valid @RequestBody BulkPathsRequest req) {
+        BulkOperationResult result = nodeService.bulkDelete(
+                req.paths().stream().map(this::toContentPath).toList(),
+                req.userId());
+        return ResponseEntity.ok(result);
+    }
+
+    /** Bulk move: move all listed paths to a common target parent. */
+    @PostMapping("/bulk/move")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
+    public ResponseEntity<BulkOperationResult> bulkMove(@Valid @RequestBody BulkMoveRequest req) {
+        BulkOperationResult result = nodeService.bulkMove(
+                req.paths().stream().map(this::toContentPath).toList(),
+                toContentPath(req.targetParentPath()),
+                req.userId());
+        return ResponseEntity.ok(result);
+    }
+
     /** Restore a specific version. */
     @PostMapping("/node/restore")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
@@ -189,6 +240,15 @@ public class AuthorContentController {
 
     public record MoveNodeRequest(
             @NotBlank(message = "sourcePath is required") String sourcePath,
+            @NotBlank(message = "targetParentPath is required") String targetParentPath,
+            @NotBlank(message = "userId is required") String userId) {}
+
+    public record BulkPathsRequest(
+            @NotNull(message = "paths is required") List<String> paths,
+            @NotBlank(message = "userId is required") String userId) {}
+
+    public record BulkMoveRequest(
+            @NotNull(message = "paths is required") List<String> paths,
             @NotBlank(message = "targetParentPath is required") String targetParentPath,
             @NotBlank(message = "userId is required") String userId) {}
 }

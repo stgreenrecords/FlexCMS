@@ -3,6 +3,7 @@ package com.flexcms.headless.controller;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.service.ContentNodeService;
 import com.flexcms.plugin.spi.ContentNodeData;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.*;
 /**
  * REST API for raw content node access.
  */
+@Tag(name = "Headless Nodes", description = "Raw content node access and descendant tree traversal")
 @RestController
 @RequestMapping("/api/content/v1/nodes")
 public class NodeApiController {

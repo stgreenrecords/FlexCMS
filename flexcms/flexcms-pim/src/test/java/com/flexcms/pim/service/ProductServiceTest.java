@@ -7,6 +7,7 @@ import com.flexcms.pim.model.ProductStatus;
 import com.flexcms.pim.repository.CatalogRepository;
 import com.flexcms.pim.repository.ProductRepository;
 import com.flexcms.pim.repository.ProductSchemaRepository;
+import com.flexcms.pim.repository.ProductVersionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,6 +39,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductSchemaRepository schemaRepo;
+
+    @Mock
+    private ProductVersionRepository productVersionRepo;
 
     @Mock
     private SchemaValidationService schemaValidationService;

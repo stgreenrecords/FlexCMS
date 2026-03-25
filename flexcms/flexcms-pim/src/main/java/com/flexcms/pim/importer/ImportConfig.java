@@ -10,6 +10,7 @@ import java.util.UUID;
 public class ImportConfig {
     private UUID catalogId;
     private UUID schemaId;
+    private String sourceType;                    // CSV, EXCEL, JSON, API
     private Map<String, String> fieldMappings;   // sourceField → schemaAttribute
     private Map<String, String> defaults;         // attribute → default value
     private Map<String, String> transforms;       // attribute → transform expression
@@ -22,6 +23,8 @@ public class ImportConfig {
     public void setCatalogId(UUID catalogId) { this.catalogId = catalogId; }
     public UUID getSchemaId() { return schemaId; }
     public void setSchemaId(UUID schemaId) { this.schemaId = schemaId; }
+    public String getSourceType() { return sourceType; }
+    public void setSourceType(String sourceType) { this.sourceType = sourceType; }
     public Map<String, String> getFieldMappings() { return fieldMappings; }
     public void setFieldMappings(Map<String, String> fieldMappings) { this.fieldMappings = fieldMappings; }
     public Map<String, String> getDefaults() { return defaults; }

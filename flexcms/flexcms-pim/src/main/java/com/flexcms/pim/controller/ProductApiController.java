@@ -4,6 +4,7 @@ import com.flexcms.pim.model.Product;
 import com.flexcms.pim.model.ProductAssetRef;
 import com.flexcms.pim.model.ProductStatus;
 import com.flexcms.pim.model.ProductVariant;
+import com.flexcms.pim.model.ProductVersion;
 import com.flexcms.pim.service.ProductAssetRefService;
 import com.flexcms.pim.service.ProductService;
 import com.flexcms.pim.service.VariantService;
@@ -233,4 +234,23 @@ public class ProductApiController {
     public record UpdateAssetRefRequest(
             String role,
             int orderIndex) {}
+
+    // -------------------------------------------------------------------------
+    // Version history
+    // -------------------------------------------------------------------------
+
+    /** Get the full version history for a product (newest first). */
+    @GetMapping("/{id}/versions")
+    public ResponseEntity<List<ProductVersion>> getVersionHistory(@PathVariable UUID id) {
+        return ResponseEntity.ok(productService.getVersionHistory(id));
+    }
+
+    /** Restore a product to a specific historical version. */
+    @PostMapping("/{id}/versions/{versionNumber}/restore")
+    public ResponseEntity<Product> restoreVersion(
+            @PathVariable UUID id,
+            @PathVariable Long versionNumber,
+            @NotBlank(message = "userId is required") @RequestParam String userId) {
+        return ResponseEntity.ok(productService.restoreVersion(id, versionNumber, userId));
+    }
 }

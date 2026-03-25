@@ -4,6 +4,7 @@ import com.flexcms.core.model.ComponentDefinition;
 import com.flexcms.core.service.ComponentRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ import java.util.*;
  * and their data schemas. Both sides develop independently as long as the
  * contract (dataSchema) is honored.</p>
  */
+@Tag(name = "Headless Components", description = "Component registry — discover registered component types and their data schemas")
 @RestController
 @RequestMapping("/api/content/v1/component-registry")
 public class ComponentRegistryController {

@@ -103,9 +103,9 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | Module | Locked By Item | Agent | Since |
 |---|---|---|---|
-| `flexcms-core` | P4-01 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-core` | P4-02 | Claude Sonnet 4.6 | 2026-03-25 |
 | `flexcms-app` | — | — | — |
-| `flexcms-author` | P4-01 | Claude Sonnet 4.6 | 2026-03-25 |
+| `flexcms-author` | P4-02 | Claude Sonnet 4.6 | 2026-03-25 |
 | `flexcms-publish` | — | — | — |
 | `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
@@ -172,7 +172,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P2-04 | **Elasticsearch: search API with facets** | 🟢 OPEN | 🟡 P1 | M | `flexcms-search`, `flexcms-headless` | P2-03 | — |
 | P2-05 | **Angular adapter: full implementation** | 🟢 OPEN | 🟡 P1 | L | `frontend/packages/angular` | — | — |
 | P2-06 | **Angular reference site (SSR)** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/site-angular` (new) | P2-05 | — |
-| P2-07 | **OpenAPI/Swagger spec for REST** | 🟢 OPEN | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | — |
+| P2-07 | **OpenAPI/Swagger spec for REST** | ✅ DONE | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | Claude Sonnet 4.6 |
 | P2-08 | **Observability: Micrometer + Prometheus** | ✅ DONE | 🔴 P0 | M | `flexcms-app` | — | Claude Sonnet 4.6 |
 | P2-09 | **Observability: OpenTelemetry tracing** | ✅ DONE | 🔴 P0 | M | `flexcms-app` | P2-08 | Claude Sonnet 4.6 |
 | P2-10 | **Observability: structured JSON logging** | ✅ DONE | 🔴 P0 | S | `flexcms-app` | — | Claude Sonnet 4.6 |
@@ -216,8 +216,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
-| P4-01 | **Scheduled publishing (cron scheduler)** | 🔵 IN PROGRESS | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
-| P4-02 | **Bulk operations (publish/delete/move)** | 🟢 OPEN | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | — |
+| P4-01 | **Scheduled publishing (cron scheduler)** | ✅ DONE | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
+| P4-02 | **Bulk operations (publish/delete/move)** | 🔵 IN PROGRESS | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
 | P4-03 | **CDN: CloudFront provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
 | P4-04 | **CDN: Cloudflare provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
 | P4-05 | **Translation: DeepL connector** | 🟢 OPEN | 🟢 P2 | M | `flexcms-i18n` | — | — |
@@ -234,9 +234,9 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 |---|---|---|---|---|---|---|---|
 | P5-01 | **PIM: complete ProductService CRUD + validation** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | — | Claude Sonnet 4.6 |
 | P5-02 | **PIM: schema validation (JSON Schema)** | ✅ DONE | 🟡 P1 | M | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
-| P5-03 | **PIM: product versioning history** | 🟢 OPEN | 🟡 P1 | M | `flexcms-pim` | P5-01 | — |
+| P5-03 | **PIM: product versioning history** | ✅ DONE | 🟡 P1 | M | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-04 | **PIM: year-over-year carryforward (full merge)** | 🟢 OPEN | 🟡 P1 | L | `flexcms-pim` | P5-01 | — |
-| P5-05 | **PIM: ImportService + field mapping profiles** | 🟢 OPEN | 🟡 P1 | L | `flexcms-pim` | P5-01 | — |
+| P5-05 | **PIM: ImportService + field mapping profiles** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-06 | **PIM: Excel import source (POI)** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-07 | **PIM: JSON/API import source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-08 | **PIM: auto-schema inference from source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
@@ -547,6 +547,112 @@ output_files:
   - `flexcms-headless/src/test/.../graphql/ContentQueryResolverTest.java` — new (18 tests)
 **Build Verified:** Yes — `mvn clean install -pl flexcms-core` then `mvn test -pl flexcms-headless` → 18/18 pass
 **Notes:** `SearchIndexService.SearchResult` record fields (`totalCount`, `items`) and `SearchHitResult` fields (`path`, `title`, `excerpt`, `score`, `type`) already match the GraphQL schema exactly — no mapping layer needed.
+
+---
+
+### P5-05 — PIM: ImportService + field mapping profiles
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `FieldMappingProfile` entity — named/reusable mapping profile scoped to a catalog + source type
+  - [x] `V3__field_mapping_profiles.sql` — `field_mapping_profiles` table with JSONB columns for mappings/defaults/transforms
+  - [x] `FieldMappingProfileRepository` — `findByCatalogId()`, `findByCatalogIdAndName()`
+  - [x] `ImportResult` — tracks created/updated/skipped/failed counts + error list
+  - [x] `ImportConfig.sourceType` field added (was missing)
+  - [x] `ImportService.importProducts()` — resolves source by type, applies mappings → defaults → transforms → create/update
+  - [x] `ImportService.importFromProfile()` — loads saved profile and delegates to `importProducts()`
+  - [x] `ImportService.saveProfile()`, `listProfiles()`, `getProfile()`, `deleteProfile()`
+  - [x] Field mapping: renames source keys to schema attribute names
+  - [x] Defaults: fills missing attributes with configured values
+  - [x] Transforms: `trim`, `uppercase`, `lowercase`, `prefix:<v>`, `suffix:<v>`
+  - [x] `updateExisting=false` skips existing SKUs instead of updating
+  - [x] Per-record error isolation — one failed record doesn't abort the whole import
+  - [x] 12/12 `ImportServiceTest` pass; 69/69 total PIM tests; BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-pim/.../importer/ImportConfig.java` — added `sourceType` field + getter/setter
+  - `flexcms-pim/.../importer/ImportResult.java` — new result class
+  - `flexcms-pim/.../model/FieldMappingProfile.java` — new entity
+  - `flexcms-pim/.../repository/FieldMappingProfileRepository.java` — new repository
+  - `flexcms-pim/src/main/resources/db/pim/V3__field_mapping_profiles.sql` — new migration
+  - `flexcms-pim/.../service/ImportService.java` — new import orchestrator
+  - `flexcms-pim/src/test/.../service/ImportServiceTest.java` — 12 unit tests
+
+---
+
+### P5-03 — PIM: product versioning history
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `ProductVersion` entity — immutable snapshot with `productId`, `versionNumber`, `sku`, `name`, `attributes`, `status`, `updatedBy`, `createdAt`, `changeSummary`
+  - [x] `V2__product_version_history.sql` — `product_versions` table + unique constraint on `(product_id, version_number)` + indexes
+  - [x] `ProductVersionRepository` — `findByProductIdOrderByVersionNumberDesc()` and `findByProductIdAndVersionNumber()`
+  - [x] `ProductService.create()` saves a version snapshot after persisting the new product
+  - [x] `ProductService.update()` saves a version snapshot after each attribute update
+  - [x] `ProductService.updateStatus()` saves a version snapshot after each status change
+  - [x] `ProductService.getVersionHistory(id)` returns all versions newest-first
+  - [x] `ProductService.restoreVersion(id, version, userId)` — restores attributes+name, saves new snapshot with `changeSummary = "Restored from version N"`
+  - [x] `GET /api/pim/v1/products/{id}/versions` — returns version list
+  - [x] `POST /api/pim/v1/products/{id}/versions/{versionNumber}/restore?userId=` — restores
+  - [x] 7/7 `ProductVersionServiceTest` tests pass; 57/57 total PIM tests pass; BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-pim/.../model/ProductVersion.java` — new entity
+  - `flexcms-pim/.../repository/ProductVersionRepository.java` — new repository
+  - `flexcms-pim/src/main/resources/db/pim/V2__product_version_history.sql` — new migration
+  - `flexcms-pim/.../service/ProductService.java` — added `productVersionRepo`, snapshots on save, `getVersionHistory()`, `restoreVersion()`
+  - `flexcms-pim/.../controller/ProductApiController.java` — added version history and restore endpoints
+  - `flexcms-pim/src/test/.../service/ProductVersionServiceTest.java` — 7 unit tests
+  - `flexcms-pim/src/test/.../service/ProductServiceTest.java` — added `@Mock ProductVersionRepository`
+
+---
+
+### P2-07 — OpenAPI/Swagger spec for REST
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `springdoc-openapi-starter-webmvc-ui` 2.5.0 added to parent pom + `flexcms-headless` + `flexcms-author`
+  - [x] `OpenApiConfig` in `flexcms-app` — `OpenAPI` bean with title, version, servers, Bearer JWT security scheme
+  - [x] Two `GroupedOpenApi` beans: `author` (`/api/author/**`) and `headless` (`/api/content/**`, `/api/pages/**`)
+  - [x] Swagger UI available at `/swagger-ui.html`; raw JSON at `/v3/api-docs`
+  - [x] `@Tag` annotations on all 8 controllers: `AuthorContentController`, `AuthorAssetController`, `AuthorWorkflowController`, `PageApiController`, `NodeApiController`, `NavigationApiController`, `SearchApiController`, `ComponentRegistryController`
+  - [x] `mvn clean compile -pl flexcms-headless,flexcms-author,flexcms-app -am` → BUILD SUCCESS
+**Files Changed:**
+  - `flexcms/pom.xml` — added `springdoc.version=2.5.0` property + `springdoc-openapi-starter-webmvc-ui` in dependencyManagement
+  - `flexcms-headless/pom.xml` — added springdoc dependency
+  - `flexcms-author/pom.xml` — added springdoc dependency
+  - `flexcms-app/.../config/OpenApiConfig.java` — new OpenAPI config with two API groups
+  - 8 controller files — added `@Tag` class-level annotations
+
+---
+
+### P4-01 — Scheduled publishing (cron scheduler)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `ContentNode` has `scheduledPublishAt` and `scheduledDeactivateAt` fields (Instant)
+  - [x] `V10__scheduled_publish_columns.sql` migration adds columns + partial indexes to `content_nodes`
+  - [x] `ContentNodeRepository.findDueForPublish(now)` — JPQL query finding nodes where scheduledPublishAt ≤ now AND status ≠ PUBLISHED
+  - [x] `ContentNodeRepository.findDueForDeactivation(now)` — JPQL query finding nodes where scheduledDeactivateAt ≤ now AND status = PUBLISHED
+  - [x] `ScheduledPublishingService` runs on author tier only (`@ConditionalOnProperty runmode=author`)
+  - [x] `processScheduledPublishes()` — `@Scheduled(fixedDelay=60000)`, replicates via `ReplicationAgent.replicate(ACTIVATE)`, clears the schedule field on success
+  - [x] `processScheduledDeactivations()` — `@Scheduled(fixedDelay=60000)`, replicates via `ReplicationAgent.replicate(DEACTIVATE)`, clears the schedule field on success
+  - [x] Failures are logged + retried next cycle (no rollback of other nodes)
+  - [x] `PUT /api/author/content/node/schedule-publish?path=&publishAt=` — sets or clears scheduled publish time
+  - [x] `PUT /api/author/content/node/schedule-deactivate?path=&deactivateAt=` — sets or clears scheduled deactivation time
+  - [x] `@EnableScheduling` added to `FlexCmsApplication`
+  - [x] 12/12 `ScheduledPublishingServiceTest` tests pass; BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-app/src/main/java/.../FlexCmsApplication.java` — added `@EnableScheduling`
+  - `flexcms-app/src/main/resources/db/migration/V10__scheduled_publish_columns.sql` — new migration
+  - `flexcms-core/.../model/ContentNode.java` — added `scheduledPublishAt`, `scheduledDeactivateAt` fields + getters/setters
+  - `flexcms-core/.../repository/ContentNodeRepository.java` — added `findDueForPublish()`, `findDueForDeactivation()` queries
+  - `flexcms-author/.../service/ScheduledPublishingService.java` — new scheduled service
+  - `flexcms-author/.../controller/AuthorContentController.java` — added schedule-publish and schedule-deactivate endpoints
+  - `flexcms-author/src/test/.../service/ScheduledPublishingServiceTest.java` — 12 unit tests
+**Build Verified:** Yes — `mvn test -pl flexcms-author -am` → 27 author + 23 replication + 14+9 DAM + 78 core = BUILD SUCCESS
 
 ---
 

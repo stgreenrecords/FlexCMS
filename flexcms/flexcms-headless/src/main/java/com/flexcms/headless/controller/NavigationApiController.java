@@ -3,6 +3,7 @@ package com.flexcms.headless.controller;
 import com.flexcms.core.service.ContentDeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map;
 /**
  * REST API for site navigation trees.
  */
+@Tag(name = "Headless Navigation", description = "Site navigation trees for menus and sitemaps")
 @RestController
 @RequestMapping("/api/content/v1/navigation")
 public class NavigationApiController {

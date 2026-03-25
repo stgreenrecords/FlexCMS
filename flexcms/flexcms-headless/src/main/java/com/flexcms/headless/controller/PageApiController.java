@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 
 /**
  * REST API for headless page delivery.
  */
+@Tag(name = "Headless Pages", description = "Retrieve rendered page data and component trees for headless rendering")
 @RestController
 @RequestMapping("/api/content/v1/pages")
 public class PageApiController {
