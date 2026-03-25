@@ -1,0 +1,54 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Design System/Introduction" />
+
+# FlexCMS Design System — `@flexcms/ui`
+
+A collection of **accessible, themeable UI components** powering the FlexCMS Admin UI and site frontends.
+
+---
+
+## Core Principles
+
+1. **Tokens, not hex values** — Every color, radius, and shadow is driven by CSS custom properties (`var(--color-primary)`). Never hardcode values.
+2. **Radix UI primitives** — All interactive components are built on `@radix-ui/*`, providing keyboard navigation, ARIA roles, and focus management out of the box.
+3. **CVA variants** — Component visual permutations are defined with `class-variance-authority` for type-safe, composable styling.
+4. **Theme-agnostic** — Swap themes at runtime via `applyTheme()`. The built-in `lightTheme` and `darkTheme` ship out of the box; custom brand themes can be configured per site.
+
+---
+
+## Getting Started
+
+```tsx
+// 1. Wrap your app with a theme
+import { applyTheme, darkTheme } from '@flexcms/ui/themes';
+applyTheme(darkTheme);
+
+// 2. Import and use components
+import { Button, Badge, Card } from '@flexcms/ui';
+
+<Button variant="default" size="lg">Publish Page</Button>
+<Badge variant="success">Active</Badge>
+```
+
+---
+
+## Component Categories
+
+| Category | Components |
+|---|---|
+| **Layout** | Card, Separator |
+| **Forms** | Button, Input, Textarea, Label, Select, Checkbox, RadioGroup, Switch, DatePicker, DateRangePicker |
+| **Rich Inputs** | TagInput, ColorPicker, FileUpload |
+| **Overlays** | Dialog, Sheet, DropdownMenu, Tooltip, Popover |
+| **Navigation** | Breadcrumb, Tabs, Accordion, TreeView, Sidebar |
+| **Data** | DataTable |
+| **Feedback** | Badge, Toast, StepIndicator, Skeleton |
+| **Advanced** | CommandPalette |
+
+---
+
+## Theme Toggle
+
+Use the **🌙 Theme** toolbar above to switch between Light and Dark modes. All components adapt automatically via CSS custom properties.
+

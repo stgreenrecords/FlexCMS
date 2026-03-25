@@ -92,6 +92,31 @@ export class ManifestManager {
   }
 
   /**
+   * Remove pages from the manifest (for DEACTIVATE / DELETE events).
+   */
+  async remove(siteId: string, locale: string, pagePaths: string[]): Promise<void> {
+    const manifest = await this.load(siteId, locale);
+    let changed = false;
+    for (const path of pagePaths) {
+      if (manifest.pages[path]) {
+        delete manifest.pages[path];
+        changed = true;
+      }
+    }
+    if (!changed) return;
+    manifest.builtAt = new Date().toISOString();
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: this.manifestKey(siteId, locale),
+        Body: JSON.stringify(manifest, null, 2),
+        ContentType: 'application/json',
+      })
+    );
+    log.info({ siteId, locale, removed: pagePaths.length }, 'Manifest entries removed');
+  }
+
+  /**
    * Check if a page needs recompilation by comparing content versions.
    */
   async isStale(siteId: string, locale: string, pagePath: string, currentVersion: string): Promise<boolean> {

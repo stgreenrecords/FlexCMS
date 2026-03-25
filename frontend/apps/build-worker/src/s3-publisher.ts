@@ -6,7 +6,7 @@
  *   sites/{siteId}/_assets/{hash}.js
  *   _meta/{siteId}/manifest.json
  */
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import type { RenderResult } from './page-renderer';
 import type { BuildWorkerConfig } from './index';
 import { createLogger } from './logger';
@@ -89,6 +89,38 @@ export class S3Publisher {
       hash: result.hash,
       contentVersion: result.contentVersion,
     };
+  }
+
+  /**
+   * Delete a batch of pages from S3 (for DEACTIVATE / DELETE events).
+   * Returns the number of objects successfully deleted.
+   */
+  async deleteBatch(pagePaths: string[], siteId: string, locale: string): Promise<number> {
+    if (pagePaths.length === 0) return 0;
+
+    const keys = pagePaths.map((path) => {
+      const urlPath = this.contentPathToUrlPath(path, siteId, locale);
+      return { Key: `sites/${siteId}/${locale}/${urlPath}/index.html` };
+    });
+
+    // S3 supports deleting up to 1000 objects per request
+    let deleted = 0;
+    for (let i = 0; i < keys.length; i += 1000) {
+      const batch = keys.slice(i, i + 1000);
+      try {
+        await this.s3.send(
+          new DeleteObjectsCommand({
+            Bucket: this.bucket,
+            Delete: { Objects: batch, Quiet: true },
+          })
+        );
+        deleted += batch.length;
+        log.debug({ count: batch.length }, 'Deleted objects from S3');
+      } catch (err) {
+        log.error({ err, count: batch.length }, 'Failed to delete objects from S3');
+      }
+    }
+    return deleted;
   }
 
   /**

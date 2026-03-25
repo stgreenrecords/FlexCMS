@@ -1,78 +1,72 @@
 /**
  * @flexcms/angular — Angular adapter for FlexCMS
  *
- * Provides an Injectable ComponentMapperService and standalone components
- * for rendering CMS content in Angular 17+ applications.
+ * Renders FlexCMS content trees as Angular components.
+ * Compatible with Angular 17+ (standalone components, signals, inject()).
  *
- * Usage:
+ * ## Quick Start
  *
  * ```typescript
  * // app.config.ts
  * import { provideFlexCms } from '@flexcms/angular';
+ * import { HeroComponent } from './components/hero.component';
  *
- * export const appConfig = {
+ * export const appConfig: ApplicationConfig = {
  *   providers: [
  *     provideFlexCms({
  *       apiUrl: 'https://api.example.com',
  *       components: {
- *         'myapp/hero-banner': () => import('./components/hero-banner.component'),
- *         'flexcms/rich-text': () => import('./components/rich-text.component'),
- *       }
- *     })
- *   ]
+ *         'myapp/hero': HeroComponent,
+ *         'myapp/text': () => import('./components/text.component').then(m => m.TextComponent),
+ *       },
+ *     }),
+ *   ],
  * };
- * ```
  *
- * ```html
- * <!-- Template usage -->
- * <flexcms-page [pageData]="pageData"></flexcms-page>
+ * // page.component.ts
+ * @Component({
+ *   standalone: true,
+ *   imports: [FlexCmsPageComponent, NgIf],
+ *   template: `
+ *     <flexcms-page *ngIf="pageData" [pageData]="pageData"></flexcms-page>
+ *   `,
+ * })
+ * export class PageComponent implements OnInit {
+ *   pageData?: PageResponse;
+ *   private cms = inject(FlexCmsService);
+ *
+ *   ngOnInit() {
+ *     this.cms.getPage('/en/homepage').subscribe(data => this.pageData = data);
+ *   }
+ * }
  * ```
  */
 
-import { FlexCmsClient, ComponentMapper } from '@flexcms/sdk';
-import type {
-  FlexCmsConfig,
-  PageResponse,
-  ComponentNode,
-  NavigationItem,
-} from '@flexcms/sdk';
+// Providers
+export { provideFlexCms } from './flexcms.providers';
 
-// ---------------------------------------------------------------------------
-// Configuration interface
-// ---------------------------------------------------------------------------
+// DI Tokens
+export { FLEXCMS_CLIENT, FLEXCMS_MAPPER } from './tokens';
 
-export interface FlexCmsAngularConfig extends FlexCmsConfig {
-  /** Map of resourceType → lazy-loaded Angular component */
-  components?: Record<string, () => Promise<any>>;
-}
+// Core service
+export { FlexCmsService } from './flexcms.service';
 
-// ---------------------------------------------------------------------------
-// Service factory
-// ---------------------------------------------------------------------------
+// Page service (signals-based state)
+export { FlexCmsPageService, type PageState } from './flexcms-page.service';
 
-/**
- * Creates providers for FlexCMS Angular integration.
- * Use in app.config.ts or a module's providers array.
- *
- * This is a plain factory (not using @Injectable decorator)
- * to avoid Angular compiler dependency at build time.
- * Actual Angular module/provider setup should be done in the consuming app.
- */
-export function createFlexCmsProviders(config: FlexCmsAngularConfig) {
-  const client = new FlexCmsClient(config);
-  const mapper = new ComponentMapper<() => Promise<any>>();
+// Standalone components
+export { FlexCmsComponentComponent } from './flexcms-component.component';
+export { FlexCmsPageComponent } from './flexcms-page.component';
 
-  if (config.components) {
-    mapper.registerAll(config.components);
-  }
+// Types
+export type {
+  FlexCmsComponent,
+  FlexCmsAngularComponentType,
+  FlexCmsAngularComponentFactory,
+  FlexCmsAngularConfig,
+} from './types';
 
-  return { client, mapper };
-}
-
-// ---------------------------------------------------------------------------
-// Re-exports
-// ---------------------------------------------------------------------------
-
+// Re-export SDK essentials so consumers don't need a separate import
 export { FlexCmsClient, ComponentMapper } from '@flexcms/sdk';
 export type {
   FlexCmsConfig,
