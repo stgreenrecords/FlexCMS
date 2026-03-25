@@ -7,6 +7,7 @@ import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ContentNodeVersionRepository;
+import com.flexcms.core.util.RichTextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,9 @@ public class ContentNodeService {
 
     @Autowired
     private ContentNodeVersionRepository versionRepository;
+
+    @Autowired
+    private RichTextSanitizer richTextSanitizer;
 
     /**
      * Get a single content node by path.
@@ -61,7 +65,7 @@ public class ContentNodeService {
 
         ContentNode node = new ContentNode(path, name, resourceType);
         node.setParentPath(parentPath);
-        node.setProperties(properties != null ? properties : new HashMap<>());
+        node.setProperties(sanitizeProperties(properties != null ? properties : new HashMap<>()));
         node.setSiteId(parent.getSiteId());
         node.setLocale(parent.getLocale());
         node.setCreatedBy(userId);
@@ -91,10 +95,10 @@ public class ContentNodeService {
         // Save version before update
         versionRepository.save(ContentNodeVersion.fromNode(node));
 
-        // Merge properties
+        // Merge and sanitize properties
         Map<String, Object> merged = new HashMap<>(node.getProperties());
         merged.putAll(updates);
-        node.setProperties(merged);
+        node.setProperties(sanitizeProperties(merged));
         node.setModifiedBy(userId);
 
         return nodeRepository.save(node);
@@ -239,15 +243,57 @@ public class ContentNodeService {
 
     // --- Private helpers ---
 
-    private ContentNode loadChildrenRecursive(ContentNode node) {
-        List<ContentNode> children = nodeRepository.findByParentPathOrderByOrderIndex(node.getPath());
-        List<com.flexcms.plugin.spi.ContentNodeData> childData = new ArrayList<>();
+    /**
+     * Load the full component tree for {@code root} using a single bulk query.
+     *
+     * <p>Previously this used a recursive pattern that issued one
+     * {@code findByParentPathOrderByOrderIndex} query per node (N+1). Now we
+     * load all descendants in one query, group them by parent path in memory,
+     * and wire up the tree without further DB round-trips.</p>
+     */
+    private ContentNode loadChildrenRecursive(ContentNode root) {
+        // Single query: all descendants of root (any depth)
+        List<ContentNode> allDescendants = nodeRepository.findDescendants(root.getPath());
+
+        // Group descendants by parent path for O(1) lookup
+        Map<String, List<ContentNode>> byParent = new LinkedHashMap<>();
+        for (ContentNode node : allDescendants) {
+            byParent.computeIfAbsent(node.getParentPath(), k -> new ArrayList<>()).add(node);
+        }
+
+        // Sort each group by orderIndex (findDescendants orders by path, not orderIndex)
+        byParent.values().forEach(list -> list.sort(Comparator.comparingInt(ContentNode::getOrderIndex)));
+
+        // Wire up children recursively in memory (no more DB calls)
+        wireChildren(root, byParent);
+        return root;
+    }
+
+    private void wireChildren(ContentNode node, Map<String, List<ContentNode>> byParent) {
+        List<ContentNode> children = byParent.getOrDefault(node.getPath(), List.of());
+        List<com.flexcms.plugin.spi.ContentNodeData> childData = new ArrayList<>(children.size());
         for (ContentNode child : children) {
-            loadChildrenRecursive(child);
+            wireChildren(child, byParent);
             childData.add(child);
         }
         node.setChildren(childData);
-        return node;
+    }
+
+    /**
+     * Sanitizes all String-type property values that contain HTML markup,
+     * preventing XSS when rich-text content is stored.
+     */
+    private Map<String, Object> sanitizeProperties(Map<String, Object> properties) {
+        Map<String, Object> result = new HashMap<>(properties.size());
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof String s) {
+                result.put(entry.getKey(), richTextSanitizer.sanitizeIfHtml(s));
+            } else {
+                result.put(entry.getKey(), value);
+            }
+        }
+        return result;
     }
 
     private String sanitizeName(String name) {

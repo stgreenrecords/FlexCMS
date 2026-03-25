@@ -159,6 +159,13 @@
                 <version>${caffeine.version}</version>
             </dependency>
 
+            <!-- OWASP HTML Sanitizer — XSS protection for rich text content -->
+            <dependency>
+                <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+                <artifactId>owasp-java-html-sanitizer</artifactId>
+                <version>20220608.1</version>
+            </dependency>
+
             <!-- Testcontainers BOM — versions managed by Spring Boot parent -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
@@ -166,6 +173,11 @@
                 <version>1.19.8</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>json-schema-validator</artifactId>
+                <version>1.3.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

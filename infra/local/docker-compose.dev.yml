@@ -1,28 +1,54 @@
 # =============================================================================
 # FlexCMS — Full Local Development Stack
 # =============================================================================
-# Runs author + publish backend instances with all infrastructure services.
-# Usage:
-#   cd infra/local
-#   cp .env.local .env        # (first time only)
-#   docker compose -f docker-compose.dev.yml up -d
+# All three pillars (Content/CMS, DAM, PIM) run inside each FlexCMS instance.
+# Author instance = read-write (authoring + DAM upload + PIM editing)
+# Publish instance = read-only (headless delivery, receives replication)
 #
-# Services available:
-#   Author API:       http://localhost:8080
-#   Publish API:      http://localhost:8081
-#   Admin UI:         http://localhost:3000   (run separately: cd frontend/apps/admin && pnpm dev)
-#   RabbitMQ Console: http://localhost:15672  (guest/guest)
-#   MinIO Console:    http://localhost:9001   (minioadmin/minioadmin)
-#   Elasticsearch:    http://localhost:9200
-#   PostgreSQL:       localhost:5432          (flexcms/flexcms)
+# Quick start:
+#   cd infra/local
+#   cp .env.local .env
+#   docker compose up -d                     # infrastructure only
+#   docker compose --profile app up -d       # infrastructure + backend apps
+#   docker compose --profile full up -d      # everything including admin UI
+#
+# Developer workflow (recommended — fastest iteration):
+#   docker compose up -d                     # start infra only
+#   cd ../../flexcms && mvn spring-boot:run -Dspring-boot.run.profiles=author   # backend from IDE
+#   cd ../../frontend/apps/admin && pnpm dev                                     # frontend from IDE
+#
+# Full-stack Docker (CI-like, slower iteration):
+#   docker compose --profile full up -d --build
+#
+# ┌─────────────────────────────────────────────────────────────────────┐
+# │                       Service Map                                  │
+# ├─────────────────────────────────────────────────────────────────────┤
+# │  Infrastructure (always up):                                       │
+# │    PostgreSQL 16 ......... localhost:5432  (flexcms/flexcms)       │
+# │    Redis 7 ............... localhost:6379                          │
+# │    RabbitMQ 3 ............ localhost:5672  (mgmt: 15672)          │
+# │    MinIO (S3) ............ localhost:9000  (console: 9001)        │
+# │    Elasticsearch 8 ...... localhost:9200                          │
+# │                                                                    │
+# │  Backend (--profile app):                                          │
+# │    CMS Author ........... localhost:8080  (Content+DAM+PIM R/W)   │
+# │    CMS Publish .......... localhost:8081  (Content+DAM read-only) │
+# │                                                                    │
+# │  Frontend (--profile full):                                        │
+# │    Admin UI (Next.js) ... localhost:3000                          │
+# │                                                                    │
+# │  Databases:                                                        │
+# │    flexcms_author ........ CMS author content tree + DAM assets   │
+# │    flexcms_publish ....... CMS publish (replicated read-only)     │
+# │    flexcms_pim ........... PIM products, catalogs, schemas        │
+# └─────────────────────────────────────────────────────────────────────┘
 # =============================================================================
 
-version: '3.9'
-
 services:
-  # ---------------------------------------------------------------------------
-  # Infrastructure Services
-  # ---------------------------------------------------------------------------
+  # ===========================================================================
+  # Infrastructure Services (no profile = always start)
+  # ===========================================================================
+
   postgres:
     image: postgres:16-alpine
     container_name: flexcms-postgres
@@ -80,12 +106,12 @@ services:
     volumes:
       - minio_data:/data
 
-  # Create the default S3 bucket on startup
   minio-init:
     image: minio/mc:latest
     depends_on:
       minio:
         condition: service_started
+    restart: "no"
     entrypoint: >
       /bin/sh -c "
       sleep 3;
@@ -112,10 +138,18 @@ services:
       timeout: 5s
       retries: 10
 
-  # ---------------------------------------------------------------------------
-  # FlexCMS Author Instance (read-write)
-  # ---------------------------------------------------------------------------
+  # ===========================================================================
+  # FlexCMS Author (Content + DAM + PIM — read-write)
+  # ===========================================================================
+  # This single JAR serves all three pillars:
+  #   /api/author/**   → Content authoring (create/edit/delete pages)
+  #   /api/dam/**      → DAM operations (upload/process/manage assets)
+  #   /api/pim/**      → PIM operations (product CRUD, catalog, import)
+  #   /api/content/**  → Headless preview (author-mode content read)
+  #   /graphql         → GraphQL endpoint
+  # ===========================================================================
   author:
+    profiles: [app, full]
     image: ghcr.io/stgreenrecords/flexcms-app:latest
     build:
       context: ../../flexcms
@@ -125,24 +159,31 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: author
+      # --- CMS Database (author) ---
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_author
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      # --- PIM Database (separate, shared between author/publish) ---
+      FLEXCMS_PIM_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_pim
+      FLEXCMS_PIM_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
+      FLEXCMS_PIM_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      # --- Redis ---
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      # --- RabbitMQ (replication agent — sends events) ---
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
       SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
+      # --- Elasticsearch ---
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      # --- DAM / S3 (MinIO) ---
       FLEXCMS_DAM_S3_ENDPOINT: http://minio:9000
       FLEXCMS_DAM_S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
       FLEXCMS_DAM_S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
       FLEXCMS_DAM_S3_BUCKET: flexcms-assets
       FLEXCMS_DAM_S3_REGION: us-east-1
-      FLEXCMS_PIM_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_pim
-      FLEXCMS_PIM_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
-      FLEXCMS_PIM_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      # --- Security ---
       FLEXCMS_JWT_ISSUER_URI: ${FLEXCMS_JWT_ISSUER_URI:-http://localhost:8180/realms/flexcms}
       SERVER_PORT: 8080
     depends_on:
@@ -159,10 +200,17 @@ services:
       retries: 10
       start_period: 60s
 
-  # ---------------------------------------------------------------------------
-  # FlexCMS Publish Instance (read-only, receives replication)
-  # ---------------------------------------------------------------------------
+  # ===========================================================================
+  # FlexCMS Publish (Content + DAM read-only — receives replication)
+  # ===========================================================================
+  # Read-only delivery tier. Receives content from Author via RabbitMQ.
+  #   /api/content/**  → Headless content delivery (REST)
+  #   /graphql         → GraphQL endpoint
+  #   /dam/renditions  → DAM asset renditions (CDN-friendly)
+  # PIM data is also accessible for product pages (read-only from flexcms_pim DB).
+  # ===========================================================================
   publish:
+    profiles: [app, full]
     image: ghcr.io/stgreenrecords/flexcms-app:latest
     build:
       context: ../../flexcms
@@ -172,24 +220,31 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: publish
+      # --- CMS Database (publish — replicated content) ---
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_publish
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      # --- PIM Database (shared read-only) ---
+      FLEXCMS_PIM_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_pim
+      FLEXCMS_PIM_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
+      FLEXCMS_PIM_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      # --- Redis (caching) ---
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      # --- RabbitMQ (replication receiver — consumes events) ---
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
       SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-guest}
+      # --- Elasticsearch ---
       SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+      # --- DAM / S3 (MinIO) ---
       FLEXCMS_DAM_S3_ENDPOINT: http://minio:9000
       FLEXCMS_DAM_S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
       FLEXCMS_DAM_S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
       FLEXCMS_DAM_S3_BUCKET: flexcms-assets
       FLEXCMS_DAM_S3_REGION: us-east-1
-      FLEXCMS_PIM_DATASOURCE_URL: jdbc:postgresql://postgres:5432/flexcms_pim
-      FLEXCMS_PIM_DATASOURCE_USERNAME: ${POSTGRES_USER:-flexcms}
-      FLEXCMS_PIM_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-flexcms}
+      # --- Security ---
       FLEXCMS_JWT_ISSUER_URI: ${FLEXCMS_JWT_ISSUER_URI:-http://localhost:8180/realms/flexcms}
       SERVER_PORT: 8081
     depends_on:
@@ -207,6 +262,24 @@ services:
       timeout: 5s
       retries: 10
       start_period: 60s
+
+  # ===========================================================================
+  # Admin UI — Next.js (Content + DAM + PIM admin interface)
+  # ===========================================================================
+  admin-ui:
+    profiles: [full]
+    build:
+      context: ../../frontend
+      dockerfile: apps/admin/Dockerfile
+    container_name: flexcms-admin-ui
+    ports:
+      - "3000:3000"
+    environment:
+      FLEXCMS_API_URL: http://author:8080
+      NEXT_PUBLIC_FLEXCMS_API_URL: http://localhost:8080
+    depends_on:
+      author:
+        condition: service_healthy
 
 volumes:
   postgres_data:

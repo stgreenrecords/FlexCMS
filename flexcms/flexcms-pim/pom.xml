@@ -63,7 +63,11 @@
             <version>5.2.5</version>
         </dependency>
 
-        <!-- JSON Schema validation -->
+        <!-- JSON Schema validation (draft-07) -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

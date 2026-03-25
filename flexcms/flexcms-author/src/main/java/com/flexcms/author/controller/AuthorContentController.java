@@ -15,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.flexcms.author.service.ScheduledPublishingService;
+
+import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,13 +39,17 @@ public class AuthorContentController {
     @Autowired
     private ContentNodeService nodeService;
 
+    @Autowired
+    private ScheduledPublishingService scheduledPublishingService;
+
     /** Get a content node by path. */
     @GetMapping("/node")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<ContentNode> getNode(@RequestParam String path) {
+        String contentPath = toContentPath(path);
         return ResponseEntity.ok(
-                nodeService.getByPath(path)
-                        .orElseThrow(() -> NotFoundException.forPath(path))
+                nodeService.getByPath(contentPath)
+                        .orElseThrow(() -> NotFoundException.forPath(contentPath))
         );
     }
 
@@ -50,9 +57,10 @@ public class AuthorContentController {
     @GetMapping("/page")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<ContentNode> getPage(@RequestParam String path) {
+        String contentPath = toContentPath(path);
         return ResponseEntity.ok(
-                nodeService.getWithChildren(path)
-                        .orElseThrow(() -> NotFoundException.forPath(path))
+                nodeService.getWithChildren(contentPath)
+                        .orElseThrow(() -> NotFoundException.forPath(contentPath))
         );
     }
 
@@ -61,7 +69,7 @@ public class AuthorContentController {
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> createNode(@Valid @RequestBody CreateNodeRequest request) {
         ContentNode node = nodeService.create(
-                request.parentPath(),
+                toContentPath(request.parentPath()),
                 request.name(),
                 request.resourceType(),
                 request.properties(),
@@ -74,7 +82,7 @@ public class AuthorContentController {
     @PutMapping("/node/properties")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> updateProperties(@Valid @RequestBody UpdatePropertiesRequest request) {
-        ContentNode node = nodeService.updateProperties(request.path(), request.properties(), request.userId());
+        ContentNode node = nodeService.updateProperties(toContentPath(request.path()), request.properties(), request.userId());
         return ResponseEntity.ok(node);
     }
 
@@ -82,7 +90,7 @@ public class AuthorContentController {
     @PostMapping("/node/move")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> moveNode(@Valid @RequestBody MoveNodeRequest request) {
-        ContentNode node = nodeService.move(request.sourcePath(), request.targetParentPath(), request.userId());
+        ContentNode node = nodeService.move(toContentPath(request.sourcePath()), toContentPath(request.targetParentPath()), request.userId());
         return ResponseEntity.ok(node);
     }
 
@@ -90,7 +98,7 @@ public class AuthorContentController {
     @DeleteMapping("/node")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<Void> deleteNode(@RequestParam String path) {
-        nodeService.delete(path);
+        nodeService.delete(toContentPath(path));
         return ResponseEntity.ok().build();
     }
 
@@ -98,14 +106,14 @@ public class AuthorContentController {
     @PostMapping("/node/lock")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> lock(@RequestParam String path, @RequestParam String userId) {
-        return ResponseEntity.ok(nodeService.lock(path, userId));
+        return ResponseEntity.ok(nodeService.lock(toContentPath(path), userId));
     }
 
     /** Unlock a node. */
     @PostMapping("/node/unlock")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> unlock(@RequestParam String path, @RequestParam String userId) {
-        return ResponseEntity.ok(nodeService.unlock(path, userId));
+        return ResponseEntity.ok(nodeService.unlock(toContentPath(path), userId));
     }
 
     /** Update node status (DRAFT → REVIEW → PUBLISHED → ARCHIVED). */
@@ -114,7 +122,7 @@ public class AuthorContentController {
     public ResponseEntity<ContentNode> updateStatus(@RequestParam String path,
                                                      @RequestParam NodeStatus status,
                                                      @RequestParam String userId) {
-        return ResponseEntity.ok(nodeService.updateStatus(path, status, userId));
+        return ResponseEntity.ok(nodeService.updateStatus(toContentPath(path), status, userId));
     }
 
     /** Get version history. */
@@ -127,6 +135,26 @@ public class AuthorContentController {
         return ResponseEntity.ok(nodeService.getVersionHistory(nodeId, PageRequest.of(page, size)));
     }
 
+    /** Schedule a node for future publishing. Pass null publishAt to clear the schedule. */
+    @PutMapping("/node/schedule-publish")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
+    public ResponseEntity<Void> schedulePublish(
+            @NotBlank(message = "path is required") @RequestParam String path,
+            @RequestParam(required = false) Instant publishAt) {
+        scheduledPublishingService.schedulePublish(toContentPath(path), publishAt);
+        return ResponseEntity.ok().build();
+    }
+
+    /** Schedule a node for future deactivation. Pass null deactivateAt to clear the schedule. */
+    @PutMapping("/node/schedule-deactivate")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
+    public ResponseEntity<Void> scheduleDeactivate(
+            @NotBlank(message = "path is required") @RequestParam String path,
+            @RequestParam(required = false) Instant deactivateAt) {
+        scheduledPublishingService.scheduleDeactivate(toContentPath(path), deactivateAt);
+        return ResponseEntity.ok().build();
+    }
+
     /** Restore a specific version. */
     @PostMapping("/node/restore")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
@@ -134,6 +162,16 @@ public class AuthorContentController {
                                                        @RequestParam Long versionNumber,
                                                        @RequestParam String userId) {
         return ResponseEntity.ok(nodeService.restoreVersion(nodeId, versionNumber, userId));
+    }
+
+    /**
+     * Normalize a content path from either URL format ({@code /site/en/home})
+     * or ltree format ({@code content.site.en.home}) to the canonical ltree form.
+     */
+    private String toContentPath(String path) {
+        String p = path.startsWith("/") ? path.substring(1) : path;
+        p = p.replace("/", ".");
+        return p.startsWith("content.") ? p : "content." + p;
     }
 
     // Request DTOs with validation constraints

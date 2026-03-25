@@ -66,6 +66,12 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <!-- OWASP HTML Sanitizer — XSS protection for rich text properties -->
+        <dependency>
+            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+            <artifactId>owasp-java-html-sanitizer</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

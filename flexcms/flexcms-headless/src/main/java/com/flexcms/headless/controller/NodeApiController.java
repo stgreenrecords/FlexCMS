@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * REST API for raw content node access.
@@ -25,7 +24,7 @@ public class NodeApiController {
      */
     @GetMapping("/{*path}")
     public ResponseEntity<Map<String, Object>> getNode(@PathVariable String path) {
-        String contentPath = path.replace("/", ".");
+        String contentPath = toContentPath(path);
 
         return nodeService.getByPath(contentPath)
                 .map(node -> ResponseEntity.ok(toMap(node)))
@@ -33,19 +32,35 @@ public class NodeApiController {
     }
 
     /**
-     * Get subtree of descendants.
+     * Get subtree of descendants up to a maximum depth.
+     *
+     * @param depth maximum traversal depth (1 = direct children only, default 5, max 10)
      */
     @GetMapping("/{*path}/descendants")
-    public ResponseEntity<List<Map<String, Object>>> getDescendants(@PathVariable String path) {
-        String contentPath = path.replace("/", ".");
+    public ResponseEntity<Map<String, Object>> getDescendants(
+            @PathVariable String path,
+            @RequestParam(defaultValue = "5") int depth) {
+        String contentPath = toContentPath(path);
+        int cappedDepth = Math.min(Math.max(depth, 1), 10);
 
         return nodeService.getWithChildren(contentPath)
                 .map(node -> {
                     List<Map<String, Object>> descendants = new ArrayList<>();
-                    collectDescendants(node, descendants);
-                    return ResponseEntity.ok(descendants);
+                    collectDescendants(node, descendants, cappedDepth, 0);
+                    Map<String, Object> response = new LinkedHashMap<>();
+                    response.put("path", contentPath);
+                    response.put("depth", cappedDepth);
+                    response.put("count", descendants.size());
+                    response.put("items", descendants);
+                    return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    private String toContentPath(String path) {
+        String p = path.startsWith("/") ? path.substring(1) : path;
+        p = p.replace("/", ".");
+        return p.startsWith("content.") ? p : "content." + p;
     }
 
     private Map<String, Object> toMap(ContentNode node) {
@@ -62,11 +77,12 @@ public class NodeApiController {
         return map;
     }
 
-    private void collectDescendants(ContentNode node, List<Map<String, Object>> result) {
+    private void collectDescendants(ContentNode node, List<Map<String, Object>> result, int maxDepth, int currentDepth) {
+        if (currentDepth >= maxDepth) return;
         for (ContentNodeData child : node.getChildren()) {
             if (child instanceof ContentNode cn) {
                 result.add(toMap(cn));
-                collectDescendants(cn, result);
+                collectDescendants(cn, result, maxDepth, currentDepth + 1);
             }
         }
     }

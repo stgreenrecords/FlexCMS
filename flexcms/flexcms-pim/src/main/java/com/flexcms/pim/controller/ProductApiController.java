@@ -1,7 +1,12 @@
 package com.flexcms.pim.controller;
 
 import com.flexcms.pim.model.Product;
+import com.flexcms.pim.model.ProductAssetRef;
+import com.flexcms.pim.model.ProductStatus;
+import com.flexcms.pim.model.ProductVariant;
+import com.flexcms.pim.service.ProductAssetRefService;
 import com.flexcms.pim.service.ProductService;
+import com.flexcms.pim.service.VariantService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,6 +38,16 @@ public class ProductApiController {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private VariantService variantService;
+
+    @Autowired
+    private ProductAssetRefService assetRefService;
+
+    // -------------------------------------------------------------------------
+    // Product CRUD
+    // -------------------------------------------------------------------------
+
     /** Get a product by SKU with fully resolved attributes */
     @GetMapping("/{sku}")
     public ResponseEntity<Map<String, Object>> getProduct(@PathVariable String sku) {
@@ -40,7 +56,7 @@ public class ProductApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /** List products in a catalog (paginated) */
+    /** List products in a catalog or search globally (paginated) */
     @GetMapping
     public ResponseEntity<Page<Product>> listProducts(
             @RequestParam(required = false) UUID catalogId,
@@ -77,6 +93,22 @@ public class ProductApiController {
         return ResponseEntity.ok(updated);
     }
 
+    /** Delete a product and all its variants and asset refs */
+    @DeleteMapping("/{sku}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable String sku) {
+        productService.delete(sku);
+        return ResponseEntity.noContent().build();
+    }
+
+    /** Update product status (DRAFT / ACTIVE / ARCHIVED / DISCONTINUED) */
+    @PutMapping("/{sku}/status")
+    public ResponseEntity<Product> updateStatus(
+            @PathVariable String sku,
+            @Valid @RequestBody UpdateStatusRequest request) {
+        Product updated = productService.updateStatus(sku, request.status(), request.userId());
+        return ResponseEntity.ok(updated);
+    }
+
     /** Carryforward products from one catalog to another (year rollover) */
     @PostMapping("/carryforward")
     public ResponseEntity<Map<String, Object>> carryforward(@Valid @RequestBody CarryforwardRequest request) {
@@ -86,7 +118,82 @@ public class ProductApiController {
         return ResponseEntity.ok(Map.of("carriedForward", count));
     }
 
-    // Request records with validation constraints
+    // -------------------------------------------------------------------------
+    // Variants
+    // -------------------------------------------------------------------------
+
+    @GetMapping("/{sku}/variants")
+    public ResponseEntity<List<ProductVariant>> listVariants(@PathVariable String sku) {
+        return productService.getBysku(sku)
+                .map(p -> ResponseEntity.ok(variantService.listByProduct(p.getId())))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{sku}/variants")
+    public ResponseEntity<ProductVariant> createVariant(
+            @PathVariable String sku,
+            @Valid @RequestBody CreateVariantRequest request) {
+        return productService.getBysku(sku)
+                .map(p -> ResponseEntity.ok(variantService.create(
+                        p.getId(), request.variantSku(),
+                        request.attributes(), request.pricing(), request.inventory())))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/variants/{variantId}")
+    public ResponseEntity<ProductVariant> updateVariant(
+            @PathVariable UUID variantId,
+            @RequestBody UpdateVariantRequest request) {
+        ProductVariant updated = variantService.update(variantId,
+                request.attributes(), request.pricing(), request.inventory());
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/variants/{variantId}")
+    public ResponseEntity<Void> deleteVariant(@PathVariable UUID variantId) {
+        variantService.delete(variantId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // -------------------------------------------------------------------------
+    // Asset references
+    // -------------------------------------------------------------------------
+
+    @GetMapping("/{sku}/assets")
+    public ResponseEntity<List<ProductAssetRef>> listAssets(@PathVariable String sku) {
+        return productService.getBysku(sku)
+                .map(p -> ResponseEntity.ok(assetRefService.listByProduct(p.getId())))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{sku}/assets")
+    public ResponseEntity<ProductAssetRef> linkAsset(
+            @PathVariable String sku,
+            @Valid @RequestBody LinkAssetRequest request) {
+        return productService.getBysku(sku)
+                .map(p -> ResponseEntity.ok(assetRefService.link(
+                        p.getId(), request.assetPath(), request.role(), request.orderIndex())))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/assets/{refId}")
+    public ResponseEntity<ProductAssetRef> updateAssetRef(
+            @PathVariable UUID refId,
+            @RequestBody UpdateAssetRefRequest request) {
+        ProductAssetRef updated = assetRefService.updateRef(refId, request.role(), request.orderIndex());
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/assets/{refId}")
+    public ResponseEntity<Void> unlinkAsset(@PathVariable UUID refId) {
+        assetRefService.unlink(refId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // -------------------------------------------------------------------------
+    // Request records
+    // -------------------------------------------------------------------------
+
     public record CreateProductRequest(
             @NotBlank(message = "sku is required") String sku,
             @NotBlank(message = "name is required") String name,
@@ -98,8 +205,32 @@ public class ProductApiController {
             @NotNull(message = "attributes is required") Map<String, Object> attributes,
             @NotBlank(message = "userId is required") String userId) {}
 
+    public record UpdateStatusRequest(
+            @NotNull(message = "status is required") ProductStatus status,
+            @NotBlank(message = "userId is required") String userId) {}
+
     public record CarryforwardRequest(
             @NotNull(message = "sourceCatalogId is required") UUID sourceCatalogId,
             @NotNull(message = "targetCatalogId is required") UUID targetCatalogId,
             @NotBlank(message = "userId is required") String userId) {}
+
+    public record CreateVariantRequest(
+            @NotBlank(message = "variantSku is required") String variantSku,
+            Map<String, Object> attributes,
+            Map<String, Object> pricing,
+            Map<String, Object> inventory) {}
+
+    public record UpdateVariantRequest(
+            Map<String, Object> attributes,
+            Map<String, Object> pricing,
+            Map<String, Object> inventory) {}
+
+    public record LinkAssetRequest(
+            @NotBlank(message = "assetPath is required") String assetPath,
+            @NotBlank(message = "role is required") String role,
+            int orderIndex) {}
+
+    public record UpdateAssetRefRequest(
+            String role,
+            int orderIndex) {}
 }

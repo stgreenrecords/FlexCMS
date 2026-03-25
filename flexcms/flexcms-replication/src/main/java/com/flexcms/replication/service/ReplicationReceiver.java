@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Publish-side replication receiver: consumes events and updates the local content store.
@@ -25,6 +27,9 @@ public class ReplicationReceiver {
 
     @Autowired
     private ContentNodeRepository nodeRepository;
+
+    @Autowired
+    private AuthorNodeClient authorNodeClient;
 
     @RabbitListener(queues = "#{publishQueue.name}")
     @Transactional
@@ -40,42 +45,101 @@ public class ReplicationReceiver {
 
     private void activateContent(ReplicationEvent event) {
         if (event.getType() == ReplicationEvent.ReplicationType.TREE) {
-            // Tree activation — process each affected path
-            if (event.getAffectedPaths() != null) {
-                log.info("Tree activation: {} paths from {}", event.getAffectedPaths().size(), event.getPath());
-            }
+            activateTree(event);
+            return;
+        }
+        activateSingleNode(event.getPath(), event.getResourceType(), event.getParentPath(),
+                event.getSiteId(), event.getLocale(), event.getNodeProperties(),
+                event.getOrderIndex(), event.getVersion());
+    }
+
+    /**
+     * Tree activation: fetch each affected node from the author and upsert it.
+     *
+     * <p>Tree events carry only path lists — not node payloads — so each node
+     * must be fetched individually via {@link AuthorNodeClient}. Nodes that
+     * cannot be fetched (e.g. author temporarily unreachable) are skipped
+     * and logged as warnings.</p>
+     */
+    private void activateTree(ReplicationEvent event) {
+        List<String> paths = event.getAffectedPaths();
+        if (paths == null || paths.isEmpty()) {
+            log.warn("Tree activation event for '{}' has no affected paths — skipping", event.getPath());
             return;
         }
 
-        // Single node activation — upsert into publish store
-        var existing = nodeRepository.findByPath(event.getPath());
+        log.info("Tree activation: fetching {} nodes from author, root={}", paths.size(), event.getPath());
+        int succeeded = 0;
+        int failed = 0;
+
+        for (String path : paths) {
+            try {
+                Map<String, Object> nodeData = authorNodeClient.fetchNode(path)
+                        .orElse(null);
+
+                if (nodeData == null) {
+                    log.warn("Could not fetch node '{}' from author — skipping", path);
+                    failed++;
+                    continue;
+                }
+
+                activateSingleNode(
+                        path,
+                        (String) nodeData.get("resourceType"),
+                        (String) nodeData.get("parentPath"),
+                        (String) nodeData.getOrDefault("siteId", event.getSiteId()),
+                        (String) nodeData.getOrDefault("locale", event.getLocale()),
+                        castProperties(nodeData.get("properties")),
+                        nodeData.get("orderIndex") instanceof Number n ? n.intValue() : null,
+                        nodeData.get("version") instanceof Number n ? n.longValue() : null
+                );
+                succeeded++;
+            } catch (Exception e) {
+                log.error("Error activating node '{}' during tree replication: {}", path, e.getMessage());
+                failed++;
+            }
+        }
+
+        log.info("Tree activation complete: {}/{} nodes activated (root={})", succeeded, paths.size(), event.getPath());
+        if (failed > 0) {
+            log.warn("Tree activation: {} nodes failed — partial tree on publish tier", failed);
+        }
+    }
+
+    /**
+     * Upsert a single content node into the publish store.
+     */
+    private void activateSingleNode(String path, String resourceType, String parentPath,
+                                     String siteId, String locale,
+                                     Map<String, Object> properties, Integer orderIndex, Long version) {
+        var existing = nodeRepository.findByPath(path);
         ContentNode node;
 
         if (existing.isPresent()) {
             node = existing.get();
         } else {
-            node = new ContentNode(event.getPath(),
-                    extractName(event.getPath()),
-                    event.getResourceType() != null ? event.getResourceType() : "flexcms/page");
-            node.setParentPath(event.getParentPath());
-            node.setSiteId(event.getSiteId());
-            node.setLocale(event.getLocale());
+            node = new ContentNode(path,
+                    extractName(path),
+                    resourceType != null ? resourceType : "flexcms/page");
+            node.setParentPath(parentPath);
+            node.setSiteId(siteId);
+            node.setLocale(locale);
         }
 
-        if (event.getNodeProperties() != null) {
-            node.setProperties(new HashMap<>(event.getNodeProperties()));
+        if (properties != null) {
+            node.setProperties(new HashMap<>(properties));
         }
-        if (event.getResourceType() != null) {
-            node.setResourceType(event.getResourceType());
+        if (resourceType != null) {
+            node.setResourceType(resourceType);
         }
-        if (event.getOrderIndex() != null) {
-            node.setOrderIndex(event.getOrderIndex());
+        if (orderIndex != null) {
+            node.setOrderIndex(orderIndex);
         }
-        node.setVersion(event.getVersion() != null ? event.getVersion() : node.getVersion());
+        node.setVersion(version != null ? version : node.getVersion());
         node.setStatus(NodeStatus.PUBLISHED);
 
         nodeRepository.save(node);
-        log.info("Activated content on publish: {}", event.getPath());
+        log.debug("Activated content on publish: {}", path);
     }
 
     private void deactivateContent(ReplicationEvent event) {
@@ -96,5 +160,12 @@ public class ReplicationReceiver {
         String[] parts = path.split("\\.");
         return parts[parts.length - 1];
     }
-}
 
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> castProperties(Object value) {
+        if (value instanceof Map<?, ?> m) {
+            return (Map<String, Object>) m;
+        }
+        return null;
+    }
+}

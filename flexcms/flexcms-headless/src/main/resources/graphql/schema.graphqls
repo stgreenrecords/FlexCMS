@@ -21,6 +21,9 @@ type Page {
 type PageConnection {
     totalCount: Int!
     items: [Page!]!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    nextOffset: Int
 }
 
 type ContentNode {

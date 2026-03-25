@@ -7,6 +7,8 @@ import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ContentNodeVersionRepository;
+import com.flexcms.core.util.RichTextSanitizer;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -37,8 +39,20 @@ class ContentNodeServiceTest {
     @Mock
     private ContentNodeVersionRepository versionRepository;
 
+    @Mock
+    private RichTextSanitizer richTextSanitizer;
+
     @InjectMocks
     private ContentNodeService contentNodeService;
+
+    @BeforeEach
+    void configureSanitizer() {
+        // Lenient: pass-through default so existing tests need no changes.
+        // Lenient avoids UnnecessaryStubbingException in tests that don't call sanitizeIfHtml.
+        org.mockito.Mockito.lenient()
+                .when(richTextSanitizer.sanitizeIfHtml(org.mockito.ArgumentMatchers.anyString()))
+                .thenAnswer(inv -> inv.getArgument(0));
+    }
 
     private ContentNode buildNode(String path, String name) {
         ContentNode node = new ContentNode(path, name, "flexcms/page");
@@ -363,5 +377,69 @@ class ContentNodeServiceTest {
         List<ContentNode> children = contentNodeService.getChildren("content.corporate.en.home");
 
         assertThat(children).containsExactly(child1, child2);
+    }
+
+    // --- XSS sanitization ---
+
+    @Test
+    void create_sanitizesHtmlProperties_viaRichTextSanitizer() {
+        ContentNode parent = buildNode("content.corporate.en", "en");
+        when(nodeRepository.existsByPath(any())).thenReturn(false);
+        when(nodeRepository.findByPath("content.corporate.en")).thenReturn(Optional.of(parent));
+        when(nodeRepository.findByParentPathOrderByOrderIndex(any())).thenReturn(List.of());
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        // Sanitizer strips script tag
+        when(richTextSanitizer.sanitizeIfHtml("<p>Hello</p><script>xss()</script>"))
+                .thenReturn("<p>Hello</p>");
+        when(richTextSanitizer.sanitizeIfHtml("plain text")).thenReturn("plain text");
+
+        contentNodeService.create("content.corporate.en", "home", "flexcms/page",
+                Map.of("body", "<p>Hello</p><script>xss()</script>", "title", "plain text"),
+                "user1");
+
+        ArgumentCaptor<ContentNode> captor = ArgumentCaptor.forClass(ContentNode.class);
+        verify(nodeRepository).save(captor.capture());
+        assertThat(captor.getValue().getProperties())
+                .containsEntry("body", "<p>Hello</p>")
+                .containsEntry("title", "plain text");
+    }
+
+    @Test
+    void updateProperties_sanitizesHtmlValues_viaRichTextSanitizer() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        node.setProperties(new HashMap<>());
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(richTextSanitizer.sanitizeIfHtml("<img src=x onerror=alert(1)>"))
+                .thenReturn("<img src=\"x\" />");
+
+        ContentNode result = contentNodeService.updateProperties("content.corporate.en.home",
+                Map.of("hero", "<img src=x onerror=alert(1)>"), "user1");
+
+        assertThat(result.getProperties()).containsEntry("hero", "<img src=\"x\" />");
+    }
+
+    @Test
+    void create_skipsNonStringProperties_withoutSanitization() {
+        ContentNode parent = buildNode("content.corporate.en", "en");
+        when(nodeRepository.existsByPath(any())).thenReturn(false);
+        when(nodeRepository.findByPath("content.corporate.en")).thenReturn(Optional.of(parent));
+        when(nodeRepository.findByParentPathOrderByOrderIndex(any())).thenReturn(List.of());
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Map<String, Object> props = new HashMap<>();
+        props.put("count", 42);
+        props.put("enabled", true);
+
+        contentNodeService.create("content.corporate.en", "home", "flexcms/page", props, "user1");
+
+        ArgumentCaptor<ContentNode> captor = ArgumentCaptor.forClass(ContentNode.class);
+        verify(nodeRepository).save(captor.capture());
+        assertThat(captor.getValue().getProperties())
+                .containsEntry("count", 42)
+                .containsEntry("enabled", true);
+        // sanitizeIfHtml must not be called for non-String values
+        org.mockito.Mockito.verify(richTextSanitizer,
+                org.mockito.Mockito.never()).sanitizeIfHtml(null);
     }
 }

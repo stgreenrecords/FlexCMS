@@ -1,40 +1,41 @@
-# FlexCMS Infrastructure
+# FlexCMS Infrastructure & Deployment Guide
 
-## Architecture Overview
+## Application Architecture — Three Pillars
+
+FlexCMS has three independent functional pillars that **run inside the same Java application**:
+
+| Pillar | API Prefix | Database | Description |
+|---|---|---|---|
+| **Content (CMS)** | `/api/author/*`, `/api/content/*` | `flexcms_author` / `flexcms_publish` | Content tree, pages, components, workflows, replication |
+| **Digital Assets (DAM)** | `/api/dam/*` | Same as CMS + S3 bucket | Asset upload, rendition pipeline, CDN delivery |
+| **Products (PIM)** | `/api/pim/*` | `flexcms_pim` (separate DB) | Product catalog, schemas, import, year-over-year carryforward |
+
+**Key design:** One Docker image (`flexcms-app`), two deployment modes:
+- **Author** (`SPRING_PROFILES_ACTIVE=author`) — read-write, serves all three pillar APIs
+- **Publish** (`SPRING_PROFILES_ACTIVE=publish`) — read-only, headless delivery, receives replicated content from Author via RabbitMQ
 
 ```
-                    ┌─────────────────────────────────────┐
-                    │          CloudFront CDN              │
-                    │    (prod only — static + API cache)  │
-                    └──────────────┬──────────────────────┘
-                                   │
-              ┌────────────────────┼────────────────────┐
-              │                    │                     │
-    ┌─────────▼──────────┐  ┌─────▼───────────┐        │
-    │  Publish ALB       │  │  Author ALB     │        │
-    │  (internet-facing) │  │  (internal)     │        │
-    │  Round-robin       │  │  Sticky session │        │
-    └─────────┬──────────┘  └─────┬───────────┘        │
-              │                    │                     │
-    ┌─────────▼──────────┐  ┌─────▼───────────┐        │
-    │  Publish ECS Tasks │  │  Author ECS     │        │
-    │  (Fargate + Spot)  │  │  (Fargate)      │        │
-    │  Auto-scaling      │  │  Fixed count    │        │
-    │  QA: 2, Prod: 5-20 │  │  QA:1, Prod:2  │        │
-    └─────────┬──────────┘  └─────┬───────────┘        │
-              │                    │                     │
-    ┌─────────┴────────────────────┴───────────────────┐│
-    │              Private Subnets (2 AZs)             ││
-    │  ┌──────┐ ┌───────────┐ ┌──────────┐ ┌────────┐ ││
-    │  │ RDS  │ │ElastiCache│ │Amazon MQ │ │   S3   │ ││
-    │  │PG 16 │ │ Redis 7   │ │RabbitMQ  │ │ Assets │ ││
-    │  └──────┘ └───────────┘ └──────────┘ └────────┘ ││
-    └──────────────────────────────────────────────────┘│
-                                                        │
-    ┌───────────────────────────────────────────────────┘
-    │  S3 Static Site Bucket (compiled HTML/CSS/JS)
-    └──────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                    Single Docker Image                          │
+│                  ghcr.io/.../flexcms-app                        │
+│                                                                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
+│  │   Content    │  │     DAM      │  │     PIM      │         │
+│  │   (CMS)      │  │  (Assets)    │  │  (Products)  │         │
+│  │              │  │              │  │              │          │
+│  │ flexcms-core │  │ flexcms-dam  │  │ flexcms-pim  │         │
+│  │ flexcms-     │  │ (S3Service,  │  │ (own DB,     │         │
+│  │  author/     │  │  renditions) │  │  own entity  │         │
+│  │  publish/    │  │              │  │  manager)    │         │
+│  │  headless    │  │              │  │              │         │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘         │
+│         │                 │                  │                  │
+│    flexcms_author    S3 Bucket         flexcms_pim             │
+│    flexcms_publish   (MinIO/AWS S3)    (separate DB)           │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Directory Structure
 
@@ -42,7 +43,7 @@
 infra/
 ├── README.md                  # This file
 ├── local/
-│   ├── docker-compose.dev.yml # Full local dev stack (author+publish+infra)
+│   ├── docker-compose.dev.yml # Full local dev stack (infra + app + frontend)
 │   └── .env.local             # Local env var template
 ├── cfn/
 │   ├── main.yml               # Root CloudFormation stack (orchestrator)
@@ -59,115 +60,223 @@ infra/
     └── init-rds.sh            # One-time RDS database initialization
 ```
 
-## Environments
-
-| Setting | QA | Production |
-|---|---|---|
-| Author instances | 1 | 2 |
-| Publish instances | 2 (min) → 6 (max) | 5 (min) → 20 (max) |
-| RDS | db.t3.medium, single-AZ | db.r6g.large, Multi-AZ |
-| Redis | cache.t3.micro, 1 node | cache.r6g.large, 2 nodes |
-| RabbitMQ | mq.m5.large, single | mq.m5.large, HA cluster |
-| Publish capacity | FARGATE + FARGATE_SPOT | FARGATE + FARGATE_SPOT |
-| Auto-scaling trigger | CPU > 60% or 1000 req/target/min | Same |
-| CloudFront | No | Yes |
-| WAF | No | Yes (future) |
+---
 
 ## Local Development
 
+### Option A: Infrastructure-only (Recommended — fastest iteration)
+
+Start only infrastructure services in Docker; run backend and frontend from your IDE with hot-reload.
+
 ```bash
-# Start everything (PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch, Author, Publish)
+# 1. Start infrastructure (PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch)
 cd infra/local
-cp .env.local .env    # first time only — customize if needed
-docker compose -f docker-compose.dev.yml up -d
+cp .env.local .env          # first time only
+docker compose up -d
 
-# Check health
-docker compose -f docker-compose.dev.yml ps
+# 2. Verify infrastructure is healthy
+docker compose ps           # all should show "healthy" or "running"
 
-# View author logs
-docker compose -f docker-compose.dev.yml logs -f author
+# 3. Build & run backend from IDE (author mode — serves Content + DAM + PIM)
+cd ../../flexcms
+mvn clean compile
+mvn spring-boot:run -pl flexcms-app -Dspring-boot.run.profiles=author
 
-# Frontend (run separately for hot-reload)
-cd frontend && pnpm install && pnpm dev
+# 4. (Optional) Run a second publish instance in another terminal
+mvn spring-boot:run -pl flexcms-app -Dspring-boot.run.profiles=publish
+
+# 5. Run Admin UI with hot-reload
+cd ../frontend
+pnpm install
+cd apps/admin
+pnpm dev
 ```
 
-### Endpoints (Local)
-
-| Service | URL |
-|---|---|
-| Author API | http://localhost:8080 |
-| Publish API | http://localhost:8081 |
-| Admin UI | http://localhost:3000 (run `pnpm dev` in frontend/apps/admin) |
-| RabbitMQ Console | http://localhost:15672 (guest/guest) |
-| MinIO Console | http://localhost:9001 (minioadmin/minioadmin) |
-
-## AWS Deployment
-
-### Prerequisites
-
-1. AWS CLI v2 installed and configured
-2. GitHub repository secrets configured:
-   - `AWS_ACCESS_KEY_ID` — IAM user access key
-   - `AWS_SECRET_ACCESS_KEY` — IAM user secret key
-   - `AWS_REGION` — target region (default: `eu-central-1`)
-   - `FLEXCMS_DB_PASSWORD` — RDS master password (min 8 chars)
-   - `FLEXCMS_MQ_PASSWORD` — RabbitMQ password (min 8 chars)
-
-### Deploy via GitHub Actions (Recommended)
-
-1. Go to **Actions** → **Deploy Environment**
-2. Click **Run workflow**
-3. Select environment (`qa` or `prod`), set instance counts, image tag
-4. Click **Run workflow**
-
-QA auto-deploys after every successful CI build on `main`.
-
-### Deploy via CLI
+### Option B: Full-stack Docker (CI-like, tests deployment image)
 
 ```bash
-# Set AWS credentials
-export AWS_ACCESS_KEY_ID=...
-export AWS_SECRET_ACCESS_KEY=...
-export AWS_DEFAULT_REGION=eu-central-1
-export FLEXCMS_DB_PASSWORD=...
-export FLEXCMS_MQ_PASSWORD=...
+cd infra/local
+cp .env.local .env                          # first time only
+docker compose --profile app up -d --build  # infra + author + publish
+docker compose --profile full up -d --build # + admin UI
+```
 
-# Deploy QA
-bash infra/scripts/deploy.sh --env qa --action create --image-tag latest
+### Option C: Backend in Docker, frontend in IDE
 
-# Update production with specific image
+```bash
+cd infra/local
+docker compose --profile app up -d --build  # infra + author + publish
+# then separately:
+cd ../../frontend/apps/admin && pnpm dev    # admin UI with hot-reload
+```
+
+### Local Endpoints
+
+| Service | URL | Credentials |
+|---|---|---|
+| **Author API** (Content + DAM + PIM) | http://localhost:8080 | — |
+| **Publish API** (headless delivery) | http://localhost:8081 | — |
+| **Admin UI** | http://localhost:3000 | — |
+| Component Registry Contract | http://localhost:8080/api/content/v1/component-registry | — |
+| GraphiQL | http://localhost:8080/graphiql | — |
+| Actuator (Author) | http://localhost:8080/actuator/health | — |
+| PostgreSQL | localhost:5432 | flexcms / flexcms |
+| RabbitMQ Console | http://localhost:15672 | guest / guest |
+| MinIO Console | http://localhost:9001 | minioadmin / minioadmin |
+| Elasticsearch | http://localhost:9200 | — |
+
+### API Quick-Test Cheat Sheet
+
+```bash
+# === Content (CMS) ===
+# Get component registry (the backend-frontend contract)
+curl http://localhost:8080/api/content/v1/component-registry | jq .
+
+# Create a site
+curl -X POST http://localhost:8080/api/admin/sites \
+  -H "Content-Type: application/json" \
+  -d '{"siteId":"corporate","title":"Corporate Website"}'
+
+# Get a page (headless delivery)
+curl http://localhost:8080/api/content/v1/pages/content/corporate/en/homepage
+
+# === DAM ===
+# Upload an asset
+curl -X POST http://localhost:8080/api/dam/upload \
+  -F "file=@hero.jpg" -F "folder=/dam/corporate/images"
+
+# === PIM ===
+# List products
+curl http://localhost:8080/api/pim/v1/products
+
+# Create a product
+curl -X POST http://localhost:8080/api/pim/v1/products \
+  -H "Content-Type: application/json" \
+  -d '{"sku":"PROD-001","name":"Example Product","catalogId":"..."}'
+
+# === Replication ===
+# Publish content → author sends to RabbitMQ → publish receives
+# Check RabbitMQ queue status:
+curl -u guest:guest http://localhost:15672/api/queues | jq '.[].name'
+```
+
+### Verifying Author-to-Publish Replication Locally
+
+1. Create content on Author (:8080) via `/api/author/content/node`
+2. Publish it via the workflow or `/api/author/content/.../status`
+3. Content appears on Publish (:8081) via `/api/content/v1/pages/...`
+4. Monitor RabbitMQ at http://localhost:15672 → Queues tab
+
+---
+
+## AWS Environments
+
+### Architecture
+
+```
+                    ┌──────────────────────────────┐
+                    │     CloudFront CDN (prod)     │
+                    └──────────────┬───────────────┘
+                                   │
+           ┌───────────────────────┼───────────────────────┐
+           │                       │                        │
+ ┌─────────▼──────────┐  ┌────────▼────────┐              │
+ │  Publish ALB       │  │  Author ALB     │              │
+ │  (internet-facing) │  │  (internal)     │              │
+ │  Round-robin       │  │  Sticky session │              │
+ └─────────┬──────────┘  └────────┬────────┘              │
+           │                       │                        │
+ ┌─────────▼──────────┐  ┌────────▼────────┐              │
+ │  Publish Tasks     │  │  Author Tasks   │              │
+ │  (Fargate+Spot)    │  │  (Fargate)      │              │
+ │  Content+DAM+PIM   │  │  Content+DAM+PIM│              │
+ │  READ-ONLY         │  │  READ-WRITE     │              │
+ │  Auto-scaling      │  │  Fixed count    │              │
+ └─────────┬──────────┘  └────────┬────────┘              │
+           │                       │                        │
+ ┌─────────┴───────────────────────┴──────────────────────┐│
+ │              Private Subnets (2 AZs)                   ││
+ │  ┌──────┐  ┌───────────┐  ┌──────────┐  ┌──────────┐ ││
+ │  │ RDS  │  │ElastiCache│  │Amazon MQ │  │   S3     │ ││
+ │  │PG 16 │  │ Redis 7   │  │RabbitMQ  │  │ Assets   │ ││
+ │  │3 DBs │  │           │  │          │  │ Static   │ ││
+ │  └──────┘  └───────────┘  └──────────┘  └──────────┘ ││
+ └────────────────────────────────────────────────────────┘│
+```
+
+### Environment Comparison
+
+| Setting | QA | Production |
+|---|---|---|
+| Author instances | **1** | **2** |
+| Publish instances | **2** (min) → 6 (max) | **5** (min) → 20 (max) |
+| RDS | db.t3.medium, single-AZ | db.r6g.large, Multi-AZ, encrypted |
+| Redis | cache.t3.micro, 1 node | cache.r6g.large, 2 nodes, Multi-AZ |
+| RabbitMQ | mq.m5.large, single | mq.m5.large, HA cluster |
+| Publish capacity | FARGATE + FARGATE_SPOT | FARGATE + FARGATE_SPOT |
+| Auto-scaling triggers | CPU > 60%, 1000 req/target/min | Same |
+| CloudFront CDN | No | Yes |
+| WAF | No | Yes (future) |
+
+### Databases in AWS (Single RDS, 3 Databases)
+
+| Database | Used By | Purpose |
+|---|---|---|
+| `flexcms_author` | Author instances | Content tree, workflows, DAM metadata |
+| `flexcms_publish` | Publish instances | Replicated content (read-only) |
+| `flexcms_pim` | Both Author + Publish | Product catalog, schemas, variants |
+
+### Deployment
+
+#### Via GitHub Actions (Recommended)
+
+1. Configure repository secrets:
+   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`
+   - `FLEXCMS_DB_PASSWORD`, `FLEXCMS_MQ_PASSWORD`
+2. Go to **Actions → Deploy Environment → Run workflow**
+3. QA auto-deploys after every successful CI build on `main`
+
+#### Via CLI
+
+```bash
+export AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... AWS_DEFAULT_REGION=eu-central-1
+export FLEXCMS_DB_PASSWORD=... FLEXCMS_MQ_PASSWORD=...
+
+# Create QA
+bash infra/scripts/deploy.sh --env qa --action create
+
+# Update production
 bash infra/scripts/deploy.sh --env prod --action update --image-tag sha-abc1234
 ```
 
-### First-Time Setup (After Initial Deploy)
+#### First-Time RDS Setup
 
 ```bash
-# Get RDS endpoint from stack outputs
 RDS_EP=$(aws cloudformation describe-stacks --stack-name flexcms-qa \
   --query "Stacks[0].Outputs[?OutputKey=='RDSEndpoint'].OutputValue" --output text)
-
-# Initialize databases (requires network access to RDS — use SSM tunnel)
 bash infra/scripts/init-rds.sh qa "$RDS_EP"
 ```
+
+---
 
 ## Load Balancing Strategy
 
 ### Author ALB (Internal)
-- **Scheme:** Internal (private subnets only)
-- **Sticky sessions:** Enabled (LB cookie, 1-hour TTL)
-- **Routing:** `/api/author/*` → Author, `/api/pim/*` → Author, `/api/dam/*` → Author
+- **Internal only** — not exposed to the internet
+- **Sticky sessions** (LB cookie, 1hr) — Admin UI needs consistent backend connection
+- **Routes:** `/api/author/*`, `/api/pim/*`, `/api/dam/*` → Author target group
 - **Health check:** `/actuator/health/readiness`
-- **Why sticky:** Admin UI maintains session state; ensures consistent authoring experience
 
 ### Publish ALB (Internet-facing)
-- **Scheme:** Internet-facing (public subnets)
-- **Round-robin:** Default (stateless reads)
-- **Routing:** `/api/content/*` → Publish, `/graphql` → Publish
+- **Round-robin** — all publish instances are stateless, any can handle any request
+- **Routes:** `/api/content/*`, `/graphql`, `/dam/renditions/*` → Publish target group
+- **Auto-scaling:** CPU target 60% + 1000 requests/target/minute
+- **FARGATE_SPOT:** ~75% of publish tasks use Spot capacity (70% cheaper, safe because stateless)
 - **Health check:** `/actuator/health/readiness`
-- **Auto-scaling:** CPU target tracking (60%) + ALB request count (1000/target/min)
-- **FARGATE_SPOT:** 75% of publish tasks use Spot (stateless, replaceable, 70% cost savings)
 
-## Cost Estimates (Monthly)
+---
+
+## Cost Estimates (Monthly, eu-central-1)
 
 | Resource | QA | Production |
 |---|---|---|
@@ -177,9 +286,7 @@ bash infra/scripts/init-rds.sh qa "$RDS_EP"
 | ElastiCache Redis | ~$15 | ~$300 |
 | Amazon MQ RabbitMQ | ~$150 | ~$300 |
 | NAT Gateway | ~$35 | ~$35 |
-| ALB (x2) | ~$40 | ~$40 |
+| ALB (×2) | ~$40 | ~$40 |
 | S3 | ~$5 | ~$20 |
 | **Total** | **~$410/mo** | **~$1,585/mo** |
-
-*Estimates based on eu-central-1 pricing. Actual costs vary with traffic.*
 

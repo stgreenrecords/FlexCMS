@@ -48,6 +48,14 @@ FlexCMS has three independent pillars: Content (CMS), Digital Assets (DAM), and 
 ## Build Commands
 
 ```bash
+# Flex CLI (recommended — from project root)
+flex start local all                  # Start everything (infra + author + publish + admin)
+flex start local author               # Infra + Author only
+flex start local author,publish       # Infra + Author + Publish
+flex stop local                       # Stop everything
+flex status                           # Health-check all services
+flex logs author                      # Tail Author log
+
 # Backend — build all modules
 cd flexcms && mvn clean install
 

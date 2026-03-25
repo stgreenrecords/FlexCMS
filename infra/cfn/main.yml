@@ -265,6 +265,13 @@ Resources:
             - {Name: SPRING_RABBITMQ_SSL_ENABLED, Value: 'true'}
             - {Name: FLEXCMS_DAM_S3_BUCKET, Value: !GetAtt StorageStack.Outputs.AssetsBucketName}
             - {Name: FLEXCMS_DAM_S3_REGION, Value: !Ref 'AWS::Region'}
+            # PIM database (separate DB on same RDS instance)
+            - Name: FLEXCMS_PIM_DATASOURCE_URL
+              Value: !Sub
+                - jdbc:postgresql://${EP}:5432/flexcms_pim
+                - EP: !GetAtt DatabaseStack.Outputs.DBEndpoint
+            - {Name: FLEXCMS_PIM_DATASOURCE_USERNAME, Value: flexcms}
+            - {Name: FLEXCMS_PIM_DATASOURCE_PASSWORD, Value: !Ref DBMasterPassword}
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -325,6 +332,13 @@ Resources:
             - {Name: SPRING_RABBITMQ_SSL_ENABLED, Value: 'true'}
             - {Name: FLEXCMS_DAM_S3_BUCKET, Value: !GetAtt StorageStack.Outputs.AssetsBucketName}
             - {Name: FLEXCMS_DAM_S3_REGION, Value: !Ref 'AWS::Region'}
+            # PIM database (separate DB on same RDS instance, read-only for publish)
+            - Name: FLEXCMS_PIM_DATASOURCE_URL
+              Value: !Sub
+                - jdbc:postgresql://${EP}:5432/flexcms_pim
+                - EP: !GetAtt DatabaseStack.Outputs.DBEndpoint
+            - {Name: FLEXCMS_PIM_DATASOURCE_USERNAME, Value: flexcms}
+            - {Name: FLEXCMS_PIM_DATASOURCE_PASSWORD, Value: !Ref DBMasterPassword}
           LogConfiguration:
             LogDriver: awslogs
             Options:

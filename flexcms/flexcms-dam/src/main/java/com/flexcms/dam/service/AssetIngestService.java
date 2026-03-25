@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
 import java.time.Instant;
 import java.util.*;
 
@@ -133,19 +136,31 @@ public class AssetIngestService {
     }
 
     /**
-     * List assets in a folder.
+     * List assets in a folder with pagination.
+     *
+     * @param folderPath folder path to list
+     * @param siteId     site identifier
+     * @param page       zero-based page number
+     * @param size       page size (capped at 200)
+     * @return paginated result
      */
-    public List<Asset> listFolder(String folderPath, String siteId) {
+    public Page<Asset> listFolder(String folderPath, String siteId, int page, int size) {
         return assetRepository.findByFolderPathAndStatus(folderPath, AssetStatus.ACTIVE,
-                org.springframework.data.domain.Pageable.unpaged()).getContent();
+                PageRequest.of(page, Math.min(size, 200)));
     }
 
     /**
-     * Search assets by query.
+     * Search assets by query with pagination.
+     *
+     * @param siteId site identifier
+     * @param query  search query
+     * @param page   zero-based page number
+     * @param size   page size (capped at 200)
+     * @return paginated result
      */
-    public List<Asset> searchAssets(String siteId, String query) {
+    public Page<Asset> searchAssets(String siteId, String query, int page, int size) {
         return assetRepository.search(siteId, query,
-                org.springframework.data.domain.Pageable.unpaged()).getContent();
+                PageRequest.of(page, Math.min(size, 200)));
     }
 }
 

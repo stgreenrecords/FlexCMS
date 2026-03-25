@@ -12,8 +12,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Page;
+
 import java.io.IOException;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -50,13 +53,22 @@ public class AuthorAssetController {
         );
     }
 
-    /** List assets in a folder. */
+    /** List assets in a folder with pagination. */
     @GetMapping("/folder")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
-    public ResponseEntity<List<Asset>> listFolder(
+    public ResponseEntity<Map<String, Object>> listFolder(
             @NotBlank(message = "folderPath is required") @RequestParam String folderPath,
-            @NotBlank(message = "siteId is required") @RequestParam String siteId) {
-        return ResponseEntity.ok(assetService.listFolder(folderPath, siteId));
+            @NotBlank(message = "siteId is required") @RequestParam String siteId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        Page<Asset> result = assetService.listFolder(folderPath, siteId, page, size);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("items", result.getContent());
+        response.put("totalCount", result.getTotalElements());
+        response.put("page", result.getNumber());
+        response.put("size", result.getSize());
+        response.put("hasNextPage", result.hasNext());
+        return ResponseEntity.ok(response);
     }
 
     /** Delete an asset. */

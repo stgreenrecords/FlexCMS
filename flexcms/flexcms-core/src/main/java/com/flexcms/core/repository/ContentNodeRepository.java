@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -90,6 +91,20 @@ public interface ContentNodeRepository extends JpaRepository<ContentNode, UUID> 
     @Query(value = "DELETE FROM content_nodes WHERE path::text LIKE :pathPrefix || '%'",
            nativeQuery = true)
     void deleteSubtree(@Param("pathPrefix") String pathPrefix);
+
+    /**
+     * Find nodes whose scheduled publish time has passed and are not yet published.
+     */
+    @Query("SELECT n FROM ContentNode n WHERE n.scheduledPublishAt IS NOT NULL " +
+           "AND n.scheduledPublishAt <= :now AND n.status <> 'PUBLISHED'")
+    List<ContentNode> findDueForPublish(@Param("now") Instant now);
+
+    /**
+     * Find published nodes whose scheduled deactivation time has passed.
+     */
+    @Query("SELECT n FROM ContentNode n WHERE n.scheduledDeactivateAt IS NOT NULL " +
+           "AND n.scheduledDeactivateAt <= :now AND n.status = 'PUBLISHED'")
+    List<ContentNode> findDueForDeactivation(@Param("now") Instant now);
 
     /**
      * Full-text search across content properties.

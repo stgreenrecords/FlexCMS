@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
   BreadcrumbPage, BreadcrumbSeparator,
@@ -226,6 +228,12 @@ function AssetMenu({ asset, onDelete }: { asset: Asset; onDelete: (id: string) =
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem asChild>
+          <Link href={`/dam/${asset.id}`}>
+            <InfoIcon className="h-4 w-4 mr-2" />
+            View Details
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem>
           <DownloadIcon className="h-4 w-4 mr-2" />
           Download
@@ -254,6 +262,7 @@ function AssetMenu({ asset, onDelete }: { asset: Asset; onDelete: (id: string) =
 // ---------------------------------------------------------------------------
 
 export default function DamBrowserPage() {
+  const router = useRouter();
   const [viewMode, setViewMode]       = useState<ViewMode>('grid');
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
   const [search, setSearch]           = useState('');
@@ -643,6 +652,7 @@ export default function DamBrowserPage() {
                       <div
                         key={asset.id}
                         onClick={() => toggleSelect(asset.id)}
+                        onDoubleClick={() => router.push(`/dam/${asset.id}`)}
                         className={`group relative rounded-[var(--radius-lg)] p-3 border-2 transition-all cursor-pointer
                           ${isSelected
                             ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5 shadow-lg'
@@ -937,9 +947,9 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-function InfoIcon() {
+function InfoIcon({ className }: { className?: string }) {
   return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none"
+    <svg className={className ?? 'h-4 w-4'} viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <circle cx="12" cy="12" r="10"/>
       <line x1="12" y1="16" x2="12" y2="12"/>

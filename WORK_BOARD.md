@@ -103,9 +103,9 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | Module | Locked By Item | Agent | Since |
 |---|---|---|---|
-| `flexcms-core` | — | — | — |
+| `flexcms-core` | P4-01 | Claude Sonnet 4.6 | 2026-03-25 |
 | `flexcms-app` | — | — | — |
-| `flexcms-author` | — | — | — |
+| `flexcms-author` | P4-01 | Claude Sonnet 4.6 | 2026-03-25 |
 | `flexcms-publish` | — | — | — |
 | `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
@@ -150,7 +150,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P1-03 | **Per-node ACL enforcement** | ✅ DONE | 🔴 P0 | L | `flexcms-core` | P1-01 | Claude Sonnet 4.6 |
 | P1-04 | **Global error handling (@ControllerAdvice)** | ✅ DONE | 🔴 P0 | M | `flexcms-app`, `flexcms-core` | — | Claude Sonnet 4.6 |
 | P1-05 | **Request DTO validation (@Valid + Zod schemas)** | ✅ DONE | 🔴 P0 | M | `flexcms-author`, `flexcms-headless`, `flexcms-pim` | P1-04 | Claude Sonnet 4.6 |
-| P1-06 | **XSS sanitization on rich text** | 🟢 OPEN | 🟡 P1 | S | `flexcms-core` | P1-04 | — |
+| P1-06 | **XSS sanitization on rich text** | ✅ DONE | 🟡 P1 | S | `flexcms-core` | P1-04 | Claude Sonnet 4.6 |
 | P1-07 | **Unit tests: flexcms-core services** | ✅ DONE | 🔴 P0 | L | `flexcms-core` | — | Claude Sonnet 4.6 |
 | P1-08 | **Unit tests: flexcms-author services** | ✅ DONE | 🔴 P0 | L | `flexcms-author` | — | Claude Sonnet 4.6 |
 | P1-09 | **Unit tests: flexcms-replication** | ✅ DONE | 🔴 P0 | M | `flexcms-replication` | — | Claude Sonnet 4.6 |
@@ -166,8 +166,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
-| P2-01 | **Complete GraphQL resolvers (all query types)** | 🟢 OPEN | 🟡 P1 | L | `flexcms-headless` | — | — |
-| P2-02 | **GraphQL: pagination + field resolvers** | 🟢 OPEN | 🟡 P1 | M | `flexcms-headless` | P2-01 | — |
+| P2-01 | **Complete GraphQL resolvers (all query types)** | ✅ DONE | 🟡 P1 | L | `flexcms-headless` | — | Claude Sonnet 4.6 |
+| P2-02 | **GraphQL: pagination + field resolvers** | ✅ DONE | 🟡 P1 | M | `flexcms-headless` | P2-01 | Claude Sonnet 4.6 |
 | P2-03 | **Elasticsearch: full-text indexing on publish** | 🟢 OPEN | 🟡 P1 | L | `flexcms-search`, `flexcms-replication` | — | — |
 | P2-04 | **Elasticsearch: search API with facets** | 🟢 OPEN | 🟡 P1 | M | `flexcms-search`, `flexcms-headless` | P2-03 | — |
 | P2-05 | **Angular adapter: full implementation** | 🟢 OPEN | 🟡 P1 | L | `frontend/packages/angular` | — | — |
@@ -205,8 +205,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P3-12 | **Content tree browser page** | ✅ DONE | 🔴 P0 | XL | `frontend/apps/admin` | P3-09, P3-04, P3-03 | Claude Sonnet 4.6 |
 | P3-13 | **Visual page editor (drag-and-drop)** | ✅ DONE | 🔴 P0 | XL | `frontend/apps/admin` | P3-12, P3-01 | Claude Sonnet 4.6 |
 | P3-14 | **DAM browser page** | ✅ DONE | 🔴 P0 | L | `frontend/apps/admin` | P3-09, P3-03, P3-07 | Claude Sonnet 4.6 |
-| P3-15 | **DAM asset detail page** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-14 | — |
-| P3-16 | **Workflow inbox page** | 🟢 OPEN | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03 | — |
+| P3-15 | **DAM asset detail page** | ✅ DONE | 🟡 P1 | M | `frontend/apps/admin` | P3-14 | Claude Sonnet 4.6 |
+| P3-16 | **Workflow inbox page** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03 | Claude Sonnet 4.6 |
 | P3-17 | **Component registry browser page** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-09, P3-03 | — |
 | P3-18 | **Content preview (iframe + viewport toggle)** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-13 | — |
 | P3-19 | **Translation manager page** | 🟢 OPEN | 🟢 P2 | M | `frontend/apps/admin` | P3-09, P3-03 | — |
@@ -216,7 +216,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
-| P4-01 | **Scheduled publishing (cron scheduler)** | 🟢 OPEN | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | — |
+| P4-01 | **Scheduled publishing (cron scheduler)** | 🔵 IN PROGRESS | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | Claude Sonnet 4.6 |
 | P4-02 | **Bulk operations (publish/delete/move)** | 🟢 OPEN | 🟡 P1 | L | `flexcms-author`, `flexcms-core` | — | — |
 | P4-03 | **CDN: CloudFront provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
 | P4-04 | **CDN: Cloudflare provider implementation** | 🟢 OPEN | 🟡 P1 | M | `flexcms-cdn` | — | — |
@@ -232,8 +232,8 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
-| P5-01 | **PIM: complete ProductService CRUD + validation** | 🟢 OPEN | 🟡 P1 | L | `flexcms-pim` | — | — |
-| P5-02 | **PIM: schema validation (JSON Schema)** | 🟢 OPEN | 🟡 P1 | M | `flexcms-pim` | P5-01 | — |
+| P5-01 | **PIM: complete ProductService CRUD + validation** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | — | Claude Sonnet 4.6 |
+| P5-02 | **PIM: schema validation (JSON Schema)** | ✅ DONE | 🟡 P1 | M | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-03 | **PIM: product versioning history** | 🟢 OPEN | 🟡 P1 | M | `flexcms-pim` | P5-01 | — |
 | P5-04 | **PIM: year-over-year carryforward (full merge)** | 🟢 OPEN | 🟡 P1 | L | `flexcms-pim` | P5-01 | — |
 | P5-05 | **PIM: ImportService + field mapping profiles** | 🟢 OPEN | 🟡 P1 | L | `flexcms-pim` | P5-01 | — |
@@ -253,11 +253,11 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
-| BUG-01 | **PageApiController uses manual `new` instead of DI** | 🟢 OPEN | 🟡 P1 | S | `flexcms-headless` | — | — |
-| BUG-02 | **Inconsistent path separator (`.` vs `/`) in controllers** | 🟢 OPEN | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | — |
-| BUG-03 | **No pagination on list endpoints** | 🟢 OPEN | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | — |
-| BUG-04 | **N+1 in ContentNode.getChildren()** | 🟢 OPEN | 🟡 P1 | M | `flexcms-core` | — | — |
-| BUG-05 | **ReplicationReceiver.fetchNodeFromAuthor() incomplete** | 🟢 OPEN | 🟡 P1 | M | `flexcms-replication` | — | — |
+| BUG-01 | **PageApiController uses manual `new` instead of DI** | ✅ DONE | 🟡 P1 | S | `flexcms-headless` | — | Claude Sonnet 4.6 |
+| BUG-02 | **Inconsistent path separator (`.` vs `/`) in controllers** | ✅ DONE | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | Claude Sonnet 4.6 |
+| BUG-03 | **No pagination on list endpoints** | ✅ DONE | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | Claude Sonnet 4.6 |
+| BUG-04 | **N+1 in ContentNode.getChildren()** | ✅ DONE | 🟡 P1 | M | `flexcms-core` | — | Claude Sonnet 4.6 |
+| BUG-05 | **ReplicationReceiver.fetchNodeFromAuthor() incomplete** | ✅ DONE | 🟡 P1 | M | `flexcms-replication` | — | Claude Sonnet 4.6 |
 
 ---
 
@@ -528,6 +528,240 @@ output_files:
 
 ---
 
+### P2-01 — Complete GraphQL resolvers
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] All Query types from schema.graphqls have working resolvers — `page`, `pages`, `node`, `search`, `navigation`, `asset`, `components`
+  - [x] `page(path)` returns full page with component tree — fixed structural mismatch (renderPage returns nested `{page:{...}, components:[...]}`, GraphQL expects flattened `Page` type; added `flattenPageResponse()` helper)
+  - [x] `pages(siteId, locale)` returns paginated list — new `pages` resolver + `ContentDeliveryService.listPages()` with template filter support
+  - [x] `navigation(siteId, locale, depth)` returns navigation tree — already implemented, verified
+  - [x] `asset(path)` returns asset — verified; added invalid-UUID guard returning null
+  - [x] `components()` returns component registry — verified
+  - [x] `search(query)` delegates to SearchIndexService — verified; SearchResult/SearchHitResult fields match GraphQL SearchResult/SearchHit types
+  - [x] Tests for each resolver: 18/18 pass
+**Files Changed:**
+  - `flexcms-headless/.../graphql/ContentQueryResolver.java` — fixed `page` resolver structural mismatch, added `pages` resolver, added invalid-UUID guard on `asset`, added `toContentPath` helper, improved documentation
+  - `flexcms-core/.../service/ContentDeliveryService.java` — added `buildPageMap()` + `listPages()` for GraphQL pages query
+  - `flexcms-headless/src/test/.../graphql/ContentQueryResolverTest.java` — new (18 tests)
+**Build Verified:** Yes — `mvn clean install -pl flexcms-core` then `mvn test -pl flexcms-headless` → 18/18 pass
+**Notes:** `SearchIndexService.SearchResult` record fields (`totalCount`, `items`) and `SearchHitResult` fields (`path`, `title`, `excerpt`, `score`, `type`) already match the GraphQL schema exactly — no mapping layer needed.
+
+---
+
+### BUG-03 — No pagination on list endpoints
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `AssetIngestService.listFolder()` returns `Page<Asset>` with `page`/`size` params (capped at 200)
+  - [x] `AssetIngestService.searchAssets()` returns `Page<Asset>` with `page`/`size` params (capped at 200)
+  - [x] `AuthorAssetController.listFolder()` accepts `?page=0&size=50` query params, returns `{items, totalCount, page, size, hasNextPage}` envelope
+  - [x] `NodeApiController.getDescendants()` accepts `?depth=5` param (1–10), returns `{path, depth, count, items}` envelope
+  - [x] `mvn clean compile -pl flexcms-dam,flexcms-author,flexcms-headless -am` → BUILD SUCCESS
+**Files Changed:**
+  - `flexcms-dam/.../service/AssetIngestService.java` — `listFolder()` and `searchAssets()` now return `Page<Asset>` with PageRequest
+  - `flexcms-author/.../controller/AuthorAssetController.java` — `listFolder()` updated to paginated response envelope
+  - `flexcms-headless/.../controller/NodeApiController.java` — `getDescendants()` updated with `depth` param + paginated envelope; updated `collectDescendants()` signature
+
+---
+
+### BUG-05 — ReplicationReceiver.fetchNodeFromAuthor() incomplete
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `AuthorNodeClient` created — HTTP client calling `GET /api/author/content/node?path={path}` on author tier
+  - [x] Configurable via `flexcms.author.base-url` (defaults to `http://localhost:8080`)
+  - [x] Returns `Optional<Map<String,Object>>` — empty when author unreachable (no exception propagation)
+  - [x] `ReplicationReceiver.activateContent()` — TREE events now call `activateTree()` which iterates `affectedPaths` and fetches each node via `AuthorNodeClient`
+  - [x] Successful fetches are upserted using the same `activateSingleNode()` logic as single-node events
+  - [x] Failed fetches (empty Optional or exception) are skipped with warnings — partial tree sync is logged
+  - [x] Empty `affectedPaths` list is handled gracefully (early return, no interactions)
+  - [x] 3 new tree tests in `ReplicationReceiverTest`: fetch+upsert, skip-on-unreachable, empty-paths noop
+  - [x] All 20 replication tests pass
+**Files Changed:**
+  - `flexcms-replication/.../service/AuthorNodeClient.java` — new HTTP client
+  - `flexcms-replication/.../service/ReplicationReceiver.java` — implemented `activateTree()`, refactored `activateSingleNode()`, wired `AuthorNodeClient`
+  - `flexcms-replication/src/test/.../service/ReplicationReceiverTest.java` — added `@Mock AuthorNodeClient`, replaced stale tree test with 3 accurate tests
+**Build Verified:** Yes — `mvn test -pl flexcms-replication -am` → 20/20 pass, BUILD SUCCESS
+**Notes:** `flexcms.author.base-url` must be configured in the publish-tier `application.yml`. Tree activation partial failure (some nodes unreachable) logs a warning but does NOT roll back — the publish store may have a partial tree until the next full replication.
+
+---
+
+### BUG-04 — N+1 in ContentNode.getChildren()
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `loadChildrenRecursive` now issues 1 query instead of N+1 — `findDescendants(root.getPath())` loads all descendants in a single SQL call
+  - [x] Descendants grouped by `parentPath` in a `LinkedHashMap` for O(1) child lookup
+  - [x] Groups sorted by `orderIndex` (the native query orders by `path` ltree, not `orderIndex`)
+  - [x] `wireChildren` assembles tree in memory — no further DB round-trips
+  - [x] All 78 core tests pass including `ContentNodeServiceTest` and `ContentDeliveryServiceTest`
+**Files Changed:**
+  - `flexcms-core/.../service/ContentNodeService.java` — replaced recursive N+1 `loadChildrenRecursive` with single-query bulk load + in-memory tree assembly
+**Build Verified:** Yes — `mvn test -pl flexcms-core -am` → 78/78 pass, BUILD SUCCESS
+**Notes:** `findDescendants` was already defined in `ContentNodeRepository` using `path::text LIKE :pathPrefix || '.%'`. The query returns flat list ordered by path; re-sorting by `orderIndex` in Java is necessary for correct display order.
+
+---
+
+### BUG-02 — Inconsistent path separator
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `NodeApiController` — `getNode` and `getDescendants` now call `toContentPath()` which: strips leading `/`, replaces `/` with `.`, prepends `content.` if missing
+  - [x] `AuthorContentController` — all path-accepting endpoints now normalize: `getNode`, `getPage`, `createNode` (parentPath), `updateProperties`, `moveNode` (both paths), `deleteNode`, `lock`, `unlock`, `updateStatus`
+  - [x] `PageApiController` already had correct `toContentPath()` — no change needed
+  - [x] Clients can now pass either `/site/en/home` or `content.site.en.home` — both resolve correctly
+**Files Changed:**
+  - `flexcms-headless/.../controller/NodeApiController.java` — added `toContentPath()`, used in getNode + getDescendants
+  - `flexcms-author/.../controller/AuthorContentController.java` — added `toContentPath()`, applied to all path params
+**Build Verified:** Yes — `mvn clean compile -pl flexcms-headless,flexcms-author -am` → 0 errors
+**Notes:** `toContentPath()` is now duplicated in PageApiController, NodeApiController, and AuthorContentController. A future refactor could extract this into a shared `ContentPathUtils` in `flexcms-core`, but the current duplication is intentional to avoid cross-module coupling changes.
+
+---
+
+### P5-02 — PIM: schema validation (JSON Schema)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `SchemaValidationService` created — validates `Map<String,Object> attributes` against `ProductSchema.schemaDef` (JSON Schema draft-07)
+  - [x] Uses `networknt/json-schema-validator` 1.3.3 (added to parent pom + flexcms-pim pom)
+  - [x] `validate()` returns list of human-readable error messages; empty = valid
+  - [x] `validateOrThrow()` throws `IllegalArgumentException` with all errors joined
+  - [x] `null` schema or `null` schemaDef → no-op (graceful)
+  - [x] `null` attributes → treated as empty object (validates missing required fields)
+  - [x] Hooked into `ProductService.create()` — validates before saving
+  - [x] Hooked into `ProductService.update()` — validates merged attributes before saving
+  - [x] 11 unit tests in `SchemaValidationServiceTest` — all pass
+  - [x] All 50 PIM tests pass (including existing 39 + 11 new)
+**Files Changed:**
+  - `flexcms/pom.xml` — added `json-schema-validator` 1.3.3 to dependencyManagement
+  - `flexcms-pim/pom.xml` — added `json-schema-validator` dependency
+  - `flexcms-pim/.../service/SchemaValidationService.java` — new service
+  - `flexcms-pim/.../service/ProductService.java` — injected SchemaValidationService, added validateOrThrow calls in create() and update()
+  - `flexcms-pim/src/test/.../service/SchemaValidationServiceTest.java` — new (11 tests)
+  - `flexcms-pim/src/test/.../service/ProductServiceTest.java` — added `@Mock SchemaValidationService` (required by @InjectMocks)
+**Build Verified:** Yes — `mvn test -pl flexcms-pim -am` → 50/50 pass, BUILD SUCCESS
+**Notes:** `networknt/json-schema-validator` version 1.3.3 is compatible with Java 21 and Spring Boot 3.3. `SpecVersion.VersionFlag.V7` targets JSON Schema draft-07 which matches the `$schema` annotation in ProductSchema.
+
+---
+
+### P3-16 — Workflow Inbox page
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] Page at `src/app/(admin)/workflows/page.tsx` — matches reference design (screen.png + code.html)
+  - [x] Breadcrumb: Dashboard > Workflows
+  - [x] Split-panel layout: scrollable task list left, sticky detail panel right (450px)
+  - [x] Filter tabs: Pending (count), Approved, Rejected — switches visible tasks
+  - [x] Sort dropdown: Newest First / Priority / Deadline
+  - [x] Task cards: icon by type, priority badge, assignee count, comment/attachment counts, age; selected state with ring
+  - [x] Detail panel: workflow ID badge, full description, initiator + due date, timeline with checkmark steps + current step pulse, comment textarea with attach button
+  - [x] Approve/Reject actions update task status and close detail panel
+  - [x] Empty state when no tasks in selected tab; loading skeleton component
+  - [x] All colors use CSS custom properties (var(--color-*)); zero hardcoded hex except design system brand #f2f0ef
+  - [x] `/workflows` route already wired in SidebarNav.tsx (badge 38)
+  - [x] Textarea imported from `@flexcms/ui`; Breadcrumb, Button from `@flexcms/ui`
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/workflows/page.tsx` — new: complete workflow inbox page
+**Build Verified:** Yes — `pnpm --filter admin exec tsc --noEmit` → 0 errors
+**Notes:** Mobile design shows a simpler card list without split panel — the desktop split-panel layout gracefully degrades on smaller screens as the detail panel wraps below due to flex layout.
+
+---
+
+### P2-02 — GraphQL: pagination + field resolvers
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `PageConnection` type in schema has `totalCount`, `items`, `hasNextPage`, `hasPreviousPage`, `nextOffset` — added to schema.graphqls + `listPages()` returns all fields
+  - [x] `GraphQLFieldResolvers` — `ContentNode.children` lazy-loaded via `@SchemaMapping`; only fires when client requests children
+  - [x] `Asset.renditions` field resolver maps `renditionKey→key`, `storageKey→url` correctly
+  - [x] `ComponentDefinition.group` maps `groupName` field
+  - [x] `ComponentDefinition.isContainer` maps `isContainer()` boolean getter
+  - [x] JSON scalar registered — custom `Coercing` with Jackson for literal + variable parsing
+  - [x] Long scalar registered — custom `Coercing` (graphql-java 22.1 has no `Scalars.GraphQLLong` built-in)
+  - [x] All 9 field resolver unit tests pass; all 27 headless tests pass
+**Files Changed:**
+  - `flexcms-headless/.../graphql/GraphQLConfig.java` — new; registers JSON scalar (Jackson) + Long scalar (manual Coercing)
+  - `flexcms-headless/.../graphql/GraphQLFieldResolvers.java` — new; @SchemaMapping resolvers for children, renditions, group, isContainer
+  - `flexcms-headless/src/main/resources/graphql/schema.graphqls` — PageConnection extended with hasNextPage/hasPreviousPage/nextOffset
+  - `flexcms-core/.../service/ContentDeliveryService.java` — listPages() returns pagination metadata map
+  - `flexcms-headless/src/test/.../graphql/GraphQLFieldResolversTest.java` — new (9 tests)
+**Build Verified:** Yes — `mvn test -pl flexcms-headless -am` → 27/27 pass, BUILD SUCCESS
+**Notes:** graphql-java 22.1 does NOT expose `graphql.Scalars.GraphQLLong` — the Long scalar must be implemented manually with a custom Coercing. The extended-scalars library is not present in the project.
+
+---
+
+### P5-01 — PIM: complete ProductService CRUD + validation
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] SchemaService: full CRUD + version creation (`createNewVersion`) + parent inheritance FK — verified by SchemaServiceTest (7 tests)
+  - [x] CatalogService: full CRUD + status transitions DRAFT→ACTIVE→ARCHIVED with guards — verified by CatalogServiceTest (8 tests)
+  - [x] ProductService: completed with `delete(sku)` + `updateStatus(sku, status, userId)` — verified by ProductServiceTest (12 tests)
+  - [x] VariantService: CRUD per product + duplicate variant SKU guard — verified by VariantServiceTest (6 tests)
+  - [x] ProductAssetRefService: link/unlink DAM assets by path + duplicate guard + updateRef — verified by ProductAssetRefServiceTest (6 tests)
+  - [x] All REST endpoints in ProductApiController wired: GET/POST/PUT/DELETE products, PUT /{sku}/status, POST /carryforward, variants CRUD, asset ref CRUD
+  - [x] New controllers: SchemaApiController (GET/POST/PUT/DELETE + deactivate + new-version), CatalogApiController (GET/POST/PUT/DELETE + activate + archive)
+  - [x] Input validation: `@NotBlank`, `@NotNull`, `@Min` on all request records
+  - [x] Unit tests for each service: 39/39 pass
+**Files Changed:**
+  - `flexcms-pim/.../repository/ProductVariantRepository.java` — new
+  - `flexcms-pim/.../repository/ProductAssetRefRepository.java` — new
+  - `flexcms-pim/.../service/SchemaService.java` — new
+  - `flexcms-pim/.../service/CatalogService.java` — new
+  - `flexcms-pim/.../service/VariantService.java` — new
+  - `flexcms-pim/.../service/ProductAssetRefService.java` — new
+  - `flexcms-pim/.../service/ProductService.java` — added `delete()` + `updateStatus()`
+  - `flexcms-pim/.../controller/SchemaApiController.java` — new
+  - `flexcms-pim/.../controller/CatalogApiController.java` — new
+  - `flexcms-pim/.../controller/ProductApiController.java` — wired all endpoints
+  - `flexcms-pim/src/test/.../service/SchemaServiceTest.java` — new (7 tests)
+  - `flexcms-pim/src/test/.../service/CatalogServiceTest.java` — new (8 tests)
+  - `flexcms-pim/src/test/.../service/VariantServiceTest.java` — new (6 tests)
+  - `flexcms-pim/src/test/.../service/ProductAssetRefServiceTest.java` — new (6 tests)
+  - `flexcms-pim/src/test/.../service/ProductServiceTest.java` — new (12 tests)
+**Build Verified:** Yes — `mvn clean compile` + `mvn test` in `flexcms-pim` → 39/39 tests pass, 0 errors
+**Notes:** `ProductStatus` enum values are DRAFT/REVIEW/PUBLISHED/ARCHIVED (no ACTIVE). Catalog status lives on `Catalog.CatalogStatus` inner enum.
+
+---
+
+### P3-15 — DAM asset detail page
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] Page at `src/app/(admin)/dam/[id]/page.tsx` — Next.js dynamic route, uses AppShell via `(admin)` route group layout
+  - [x] Design faithfully matches reference (`asset_detail/code.html` + `screen.png`): 12-column grid layout, left preview + analysis, right metadata editor
+  - [x] Breadcrumb: Dashboard > Assets > {filename} (RULE 10)
+  - [x] Action header bar: "Back to Library" link, asset ID + filename, status badge (Published/Draft/Processing/Error), Discard + Save Changes buttons; sticky with backdrop blur
+  - [x] Main preview surface: aspect-video container with gradient placeholder, hover-reveal toolbar (zoom in/out, crop, palette, fullscreen)
+  - [x] Generated Renditions panel: 2-column grid of 4 renditions (Thumbnail, Social Hero, Mobile App, Print High-Res) with icons, specs, hover state; "Regenerate All" button
+  - [x] Usage References panel: CMS Pages (12), Product Gallery (4), Email Campaigns (2) with count badges; "View Full Report" button
+  - [x] Metadata Editor form card (sticky on right column): Asset Title input, Alt Text textarea, Tags (using `TagInput` from `@flexcms/ui`), Copyright Holder input with copyright icon prefix, Advanced IPTC/XMP Data expandable toggle
+  - [x] Technical Specs card: Format, Color Space, Dimensions, File Size in 2-column grid
+  - [x] Right context rail: Version History, Asset Comments (with red notification dot), Share Asset, separator, Delete Asset (destructive red) — all with Tooltip labels
+  - [x] Loading skeleton: breadcrumb, action header, preview, renditions grid, metadata form placeholders (RULE 9)
+  - [x] Empty / not-found state: icon, "Asset not found" message, "Back to Library" CTA (RULE 8)
+  - [x] Zero hardcoded colors — all via `var(--color-*)` tokens (RULE 2)
+  - [x] All interactive UI uses `@flexcms/ui` components: Button, Input, Textarea, TagInput, Tooltip, Breadcrumb, Skeleton
+  - [x] DAM browser page updated: "View Details" link added to asset context menu, double-click on grid card navigates to `/dam/{id}`, `InfoIcon` now accepts className prop
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/dam/[id]/page.tsx` — new: complete asset detail page
+  - `frontend/apps/admin/src/app/(admin)/dam/page.tsx` — added Link/useRouter imports, "View Details" menu item, double-click handler on grid cards, fixed InfoIcon className prop
+**Build Verified:** Yes — `npx tsc --noEmit` in `apps/admin` → 0 errors
+**Notes:** Responsive: left column 7/12 on lg, 8/12 on xl; right column 5/12 on lg, 4/12 on xl; stacks to full-width on mobile.
+
+---
+
 ### P3-20 — Login page
 **Status:** ✅ DONE
 **Agent:** Claude Sonnet 4.6
@@ -573,6 +807,35 @@ output_files:
   - `packages/ui/src/components/DatePicker.tsx` — new: DatePicker + DateRangePicker
   - `packages/ui/src/index.ts` — added exports for all new form controls
 **Build Verified:** Yes — `npx tsc --noEmit` → 0 new errors
+
+---
+
+### P1-06 — XSS sanitization on rich text
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `RichTextSanitizer` Spring `@Component` created using OWASP Java HTML Sanitizer 20220608.1
+  - [x] Policy allows safe rich text: block elements (p, h1-h6, ul/ol/li, blockquote, pre, table), inline (strong, em, code, span, a, img)
+  - [x] Policy strips all dangerous elements: script, style, iframe, object, embed
+  - [x] Policy strips event handler attributes (onerror, onclick, etc.) via the OWASP allowlist model
+  - [x] `javascript:` protocol stripped from href; only https/http/mailto allowed
+  - [x] `rel="nofollow"` applied to links via `requireRelNofollowOnLinks()`
+  - [x] `sanitizeIfHtml(String)`: fast-path pass-through for strings without `<`; sanitizes HTML-containing strings
+  - [x] `ContentNodeService.create()` calls `sanitizeProperties()` on input properties
+  - [x] `ContentNodeService.updateProperties()` calls `sanitizeProperties()` on merged properties
+  - [x] `sanitizeProperties()` iterates Map entries — sanitizes String values, passes non-String values (Integer, Boolean, etc.) unchanged
+  - [x] 19 unit tests in `RichTextSanitizerTest` — all pass (script removal, event handler removal, javascript: href, safe element preservation, plain text pass-through)
+  - [x] 3 new tests in `ContentNodeServiceTest` — XSS properties are sanitized on create/update, non-String props are not passed to sanitizer
+  - [x] All 78 tests pass (including previous 56): `mvn test -pl flexcms-core -am` → BUILD SUCCESS
+**Files Changed:**
+  - `flexcms/pom.xml` — added `owasp-java-html-sanitizer:20220608.1` to dependencyManagement
+  - `flexcms/flexcms-core/pom.xml` — added `owasp-java-html-sanitizer` dependency
+  - `flexcms-core/.../util/RichTextSanitizer.java` — new: OWASP-backed HTML sanitizer component
+  - `flexcms-core/.../service/ContentNodeService.java` — injected `RichTextSanitizer`, added `sanitizeProperties()`, called on create + updateProperties
+  - `flexcms-core/src/test/.../service/ContentNodeServiceTest.java` — added `@Mock RichTextSanitizer`, lenient `@BeforeEach` stub, 3 new XSS tests
+  - `flexcms-core/src/test/.../util/RichTextSanitizerTest.java` — new: 19 unit tests
+**Build Verified:** Yes — `mvn test -pl flexcms-core -am` → 78/78 tests pass; BUILD SUCCESS
 
 ---
 

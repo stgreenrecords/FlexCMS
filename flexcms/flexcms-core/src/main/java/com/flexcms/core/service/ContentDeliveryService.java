@@ -7,6 +7,8 @@ import com.flexcms.plugin.spi.ContentNodeData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,6 +94,51 @@ public class ContentDeliveryService {
         }
 
         return componentData;
+    }
+
+    /**
+     * Build page map in the structure expected by the GraphQL Page type.
+     * Fields: path, title, description, template, locale, lastModified, components (empty for list view).
+     */
+    public Map<String, Object> buildPageMap(ContentNode node) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("path", node.getPath());
+        map.put("title", node.getProperty("jcr:title", node.getName()));
+        map.put("description", node.getProperty("jcr:description", null));
+        map.put("template", node.getProperty("template", null));
+        map.put("locale", node.getLocale());
+        map.put("lastModified", node.getModifiedAt() != null ? node.getModifiedAt().toString() : null);
+        map.put("components", List.of());
+        return map;
+    }
+
+    /**
+     * List pages for a site — used by the GraphQL {@code pages} query.
+     * Returns a PageConnection-style map: {@code {totalCount, items}}.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> listPages(String siteId, String locale, String template,
+                                          int limit, int offset) {
+        int pageNum = limit > 0 ? offset / limit : 0;
+        Page<ContentNode> page = nodeService.search(siteId, locale, "", PageRequest.of(pageNum, Math.max(limit, 1)));
+
+        List<Map<String, Object>> items = page.getContent().stream()
+                .filter(n -> template == null || template.equals(n.getProperty("template", "")))
+                .map(this::buildPageMap)
+                .toList();
+
+        long totalCount = page.getTotalElements();
+        boolean hasNextPage = (long) offset + limit < totalCount;
+        boolean hasPreviousPage = offset > 0;
+        Integer nextOffset = hasNextPage ? offset + limit : null;
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("totalCount", totalCount);
+        result.put("items", items);
+        result.put("hasNextPage", hasNextPage);
+        result.put("hasPreviousPage", hasPreviousPage);
+        result.put("nextOffset", nextOffset);
+        return result;
     }
 
     /**

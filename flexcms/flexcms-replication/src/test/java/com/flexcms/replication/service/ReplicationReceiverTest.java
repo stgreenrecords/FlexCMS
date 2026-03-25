@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 class ReplicationReceiverTest {
 
     @Mock private ContentNodeRepository nodeRepository;
+    @Mock private AuthorNodeClient authorNodeClient;
 
     @InjectMocks
     private ReplicationReceiver replicationReceiver;
@@ -120,10 +121,39 @@ class ReplicationReceiverTest {
         assertThat(captor.getValue().getResourceType()).isEqualTo("flexcms/page");
     }
 
-    // ── ACTIVATE — tree event (no upsert, just logs) ──────────────────────────
+    // ── ACTIVATE — tree event (fetches each node from author) ─────────────────
 
     @Test
-    void activate_treeType_doesNotUpsertNodes() {
+    void activate_treeType_fetchesAndUpsertsEachNode() {
+        Map<String, Object> homeData = new HashMap<>(Map.of(
+                "resourceType", "flexcms/page", "parentPath", "content",
+                "siteId", "corporate", "locale", "en", "orderIndex", 0));
+        Map<String, Object> heroData = new HashMap<>(Map.of(
+                "resourceType", "flexcms/hero", "parentPath", "content.home",
+                "siteId", "corporate", "locale", "en", "orderIndex", 1));
+
+        when(authorNodeClient.fetchNode("content.home")).thenReturn(Optional.of(homeData));
+        when(authorNodeClient.fetchNode("content.home.hero")).thenReturn(Optional.of(heroData));
+        when(nodeRepository.findByPath(any())).thenReturn(Optional.empty());
+
+        ReplicationEvent event = new ReplicationEvent();
+        event.setAction(ReplicationAction.ACTIVATE);
+        event.setType(ReplicationType.TREE);
+        event.setPath("content.home");
+        event.setSiteId("corporate");
+        event.setAffectedPaths(List.of("content.home", "content.home.hero"));
+
+        replicationReceiver.handleReplication(event);
+
+        verify(authorNodeClient).fetchNode("content.home");
+        verify(authorNodeClient).fetchNode("content.home.hero");
+        verify(nodeRepository, times(2)).save(any(ContentNode.class));
+    }
+
+    @Test
+    void activate_treeType_skipsPathsWhenAuthorUnreachable() {
+        when(authorNodeClient.fetchNode(any())).thenReturn(Optional.empty());
+
         ReplicationEvent event = new ReplicationEvent();
         event.setAction(ReplicationAction.ACTIVATE);
         event.setType(ReplicationType.TREE);
@@ -132,7 +162,22 @@ class ReplicationReceiverTest {
 
         replicationReceiver.handleReplication(event);
 
-        verify(nodeRepository, never()).findByPath(any());
+        // Node fetch attempted for each path but nothing saved (author unreachable)
+        verify(authorNodeClient, times(2)).fetchNode(any());
+        verify(nodeRepository, never()).save(any());
+    }
+
+    @Test
+    void activate_treeType_withEmptyAffectedPaths_doesNothing() {
+        ReplicationEvent event = new ReplicationEvent();
+        event.setAction(ReplicationAction.ACTIVATE);
+        event.setType(ReplicationType.TREE);
+        event.setPath("content.home");
+        event.setAffectedPaths(List.of());
+
+        replicationReceiver.handleReplication(event);
+
+        verifyNoInteractions(authorNodeClient);
         verify(nodeRepository, never()).save(any());
     }
 

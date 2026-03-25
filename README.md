@@ -441,6 +441,30 @@ frontend/                              # TypeScript (pnpm + Turborepo)
 
 ### Local Development Setup
 
+**Recommended: use the `flex` CLI** (works from the project root):
+
+```powershell
+# Start everything (infra + author + publish + admin UI)
+flex start local all
+
+# Start only what you need
+flex start local author              # Infra + Author backend (:8080)
+flex start local author publish      # Infra + Author + Publish
+flex start local author admin        # Infra + Author + Admin UI
+flex start local pim                 # Same as 'author' — PIM is part of it
+
+# Check what's running
+flex status
+
+# Stop everything
+flex stop local
+
+# Tail logs
+flex logs author
+```
+
+**Or step-by-step manually:**
+
 ```bash
 # 1. Start infrastructure services
 cd flexcms
@@ -639,6 +663,14 @@ KEY RULE: Backend NEVER generates HTML. It only returns JSON.
 
 **Manual build commands:**
 ```bash
+# Flex CLI (recommended — from project root)
+flex start local all                  # Start everything
+flex start local author               # Infra + Author only
+flex start local author,publish,admin # Pick services
+flex stop local                       # Stop everything
+flex status                           # Health-check
+flex logs author                      # Tail logs
+
 # Build backend
 cd flexcms && mvn clean install
 

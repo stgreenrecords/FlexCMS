@@ -65,6 +65,7 @@ infra/local/.env
 # Logs
 *.log
 logs/
+.dev-logs/
 
 # Optional: TypeScript cache
 *.tsbuildinfo

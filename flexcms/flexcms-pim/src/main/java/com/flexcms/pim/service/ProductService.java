@@ -25,6 +25,7 @@ public class ProductService {
     @Autowired private ProductRepository productRepo;
     @Autowired private CatalogRepository catalogRepo;
     @Autowired private ProductSchemaRepository schemaRepo;
+    @Autowired private SchemaValidationService schemaValidationService;
 
     // -------------------------------------------------------------------------
     // Product CRUD
@@ -64,8 +65,12 @@ public class ProductService {
         product.setName(name);
         product.setCatalog(catalog);
         product.setSchema(catalog.getSchema());
-        product.setAttributes(attributes);
         product.setCreatedBy(userId);
+
+        // Validate attributes against the catalog's schema before saving
+        schemaValidationService.validateOrThrow(catalog.getSchema(), attributes);
+        product.setAttributes(attributes);
+
         return productRepo.save(product);
     }
 
@@ -77,6 +82,11 @@ public class ProductService {
     public Product update(String sku, Map<String, Object> newAttributes, String userId) {
         Product product = productRepo.findBySku(sku)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+
+        // Validate against schema before merging
+        Map<String, Object> merged = new HashMap<>(product.getAttributes());
+        merged.putAll(newAttributes);
+        schemaValidationService.validateOrThrow(product.getSchema(), merged);
 
         // Track overridden fields (fields that differ from source)
         if (product.getSourceProduct() != null) {
@@ -136,6 +146,22 @@ public class ProductService {
 
         log.info("Carried forward {} products from catalog {} to {}", count, sourceCatalogId, targetCatalogId);
         return count;
+    }
+
+    @Transactional("pimTransactionManager")
+    public void delete(String sku) {
+        Product product = productRepo.findBySku(sku)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+        productRepo.delete(product);
+    }
+
+    @Transactional("pimTransactionManager")
+    public Product updateStatus(String sku, ProductStatus status, String userId) {
+        Product product = productRepo.findBySku(sku)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+        product.setStatus(status);
+        product.setUpdatedBy(userId);
+        return productRepo.save(product);
     }
 
     // -------------------------------------------------------------------------

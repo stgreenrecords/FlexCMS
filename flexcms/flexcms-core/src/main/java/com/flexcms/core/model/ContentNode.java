@@ -64,6 +64,12 @@ public class ContentNode implements ContentNodeData {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
+    @Column(name = "scheduled_publish_at")
+    private Instant scheduledPublishAt;
+
+    @Column(name = "scheduled_deactivate_at")
+    private Instant scheduledDeactivateAt;
+
     @Transient
     private List<ContentNodeData> children = new ArrayList<>();
 
@@ -167,6 +173,12 @@ public class ContentNode implements ContentNodeData {
 
     public Instant getModifiedAt() { return modifiedAt; }
     public void setModifiedAt(Instant modifiedAt) { this.modifiedAt = modifiedAt; }
+
+    public Instant getScheduledPublishAt() { return scheduledPublishAt; }
+    public void setScheduledPublishAt(Instant scheduledPublishAt) { this.scheduledPublishAt = scheduledPublishAt; }
+
+    public Instant getScheduledDeactivateAt() { return scheduledDeactivateAt; }
+    public void setScheduledDeactivateAt(Instant scheduledDeactivateAt) { this.scheduledDeactivateAt = scheduledDeactivateAt; }
 
     public void setChildren(List<ContentNodeData> children) { this.children = children; }
 
