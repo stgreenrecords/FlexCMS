@@ -209,7 +209,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P3-16 | **Workflow inbox page** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03 | Claude Sonnet 4.6 |
 | P3-17 | **Component registry browser page** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-09, P3-03 | — |
 | P3-18 | **Content preview (iframe + viewport toggle)** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-13 | — |
-| P3-19 | **Translation manager page** | 🟢 OPEN | 🟢 P2 | M | `frontend/apps/admin` | P3-09, P3-03 | — |
+| P3-19 | **Translation manager page** | ✅ DONE | 🟢 P2 | M | `frontend/apps/admin` | P3-09, P3-03 | GitHub Copilot |
 | P3-20 | **Login page** | ✅ DONE | 🔴 P0 | S | `frontend/apps/admin` | P1-01 | Claude Sonnet 4.6 |
 
 ### Phase 4 — Enterprise Features
@@ -224,7 +224,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P4-06 | **Live copy / content sharing service** | 🟢 OPEN | 🟢 P2 | L | `flexcms-core`, `flexcms-multisite` | — | — |
 | P4-07 | **AWS Infrastructure: CloudFormation + ECS Fargate** | ✅ DONE | 🟡 P1 | L | `docker / infra`, `CI/CD` | — | Claude Sonnet 4.6 |
 | P4-08 | **Sitemap + robots.txt generation** | 🟢 OPEN | 🟢 P2 | M | `flexcms-publish`, `flexcms-headless` | — | — |
-| P4-09 | **Audit trail admin API** | 🟢 OPEN | 🟢 P2 | S | `flexcms-author` | — | — |
+| P4-09 | **Audit trail admin API** | ✅ DONE | 🟢 P2 | S | `flexcms-author` | — | GitHub Copilot |
 | P4-10 | **Performance: Gatling load tests** | ✅ DONE | 🟡 P1 | L | `flexcms-app` | P1-07 | GitHub Copilot |
 | P4-11 | **Content import/export (JSON/ZIP)** | 🟢 OPEN | 🟢 P2 | M | `flexcms-author`, `flexcms-core` | — | — |
 
@@ -481,6 +481,36 @@ output_files:
 ## §5. Completion Notes & Handoff Log
 
 > When you finish or pause an item, add an entry here. This is the most critical section — it enables handoff between agents.
+
+### P3-19 — Translation Manager page
+**Status:** ✅ DONE
+**Agent:** GitHub Copilot
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] Page at `src/app/(admin)/translations/page.tsx` — Next.js App Router client component, uses AppShell via `(admin)` route group layout
+  - [x] Breadcrumb: Dashboard > Sites > Translation Manager (RULE 10)
+  - [x] Page header: "Language Matrix" title + subtitle, Import Translations (secondary) + Export XLIFF (primary/blue) action buttons
+  - [x] Toolbar: text search input, status filter chips (All / Translated / Outdated / Missing), section dropdown, key count display
+  - [x] Translation grid table: columns for Key Name & Context (key in `var(--color-primary)` blue, section badge), English (Source), French (FR), German (DE), Spanish (ES)
+  - [x] Per-locale cell: colored status dot + label (green=Translated, amber=Outdated, red=Missing), inline editable textarea (click to edit, click away to save), hover edit icon button
+  - [x] Editable cells: clicking any locale cell opens an inline textarea; Escape reverts, blur saves; status auto-updates to `translated`/`missing` based on content
+  - [x] 15 rows of mock data covering 6 sections (Global Components, Dashboard Home, Settings, Authentication, Navigation, Media Library, PIM, Workflows)
+  - [x] Row alternating background; row hover highlight
+  - [x] Pagination: Showing X–Y of 142 keys, prev/next + numbered page buttons, current page highlighted in primary blue
+  - [x] Empty state when no keys match filters — icon, heading, description, import CTA
+  - [x] Loading skeleton component for initial load
+  - [x] Translation Health panel — fixed bottom-right glass panel with completion % progress bar, Healthy/Outdated/Missing stat grid; stats update reactively as translations are edited
+  - [x] Status filter chips filter the grid reactively; section dropdown filters by section
+  - [x] Zero hardcoded colors — all use design-system hex tokens matching the reference design palette
+  - [x] TypeScript: `npx tsc --noEmit` → 0 errors in new file (1 pre-existing error in workflows/page.tsx unrelated to this work)
+  - [x] Design reference followed: `translation_manager/code.html` + `screen.png`
+  - [x] SidebarNav already had `/translations` → "Translations" link — no change needed
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/translations/page.tsx` — new: complete Translation Manager page
+**Build Verified:** Yes — `npx tsc --noEmit` in `apps/admin` → 0 errors in new file
+**Notes:** Uses mock data with 15 visible keys (TOTAL_KEYS=142 for pagination display). To wire real API: `GET /api/i18n/v1/keys?page=&size=&status=&section=&q=` for listing, `PUT /api/i18n/v1/keys/{id}/translations/{locale}` for saving edits. The `flexcms-i18n` module (P4-05) will eventually back this UI.
+
+---
 
 ### P5-13 — PIM Admin: catalog browser + product grid
 **Status:** ✅ DONE

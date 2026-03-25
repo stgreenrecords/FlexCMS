@@ -10,6 +10,7 @@ import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ContentNodeVersionRepository;
 import com.flexcms.core.util.RichTextSanitizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +31,11 @@ public class ContentNodeService {
 
     @Autowired
     private RichTextSanitizer richTextSanitizer;
+
+    /** Lazy to avoid circular dependency via Spring context. */
+    @Autowired
+    @Lazy
+    private AuditService auditService;
 
     /**
      * Get a single content node by path.
@@ -76,7 +82,10 @@ public class ContentNodeService {
         List<ContentNode> siblings = nodeRepository.findByParentPathOrderByOrderIndex(parentPath);
         node.setOrderIndex(siblings.isEmpty() ? 0 : siblings.getLast().getOrderIndex() + 1);
 
-        return nodeRepository.save(node);
+        ContentNode saved = nodeRepository.save(node);
+        auditService.log(AuditService.ENTITY_CONTENT, saved.getId(), saved.getPath(),
+                AuditService.ACTION_CREATE, userId);
+        return saved;
     }
 
     /**
@@ -102,7 +111,10 @@ public class ContentNodeService {
         node.setProperties(sanitizeProperties(merged));
         node.setModifiedBy(userId);
 
-        return nodeRepository.save(node);
+        ContentNode saved = nodeRepository.save(node);
+        auditService.log(AuditService.ENTITY_CONTENT, saved.getId(), saved.getPath(),
+                AuditService.ACTION_UPDATE, userId);
+        return saved;
     }
 
     /**
@@ -135,7 +147,11 @@ public class ContentNodeService {
         }
 
         nodeRepository.saveAll(subtree);
-        return subtree.get(0);
+        ContentNode root = subtree.get(0);
+        auditService.log(AuditService.ENTITY_CONTENT, root.getId(), newPath,
+                AuditService.ACTION_MOVE, userId,
+                Map.of("from", sourcePath, "to", newPath), null, null);
+        return root;
     }
 
     /**
@@ -143,8 +159,10 @@ public class ContentNodeService {
      */
     @PreAuthorize("hasPermission(#path, 'DELETE')")
     @Transactional
-    public void delete(String path) {
+    public void delete(String path, String userId) {
         nodeRepository.deleteSubtree(path);
+        auditService.log(AuditService.ENTITY_CONTENT, null, path,
+                AuditService.ACTION_DELETE, userId);
     }
 
     /**
@@ -162,7 +180,10 @@ public class ContentNodeService {
 
         node.setLockedBy(userId);
         node.setLockedAt(Instant.now());
-        return nodeRepository.save(node);
+        ContentNode saved = nodeRepository.save(node);
+        auditService.log(AuditService.ENTITY_CONTENT, saved.getId(), saved.getPath(),
+                AuditService.ACTION_LOCK, userId);
+        return saved;
     }
 
     /**
@@ -180,7 +201,10 @@ public class ContentNodeService {
 
         node.setLockedBy(null);
         node.setLockedAt(null);
-        return nodeRepository.save(node);
+        ContentNode saved = nodeRepository.save(node);
+        auditService.log(AuditService.ENTITY_CONTENT, saved.getId(), saved.getPath(),
+                AuditService.ACTION_UNLOCK, userId);
+        return saved;
     }
 
     /**
@@ -194,7 +218,10 @@ public class ContentNodeService {
 
         node.setStatus(status);
         node.setModifiedBy(userId);
-        return nodeRepository.save(node);
+        ContentNode saved = nodeRepository.save(node);
+        String action = (status == NodeStatus.PUBLISHED) ? AuditService.ACTION_PUBLISH : AuditService.ACTION_UNPUBLISH;
+        auditService.log(AuditService.ENTITY_CONTENT, saved.getId(), saved.getPath(), action, userId);
+        return saved;
     }
 
     /**
@@ -271,7 +298,7 @@ public class ContentNodeService {
         BulkOperationResult result = new BulkOperationResult();
         for (String path : paths) {
             try {
-                delete(path);
+                delete(path, userId);
                 result.incrementSucceeded();
             } catch (Exception e) {
                 result.addError(path, e.getMessage());

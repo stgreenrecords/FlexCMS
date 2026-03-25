@@ -108,8 +108,8 @@ public class AuthorContentController {
     /** Delete a node and all descendants. */
     @DeleteMapping("/node")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
-    public ResponseEntity<Void> deleteNode(@RequestParam String path) {
-        nodeService.delete(toContentPath(path));
+    public ResponseEntity<Void> deleteNode(@RequestParam String path, @RequestParam String userId) {
+        nodeService.delete(toContentPath(path), userId);
         return ResponseEntity.ok().build();
     }
 
