@@ -277,7 +277,7 @@ class ContentNodeServiceTest {
 
     @Test
     void delete_callsDeleteSubtree() {
-        contentNodeService.delete("content.corporate.en.home");
+        contentNodeService.delete("content.corporate.en.home", "user1");
 
         verify(nodeRepository).deleteSubtree("content.corporate.en.home");
     }

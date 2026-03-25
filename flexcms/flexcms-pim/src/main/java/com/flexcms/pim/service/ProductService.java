@@ -1,5 +1,6 @@
 package com.flexcms.pim.service;
 
+import com.flexcms.pim.event.ProductPublishedMessage;
 import com.flexcms.pim.model.*;
 import com.flexcms.pim.repository.CatalogRepository;
 import com.flexcms.pim.repository.ProductRepository;
@@ -9,7 +10,9 @@ import com.flexcms.pim.repository.ProductVersionRepository;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,11 +28,20 @@ public class ProductService {
 
     private static final Logger log = LoggerFactory.getLogger(ProductService.class);
 
+    /** Routing key for product publish events on the replication exchange. */
+    public static final String PRODUCT_PUBLISHED_ROUTING_KEY = "product.published";
+
     @Autowired private ProductRepository productRepo;
     @Autowired private CatalogRepository catalogRepo;
     @Autowired private ProductSchemaRepository schemaRepo;
     @Autowired private ProductVersionRepository productVersionRepo;
     @Autowired private SchemaValidationService schemaValidationService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Value("${flexcms.replication.exchange:flexcms.replication}")
+    private String replicationExchange = "flexcms.replication"; // default; overridden by @Value in Spring context
 
     // -------------------------------------------------------------------------
     // Product CRUD
@@ -260,6 +272,16 @@ public class ProductService {
         product.setUpdatedBy(userId);
         product = productRepo.save(product);
         productVersionRepo.save(ProductVersion.fromProduct(product));
+
+        // When a product is published, notify the CMS layer so pages that reference
+        // this product can be re-activated and rebuilt via the build-worker pipeline.
+        if (status == ProductStatus.PUBLISHED) {
+            UUID catalogId = product.getCatalog() != null ? product.getCatalog().getId() : null;
+            ProductPublishedMessage msg = new ProductPublishedMessage(sku, catalogId, userId);
+            rabbitTemplate.convertAndSend(replicationExchange, PRODUCT_PUBLISHED_ROUTING_KEY, msg);
+            log.info("Published product '{}' — sent page-rebuild notification", sku);
+        }
+
         return product;
     }
 

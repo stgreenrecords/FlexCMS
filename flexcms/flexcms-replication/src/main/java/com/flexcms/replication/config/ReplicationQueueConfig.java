@@ -15,6 +15,7 @@ public class ReplicationQueueConfig {
     public static final String CONTENT_ROUTING_KEY = "content.replicate";
     public static final String TREE_ROUTING_KEY = "content.replicate.tree";
     public static final String ASSET_ROUTING_KEY = "asset.replicate";
+    public static final String PRODUCT_PUBLISHED_ROUTING_KEY = "product.published";
     public static final String DLQ_NAME = "flexcms.replication.dlq";
 
     @Value("${flexcms.instance.id:publish-default}")
@@ -57,6 +58,27 @@ public class ReplicationQueueConfig {
     @ConditionalOnProperty(name = "flexcms.runmode", havingValue = "publish")
     public Binding assetBinding(Queue publishQueue, TopicExchange replicationExchange) {
         return BindingBuilder.bind(publishQueue).to(replicationExchange).with("asset.replicate.#");
+    }
+
+    /**
+     * Author-side queue for PIM product-published notifications.
+     * The author tier reacts by finding and re-replicating all pages that reference
+     * the published product.
+     */
+    @Bean
+    @ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
+    public Queue authorProductQueue() {
+        return QueueBuilder.durable("flexcms.author.product-events." + instanceId)
+                .deadLetterExchange("")
+                .deadLetterRoutingKey(DLQ_NAME)
+                .build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
+    public Binding authorProductBinding(Queue authorProductQueue, TopicExchange replicationExchange) {
+        return BindingBuilder.bind(authorProductQueue).to(replicationExchange)
+                .with(PRODUCT_PUBLISHED_ROUTING_KEY);
     }
 }
 

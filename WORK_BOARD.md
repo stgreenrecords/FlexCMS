@@ -109,7 +109,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-publish` | — | — | — |
 | `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
-| `flexcms-replication` | — | — | — |
+| `flexcms-replication` | P5-10 | Claude Sonnet 4.6 | 2026-03-25 |
 | `flexcms-search` | — | — | — |
 | `flexcms-cache` | — | — | — |
 | `flexcms-cdn` | — | — | — |
@@ -117,7 +117,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-multisite` | — | — | — |
 | `flexcms-plugin-api` | — | — | — |
 | `flexcms-clientlibs` | — | — | — |
-| `flexcms-pim` | — | — | — |
+| `flexcms-pim` | P5-10 | Claude Sonnet 4.6 | 2026-03-25 |
 | `frontend/packages/sdk` | — | — | — |
 | `frontend/packages/react` | — | — | — |
 | `frontend/packages/vue` | — | — | — |
@@ -169,7 +169,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P2-01 | **Complete GraphQL resolvers (all query types)** | ✅ DONE | 🟡 P1 | L | `flexcms-headless` | — | Claude Sonnet 4.6 |
 | P2-02 | **GraphQL: pagination + field resolvers** | ✅ DONE | 🟡 P1 | M | `flexcms-headless` | P2-01 | Claude Sonnet 4.6 |
 | P2-03 | **Elasticsearch: full-text indexing on publish** | ✅ DONE | 🟡 P1 | L | `flexcms-search`, `flexcms-replication` | — | Claude Sonnet 4.6 |
-| P2-04 | **Elasticsearch: search API with facets** | 🔵 IN PROGRESS | 🟡 P1 | M | `flexcms-search`, `flexcms-headless` | P2-03 | Claude Sonnet 4.6 |
+| P2-04 | **Elasticsearch: search API with facets** | ✅ DONE | 🟡 P1 | M | `flexcms-search`, `flexcms-headless` | P2-03 | Claude Sonnet 4.6 |
 | P2-05 | **Angular adapter: full implementation** | ✅ DONE | 🟡 P1 | L | `frontend/packages/angular` | — | GitHub Copilot |
 | P2-06 | **Angular reference site (SSR)** | ✅ DONE | 🟡 P1 | M | `frontend/apps/site-angular` (new) | P2-05 | GitHub Copilot |
 | P2-07 | **OpenAPI/Swagger spec for REST** | ✅ DONE | 🟡 P1 | M | `flexcms-headless`, `flexcms-author` | — | Claude Sonnet 4.6 |
@@ -241,7 +241,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | P5-07 | **PIM: JSON/API import source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-08 | **PIM: auto-schema inference from source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
 | P5-09 | **PIM ↔ CMS: PimClient for ComponentModels** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-plugin-api` | P5-01 | Claude Sonnet 4.6 |
-| P5-10 | **PIM ↔ CMS: product.published → page rebuild** | 🟢 OPEN | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | — |
+| P5-10 | **PIM ↔ CMS: product.published → page rebuild** | 🔵 IN PROGRESS | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | Claude Sonnet 4.6 |
 | P5-11 | **PIM: Elasticsearch product index** | 🟢 OPEN | 🟢 P2 | L | `flexcms-pim`, `flexcms-search` | P2-03, P5-01 | — |
 | P5-12 | **PIM: GraphQL schema extension** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim`, `flexcms-headless` | P2-01, P5-01 | — |
 | P5-13 | **PIM Admin: catalog browser + product grid** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03, P5-01 | GitHub Copilot |
@@ -2095,6 +2095,31 @@ output_files:
   - `README.md` — added CI badge after the `h1` title
 **Build Verified:** N/A — workflow files are not executable locally; structure and syntax reviewed manually (standard GitHub Actions v4 actions with correct indentation and required fields)
 **Notes:** P1-14 (Docker image build + push to registry) is now unblocked. `pnpm-lock.yaml` does not exist yet — CI uses `pnpm install` without `--frozen-lockfile`; add the flag once the lockfile is committed. The Docker job currently sets `push: false`; P1-14 will add registry credentials and `push: true` for tagged releases.
+
+---
+
+### P2-04 — Elasticsearch: search API with facets
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-25
+**AC Verification:**
+  - [x] `searchWithFacets()` added to `SearchIndexService` — accepts query, siteId, locale, resourceType, template filters
+  - [x] ES term-bucket aggregations for `resourceType`, `locale`, `template` included in every faceted query
+  - [x] `FacetedSearchResult` record + `FacetBucket` record added to `SearchIndexService`
+  - [x] `extractFacets()` safely handles null aggregations (e.g. in unit tests) — returns empty map
+  - [x] `GET /api/content/v1/search/facets` endpoint added to `SearchApiController` with full @Operation Swagger docs
+  - [x] Basic `GET /api/content/v1/search` endpoint enhanced with `@Min/@Max` validation on `page`/`size`
+  - [x] `@Parameter` annotations on all query params for OpenAPI documentation
+  - [x] 8 unit tests in `SearchIndexServiceTest` — index, indexAll, remove, removeBySite, search, searchWithFacets (filters + null aggregations handling)
+  - [x] All 18 `flexcms-search` tests pass — BUILD SUCCESS
+  - [x] Pre-existing `ContentNodeServiceTest.delete_callsDeleteSubtree` bug fixed (missing `userId` arg)
+**Files Changed:**
+  - `flexcms-search/src/main/java/.../service/SearchIndexService.java` — added `searchWithFacets()`, `extractFacets()`, `FacetedSearchResult`, `FacetBucket`; import `Aggregation`, `ElasticsearchAggregations`
+  - `flexcms-headless/src/main/java/.../controller/SearchApiController.java` — added `GET /facets` endpoint; enhanced existing endpoint with validation + Swagger annotations
+  - `flexcms-search/src/test/.../service/SearchIndexServiceTest.java` — new, 8 tests
+  - `flexcms-core/src/test/.../service/ContentNodeServiceTest.java` — fixed existing delete test (added missing userId arg)
+**Build Verified:** Yes — `mvn test -pl flexcms-search` → 18/18 tests pass, BUILD SUCCESS
+**Notes:** P5-11 (PIM Elasticsearch product index) is now unblocked since P2-03 is done.
 
 ---
 

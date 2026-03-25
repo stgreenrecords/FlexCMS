@@ -96,6 +96,14 @@ public interface ContentNodeRepository extends JpaRepository<ContentNode, UUID> 
     boolean existsByPath(String path);
 
     /**
+     * Find all content nodes that reference a specific PIM product by SKU.
+     * Assumes the SKU is stored in the node's JSONB properties under the key {@code productSku}.
+     */
+    @Query(value = "SELECT * FROM content_nodes WHERE properties->>'productSku' = :sku",
+           nativeQuery = true)
+    List<ContentNode> findByProductSku(@Param("sku") String sku);
+
+    /**
      * Delete node and all descendants.
      */
     @Query(value = "DELETE FROM content_nodes WHERE path::text LIKE :pathPrefix || '%'",

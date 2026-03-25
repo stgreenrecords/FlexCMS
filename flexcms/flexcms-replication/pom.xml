@@ -19,6 +19,12 @@
             <artifactId>flexcms-core</artifactId>
         </dependency>
 
+        <!-- PIM event messages (for ProductPublishedMessage) -->
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-pim</artifactId>
+        </dependency>
+
         <!-- AMQP messaging -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

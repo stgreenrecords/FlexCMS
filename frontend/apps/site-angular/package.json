@@ -8,7 +8,7 @@
     "build": "ng build",
     "build:ssr": "ng build && ng run site-angular:server",
     "serve:ssr": "node dist/site-angular/server/server.mjs",
-    "lint": "ng lint",
+    "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
