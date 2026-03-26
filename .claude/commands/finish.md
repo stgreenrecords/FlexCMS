@@ -13,8 +13,10 @@ Check ALL acceptance criteria for your task (from §4 Context Packets or the tas
 ## Step 3A: Mark as DONE
 
 1. Run final validation:
-   - Backend: `cd flexcms && mvn clean compile`
-   - Frontend: verify no TypeScript errors
+   - Backend: `cd flexcms && mvn clean compile` — must pass
+   - Backend tests: `cd flexcms && mvn test` — all tests must pass
+   - Frontend: `cd frontend && pnpm build` — must pass (if frontend was touched)
+   - Code quality: no mock data in production code, no debug statements
 2. Update `WORK_BOARD.md` §3: change status to ✅ DONE.
 3. Update `WORK_BOARD.md` §2: clear ALL module locks for your task.
 4. Add a Completion Note in `WORK_BOARD.md` §5 using this format:

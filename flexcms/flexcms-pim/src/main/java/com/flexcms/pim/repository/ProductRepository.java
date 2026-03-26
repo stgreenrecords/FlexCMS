@@ -17,6 +17,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     Optional<Product> findBySku(String sku);
 
+    @Query(value = "SELECT p FROM Product p JOIN FETCH p.catalog JOIN FETCH p.schema WHERE p.catalog.id = :catalogId",
+           countQuery = "SELECT COUNT(p) FROM Product p WHERE p.catalog.id = :catalogId")
     Page<Product> findByCatalogId(UUID catalogId, Pageable pageable);
 
     Page<Product> findByCatalogIdAndStatus(UUID catalogId, ProductStatus status, Pageable pageable);
@@ -26,7 +28,8 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     @Query("SELECT p FROM Product p WHERE p.catalog.id = :catalogId AND LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<Product> searchInCatalog(UUID catalogId, String query, Pageable pageable);
 
-    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :query, '%'))")
+    @Query(value = "SELECT p FROM Product p JOIN FETCH p.catalog JOIN FETCH p.schema WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :query, '%'))",
+           countQuery = "SELECT COUNT(p) FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(p.sku) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<Product> searchGlobal(String query, Pageable pageable);
 
     boolean existsBySku(String sku);

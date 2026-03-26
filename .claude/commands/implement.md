@@ -40,10 +40,23 @@ Now implement the task. Follow these rules:
 
 ## Step 6: Validate
 
-Run the appropriate build commands:
-- Backend changes: `cd flexcms && mvn clean compile` (at minimum). Run `mvn test` if tests exist for the module.
-- Frontend changes: check for TypeScript errors.
+Run ALL applicable validation gates — you MUST NOT proceed until they pass:
+
+### 6a. Compile
+- Backend changes: `cd flexcms && mvn clean compile`
+- Frontend changes: `cd frontend && pnpm build`
 - Fix any compilation errors before proceeding.
+
+### 6b. Tests
+- If backend tests exist: `cd flexcms && mvn test`
+- If frontend tests exist: `cd frontend && pnpm test`
+- If YOUR task created new tests: verify they pass.
+- Fix any test failures before proceeding.
+
+### 6c. Code Quality
+- Verify NO mock/dummy data exists in production code (mock data is only acceptable in test classes).
+- Verify no `System.out.println` debugging statements remain.
+- Verify no commented-out code blocks remain.
 
 ## Step 7: Update Work Board
 

@@ -38,4 +38,3 @@ public class PimJsonbConverter implements AttributeConverter<Map<String, Object>
         }
     }
 }
-

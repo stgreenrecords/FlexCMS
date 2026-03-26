@@ -67,6 +67,8 @@ public class PimDataSourceConfig {
         return Flyway.configure()
                 .dataSource(pimDataSource())
                 .locations("classpath:db/pim")
+                .baselineOnMigrate(true)
+                .baselineVersion("0")
                 .validateOnMigrate(false)   // skip checksum check for pre-seeded history
                 .load();
     }

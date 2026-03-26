@@ -264,10 +264,14 @@ public class ContentNodeService {
 
     /**
      * List all content nodes for a site, paginated.
+     * Pass {@code null} or empty string for siteId to return nodes across all sites.
      * Pass {@code null} for locale to return nodes for all locales.
      */
     @Transactional(readOnly = true)
     public Page<ContentNode> listBySite(String siteId, String locale, Pageable pageable) {
+        if (siteId == null || siteId.isBlank()) {
+            return nodeRepository.findAllWithOptionalLocale(locale, pageable);
+        }
         return nodeRepository.findBySiteIdAndOptionalLocale(siteId, locale, pageable);
     }
 

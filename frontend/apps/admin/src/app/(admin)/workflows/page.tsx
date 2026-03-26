@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
@@ -50,147 +50,11 @@ type TabFilter = 'pending' | 'approved' | 'rejected';
 type SortOrder = 'newest' | 'priority' | 'deadline';
 
 // ---------------------------------------------------------------------------
-// Mock data
+// API
 // ---------------------------------------------------------------------------
 
-const MOCK_TASKS: WorkflowTask[] = [
-  {
-    id: 'wf-1',
-    title: 'Product Launch Campaign: Q4 Retail',
-    description: 'Reviewing metadata for new apparel line across all global storefronts.',
-    status: 'pending',
-    age: '2h ago',
-    commentCount: 8,
-    attachmentCount: 3,
-    assigneeCount: 3,
-    iconType: 'article',
-    fullDescription:
-      'Final review of the global product rollout metadata. This includes localized descriptions for 12 regions, price point validation, and high-resolution asset linkage. Approval is required by EOD for the staging sync.',
-    initiator: 'Marcus Kane',
-    initiatorInitials: 'MK',
-    dueDate: 'Oct 24, 2023',
-    dueDateOverdue: true,
-    workflowId: 'WF-99421-QA',
-    timeline: [
-      { id: 't1', label: 'Initiated & Metadata Prep', actor: 'Marcus Kane', timestamp: 'Oct 21, 09:12 AM', completed: true },
-      { id: 't2', label: 'Automated Validation', actor: 'System Bot', timestamp: 'Oct 21, 09:15 AM', completed: true },
-      { id: 't3', label: 'Pending Stakeholder Approval', actor: 'Awaiting action from You', timestamp: '', completed: false, current: true },
-    ],
-  },
-  {
-    id: 'wf-2',
-    title: 'Inventory Re-sync: EMEA Region',
-    description: 'Triggering manual audit of inventory levels in Berlin and London hubs.',
-    status: 'pending',
-    priority: 'high',
-    age: '5h ago',
-    commentCount: 0,
-    attachmentCount: 1,
-    assigneeCount: 0,
-    iconType: 'inventory',
-    fullDescription:
-      'Manual audit of inventory levels across EMEA region warehouse hubs in Berlin and London. Discrepancies in SKU counts exceeding 2% threshold require stakeholder sign-off before automated reconciliation proceeds.',
-    initiator: 'Julia Brennan',
-    initiatorInitials: 'JB',
-    dueDate: 'Nov 1, 2023',
-    dueDateOverdue: false,
-    workflowId: 'WF-99380-EM',
-    timeline: [
-      { id: 't1', label: 'Sync Request Filed', actor: 'Julia Brennan', timestamp: 'Oct 21, 06:00 AM', completed: true },
-      { id: 't2', label: 'Pending Inventory Audit Approval', actor: 'Awaiting action from You', timestamp: '', completed: false, current: true },
-    ],
-  },
-  {
-    id: 'wf-3',
-    title: 'Workflow Update: Automated Translation',
-    description: 'Update to DeepL API integration parameters for batch processing.',
-    status: 'pending',
-    priority: 'system',
-    age: 'Yesterday',
-    commentCount: 2,
-    attachmentCount: 0,
-    assigneeCount: 0,
-    iconType: 'workflow',
-    fullDescription:
-      'Configuration update to the DeepL API connector: new batch size limits (500 segments/request), updated authentication headers for v3 API, and revised retry logic for rate-limit errors. System restart required after approval.',
-    initiator: 'System Bot',
-    initiatorInitials: 'SB',
-    dueDate: 'Nov 3, 2023',
-    dueDateOverdue: false,
-    workflowId: 'WF-99370-SY',
-    timeline: [
-      { id: 't1', label: 'Config Change Proposed', actor: 'System Bot', timestamp: 'Oct 20, 02:00 PM', completed: true },
-      { id: 't2', label: 'Pending Admin Approval', actor: 'Awaiting action from You', timestamp: '', completed: false, current: true },
-    ],
-  },
-  {
-    id: 'wf-4',
-    title: 'Access Request: Senior Analyst',
-    description: 'Sarah Miller requesting temporary write access to PIM production.',
-    status: 'pending',
-    priority: 'critical',
-    age: 'Yesterday',
-    commentCount: 1,
-    attachmentCount: 0,
-    assigneeCount: 0,
-    iconType: 'warning',
-    fullDescription:
-      'Sarah Miller (Principal Analyst, Product Team) is requesting temporary write access to the PIM production environment for duration of the Q4 data migration sprint (Oct 25–Nov 12). Access level: Schema Editor + Product Publisher.',
-    initiator: 'Sarah Miller',
-    initiatorInitials: 'SM',
-    dueDate: 'Oct 25, 2023',
-    dueDateOverdue: true,
-    workflowId: 'WF-99365-AC',
-    timeline: [
-      { id: 't1', label: 'Access Request Submitted', actor: 'Sarah Miller', timestamp: 'Oct 20, 10:30 AM', completed: true },
-      { id: 't2', label: 'Security Review', actor: 'System Bot', timestamp: 'Oct 20, 10:35 AM', completed: true },
-      { id: 't3', label: 'Pending Admin Approval', actor: 'Awaiting action from You', timestamp: '', completed: false, current: true },
-    ],
-  },
-  {
-    id: 'wf-5',
-    title: 'Content Freeze Lift: Holiday Campaign',
-    description: 'Requesting removal of content freeze on /holiday-2023 site branch.',
-    status: 'approved',
-    age: '3 days ago',
-    commentCount: 4,
-    attachmentCount: 2,
-    assigneeCount: 2,
-    iconType: 'article',
-    fullDescription: 'Holiday campaign content freeze lifted after QA sign-off. Branch merged to staging.',
-    initiator: 'Emily Torres',
-    initiatorInitials: 'ET',
-    dueDate: 'Oct 18, 2023',
-    dueDateOverdue: false,
-    workflowId: 'WF-99310-HO',
-    timeline: [
-      { id: 't1', label: 'Freeze Lift Request', actor: 'Emily Torres', timestamp: 'Oct 17, 09:00 AM', completed: true },
-      { id: 't2', label: 'Approved by Admin', actor: 'You', timestamp: 'Oct 17, 11:00 AM', completed: true },
-    ],
-  },
-  {
-    id: 'wf-6',
-    title: 'Schema Migration: PIM v3',
-    description: 'Applying new attribute group schema to 12,000+ product records.',
-    status: 'rejected',
-    priority: 'critical',
-    age: '5 days ago',
-    commentCount: 6,
-    attachmentCount: 1,
-    assigneeCount: 1,
-    iconType: 'warning',
-    fullDescription: 'Schema migration rejected due to missing rollback plan. Resubmit with full rollback procedure documented.',
-    initiator: 'Dev Team',
-    initiatorInitials: 'DT',
-    dueDate: 'Oct 15, 2023',
-    dueDateOverdue: true,
-    workflowId: 'WF-99280-SC',
-    timeline: [
-      { id: 't1', label: 'Migration Request Filed', actor: 'Dev Team', timestamp: 'Oct 14, 08:00 AM', completed: true },
-      { id: 't2', label: 'Rejected — Missing Rollback Plan', actor: 'You', timestamp: 'Oct 14, 02:00 PM', completed: true },
-    ],
-  },
-];
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
+
 
 // ---------------------------------------------------------------------------
 // Icon helpers
@@ -631,9 +495,48 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
 export default function WorkflowInboxPage() {
   const [activeTab, setActiveTab] = useState<TabFilter>('pending');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>('wf-1');
-  const [tasks, setTasks] = useState<WorkflowTask[]>(MOCK_TASKS);
-  const [isLoading] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<WorkflowTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(`${API_BASE}/api/author/workflow/for-user?userId=admin`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data: Record<string, unknown>[]) => {
+        if (data.length > 0) {
+          // Map API workflow instances to UI tasks
+          const items: WorkflowTask[] = data.map((w, i) => ({
+            id: (w.id as string) ?? String(i),
+            title: (w.workflowName as string) ?? 'Workflow',
+            description: `Content path: ${(w.contentPath as string) ?? '—'}`,
+            status: ((w.status as string) ?? 'PENDING').toLowerCase() === 'pending' ? 'pending' as WorkflowStatus
+              : ((w.status as string) ?? '').toLowerCase() === 'approved' ? 'approved' as WorkflowStatus
+              : 'rejected' as WorkflowStatus,
+            age: w.createdAt ? new Date(w.createdAt as string).toLocaleDateString() : '—',
+            commentCount: 0,
+            attachmentCount: 0,
+            assigneeCount: 0,
+            iconType: 'workflow' as const,
+            fullDescription: (w.contentPath as string) ?? '',
+            initiator: (w.initiatorUserId as string) ?? 'System',
+            initiatorInitials: ((w.initiatorUserId as string) ?? 'SY').slice(0, 2).toUpperCase(),
+            dueDate: '—',
+            dueDateOverdue: false,
+            workflowId: (w.id as string) ?? '',
+            timeline: [],
+          }));
+          setTasks(items);
+          if (items.length > 0) setSelectedTaskId(items[0].id);
+        } else {
+          setTasks([]);
+        }
+      })
+      .catch(() => {
+        setTasks([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const filteredTasks = tasks
     .filter(t => t.status === activeTab)
@@ -642,7 +545,7 @@ export default function WorkflowInboxPage() {
         const order = { critical: 0, high: 1, medium: 2, system: 3, low: 4 };
         return (order[a.priority ?? 'low'] ?? 4) - (order[b.priority ?? 'low'] ?? 4);
       }
-      return 0; // keep original order for newest/deadline (mock)
+      return 0; // keep original order for newest/deadline
     });
 
   const selectedTask = tasks.find(t => t.id === selectedTaskId) ?? null;

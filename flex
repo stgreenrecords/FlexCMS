@@ -133,7 +133,7 @@ has_service() {
 # ── Service launchers ────────────────────────────────────────────────────────
 
 start_infra() {
-  banner "Infrastructure  (PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch)"
+  banner "Infrastructure  (PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch, pgAdmin)"
   ensure_env
   docker compose -f "$COMPOSE_FILE" up -d 2>&1 | sed 's/^/    /'
 
@@ -168,8 +168,8 @@ start_backend_service() {
   echo -e "    ${C_DIM}PID $pid  |  Log: $log_file${C_RESET}"
 }
 
-start_author()  { start_backend_service "author"  "Author  (Content + DAM + PIM read-write)" "8080" "author"; }
-start_publish() { start_backend_service "publish" "Publish  (Content + DAM read-only)"       "8081" "publish"; }
+start_author()  { start_backend_service "author,local"  "Author  (Content + DAM + PIM read-write)" "8080" "author"; }
+start_publish() { start_backend_service "publish,local" "Publish  (Content + DAM read-only)"       "8081" "publish"; }
 
 start_admin() {
   ensure_log_dir
@@ -210,28 +210,50 @@ cmd_start() {
   fi
 
   # 2) Compile backend once
+  local backend_ok=true
   if has_service "author" "$services" || has_service "publish" "$services"; then
     echo -e "    ${C_YELLOW}Compiling backend...${C_RESET}"
-    (cd "$FLEXCMS_DIR" && mvn clean compile -B -q 2>&1 | sed 's/^/    /')
-    if [ ${PIPESTATUS[0]:-0} -ne 0 ]; then
-      echo -e "    ${C_RED}ERROR: Maven compile failed${C_RESET}"
-      exit 1
+    # Run Maven without -q so compile errors are visible; indent output
+    set +e  # disable errexit so we can capture the exit code
+    (cd "$FLEXCMS_DIR" && mvn clean compile -B 2>&1) | sed 's/^/    /'
+    local mvn_exit=${PIPESTATUS[0]}
+    set -e
+    if [ "$mvn_exit" -ne 0 ]; then
+      backend_ok=false
+      echo ""
+      echo -e "    ${C_RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
+      echo -e "    ${C_RED}ERROR: Maven compile failed (exit code $mvn_exit)${C_RESET}"
+      echo -e "    ${C_RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${C_RESET}"
+      echo -e "    ${C_YELLOW}Fix the compilation errors above, then run:${C_RESET}"
+      echo -e "    ${C_WHITE}  flex start local author${C_RESET}   ${C_DIM}(or whichever services you need)${C_RESET}"
+      echo ""
+      echo -e "    ${C_DIM}Infrastructure is still running. Non-backend services will still start.${C_RESET}"
+      echo ""
+    else
+      echo -e "    ${C_GREEN}Build OK${C_RESET}"
     fi
-    echo -e "    ${C_GREEN}Build OK${C_RESET}"
   fi
 
-  # 3) Author
+  # 3) Author (skip if compile failed)
   if has_service "author" "$services"; then
-    start_author
+    if [ "$backend_ok" = true ]; then
+      start_author
+    else
+      echo -e "    ${C_YELLOW}Skipping Author — backend compile failed${C_RESET}"
+    fi
   fi
 
-  # 4) Publish (brief delay)
+  # 4) Publish (skip if compile failed)
   if has_service "publish" "$services"; then
-    has_service "author" "$services" && sleep 5
-    start_publish
+    if [ "$backend_ok" = true ]; then
+      has_service "author" "$services" && sleep 5
+      start_publish
+    else
+      echo -e "    ${C_YELLOW}Skipping Publish — backend compile failed${C_RESET}"
+    fi
   fi
 
-  # 5) Admin UI
+  # 5) Admin UI (always starts — no backend dependency)
   if has_service "admin" "$services"; then
     start_admin
   fi
@@ -246,15 +268,26 @@ cmd_start() {
     write_svc "RabbitMQ"      "localhost:5672"       "mgmt :15672"
     write_svc "MinIO (S3)"    "localhost:9000"       "console :9001"
     write_svc "Elasticsearch" "localhost:9200"
+    write_svc "pgAdmin 4 (DB)" "localhost:5050"      "no login · DB pwd: flexcms"
   fi
-  has_service "author"  "$services" && write_svc "Author (CMS+DAM+PIM)" "localhost:8080" ".dev-logs/author.log"
-  has_service "publish" "$services" && write_svc "Publish (read-only)"  "localhost:8081" ".dev-logs/publish.log"
+  if [ "$backend_ok" = true ]; then
+    has_service "author"  "$services" && write_svc "Author (CMS+DAM+PIM)" "localhost:8080" ".dev-logs/author.log"
+    has_service "publish" "$services" && write_svc "Publish (read-only)"  "localhost:8081" ".dev-logs/publish.log"
+  else
+    has_service "author"  "$services" && echo -e "    ${C_RED}Author (CMS+DAM+PIM)       SKIPPED  (compile error)${C_RESET}"
+    has_service "publish" "$services" && echo -e "    ${C_RED}Publish (read-only)        SKIPPED  (compile error)${C_RESET}"
+  fi
   has_service "admin"   "$services" && write_svc "Admin UI"             "localhost:3000" ".dev-logs/admin.log"
   echo ""
   echo -e "    ${C_DIM}flex status      check health${C_RESET}"
   echo -e "    ${C_DIM}flex stop local  stop everything${C_RESET}"
   echo -e "    ${C_DIM}flex logs author tail logs${C_RESET}"
   echo ""
+  if [ "$backend_ok" = false ]; then
+    echo -e "    ${C_YELLOW}⚠  Backend was not started due to compile errors.${C_RESET}"
+    echo -e "    ${C_YELLOW}   Fix the errors and run: flex start local author${C_RESET}"
+    echo ""
+  fi
 }
 
 cmd_stop() {
@@ -316,6 +349,7 @@ cmd_status() {
   check_http   "RabbitMQ       :5672" "http://localhost:15672"
   check_http   "MinIO          :9000" "http://localhost:9001"
   check_http   "Elasticsearch  :9200" "http://localhost:9200"
+  check_http   "pgAdmin 4      :5050" "http://localhost:5050"
   check_http   "Author API     :8080" "http://localhost:8080/actuator/health"
   check_http   "Publish API    :8081" "http://localhost:8081/actuator/health"
   check_http   "Admin UI       :3000" "http://localhost:3000"

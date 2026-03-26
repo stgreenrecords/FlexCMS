@@ -80,6 +80,14 @@ public interface ContentNodeRepository extends JpaRepository<ContentNode, UUID> 
                                                     Pageable pageable);
 
     /**
+     * Find all nodes across all sites, paginated.
+     * Optional locale filter.
+     */
+    @Query("SELECT n FROM ContentNode n WHERE (:locale IS NULL OR n.locale = :locale) ORDER BY n.path")
+    Page<ContentNode> findAllWithOptionalLocale(@Param("locale") String locale,
+                                                Pageable pageable);
+
+    /**
      * Find nodes by site and status.
      */
     Page<ContentNode> findBySiteIdAndStatus(String siteId, NodeStatus status, Pageable pageable);

@@ -2,6 +2,7 @@ package com.flexcms.core.model;
 
 import com.flexcms.core.converter.JsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -31,6 +32,7 @@ public class AuditLogEntry {
     private String userId;
 
     @Column(columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> changes;
 

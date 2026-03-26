@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -8,6 +8,12 @@ import {
   BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
   Skeleton,
 } from '@flexcms/ui';
+
+// ---------------------------------------------------------------------------
+// API
+// ---------------------------------------------------------------------------
+
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -36,26 +42,9 @@ interface DataHealthItem {
 }
 
 // ---------------------------------------------------------------------------
-// Mock data
+// Constants
 // ---------------------------------------------------------------------------
 
-const MOCK_VARIANTS: ProductVariant[] = [
-  { id: '1', skuSuffix: '-NA-BLK', region: 'North America', stock: 1240, status: 'live' },
-  { id: '2', skuSuffix: '-EU-SLV', region: 'Europe',        stock: 412,  status: 'oos'  },
-  { id: '3', skuSuffix: '-APAC-W', region: 'Asia Pacific',  stock: 88,   status: 'live' },
-  { id: '4', skuSuffix: '-LATAM',  region: 'Latin America', stock: 0,    status: 'draft'},
-];
-
-const MOCK_ASSETS: LinkedAsset[] = [
-  { id: '1', isHero: true,  label: 'Hero Shot'      },
-  { id: '2', isHero: false, label: 'Detail View'    },
-];
-
-const DATA_HEALTH: DataHealthItem[] = [
-  { ok: true,  label: 'Schema validation passed'  },
-  { ok: true,  label: 'Assets linked (2/2)'        },
-  { ok: false, label: 'Missing meta tags for SEO'  },
-];
 
 const VARIANT_STATUS_CONFIG: Record<VariantStatus, { label: string; color: string; dot: string }> = {
   live:  { label: 'Live',  color: '#b0c6ff', dot: '#b0c6ff' },
@@ -193,24 +182,44 @@ function ProductEditorSkeleton() {
 
 export default function ProductEditorPage() {
   const params = useParams();
-  const productId = params?.id as string;
-  const catalogId = params?.catalogId as string;
+  const productId = params?.productId as string;
+  const catalogId = params?.id as string;
 
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [activeSection, setActiveSection] = useState('general');
 
   // Form state
-  const [productName, setProductName] = useState('Quantum X-Series Ultra OLED 55');
-  const [brand, setBrand] = useState('Quantum Electronics');
-  const [category, setCategory] = useState('Home Theater / Displays');
-  const [sku] = useState('OLED-992-PX');
-  const [specPanel, setSpecPanel] = useState('True-Black OLED');
-  const [variants, setVariants] = useState<ProductVariant[]>(MOCK_VARIANTS);
-  const [assets] = useState<LinkedAsset[]>(MOCK_ASSETS);
+  const [productName, setProductName] = useState('');
+  const [brand, setBrand] = useState('');
+  const [category, setCategory] = useState('');
+  const [sku, setSku] = useState('');
+  const [specPanel, setSpecPanel] = useState('');
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [assets] = useState<LinkedAsset[]>([]);
   const [activeQuickNav, setActiveQuickNav] = useState('general');
+
+  // Fetch product from API
+  useEffect(() => {
+    if (!productId) { setIsLoading(false); return; }
+    setIsLoading(true);
+    fetch(`${API_BASE}/api/pim/v1/products/${productId}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data: Record<string, unknown>) => {
+        setProductName((data.name as string) ?? '');
+        setSku((data.sku as string) ?? productId);
+        const attrs = (data.attributes as Record<string, unknown>) ?? {};
+        setBrand((attrs.brand as string) ?? '');
+        setCategory((attrs.category as string) ?? '');
+        setSpecPanel((attrs.panel as string) ?? '');
+      })
+      .catch(() => {
+        // API unavailable — leave fields empty
+      })
+      .finally(() => setIsLoading(false));
+  }, [productId]);
 
   const markDirty = () => setIsDirty(true);
 
@@ -224,7 +233,14 @@ export default function ProductEditorPage() {
     setTimeout(() => { setIsPublishing(false); setIsDirty(false); }, 1500);
   };
 
-  const dataHealthScore = Math.round((DATA_HEALTH.filter((d) => d.ok).length / DATA_HEALTH.length) * 100);
+  const dataHealth: DataHealthItem[] = [
+    { ok: !!productName, label: productName ? 'Product name set' : 'Product name missing' },
+    { ok: assets.length > 0, label: assets.length > 0 ? `Assets linked (${assets.length})` : 'No assets linked' },
+    { ok: !!sku, label: sku ? 'SKU identifier set' : 'Missing SKU identifier' },
+  ];
+  const dataHealthScore = dataHealth.length > 0
+    ? Math.round((dataHealth.filter((d) => d.ok).length / dataHealth.length) * 100)
+    : 0;
 
   if (isLoading) {
     return <div style={{ background: '#201f1f', minHeight: '100vh' }}><ProductEditorSkeleton /></div>;
@@ -617,7 +633,7 @@ export default function ProductEditorPage() {
                 <div className="h-full rounded-full transition-all" style={{ width: `${dataHealthScore}%`, background: '#b0c6ff' }} />
               </div>
               <ul className="space-y-3">
-                {DATA_HEALTH.map((item) => (
+                {dataHealth.map((item) => (
                   <li key={item.label} className="flex items-center gap-3 text-xs" style={{ color: '#c3c6d6' }}>
                     <span
                       className="material-symbols-outlined text-base flex-shrink-0"

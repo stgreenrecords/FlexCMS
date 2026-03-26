@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -8,6 +8,12 @@ import {
   BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage,
   Skeleton,
 } from '@flexcms/ui';
+
+// ---------------------------------------------------------------------------
+// API
+// ---------------------------------------------------------------------------
+
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -39,35 +45,6 @@ interface CatalogDetail {
   lastUpdated: string;
 }
 
-// ---------------------------------------------------------------------------
-// Mock data
-// ---------------------------------------------------------------------------
-
-const MOCK_CATALOG: CatalogDetail = {
-  id: '1',
-  name: 'Summer 2026 Catalog',
-  season: 'Summer 2026',
-  status: 'active',
-  productCount: 1248,
-  completionRate: 94.2,
-  stockValue: 4200000,
-  pendingSync: 142,
-  missingThumbnails: 12,
-  lastUpdated: '14m ago',
-};
-
-const MOCK_PRODUCTS: Product[] = [
-  { id: '1', sku: 'ALP-2026-X9',  name: 'Alpine Performance Runner v4',   schema: 'Footwear',    price: 189.00, stock: 4280, syncStatus: 'synced' },
-  { id: '2', sku: 'LUM-SM6-W',    name: 'Lumina Smart Watch Gen 6',        schema: 'Electronics', price: 349.00, stock: 1120, syncStatus: 'draft' },
-  { id: '3', sku: 'DRK-NV-32L',   name: 'Drakon 32L Technical Pack',       schema: 'Gear',        price: 120.00, stock: 542,  syncStatus: 'synced' },
-  { id: '4', sku: 'ZEN-FL-100',   name: 'Zenith Flow Incense Burner',       schema: 'Lifestyle',   price: 45.00,  stock: 0,    syncStatus: 'out_of_stock' },
-  { id: '5', sku: 'TLC-H-M01',   name: 'Talc Heritage Chrono',             schema: 'Accessories', price: 1250.00,stock: 88,   syncStatus: 'synced' },
-  { id: '6', sku: 'SOL-DRY-X4',  name: 'Solaris Dry-Fit Training Tee',     schema: 'Apparel',     price: 38.00,  stock: 2100, syncStatus: 'synced' },
-  { id: '7', sku: 'KON-BLK-L11', name: 'Kono Blackout Sunglasses',         schema: 'Accessories', price: 195.00, stock: 340,  syncStatus: 'draft' },
-  { id: '8', sku: 'NRD-CP-EVO',  name: 'Nordisk Capsule Backpack Evo',     schema: 'Gear',        price: 280.00, stock: 89,   syncStatus: 'synced' },
-  { id: '9', sku: 'FLX-STR-007', name: 'Flex Studio Resistance Band Set',  schema: 'Fitness',     price: 55.00,  stock: 1850, syncStatus: 'synced' },
-  { id: '10', sku: 'VRX-NL-PRO', name: 'Vortex Noise Loop Pro Headphones', schema: 'Electronics', price: 499.00, stock: 203,  syncStatus: 'error' },
-];
 
 const SYNC_STATUS_CONFIG: Record<ProductSyncStatus, { label: string; color: string; dot: string }> = {
   synced:       { label: 'Synced',       color: '#4ade80', dot: '#4ade80' },
@@ -167,22 +144,57 @@ export default function CatalogDetailPage() {
   const params = useParams();
   const catalogId = params?.id as string;
 
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [page, setPage] = useState(1);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const pageSize = 25;
 
-  // In a real app, fetch catalog by catalogId from the API
-  const catalog = MOCK_CATALOG;
+  const [catalog, setCatalog] = useState<CatalogDetail | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (!catalogId) return;
+    setIsLoading(true);
+    Promise.all([
+      fetch(`${API_BASE}/api/pim/v1/catalogs/${catalogId}`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(`${API_BASE}/api/pim/v1/products?catalogId=${catalogId}&size=100`).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+    ]).then(([catData, prodData]) => {
+      if (catData) {
+        setCatalog({
+          id: catData.id ?? catalogId,
+          name: catData.name ?? 'Catalog',
+          season: catData.season ?? `${catData.year ?? ''}`,
+          status: (catData.status ?? 'DRAFT').toLowerCase(),
+          productCount: prodData?.totalElements ?? 0,
+          completionRate: 0,
+          stockValue: 0,
+          pendingSync: 0,
+          missingThumbnails: 0,
+          lastUpdated: catData.updatedAt ? new Date(catData.updatedAt).toLocaleDateString() : '—',
+        });
+      }
+      if (prodData?.content?.length > 0) {
+        setProducts(prodData.content.map((p: Record<string, unknown>) => ({
+          id: p.id ?? '',
+          sku: p.sku ?? '',
+          name: p.name ?? '',
+          schema: '',
+          price: 0,
+          stock: 0,
+          syncStatus: ((p.status as string) ?? 'DRAFT').toLowerCase() === 'active' ? 'synced' : 'draft',
+        })));
+      }
+    }).finally(() => setIsLoading(false));
+  }, [catalogId]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return MOCK_PRODUCTS.filter(
+    return products.filter(
       (p) => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q),
     );
-  }, [search]);
+  }, [search, products]);
 
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
@@ -215,9 +227,9 @@ export default function CatalogDetailPage() {
     });
   };
 
-  const totalInventoryValue = MOCK_PRODUCTS.reduce((sum, p) => sum + p.price * p.stock, 0);
+  const totalInventoryValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
 
-  if (isLoading) {
+  if (isLoading || !catalog) {
     return <div style={{ background: '#201f1f', minHeight: '100vh' }}><CatalogDetailSkeleton /></div>;
   }
 

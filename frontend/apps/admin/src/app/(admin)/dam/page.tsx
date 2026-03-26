@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -41,6 +41,7 @@ interface Asset {
   uploadedAt: string;
   status: AssetStatus;
   thumbnailBg?: string;  // gradient or color for non-image thumbnails
+  previewUrl?: string;   // URL to stream asset content
   selected?: boolean;
 }
 
@@ -53,82 +54,61 @@ interface Folder {
 type ViewMode = 'grid' | 'list';
 
 // ---------------------------------------------------------------------------
-// Mock data
+// API
 // ---------------------------------------------------------------------------
 
-const FOLDERS: Folder[] = [
-  { id: 'images',    name: 'Images',    count: 248 },
-  { id: 'videos',    name: 'Videos',    count: 12  },
-  { id: 'documents', name: 'Documents', count: 84  },
-  { id: 'archives',  name: 'Archives',  count: 3   },
-];
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
 
-const MOCK_ASSETS: Asset[] = [
-  {
-    id: 'a1', name: 'hero-banner-v2.jpg', type: 'image',
-    size: '2.4 MB', sizeBytes: 2516582, dimensions: '2400 × 1200',
-    folder: 'images', uploadedAt: '2026-03-20', status: 'active',
-  },
-  {
-    id: 'a2', name: 'product_teaser_v1.mp4', type: 'video',
-    size: '42.1 MB', sizeBytes: 44145254, dimensions: '1920 × 1080', duration: '0:45',
-    folder: 'videos', uploadedAt: '2026-03-18', status: 'active',
-  },
-  {
-    id: 'a3', name: 'brand_guidelines_2024.pdf', type: 'pdf',
-    size: '15.8 MB', sizeBytes: 16568934, pages: 12,
-    folder: 'documents', uploadedAt: '2026-03-15', status: 'active',
-    thumbnailBg: 'rgba(239,68,68,0.1)',
-  },
-  {
-    id: 'a4', name: 'tech-background.png', type: 'image',
-    size: '1.1 MB', sizeBytes: 1153433, dimensions: '1080 × 1080',
-    folder: 'images', uploadedAt: '2026-03-14', status: 'active',
-  },
-  {
-    id: 'a5', name: 'icon_set_complete.zip', type: 'zip',
-    size: '124 MB', sizeBytes: 130023424, files: 450,
-    folder: 'archives', uploadedAt: '2026-03-12', status: 'active',
-    thumbnailBg: 'rgba(59,130,246,0.1)',
-  },
-  {
-    id: 'a6', name: 'gaming-heritage.jpg', type: 'image',
-    size: '840 KB', sizeBytes: 860160, dimensions: '1200 × 800',
-    folder: 'images', uploadedAt: '2026-03-10', status: 'active',
-  },
-  {
-    id: 'a7', name: 'gradient-mesh-04.png', type: 'image',
-    size: '4.2 MB', sizeBytes: 4404019, dimensions: '4000 × 4000',
-    folder: 'images', uploadedAt: '2026-03-08', status: 'active',
-  },
-  {
-    id: 'a8', name: 'q4_report_draft.xlsx', type: 'xlsx',
-    size: '220 KB', sizeBytes: 225280, sheets: 4,
-    folder: 'documents', uploadedAt: '2026-03-07', status: 'active',
-    thumbnailBg: 'rgba(52,211,153,0.1)',
-  },
-  {
-    id: 'a9', name: 'minimalist-ui-bg.webp', type: 'image',
-    size: '154 KB', sizeBytes: 157696, dimensions: '2560 × 1440',
-    folder: 'images', uploadedAt: '2026-03-06', status: 'active',
-  },
-  {
-    id: 'a10', name: 'campaign-assets-q1.zip', type: 'zip',
-    size: '67 MB', sizeBytes: 70254592, files: 120,
-    folder: 'archives', uploadedAt: '2026-03-05', status: 'active',
-    thumbnailBg: 'rgba(59,130,246,0.1)',
-  },
-  {
-    id: 'a11', name: 'team-photo-2026.jpg', type: 'image',
-    size: '3.7 MB', sizeBytes: 3880550, dimensions: '3840 × 2160',
-    folder: 'images', uploadedAt: '2026-03-01', status: 'processing',
-  },
-  {
-    id: 'a12', name: 'product-tour.mp4', type: 'video',
-    size: '128 MB', sizeBytes: 134217728, dimensions: '3840 × 2160', duration: '3:12',
-    folder: 'videos', uploadedAt: '2026-02-28', status: 'processing',
-  },
-];
+// Map backend Asset entity to UI Asset type
+function apiToAsset(a: Record<string, unknown>): Asset {
+  const mimeType = (a.mimeType as string) ?? '';
+  let type: AssetType = 'other';
+  const name = (a.name as string) ?? (a.originalFilename as string) ?? 'unnamed';
+  if (mimeType.startsWith('image/')) type = 'image';
+  else if (mimeType.startsWith('video/')) type = 'video';
+  else if (mimeType === 'application/pdf' || name.endsWith('.pdf')) type = 'pdf';
+  else if (name.endsWith('.zip') || name.endsWith('.gz') || name.endsWith('.tar')) type = 'zip';
+  else if (name.endsWith('.xlsx') || name.endsWith('.xls')) type = 'xlsx';
+  else if (mimeType.startsWith('application/')) type = 'document';
+
+  const sizeBytes = (a.fileSize as number) ?? 0;
+  const width = a.width as number | undefined;
+  const height = a.height as number | undefined;
+  const dimensions = width && height ? `${width} × ${height}` : undefined;
+
+  const folder = inferFolder(type);
+
+  const id = (a.id as string) ?? String(Math.random());
+  const previewUrl = type === 'image' ? `${API_BASE}/api/author/assets/${id}/content` : undefined;
+
+  return {
+    id,
+    name,
+    type,
+    size: formatBytes(sizeBytes),
+    sizeBytes,
+    dimensions,
+    folder,
+    uploadedAt: a.createdAt
+      ? new Date(a.createdAt as string).toISOString().slice(0, 10)
+      : '—',
+    status: ((a.status as string) ?? 'ACTIVE').toLowerCase() === 'active' ? 'active'
+      : ((a.status as string) ?? '').toLowerCase() === 'processing' ? 'processing'
+      : 'error',
+    previewUrl,
+  };
+}
+
+function inferFolder(type: AssetType): string {
+  switch (type) {
+    case 'image': return 'images';
+    case 'video': return 'videos';
+    case 'pdf': case 'xlsx': case 'document': return 'documents';
+    case 'zip': return 'archives';
+    default: return 'documents';
+  }
+}
+
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -171,11 +151,17 @@ function AssetThumbnail({ asset, size = 'md' }: { asset: Asset; size?: 'sm' | 'm
   if (asset.type === 'image') {
     return (
       <div className={`w-full aspect-square rounded-[var(--radius-md)] overflow-hidden bg-[var(--color-muted)]/30 relative`}>
-        {/* Placeholder gradient as image stand-in (no external image URLs per guidelines) */}
-        <div className="w-full h-full flex items-center justify-center"
-          style={{ background: `linear-gradient(135deg, ${cfg.color}22 0%, ${cfg.color}44 100%)` }}>
-          <ImageIcon className={isLarge ? 'h-8 w-8' : 'h-5 w-5'} color={cfg.color} />
-        </div>
+        {asset.previewUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={asset.previewUrl} alt={asset.name}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center"
+            style={{ background: `linear-gradient(135deg, ${cfg.color}22 0%, ${cfg.color}44 100%)` }}>
+            <ImageIcon className={isLarge ? 'h-8 w-8' : 'h-5 w-5'} color={cfg.color} />
+          </div>
+        )}
         {asset.status === 'processing' && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/40">
             <SpinnerIcon />
@@ -267,11 +253,36 @@ export default function DamBrowserPage() {
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
   const [search, setSearch]           = useState('');
   const [selected, setSelected]       = useState<Set<string>>(new Set());
-  const [assets, setAssets]           = useState<Asset[]>(MOCK_ASSETS);
+  const [assets, setAssets]           = useState<Asset[]>([]);
   const [uploadOpen, setUploadOpen]   = useState(false);
-  const [loading]                     = useState(false);
+  const [loading, setLoading]         = useState(true);
 
   const { files: uploadFiles, addFiles, clear: clearUploadFiles } = useFileUpload();
+
+  // Compute folder list dynamically from loaded assets
+  const folders: Folder[] = useMemo(() => {
+    const folderNames = ['images', 'videos', 'documents', 'archives'];
+    return folderNames.map((name) => ({
+      id: name,
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      count: assets.filter((a) => a.folder === name).length,
+    }));
+  }, [assets]);
+
+  // Fetch assets from backend API
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API_BASE}/api/author/assets?size=200`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        const items: Asset[] = ((data.items ?? []) as Record<string, unknown>[]).map(apiToAsset);
+        setAssets(items);
+      })
+      .catch(() => {
+        setAssets([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   // Filter
   const filtered = useMemo(() => {
@@ -311,25 +322,45 @@ export default function DamBrowserPage() {
   }
 
   function handleUpload() {
-    // Simulate adding uploaded files as new assets
-    const newAssets: Asset[] = uploadFiles.map((uf, i) => ({
-      id: `new-${Date.now()}-${i}`,
-      name: uf.file.name,
-      type: uf.file.type.startsWith('image/') ? 'image'
-        : uf.file.type.startsWith('video/') ? 'video'
-        : uf.file.name.endsWith('.pdf') ? 'pdf'
-        : uf.file.name.endsWith('.zip') ? 'zip'
-        : uf.file.name.endsWith('.xlsx') ? 'xlsx'
-        : 'other',
-      size: formatBytes(uf.file.size),
-      sizeBytes: uf.file.size,
-      folder: activeFolder ?? 'images',
-      uploadedAt: new Date().toISOString().slice(0, 10),
-      status: 'processing',
-    }));
-    setAssets((prev) => [...newAssets, ...prev]);
-    clearUploadFiles();
-    setUploadOpen(false);
+    // Upload each file via the real backend API
+    const uploads = uploadFiles.map(async (uf) => {
+      const formData = new FormData();
+      formData.append('file', uf.file);
+      formData.append('path', `/dam/${activeFolder ?? 'images'}/${uf.file.name}`);
+      formData.append('siteId', 'corporate');
+      formData.append('userId', 'admin');
+      try {
+        const res = await fetch(`${API_BASE}/api/author/assets`, {
+          method: 'POST',
+          body: formData,
+        });
+        if (res.ok) {
+          const saved = await res.json();
+          return apiToAsset(saved);
+        }
+      } catch { /* ignore, fallback below */ }
+      // Fallback: create a local placeholder if API call fails
+      return {
+        id: `new-${Date.now()}-${Math.random()}`,
+        name: uf.file.name,
+        type: (uf.file.type.startsWith('image/') ? 'image'
+          : uf.file.type.startsWith('video/') ? 'video'
+          : uf.file.name.endsWith('.pdf') ? 'pdf'
+          : uf.file.name.endsWith('.zip') ? 'zip'
+          : uf.file.name.endsWith('.xlsx') ? 'xlsx'
+          : 'other') as AssetType,
+        size: formatBytes(uf.file.size),
+        sizeBytes: uf.file.size,
+        folder: activeFolder ?? 'images',
+        uploadedAt: new Date().toISOString().slice(0, 10),
+        status: 'processing' as AssetStatus,
+      };
+    });
+    Promise.all(uploads).then((newAssets) => {
+      setAssets((prev) => [...newAssets, ...prev]);
+      clearUploadFiles();
+      setUploadOpen(false);
+    });
   }
 
   // List mode columns
@@ -466,7 +497,7 @@ export default function DamBrowserPage() {
               </span>
             </button>
 
-            {FOLDERS.map((folder) => (
+            {folders.map((folder) => (
               <button
                 key={folder.id}
                 onClick={() => setActiveFolder(folder.id)}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -37,148 +37,10 @@ type StatusFilter = 'all' | 'translated' | 'outdated' | 'missing';
 type SectionFilter = 'all' | 'home' | 'dashboard' | 'global' | 'settings' | 'auth';
 
 // ---------------------------------------------------------------------------
-// Mock data
+// Constants
 // ---------------------------------------------------------------------------
 
-const MOCK_KEYS: TranslationKey[] = [
-  {
-    id: 'k1',
-    key: 'common.buttons.save',
-    section: 'Global Components',
-    sourceText: 'Save Changes',
-    fr: { status: 'translated', value: 'Sauvegarder les modifications' },
-    de: { status: 'translated', value: 'Änderungen speichern' },
-    es: { status: 'translated', value: 'Guardar cambios' },
-  },
-  {
-    id: 'k2',
-    key: 'dashboard.welcome_msg',
-    section: 'Dashboard Home',
-    sourceText: 'Welcome back, {user}!',
-    fr: { status: 'outdated', value: 'Bon retour, {user} !' },
-    de: { status: 'translated', value: 'Willkommen zurück, {user}!' },
-    es: { status: 'missing', value: '' },
-  },
-  {
-    id: 'k3',
-    key: 'settings.privacy.disclaimer',
-    section: 'Settings',
-    sourceText: 'Your data privacy is our priority. We never sell your personal information.',
-    fr: { status: 'translated', value: 'La confidentialité de vos données est notre priorité. Nous ne vendons jamais vos informations.' },
-    de: { status: 'translated', value: 'Datenschutz ist unsere Priorität. Wir verkaufen niemals Ihre Informationen.' },
-    es: { status: 'missing', value: '' },
-  },
-  {
-    id: 'k4',
-    key: 'auth.forgot_password',
-    section: 'Authentication',
-    sourceText: 'Forgot password?',
-    fr: { status: 'translated', value: 'Mot de passe oublié ?' },
-    de: { status: 'translated', value: 'Passwort vergessen?' },
-    es: { status: 'translated', value: '¿Has olvidado tu contraseña?' },
-  },
-  {
-    id: 'k5',
-    key: 'nav.products.catalog',
-    section: 'Navigation',
-    sourceText: 'Product Catalog',
-    fr: { status: 'translated', value: 'Catalogue produits' },
-    de: { status: 'outdated', value: 'Produktkatalog' },
-    es: { status: 'translated', value: 'Catálogo de productos' },
-  },
-  {
-    id: 'k6',
-    key: 'dam.upload.drag_hint',
-    section: 'Media Library',
-    sourceText: 'Drag and drop files here, or click to browse',
-    fr: { status: 'translated', value: 'Faites glisser les fichiers ici ou cliquez pour parcourir' },
-    de: { status: 'translated', value: 'Dateien hier ablegen oder zum Durchsuchen klicken' },
-    es: { status: 'missing', value: '' },
-  },
-  {
-    id: 'k7',
-    key: 'pim.product.status.draft',
-    section: 'PIM',
-    sourceText: 'Draft',
-    fr: { status: 'translated', value: 'Brouillon' },
-    de: { status: 'translated', value: 'Entwurf' },
-    es: { status: 'translated', value: 'Borrador' },
-  },
-  {
-    id: 'k8',
-    key: 'pim.product.status.published',
-    section: 'PIM',
-    sourceText: 'Published',
-    fr: { status: 'translated', value: 'Publié' },
-    de: { status: 'translated', value: 'Veröffentlicht' },
-    es: { status: 'translated', value: 'Publicado' },
-  },
-  {
-    id: 'k9',
-    key: 'workflow.action.approve',
-    section: 'Workflows',
-    sourceText: 'Approve',
-    fr: { status: 'translated', value: 'Approuver' },
-    de: { status: 'translated', value: 'Genehmigen' },
-    es: { status: 'outdated', value: 'Aprobar' },
-  },
-  {
-    id: 'k10',
-    key: 'workflow.action.reject',
-    section: 'Workflows',
-    sourceText: 'Reject',
-    fr: { status: 'translated', value: 'Rejeter' },
-    de: { status: 'translated', value: 'Ablehnen' },
-    es: { status: 'translated', value: 'Rechazar' },
-  },
-  {
-    id: 'k11',
-    key: 'common.labels.loading',
-    section: 'Global Components',
-    sourceText: 'Loading...',
-    fr: { status: 'translated', value: 'Chargement...' },
-    de: { status: 'translated', value: 'Laden...' },
-    es: { status: 'translated', value: 'Cargando...' },
-  },
-  {
-    id: 'k12',
-    key: 'common.labels.error',
-    section: 'Global Components',
-    sourceText: 'An error occurred. Please try again.',
-    fr: { status: 'translated', value: 'Une erreur s\'est produite. Veuillez réessayer.' },
-    de: { status: 'missing', value: '' },
-    es: { status: 'missing', value: '' },
-  },
-  {
-    id: 'k13',
-    key: 'auth.login.title',
-    section: 'Authentication',
-    sourceText: 'Sign in to your account',
-    fr: { status: 'translated', value: 'Connectez-vous à votre compte' },
-    de: { status: 'translated', value: 'Melden Sie sich bei Ihrem Konto an' },
-    es: { status: 'translated', value: 'Inicia sesión en tu cuenta' },
-  },
-  {
-    id: 'k14',
-    key: 'settings.account.save_changes',
-    section: 'Settings',
-    sourceText: 'Save account settings',
-    fr: { status: 'outdated', value: 'Enregistrer les paramètres du compte' },
-    de: { status: 'translated', value: 'Kontoeinstellungen speichern' },
-    es: { status: 'missing', value: '' },
-  },
-  {
-    id: 'k15',
-    key: 'dam.asset.delete_confirm',
-    section: 'Media Library',
-    sourceText: 'Are you sure you want to delete this asset? This action cannot be undone.',
-    fr: { status: 'translated', value: 'Êtes-vous sûr de vouloir supprimer cet actif ? Cette action est irréversible.' },
-    de: { status: 'translated', value: 'Möchten Sie dieses Asset wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.' },
-    es: { status: 'missing', value: '' },
-  },
-];
 
-const TOTAL_KEYS = 142;
 const PAGE_SIZE = 15;
 
 // ---------------------------------------------------------------------------
@@ -352,7 +214,7 @@ function TranslationManagerPage() {
   const [sectionFilter, setSectionFilter] = useState<SectionFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [keys, setKeys] = useState<TranslationKey[]>(MOCK_KEYS);
+  const [keys, setKeys] = useState<TranslationKey[]>([]);
 
   // Filter logic
   const filteredKeys = keys.filter((k) => {
@@ -376,7 +238,7 @@ function TranslationManagerPage() {
     return matchSearch && matchStatus && matchSection;
   });
 
-  const totalPages = Math.ceil(TOTAL_KEYS / PAGE_SIZE);
+  const totalPages = Math.ceil(filteredKeys.length / PAGE_SIZE);
   const stats = getHealthStats(keys);
 
   const handleLocaleEdit = useCallback(
@@ -651,11 +513,11 @@ function TranslationManagerPage() {
               <p className="text-[11px]" style={{ color: '#8d90a0' }}>
                 Showing{' '}
                 <span className="font-bold" style={{ color: '#e5e2e1' }}>
-                  {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, TOTAL_KEYS)}
+                  {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filteredKeys.length)}
                 </span>{' '}
                 of{' '}
                 <span className="font-bold" style={{ color: '#e5e2e1' }}>
-                  {TOTAL_KEYS}
+                  {filteredKeys.length}
                 </span>{' '}
                 keys
               </p>

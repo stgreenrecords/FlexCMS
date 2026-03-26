@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 // ---------------------------------------------------------------------------
@@ -19,40 +19,29 @@ interface ActivityItem {
 }
 
 // ---------------------------------------------------------------------------
-// Mock data
+// API
 // ---------------------------------------------------------------------------
 
-const STATS = [
-  { icon: <PageIcon />,     iconColor: '#b0c6ff', label: 'Total Pages',    value: '2,482', badge: '+12%',    badgeColor: '#34d399', badgeBg: 'rgba(52,211,153,0.1)', hoverBorder: 'rgba(176,198,255,0.3)' },
-  { icon: <SiteIcon />,     iconColor: '#b3c5fd', label: 'Active Sites',   value: '14',    badge: 'Static',  badgeColor: '#8d90a0', badgeBg: 'rgba(141,144,160,0.1)', hoverBorder: 'rgba(179,197,253,0.3)' },
-  { icon: <WorkflowIcon />, iconColor: '#ffb59b', label: 'Workflows',       value: '38',    badge: 'Urgent',  badgeColor: '#ffb59b', badgeBg: 'rgba(255,181,155,0.1)', hoverBorder: 'rgba(255,181,155,0.3)' },
-  { icon: <StorageIcon />,  iconColor: '#8d90a0', label: 'Storage Used',   value: '1.2 TB', badge: '82% Full', badgeColor: '#8d90a0', badgeBg: 'rgba(141,144,160,0.1)', hoverBorder: 'rgba(141,144,160,0.2)' },
-];
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
 
-const ACTIVITY: ActivityItem[] = [
-  { id: '1', name: 'Homepage Redesign 2024', path: '/index.html', status: 'draft',     timeAgo: '2 mins ago',  curator: { initials: 'MK', name: 'Marcus Kane',  color: '#b0c6ff' } },
-  { id: '2', name: 'Fall Product Catalog',    path: '/shop/fall-2024', status: 'published', timeAgo: '1 hour ago',  curator: { initials: 'SL', name: 'Sarah Lopez',  color: '#34d399' } },
-  { id: '3', name: 'About Us Revisions',      path: '/company/about',  status: 'review',    timeAgo: '4 hours ago', curator: { initials: 'JA', name: 'James Aris',   color: '#ffb59b' } },
-  { id: '4', name: 'Product Taxonomy Update', path: '/shop/taxonomy',  status: 'draft',     timeAgo: 'Yesterday',   curator: { initials: 'JD', name: 'Jane Doe',     color: '#b0c6ff' } },
-  { id: '5', name: 'Developer Docs v3',       path: '/docs/v3',        status: 'published', timeAgo: '2 days ago',  curator: { initials: 'SA', name: 'Sarah Archer', color: '#34d399' } },
-];
+interface DashboardStats {
+  totalPages: string;
+  activeSites: string;
+  workflows: string;
+  storageUsed: string;
+}
 
-const CHART_BARS = [
-  { height: 30, opacity: 0.3, primary: false },
-  { height: 45, opacity: 0.4, primary: false },
-  { height: 60, opacity: 1,   primary: true },
-  { height: 40, opacity: 1,   primary: true },
-  { height: 75, opacity: 1,   primary: true },
-  { height: 55, opacity: 1,   primary: true },
-  { height: 40, opacity: 0.4, primary: false },
-  { height: 20, opacity: 0.3, primary: false },
-  { height: 50, opacity: 1,   primary: true },
-  { height: 85, opacity: 1,   primary: true, glow: true },
-  { height: 65, opacity: 1,   primary: true },
-  { height: 95, opacity: 1,   primary: true, glow: true },
-  { height: 35, opacity: 1,   primary: true },
-  { height: 15, opacity: 0.3, primary: false },
-];
+const DEFAULT_STATS: DashboardStats = {
+  totalPages: '—',
+  activeSites: '—',
+  workflows: '—',
+  storageUsed: '—',
+};
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
 
 const STATUS_STYLES: Record<ActivityStatus, { label: string; bg: string; color: string; border?: string }> = {
   draft:     { label: 'DRAFT',     bg: '#324575',                  color: '#b3c5fd' },
@@ -66,7 +55,80 @@ const STATUS_STYLES: Record<ActivityStatus, { label: string; bg: string; color: 
 // ---------------------------------------------------------------------------
 
 export default function DashboardPage() {
-  const [chartRange, setChartRange] = useState<'30D' | '90D'>('30D');
+  const [stats, setStats] = useState<DashboardStats>(DEFAULT_STATS);
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real data from backend
+  useEffect(() => {
+    setLoading(true);
+    const statusMap: Record<string, ActivityStatus> = {
+      PUBLISHED: 'published',
+      DRAFT: 'draft',
+      IN_REVIEW: 'review',
+      APPROVED: 'review',
+      ARCHIVED: 'archived',
+    };
+
+    // Fetch content list for recent activity + stats
+    fetch(`${API_BASE}/api/author/content/list?size=50`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        const nodes = (data.content ?? []) as Record<string, unknown>[];
+        const totalElements = (data.totalElements ?? nodes.length) as number;
+
+        // Build stats
+        setStats({
+          totalPages: totalElements.toLocaleString(),
+          activeSites: String(new Set(nodes.map((n) => n.siteId).filter(Boolean)).size || '—'),
+          workflows: '—',
+          storageUsed: '—',
+        });
+
+        // Build recent activity from the first 5 nodes
+        if (nodes.length > 0) {
+          const items: ActivityItem[] = nodes.slice(0, 5).map((n, i) => {
+            const updatedBy = (n.modifiedBy as string) ?? (n.createdBy as string) ?? 'System';
+            const initials = updatedBy.slice(0, 2).toUpperCase();
+            const modAt = n.modifiedAt ? new Date(n.modifiedAt as string) : null;
+            const timeAgo = modAt ? timeSince(modAt) : '—';
+            return {
+              id: (n.id as string) ?? String(i),
+              name: (n.name as string) ?? 'Untitled',
+              path: '/' + ((n.path as string) ?? '').replace(/\./g, '/'),
+              status: statusMap[(n.status as string) ?? 'DRAFT'] ?? 'draft',
+              timeAgo,
+              curator: { initials, name: updatedBy, color: '#b0c6ff' },
+            };
+          });
+          setActivity(items);
+        }
+      })
+      .catch(() => {
+        // API unavailable
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Helper: human-readable time since date
+  function timeSince(date: Date): string {
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return days === 1 ? 'Yesterday' : `${days} days ago`;
+  }
+
+  // Build dynamic stats array
+  const DYNAMIC_STATS = [
+    { icon: <PageIcon />, iconColor: '#b0c6ff', label: 'Total Pages', value: stats.totalPages, badge: loading ? '...' : 'Live', badgeColor: '#34d399', badgeBg: 'rgba(52,211,153,0.1)', hoverBorder: 'rgba(176,198,255,0.3)' },
+    { icon: <SiteIcon />, iconColor: '#b3c5fd', label: 'Active Sites', value: stats.activeSites, badge: 'Live', badgeColor: '#8d90a0', badgeBg: 'rgba(141,144,160,0.1)', hoverBorder: 'rgba(179,197,253,0.3)' },
+    { icon: <WorkflowIcon />, iconColor: '#ffb59b', label: 'Workflows', value: stats.workflows, badge: '—', badgeColor: '#ffb59b', badgeBg: 'rgba(255,181,155,0.1)', hoverBorder: 'rgba(255,181,155,0.3)' },
+    { icon: <StorageIcon />, iconColor: '#8d90a0', label: 'Storage Used', value: stats.storageUsed, badge: '—', badgeColor: '#8d90a0', badgeBg: 'rgba(141,144,160,0.1)', hoverBorder: 'rgba(141,144,160,0.2)' },
+  ];
 
   return (
     <div className="p-8" style={{ minHeight: 'calc(100vh - 64px)', background: '#201f1f' }}>
@@ -103,7 +165,7 @@ export default function DashboardPage() {
 
       {/* Stats grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {STATS.map(({ icon, iconColor, label, value, badge, badgeColor, badgeBg, hoverBorder }) => (
+        {DYNAMIC_STATS.map(({ icon, iconColor, label, value, badge, badgeColor, badgeBg, hoverBorder }) => (
           <div
             key={label}
             className="p-6 rounded-xl border transition-all"
@@ -137,7 +199,7 @@ export default function DashboardPage() {
 
       {/* Main content grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Content Updates chart (2/3 width) */}
+        {/* Content Updates (2/3 width) */}
         <section
           className="xl:col-span-2 rounded-xl p-8 border"
           style={{ background: '#1c1b1b', borderColor: 'rgba(66,70,84,0.1)' }}
@@ -148,50 +210,22 @@ export default function DashboardPage() {
                 Content Updates
               </h3>
               <p className="text-xs mt-0.5" style={{ color: '#8d90a0' }}>
-                System-wide performance over the last {chartRange === '30D' ? '30' : '90'} days
+                System-wide performance overview
               </p>
-            </div>
-            <div className="flex gap-2">
-              {(['30D', '90D'] as const).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setChartRange(r)}
-                  className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
-                  style={
-                    chartRange === r
-                      ? { background: '#2a2a2a', color: '#e5e2e1' }
-                      : { color: '#8d90a0' }
-                  }
-                >
-                  {r}
-                </button>
-              ))}
             </div>
           </div>
 
-          {/* Bar chart */}
-          <div className="relative h-[240px] w-full flex items-end gap-1.5 pb-2">
-            {CHART_BARS.map((bar, i) => (
-              <div
-                key={i}
-                className="flex-1 rounded-t-sm transition-all duration-500"
-                style={{
-                  height: `${bar.height}%`,
-                  background: bar.primary ? `rgba(176,198,255,${bar.opacity})` : '#353534',
-                  opacity: bar.primary ? 1 : bar.opacity,
-                  boxShadow: bar.glow ? '0 0 20px rgba(176,198,255,0.3)' : 'none',
-                }}
-              />
-            ))}
-            {/* X-axis labels */}
-            <div
-              className="absolute -bottom-6 left-0 w-full flex justify-between text-[10px] font-bold uppercase tracking-tighter"
-              style={{ color: 'rgba(195,198,214,0.4)' }}
-            >
-              <span>Oct 01</span>
-              <span>Oct 15</span>
-              <span>Oct 30</span>
-            </div>
+          {/* Empty state when no data */}
+          <div className="flex flex-col items-center justify-center h-[240px]" style={{ color: '#8d90a0' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" aria-hidden="true" style={{ opacity: 0.3 }}>
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="3" y1="9" x2="21" y2="9" />
+              <line x1="9" y1="21" x2="9" y2="9" />
+            </svg>
+            <p className="text-sm mt-4 font-medium">No content activity data yet</p>
+            <p className="text-xs mt-1" style={{ color: 'rgba(141,144,160,0.6)' }}>
+              Activity charts will appear once content is authored
+            </p>
           </div>
         </section>
 
@@ -213,53 +247,15 @@ export default function DashboardPage() {
             </span>
           </div>
 
-          <div className="space-y-3">
-            <SmartTask
-              title="Approve SEO Meta Tags"
-              description="High urgency: Required for tomorrow's launch"
-              badge="CRITICAL"
-              badgeColor="#ffb4ab"
-              badgeBg="rgba(147,0,10,0.2)"
-              borderColor="rgba(255,180,171,0.6)"
-              time="Due in 2h"
-              indicator="!"
-              indicatorColor="#ffb4ab"
-            />
-            <SmartTask
-              title="Update Asset Library"
-              description="PIM sync completed with 4 conflicts"
-              badge="RESOLVE"
-              badgeColor="#b0c6ff"
-              badgeBg="rgba(176,198,255,0.1)"
-              borderColor="rgba(176,198,255,0.6)"
-              time="Auto-detected"
-              indicator="i"
-              indicatorColor="#b0c6ff"
-            />
-            <SmartTask
-              title="Archival Review"
-              description="12 outdated pages can be archived"
-              badge="LOW"
-              badgeColor="#34d399"
-              badgeBg="rgba(52,211,153,0.1)"
-              borderColor="rgba(52,211,153,0.6)"
-              time="Recommended"
-              indicator="✓"
-              indicatorColor="#34d399"
-            />
+          <div className="flex flex-col items-center justify-center py-12" style={{ color: '#8d90a0' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true" style={{ opacity: 0.3 }}>
+              <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
+            </svg>
+            <p className="text-xs mt-3 font-medium">No pending tasks</p>
+            <p className="text-[10px] mt-1 text-center" style={{ color: 'rgba(141,144,160,0.6)' }}>
+              AI-prioritised tasks will appear here based on your content activity
+            </p>
           </div>
-
-          <button
-            className="w-full mt-6 py-2 text-[11px] font-bold uppercase tracking-widest rounded-lg transition-all"
-            style={{
-              color: 'rgba(195,198,214,0.6)',
-              border: '1px dashed rgba(66,70,84,0.4)',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#b0c6ff'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(195,198,214,0.6)'; }}
-          >
-            View Intelligence Report
-          </button>
         </section>
 
         {/* Recent Activity table (full width) */}
@@ -315,7 +311,7 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {ACTIVITY.map((item) => {
+              {activity.map((item) => {
                 const s = STATUS_STYLES[item.status];
                 return (
                   <tr
@@ -392,61 +388,6 @@ export default function DashboardPage() {
             </button>
           </div>
         </section>
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Smart task card
-// ---------------------------------------------------------------------------
-
-function SmartTask({
-  title,
-  description,
-  badge,
-  badgeColor,
-  badgeBg,
-  borderColor,
-  time,
-  indicator,
-  indicatorColor,
-}: {
-  title: string;
-  description: string;
-  badge: string;
-  badgeColor: string;
-  badgeBg: string;
-  borderColor: string;
-  time: string;
-  indicator: string;
-  indicatorColor: string;
-}) {
-  return (
-    <div
-      className="p-3 rounded-xl cursor-pointer transition-all"
-      style={{
-        background: 'rgba(42,42,42,0.4)',
-        borderLeft: `4px solid ${borderColor}`,
-      }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(42,42,42,0.7)'; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(42,42,42,0.4)'; }}
-    >
-      <div className="flex justify-between items-start mb-1">
-        <span className="text-xs font-bold" style={{ color: '#e5e2e1' }}>{title}</span>
-        <span className="text-xs font-bold" style={{ color: indicatorColor }}>{indicator}</span>
-      </div>
-      <p className="text-[10px] mb-2 truncate" style={{ color: '#8d90a0' }}>{description}</p>
-      <div className="flex items-center gap-2">
-        <span
-          className="px-2 py-0.5 rounded text-[9px] font-bold"
-          style={{ background: badgeBg, color: badgeColor }}
-        >
-          {badge}
-        </span>
-        <span className="text-[9px] font-medium" style={{ color: 'rgba(141,144,160,0.6)' }}>
-          {time}
-        </span>
       </div>
     </div>
   );

@@ -76,7 +76,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | `packages/react` | — | — | — |
 | `packages/vue` | — | — | — |
 | `packages/ui` | — | — | — |
-| `apps/admin` | P1-15 | AI Agent | 2026-03-26 |
+| `apps/admin` | — | — | — |
 | `apps/site-nextjs` | — | — | — |
 | `apps/site-nuxt` | — | — | — |
 | `apps/build-worker` | — | — | — |
@@ -131,7 +131,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P1-12 | 🟢 OPEN | **PIM ↔ CMS integration — product enrichment in ComponentModels** | 3d | `flexcms-pim`, `flexcms-core`, `flexcms-plugin-api` | — |
 | P1-13 | 🟢 OPEN | **PIM ↔ DAM integration — product asset linking** | 2d | `flexcms-pim`, `flexcms-dam` | — |
 | P1-14 | ✅ DONE | **Automated data seeding script — re-runnable setup for TUT sample website** | 2d | `scripts`, `flexcms-app` | P0-11 |
-| P1-15 | 🔵 IN PROGRESS | **Admin UI — Content Tree folder-style navigation (lazy-load children on row click)** | 4h | `apps/admin`, `flexcms-author` | — |
+| P1-15 | ✅ DONE | **Admin UI — Content Tree folder-style navigation (lazy-load children on row click)** | 4h | `apps/admin`, `flexcms-author` | — |
 
 ### 🟡 P2 — Medium (Enhances Enterprise Value)
 
@@ -526,6 +526,26 @@ Each task below lists the files to read and acceptance criteria to verify.
 ---
 
 *No entries yet. First task completion will be recorded here.*
+
+---
+
+### P1-15 — Admin UI Content Tree folder-style navigation
+**Status:** ✅ DONE
+**Date:** 2026-03-26
+**Agent:** AI Agent
+**AC Verification:**
+  - [x] AC1 — First load shows only direct children of `content` root (e.g. experience-fragments, tut-ca)
+  - [x] AC2 — Clicking a row navigates into that folder and fetches its children via new `/api/author/content/children` endpoint
+  - [x] AC3 — Clickable breadcrumb trail (`Content / experience-fragments / tut-ca`) allows navigating back up
+  - [x] AC4 — "↑ Up one level" button navigates to parent folder
+  - [x] AC5 — Checkbox and action menu clicks do NOT trigger folder navigation (stopPropagation)
+  - [x] AC6 — Row hover highlight, loading skeletons, empty-folder state all present
+  - [x] AC7 — Search filters within current folder only
+**Files Changed:**
+  - `flexcms/flexcms-author/src/main/java/com/flexcms/author/controller/AuthorContentController.java` — added `GET /api/author/content/children?path={ltreePath}` endpoint
+  - `frontend/apps/admin/src/app/(admin)/content/page.tsx` — full rewrite: folder navigation state (`currentPath`, `breadcrumbs`), lazy-load children, clickable rows, breadcrumb bar, loading skeletons, removed List/Tree toggle and flattenTree logic
+**Build Verified:** Yes — `mvn clean compile` passed (flexcms-author + deps); `tsc --noEmit` passed (admin app)
+**Notes:** The new endpoint accepts the ltree path directly (no URL→ltree conversion), defaulting to `"content"`. The `toContentPath()` helper is NOT used for this endpoint to avoid the `content.content` double-prefix bug.
 
 ---
 

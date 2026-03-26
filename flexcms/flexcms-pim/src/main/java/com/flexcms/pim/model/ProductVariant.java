@@ -2,6 +2,7 @@ package com.flexcms.pim.model;
 
 import com.flexcms.pim.converter.PimJsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -24,14 +25,17 @@ public class ProductVariant {
     private String variantSku;
 
     @Column(columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> attributes = new HashMap<>();
 
     @Column(columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> pricing = new HashMap<>();
 
     @Column(columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> inventory = new HashMap<>();
 

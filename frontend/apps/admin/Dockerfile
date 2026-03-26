@@ -33,6 +33,7 @@ COPY --from=deps /app/apps/admin/node_modules ./apps/admin/node_modules
 COPY . .
 
 # Build SDK → React → UI → Admin (dependency order)
+ENV STANDALONE=1
 RUN pnpm --filter @flexcms/sdk build && \
     pnpm --filter @flexcms/react build && \
     pnpm --filter @flexcms/ui build && \

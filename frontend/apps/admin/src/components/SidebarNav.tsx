@@ -30,7 +30,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/dashboard', label: 'Dashboard', icon: <GridIcon /> },
       { href: '/content', label: 'Content Tree', icon: <TreeIcon /> },
       { href: '/sites', label: 'Sites', icon: <GlobeIcon /> },
-      { href: '/workflows', label: 'Workflows', icon: <WorkflowIcon />, badge: 38 },
+      { href: '/workflows', label: 'Workflows', icon: <WorkflowIcon /> },
       { href: '/components', label: 'Components', icon: <ComponentIcon /> },
       { href: '/experience-fragments', label: 'Experience Fragments', icon: <ExperienceFragmentIcon /> },
       { href: '/preview', label: 'Content Preview', icon: <PreviewIcon /> },

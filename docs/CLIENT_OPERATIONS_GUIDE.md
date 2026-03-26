@@ -257,11 +257,9 @@ curl -X POST http://localhost:8080/api/admin/sites \
   -d '{
     "siteId": "my-company-gb",
     "title": "My Company — United Kingdom",
-    "contentRoot": "/content/my-company-gb",
-    "damRoot": "/dam/my-company",
-    "configRoot": "/conf/my-company-gb",
     "defaultLocale": "en",
-    "locales": ["en"]
+    "supportedLocales": ["en"],
+    "userId": "admin"
   }'
 ```
 
@@ -483,11 +481,12 @@ curl -X POST http://localhost:8080/api/author/workflow/start \
     "userId": "admin"
   }'
 
-# Move through workflow steps
-# Submit → Approve → Publish
-curl -X POST http://localhost:8080/api/author/workflow/<instance-id>/advance \
+# Move through workflow steps (Submit → Approve → Publish)
+# The response from /start returns an instanceId — use it here:
+curl -X POST http://localhost:8080/api/author/workflow/advance \
   -H "Content-Type: application/json" \
   -d '{
+    "instanceId": "<instance-uuid-from-start>",
     "action": "submit",
     "userId": "admin"
   }'
@@ -884,7 +883,7 @@ Uses `@flexcms/vue` plugin with `<FlexCmsPage>` and `<FlexCmsComponent>` composa
 | `/api/author/assets` | POST | Upload DAM asset |
 | `/api/author/assets` | GET | List/search assets |
 | `/api/author/workflow/start` | POST | Start workflow |
-| `/api/author/workflow/{id}/advance` | POST | Advance workflow step |
+| `/api/author/workflow/advance` | POST | Advance workflow step |
 | `/api/pim/v1/products` | CRUD | Manage products |
 | `/api/pim/v1/catalogs` | CRUD | Manage catalogs |
 | `/api/pim/v1/schemas` | CRUD | Manage product schemas |

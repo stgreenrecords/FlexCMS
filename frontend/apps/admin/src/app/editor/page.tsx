@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -94,6 +95,20 @@ let instanceCounter = 10;
 // ---------------------------------------------------------------------------
 
 export default function VisualPageEditorPage() {
+  return (
+    <Suspense fallback={<div style={{ background: '#131313', color: '#8d90a0', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'Inter, sans-serif' }}>Loading editor…</div>}>
+      <EditorInner />
+    </Suspense>
+  );
+}
+
+function EditorInner() {
+  const searchParams  = useSearchParams();
+  // ?path=/content/experience-fragments/tut-ca/en/footer/master
+  const contentPath   = searchParams.get('path') ?? '';
+  // Derive a human-readable page name from the last path segment
+  const pageName      = contentPath ? contentPath.split('/').filter(Boolean).pop() ?? contentPath : 'Untitled Page';
+
   const [viewport, setViewport]           = useState<Viewport>('desktop');
   const [components, setComponents]       = useState<PageComponent[]>(INITIAL_COMPONENTS);
   const [selectedId, setSelectedId]       = useState<string | null>('inst-1');
@@ -159,13 +174,13 @@ export default function VisualPageEditorPage() {
     dragSrc.current = null;
   }
 
-  // Save (mock)
+  // Save (local only — will wire to API)
   function handleSave() {
     const now = new Date();
     setSavedAt(`${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`);
   }
 
-  // Publish (mock)
+  // Publish (local only — will wire to API)
   function handlePublish() {
     setIsDraft(false);
     handleSave();
@@ -186,6 +201,7 @@ export default function VisualPageEditorPage() {
         style={{
           height: 56,
           flexShrink: 0,
+          position: 'relative',
           background: 'rgba(19,19,19,0.8)',
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(66,70,84,0.15)',
@@ -217,6 +233,18 @@ export default function VisualPageEditorPage() {
             ))}
           </nav>
         </div>
+
+        {/* Center: page name + path */}
+        {contentPath && (
+          <div className="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2">
+            <span className="text-sm font-bold" style={{ color: '#e5e2e1', lineHeight: 1.2 }}>
+              {pageName}
+            </span>
+            <span className="text-[0.65rem] font-mono mt-0.5" style={{ color: '#8d90a0' }}>
+              {contentPath}
+            </span>
+          </div>
+        )}
 
         {/* Right: actions */}
         <div className="flex items-center gap-4">

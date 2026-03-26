@@ -2,6 +2,7 @@ package com.flexcms.pim.model;
 
 import com.flexcms.pim.converter.PimJsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class ProductVersion {
     private String name;
 
     @Column(name = "attributes", columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> attributes;
 

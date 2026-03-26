@@ -2,6 +2,7 @@ package com.flexcms.core.model;
 
 import com.flexcms.plugin.spi.ContentNodeData;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.*;
@@ -30,6 +31,7 @@ public class ContentNode implements ContentNodeData {
     private Integer orderIndex = 0;
 
     @Column(name = "properties", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = com.flexcms.core.converter.JsonbConverter.class)
     private Map<String, Object> properties = new HashMap<>();
 

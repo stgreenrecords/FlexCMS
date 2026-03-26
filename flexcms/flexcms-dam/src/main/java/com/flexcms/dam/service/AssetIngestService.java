@@ -150,6 +150,17 @@ public class AssetIngestService {
     }
 
     /**
+     * List all assets with pagination.
+     *
+     * @param page zero-based page number
+     * @param size page size (capped at 200)
+     * @return paginated result
+     */
+    public Page<Asset> listAll(int page, int size) {
+        return assetRepository.findAll(PageRequest.of(page, Math.min(size, 200)));
+    }
+
+    /**
      * Search assets by query with pagination.
      *
      * @param siteId site identifier

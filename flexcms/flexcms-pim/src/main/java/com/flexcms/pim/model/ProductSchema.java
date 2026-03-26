@@ -1,7 +1,9 @@
 package com.flexcms.pim.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flexcms.pim.converter.PimJsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.UUID;
  * inherit from v2026, adding/modifying attributes without breaking existing products.
  * Products are validated against their schema at write time.</p>
  */
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "product_schemas", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "version"}))
 public class ProductSchema {
@@ -32,11 +35,13 @@ public class ProductSchema {
 
     /** JSON Schema (draft-07) defining all product attributes */
     @Column(name = "schema_def", columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> schemaDef;
 
     /** Grouped attribute layout for the admin UI */
     @Column(name = "attribute_groups", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> attributeGroups;
 

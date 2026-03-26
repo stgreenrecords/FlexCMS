@@ -29,6 +29,7 @@
 # │    RabbitMQ 3 ............ localhost:5672  (mgmt: 15672)          │
 # │    MinIO (S3) ............ localhost:9000  (console: 9001)        │
 # │    Elasticsearch 8 ...... localhost:9200                          │
+# │    pgAdmin 4 ............. localhost:5050  (DB browser UI)        │
 # │                                                                    │
 # │  Backend (--profile app):                                          │
 # │    CMS Author ........... localhost:8080  (Content+DAM+PIM R/W)   │
@@ -137,6 +138,38 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  # ===========================================================================
+  # pgAdmin 4 — PostgreSQL Web UI
+  # ===========================================================================
+  # Browse all three FlexCMS databases from a single web interface.
+  # Open: http://localhost:5050
+  # Login is DISABLED (desktop mode) — opens straight to the database browser.
+  # All three databases are pre-registered (servers.json):
+  #   • FlexCMS Author DB   → flexcms_author
+  #   • FlexCMS Publish DB  → flexcms_publish
+  #   • FlexCMS PIM DB      → flexcms_pim
+  # Password to connect to each server: flexcms
+  # ===========================================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: flexcms-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@flexcms.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+      # Desktop mode: skip the pgAdmin login screen entirely
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      # Pre-register all three FlexCMS databases automatically
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
 
   # ===========================================================================
   # FlexCMS Author (Content + DAM + PIM — read-write)
@@ -319,4 +352,5 @@ volumes:
   postgres_data:
   minio_data:
   es_data:
+  pgadmin_data:
 

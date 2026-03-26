@@ -1,11 +1,15 @@
 package com.flexcms.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flexcms.core.converter.JsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.*;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "assets")
 public class Asset {
@@ -59,6 +63,7 @@ public class Asset {
     private Integer frameRate;
 
     @Column(name = "metadata", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> metadata = new HashMap<>();
 
@@ -84,6 +89,7 @@ public class Asset {
     @Column(name = "modified_at")
     private Instant modifiedAt;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "asset", fetch = FetchType.LAZY)
     private List<AssetRendition> renditions = new ArrayList<>();
 

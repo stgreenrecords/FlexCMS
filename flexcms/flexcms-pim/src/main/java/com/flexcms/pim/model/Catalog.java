@@ -1,11 +1,14 @@
 package com.flexcms.pim.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flexcms.pim.converter.PimJsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "catalogs")
 public class Catalog {
@@ -31,6 +34,7 @@ public class Catalog {
     private CatalogStatus status = CatalogStatus.DRAFT;
 
     @Column(columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private java.util.Map<String, Object> settings;
 

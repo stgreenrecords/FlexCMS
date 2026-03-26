@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -38,193 +38,30 @@ interface ComponentDef {
 type ViewMode = 'table' | 'grid';
 
 // ---------------------------------------------------------------------------
-// Mock data — mirrors ComponentDefinition from flexcms-core
+// API
 // ---------------------------------------------------------------------------
 
-const MOCK_COMPONENTS: ComponentDef[] = [
-  {
-    id: 'c1',
-    resourceType: 'flexcms/hero',
-    title: 'Hero Banner',
-    description: 'Full-width hero section with headline, subtext, background image, and CTA buttons.',
-    group: 'media',
-    isContainer: false,
-    status: 'active',
-    usageCount: 1248,
-    lastModified: 'Oct 12, 2023',
-    lastModifiedBy: 'Alex Rivera',
-    version: 'v2.4.1',
-    hasDialog: true,
-    hasPolicies: true,
-  },
-  {
-    id: 'c2',
-    resourceType: 'flexcms/text',
-    title: 'Rich Text',
-    description: 'WYSIWYG rich text editor component with HTML sanitization and XSS protection.',
-    group: 'content',
-    isContainer: false,
-    status: 'active',
-    usageCount: 3120,
-    lastModified: 'Oct 11, 2023',
-    lastModifiedBy: 'Sarah Chen',
-    version: 'v3.0.0',
-    hasDialog: true,
-    hasPolicies: false,
-  },
-  {
-    id: 'c3',
-    resourceType: 'flexcms/image',
-    title: 'Image',
-    description: 'Responsive image with DAM picker, alt text, caption, and rendition support.',
-    group: 'media',
-    isContainer: false,
-    status: 'active',
-    usageCount: 842,
-    lastModified: 'Oct 10, 2023',
-    lastModifiedBy: 'Marcus Kane',
-    version: 'v2.1.0',
-    hasDialog: true,
-    hasPolicies: true,
-  },
-  {
-    id: 'c4',
-    resourceType: 'flexcms/container',
-    title: 'Layout Container',
-    description: 'Generic container component that accepts child components. Supports grid and flex layouts.',
-    group: 'layout',
-    isContainer: true,
-    status: 'active',
-    usageCount: 2340,
-    lastModified: 'Oct 09, 2023',
-    lastModifiedBy: 'System Bot',
-    version: 'v1.5.2',
-    hasDialog: true,
-    hasPolicies: true,
-  },
-  {
-    id: 'c5',
-    resourceType: 'flexcms/navigation',
-    title: 'Navigation Menu',
-    description: 'Dynamic navigation menu driven by content tree structure with multi-level support.',
-    group: 'navigation',
-    isContainer: false,
-    status: 'active',
-    usageCount: 156,
-    lastModified: 'Oct 08, 2023',
-    lastModifiedBy: 'Priya Nair',
-    version: 'v2.0.1',
-    hasDialog: true,
-    hasPolicies: false,
-  },
-  {
-    id: 'c6',
-    resourceType: 'flexcms/product-teaser',
-    title: 'Product Teaser',
-    description: 'PIM-connected product card with SKU, price, stock indicator, and add-to-cart CTA.',
-    group: 'commerce',
-    isContainer: false,
-    status: 'active',
-    usageCount: 521,
-    lastModified: 'Oct 07, 2023',
-    lastModifiedBy: 'Marcus Kane',
-    version: 'v1.2.0',
-    hasDialog: true,
-    hasPolicies: true,
-  },
-  {
-    id: 'c7',
-    resourceType: 'flexcms/form',
-    title: 'Contact Form',
-    description: 'Schema-driven form builder with validation, honeypot spam protection, and webhook output.',
-    group: 'forms',
-    isContainer: true,
-    status: 'draft',
-    usageCount: 0,
-    lastModified: 'Oct 06, 2023',
-    lastModifiedBy: 'Sarah Chen',
-    version: 'v0.9.0-rc1',
-    hasDialog: true,
-    hasPolicies: false,
-  },
-  {
-    id: 'c8',
-    resourceType: 'flexcms/tabs',
-    title: 'Tab Panel',
-    description: 'Container component with tabbed sub-panels. Accepts any child component per tab.',
-    group: 'layout',
-    isContainer: true,
-    status: 'active',
-    usageCount: 389,
-    lastModified: 'Oct 05, 2023',
-    lastModifiedBy: 'Alex Rivera',
-    version: 'v1.1.0',
-    hasDialog: true,
-    hasPolicies: true,
-  },
-  {
-    id: 'c9',
-    resourceType: 'flexcms/video',
-    title: 'Video Player',
-    description: 'Embedded video player with DAM asset source, captions, autoplay, and loop controls.',
-    group: 'media',
-    isContainer: false,
-    status: 'active',
-    usageCount: 212,
-    lastModified: 'Oct 04, 2023',
-    lastModifiedBy: 'Priya Nair',
-    version: 'v1.3.0',
-    hasDialog: true,
-    hasPolicies: false,
-  },
-  {
-    id: 'c10',
-    resourceType: 'flexcms/breadcrumb',
-    title: 'Breadcrumb',
-    description: 'Auto-generated breadcrumb trail from content tree path. Configurable separator and root.',
-    group: 'navigation',
-    isContainer: false,
-    status: 'active',
-    usageCount: 98,
-    lastModified: 'Sep 28, 2023',
-    lastModifiedBy: 'System Bot',
-    version: 'v1.0.2',
-    hasDialog: false,
-    hasPolicies: false,
-  },
-  {
-    id: 'c11',
-    resourceType: 'flexcms/teaser-list',
-    title: 'Teaser List',
-    description: 'Legacy multi-page teaser list component — superseded by flexcms/content-list.',
-    group: 'content',
-    isContainer: false,
-    status: 'deprecated',
-    usageCount: 52,
-    lastModified: 'Sep 15, 2023',
-    lastModifiedBy: 'Marcus Aurelius',
-    version: 'v0.9.4',
-    hasDialog: true,
-    hasPolicies: false,
-  },
-  {
-    id: 'c12',
-    resourceType: 'flexcms/content-list',
-    title: 'Content List',
-    description: 'Dynamic content list driven by content tree query with sorting, pagination, and templates.',
-    group: 'content',
-    isContainer: false,
-    status: 'active',
-    usageCount: 641,
-    lastModified: 'Oct 12, 2023',
-    lastModifiedBy: 'Alex Rivera',
-    version: 'v1.4.0',
-    hasDialog: true,
-    hasPolicies: true,
-  },
-];
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
 
-const TOTAL_COMPONENTS = 148;
+function apiToComponentDef(c: Record<string, unknown>): ComponentDef {
+  return {
+    id: (c.resourceType as string) ?? '',
+    resourceType: (c.resourceType as string) ?? '',
+    title: (c.title as string) ?? (c.name as string) ?? '',
+    description: (c.description as string) ?? '',
+    group: ((c.group as string) ?? 'content') as ComponentGroup,
+    isContainer: (c.isContainer as boolean) ?? false,
+    status: 'active',
+    usageCount: 0,
+    lastModified: '—',
+    lastModifiedBy: '—',
+    version: '—',
+    hasDialog: !!(c.dialog),
+    hasPolicies: false,
+  };
+}
+
+
 const PAGE_SIZE = 12;
 
 // ---------------------------------------------------------------------------
@@ -478,7 +315,8 @@ function ComponentGridCard({ comp }: { comp: ComponentDef }) {
 // ---------------------------------------------------------------------------
 
 function ComponentRegistryPage() {
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [components, setComponents] = useState<ComponentDef[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>('table');
   const [searchQuery, setSearchQuery] = useState('');
   const [groupFilter, setGroupFilter] = useState<ComponentGroup | 'all'>('all');
@@ -486,8 +324,20 @@ function ComponentRegistryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
 
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(`${API_BASE}/api/content/v1/component-registry`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        const items = ((data.components ?? []) as Record<string, unknown>[]).map(apiToComponentDef);
+        setComponents(items);
+      })
+      .catch(() => setComponents([]))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   const filteredComponents = useMemo(() => {
-    return MOCK_COMPONENTS.filter((c) => {
+    return components.filter((c) => {
       const matchSearch =
         !searchQuery ||
         c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -501,7 +351,7 @@ function ComponentRegistryPage() {
     });
   }, [searchQuery, groupFilter, statusFilter]);
 
-  const totalPages = Math.ceil(TOTAL_COMPONENTS / PAGE_SIZE);
+  const totalPages = Math.ceil(filteredComponents.length / PAGE_SIZE);
 
   if (isLoading) return <ComponentBrowserSkeleton />;
 
@@ -569,10 +419,10 @@ function ComponentRegistryPage() {
       <div className="px-8 pb-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total Components', value: TOTAL_COMPONENTS, icon: '◈', color: '#b0c6ff' },
-            { label: 'Active', value: MOCK_COMPONENTS.filter(c => c.status === 'active').length, icon: '●', color: '#4ade80' },
-            { label: 'Containers', value: MOCK_COMPONENTS.filter(c => c.isContainer).length, icon: '⬡', color: '#b3c5fd' },
-            { label: 'Deprecated', value: MOCK_COMPONENTS.filter(c => c.status === 'deprecated').length, icon: '⚠', color: '#ef4444' },
+            { label: 'Total Components', value: components.length, icon: '◈', color: '#b0c6ff' },
+            { label: 'Active', value: components.filter(c => c.status === 'active').length, icon: '●', color: '#4ade80' },
+            { label: 'Containers', value: components.filter(c => c.isContainer).length, icon: '⬡', color: '#b3c5fd' },
+            { label: 'Deprecated', value: components.filter(c => c.status === 'deprecated').length, icon: '⚠', color: '#ef4444' },
           ].map(({ label, value, color }) => (
             <div
               key={label}
@@ -667,7 +517,7 @@ function ComponentRegistryPage() {
                 ))}
               </div>
               <span className="text-xs font-medium" style={{ color: '#8d90a0' }}>
-                Showing <span style={{ color: '#e5e2e1', fontWeight: 700 }}>{filteredComponents.length}</span> of {TOTAL_COMPONENTS}
+                Showing <span style={{ color: '#e5e2e1', fontWeight: 700 }}>{filteredComponents.length}</span> of {components.length}
               </span>
             </div>
           </div>

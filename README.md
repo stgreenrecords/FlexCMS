@@ -18,6 +18,13 @@
 8. [Getting Started](#8-getting-started)
 9. [AI Agent Onboarding Guide](#9-ai-agent-onboarding-guide)
 
+### Additional Documentation
+- **[`WORK_BOARD.md`](WORK_BOARD.md)** — Task coordination board (read before any implementation)
+- **[`docs/CLIENT_OPERATIONS_GUIDE.md`](docs/CLIENT_OPERATIONS_GUIDE.md)** — How to build real websites using FlexCMS + PIM + DAM
+- **[`docs/PROGRESS_ASSESSMENT.md`](docs/PROGRESS_ASSESSMENT.md)** — Current progress vs. roadmap evaluation
+- **[`docs/TEST_DATA_SPECIFICATION.md`](docs/TEST_DATA_SPECIFICATION.md)** — TUT luxury cars sample website data spec
+- **[`docs/DEV_ENVIRONMENT_RELIABILITY.md`](docs/DEV_ENVIRONMENT_RELIABILITY.md)** — Root cause analysis of dev setup issues
+
 ---
 
 ## 1. Project Vision
@@ -580,6 +587,9 @@ KEY RULE: Backend NEVER generates HTML. It only returns JSON.
 | Need to understand... | Start here |
 |---|---|
 | **🚨 Available work items + how to contribute** | **[`WORK_BOARD.md`](WORK_BOARD.md)** — read this FIRST |
+| **📖 How clients use FlexCMS** | **[`docs/CLIENT_OPERATIONS_GUIDE.md`](docs/CLIENT_OPERATIONS_GUIDE.md)** — setup + operations |
+| **📊 Progress vs. roadmap** | **[`docs/PROGRESS_ASSESSMENT.md`](docs/PROGRESS_ASSESSMENT.md)** — what's done, what's left |
+| **🧪 Sample website data spec** | **[`docs/TEST_DATA_SPECIFICATION.md`](docs/TEST_DATA_SPECIFICATION.md)** — TUT luxury cars |
 | Overall architecture & vision | `Design/cms_architecture/01_ARCHITECTURE_OVERVIEW.md` |
 | Content model & component framework | `Design/cms_architecture/02_CONTENT_MODEL_AND_COMPONENTS.md` |
 | Author/Publish + Replication + Workflows | `Design/cms_architecture/03_AUTHOR_PUBLISH_REPLICATION.md` |

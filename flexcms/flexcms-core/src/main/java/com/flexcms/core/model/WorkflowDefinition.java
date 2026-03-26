@@ -2,6 +2,7 @@ package com.flexcms.core.model;
 
 import com.flexcms.core.converter.JsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class WorkflowDefinition {
     private String description;
 
     @Column(name = "definition", columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> definition;
 

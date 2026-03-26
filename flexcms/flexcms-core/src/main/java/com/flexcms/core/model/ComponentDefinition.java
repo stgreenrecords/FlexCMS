@@ -2,6 +2,7 @@ package com.flexcms.core.model;
 
 import com.flexcms.core.converter.JsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -33,10 +34,12 @@ public class ComponentDefinition {
     private boolean container;
 
     @Column(name = "dialog", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> dialog;
 
     @Column(name = "policies", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> policies;
 
@@ -46,6 +49,7 @@ public class ComponentDefinition {
      * the adapted model will conform to this schema, and the frontend renders accordingly.
      */
     @Column(name = "data_schema", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> dataSchema;
 

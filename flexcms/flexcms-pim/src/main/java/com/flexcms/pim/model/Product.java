@@ -1,7 +1,10 @@
 package com.flexcms.pim.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flexcms.pim.converter.PimJsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.*;
@@ -14,6 +17,7 @@ import java.util.*;
  * year-over-year carryforward: a 2027 product can reference a 2026 source,
  * inheriting all unchanged attributes.</p>
  */
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "products")
 public class Product {
@@ -38,6 +42,7 @@ public class Product {
 
     /** Product attributes conforming to the schema */
     @Column(columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> attributes = new HashMap<>();
 
@@ -68,9 +73,11 @@ public class Product {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductVariant> variants = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("orderIndex ASC")
     private List<ProductAssetRef> assetRefs = new ArrayList<>();

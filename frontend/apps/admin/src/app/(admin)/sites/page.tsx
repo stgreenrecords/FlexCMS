@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -21,19 +21,41 @@ interface Site {
 }
 
 // ---------------------------------------------------------------------------
-// Mock data
+// API
 // ---------------------------------------------------------------------------
 
-const SITES: Site[] = [
-  { id: '1', name: 'Corporate Global',    siteId: 'SITE-08221', status: 'published',   url: 'global.example.com',   lastPublished: '2h ago',    pages: 452,  locales: ['en', 'de', 'fr'],    color: '#b0c6ff' },
-  { id: '2', name: 'Customer Portal',     siteId: 'SITE-09112', status: 'maintenance', url: 'portal.example.com',   lastPublished: '1d ago',    pages: 1208, locales: ['en', 'es'],          color: '#ffb59b' },
-  { id: '3', name: 'Marketing Campaign',  siteId: 'SITE-07534', status: 'published',   url: 'campaign.example.com', lastPublished: '30m ago',   pages: 84,   locales: ['en'],                color: '#b0c6ff' },
-  { id: '4', name: 'Developer Docs',      siteId: 'SITE-11002', status: 'published',   url: 'docs.example.com',     lastPublished: '3d ago',    pages: 340,  locales: ['en'],                color: '#b0c6ff' },
-  { id: '5', name: 'E-Commerce Store',    siteId: 'SITE-04421', status: 'draft',       url: 'shop.example.com',     lastPublished: 'Never',     pages: 18,   locales: ['en', 'de', 'fr', 'ja'], color: '#8d90a0' },
-  { id: '6', name: 'Partner Extranet',    siteId: 'SITE-12087', status: 'offline',     url: 'partners.example.com', lastPublished: '2 weeks ago', pages: 96, locales: ['en'],               color: '#ffb4ab' },
-  { id: '7', name: 'HR Intranet',         siteId: 'SITE-05533', status: 'published',   url: 'intranet.example.com', lastPublished: '6h ago',    pages: 203,  locales: ['en', 'de'],          color: '#b0c6ff' },
-  { id: '8', name: 'Mobile App Landing',  siteId: 'SITE-14321', status: 'maintenance', url: 'app.example.com',      lastPublished: '4h ago',    pages: 22,   locales: ['en', 'es', 'pt'],    color: '#ffb59b' },
-];
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
+
+function apiToSite(s: Record<string, unknown>): Site {
+  const active = (s.active as boolean) ?? true;
+  const domains = (s.domains as Record<string, unknown>[]) ?? [];
+  const primaryDomain = domains.find((d) => d.primary || d.isPrimary) ?? domains[0];
+  const url = primaryDomain ? (primaryDomain.domain as string) ?? '' : '';
+
+  // Parse supportedLocales — may come as array or comma-separated string
+  let locales: string[] = [];
+  if (Array.isArray(s.supportedLocales)) {
+    locales = s.supportedLocales as string[];
+  } else if (typeof s.supportedLocalesRaw === 'string') {
+    locales = (s.supportedLocalesRaw as string).split(',').map((l: string) => l.trim()).filter(Boolean);
+  } else {
+    locales = [(s.defaultLocale as string) ?? 'en'];
+  }
+
+  const status: SiteStatus = active ? 'published' : 'offline';
+
+  return {
+    id: (s.siteId as string) ?? '',
+    name: (s.title as string) ?? (s.siteId as string) ?? '',
+    siteId: (s.siteId as string) ?? '',
+    status,
+    url,
+    lastPublished: s.updatedAt ? new Date(s.updatedAt as string).toLocaleDateString() : '—',
+    pages: 0,
+    locales,
+    color: status === 'published' ? '#b0c6ff' : '#8d90a0',
+  };
+}
 
 const STATUS_STYLES: Record<SiteStatus, { label: string; bg: string; color: string; border: string }> = {
   published:   { label: 'Published',   bg: 'rgba(176,198,255,0.15)',  color: '#b0c6ff',  border: 'rgba(176,198,255,0.3)' },
@@ -47,21 +69,35 @@ const STATUS_STYLES: Record<SiteStatus, { label: string; bg: string; color: stri
 // ---------------------------------------------------------------------------
 
 export default function SiteManagerPage() {
+  const [sites, setSites]           = useState<Site[]>([]);
+  const [loading, setLoading]       = useState(true);
   const [search, setSearch]         = useState('');
   const [view, setView]             = useState<'list' | 'grid'>('list');
   const [selected, setSelected]     = useState<Set<string>>(new Set());
   const [sortBy, setSortBy]         = useState<'name' | 'pages' | 'lastPublished'>('name');
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API_BASE}/api/admin/sites`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data: Record<string, unknown>[]) => {
+        const items = data.map(apiToSite);
+        setSites(items);
+      })
+      .catch(() => setSites([]))
+      .finally(() => setLoading(false));
+  }, []);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    const results = SITES.filter(
+    const results = sites.filter(
       (s) => s.name.toLowerCase().includes(q) || s.url.toLowerCase().includes(q),
     );
     return [...results].sort((a, b) =>
       sortBy === 'pages' ? b.pages - a.pages : a.name.localeCompare(b.name),
     );
-  }, [search, sortBy]);
+  }, [search, sortBy, sites]);
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -288,7 +324,7 @@ export default function SiteManagerPage() {
           >
             <p className="text-xs" style={{ color: '#8d90a0' }}>
               Showing <span style={{ color: '#e5e2e1' }}>{filtered.length}</span> of{' '}
-              <span style={{ color: '#e5e2e1' }}>{SITES.length}</span> sites
+              <span style={{ color: '#e5e2e1' }}>{sites.length}</span> sites
               {selected.size > 0 && (
                 <span> · <span style={{ color: '#b0c6ff' }}>{selected.size} selected</span></span>
               )}

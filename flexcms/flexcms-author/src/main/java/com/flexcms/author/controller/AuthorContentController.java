@@ -65,10 +65,10 @@ public class AuthorContentController {
     }
 
     /**
-     * List content nodes for a site, paginated.
+     * List content nodes, optionally filtered by site, paginated.
      * Used by the admin Content Tree UI.
      *
-     * @param site   site ID (e.g. "my-site") — required
+     * @param site   site ID (e.g. "my-site") — optional, omit to list all sites
      * @param locale locale (e.g. "en") — optional, omit to list all locales
      * @param page   zero-based page index (default 0)
      * @param size   page size (default 50, max 200)
@@ -76,7 +76,7 @@ public class AuthorContentController {
     @GetMapping("/list")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Page<ContentNode>> listNodes(
-            @RequestParam String site,
+            @RequestParam(required = false) String site,
             @RequestParam(required = false) String locale,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
@@ -84,6 +84,22 @@ public class AuthorContentController {
         return ResponseEntity.ok(
                 nodeService.listBySite(site, locale, PageRequest.of(page, clampedSize))
         );
+    }
+
+    /**
+     * Get direct children of a content node (one level deep).
+     * Used by the Admin Content Tree UI for folder-style navigation.
+     *
+     * @param path ltree-format content path (e.g. {@code content} for the root,
+     *             {@code content.experience-fragments} for the XF folder).
+     *             Defaults to {@code "content"} so the UI can load the first level
+     *             without an explicit parameter.
+     */
+    @GetMapping("/children")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<List<ContentNode>> getChildren(
+            @RequestParam(defaultValue = "content") String path) {
+        return ResponseEntity.ok(nodeService.getChildren(path));
     }
 
     /** Get a page with full component tree. */

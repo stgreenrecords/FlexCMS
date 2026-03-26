@@ -106,7 +106,7 @@ function Write-Svc([string]$name, [string]$url, [string]$note) {
 # ─── Service Launchers ────────────────────────────────────────────────────────
 
 function Start-Infra {
-    Write-Banner "Infrastructure  (PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch)"
+    Write-Banner "Infrastructure  (PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch, pgAdmin)"
     Ensure-Env
     $oldPref = $ErrorActionPreference; $ErrorActionPreference = "SilentlyContinue"
     docker compose -f $ComposeFile up -d 2>&1 | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
@@ -124,6 +124,46 @@ function Start-Infra {
         Write-Host "." -NoNewline -ForegroundColor Yellow
     }
     Write-Host " still starting (check 'flex status')" -ForegroundColor Yellow
+}
+
+function Stop-AllServices {
+    # Close all FlexCMS terminal windows
+    Get-Process powershell -ErrorAction SilentlyContinue |
+        Where-Object { try { $_.MainWindowTitle -match "FlexCMS" } catch { $false } } |
+        ForEach-Object {
+            Write-Host "    Closing: $($_.MainWindowTitle)" -ForegroundColor DarkGray
+            Stop-Process $_ -Force -ErrorAction SilentlyContinue
+        }
+
+    # Kill all Java processes (Spring Boot instances)
+    $javaProcs = Get-Process java -ErrorAction SilentlyContinue
+    if ($javaProcs) {
+        $javaProcs | ForEach-Object {
+            Write-Host "    Stopping Java PID $($_.Id)" -ForegroundColor DarkGray
+            Stop-Process $_ -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    # Kill Node/Next.js dev server
+    Get-Process node -ErrorAction SilentlyContinue |
+        Where-Object { try { $_.CommandLine -match "next|flexcms|apps.admin" } catch { $false } } |
+        ForEach-Object {
+            Write-Host "    Stopping Node PID $($_.Id)" -ForegroundColor DarkGray
+            Stop-Process $_ -Force -ErrorAction SilentlyContinue
+        }
+
+    # Wait for log file locks to release (up to 3 s)
+    Ensure-LogDir
+    foreach ($name in @("author", "publish", "admin")) {
+        $logFile = Join-Path $LogDir "$name.log"
+        if (-not (Test-Path $logFile)) { continue }
+        for ($i = 0; $i -lt 10; $i++) {
+            try {
+                $s = [System.IO.File]::Open($logFile, 'Open', 'ReadWrite', 'None')
+                $s.Close(); break
+            } catch { Start-Sleep -Milliseconds 300 }
+        }
+    }
 }
 
 function Launch-InWindow([string]$title, [string]$workDir, [string]$cmd, [string]$logName) {
@@ -169,7 +209,7 @@ Write-Host '>>> Stopped. Press any key.' -ForegroundColor Yellow
 function Start-Author {
     Write-Banner "Author  (Content + DAM + PIM read-write)  :8080"
     Launch-InWindow "FlexCMS Author :8080" $FlexcmsDir `
-        "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=author" `
+        "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=author,local" `
         "author"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
 }
@@ -177,7 +217,7 @@ function Start-Author {
 function Start-Publish {
     Write-Banner "Publish  (Content + DAM read-only)  :8081"
     Launch-InWindow "FlexCMS Publish :8081" $FlexcmsDir `
-        "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=publish" `
+        "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=publish,local" `
         "publish"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
 }
@@ -206,36 +246,59 @@ switch ($Command) {
 
         Write-Banner "FlexCMS -- Starting: $($services -join ' + ')"
 
+        # 0) Kill any previous runs so log files are not locked
+        Write-Host "    Stopping previous runs..." -ForegroundColor DarkGray
+        Stop-AllServices
+        Write-Host "    Previous runs stopped." -ForegroundColor DarkGray
+
         # 1) Infra
         if ("infra" -in $services) { Start-Infra }
 
         # 2) Compile backend once if any backend service requested
         $needsBuild = ("author" -in $services) -or ("publish" -in $services)
+        $backendOk = $true
         if ($needsBuild) {
             Write-Host "    Compiling backend..." -ForegroundColor Yellow
             Push-Location $FlexcmsDir
             $oldPref = $ErrorActionPreference; $ErrorActionPreference = "SilentlyContinue"
-            mvn clean compile -B -q 2>&1 | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
+            mvn clean compile -B 2>&1 | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
             $mvnExit = $LASTEXITCODE
             $ErrorActionPreference = $oldPref
-            if ($mvnExit -ne 0) {
-                Write-Host "    ERROR: Maven compile failed" -ForegroundColor Red
-                Pop-Location; exit 1
-            }
-            Write-Host "    Build OK" -ForegroundColor Green
             Pop-Location
+            if ($mvnExit -ne 0) {
+                $backendOk = $false
+                Write-Host ""
+                Write-Host "    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Red
+                Write-Host "    ERROR: Maven compile failed (exit code $mvnExit)" -ForegroundColor Red
+                Write-Host "    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Red
+                Write-Host "    Fix the compilation errors above, then run:" -ForegroundColor Yellow
+                Write-Host "      flex start local author" -ForegroundColor White -NoNewline
+                Write-Host "   (or whichever services you need)" -ForegroundColor DarkGray
+                Write-Host ""
+                Write-Host "    Infrastructure is still running. Non-backend services will still start." -ForegroundColor DarkGray
+                Write-Host ""
+            } else {
+                Write-Host "    Build OK" -ForegroundColor Green
+            }
         }
 
-        # 3) Author
-        if ("author" -in $services) { Start-Author }
+        # 3) Author (skip if compile failed)
+        if ("author" -in $services) {
+            if ($backendOk) { Start-Author }
+            else { Write-Host "    Skipping Author — backend compile failed" -ForegroundColor Yellow }
+        }
 
-        # 4) Publish (short delay so author grabs :8080 first)
+        # 4) Publish (short delay so author grabs :8080 first; skip if compile failed)
         if ("publish" -in $services) {
-            if ("author" -in $services) { Start-Sleep 5 }
-            Start-Publish
+            if ($backendOk) {
+                if ("author" -in $services) { Start-Sleep 5 }
+                Start-Publish
+            } else {
+                Write-Host "    Skipping Publish — backend compile failed" -ForegroundColor Yellow
+            }
         }
 
-        # 5) Admin UI
+        # 5) Admin UI (always starts — no backend dependency)
         if ("admin" -in $services) { Start-Admin }
 
         # Summary
@@ -248,38 +311,41 @@ switch ($Command) {
             Write-Svc "RabbitMQ"      "localhost:5672"       "mgmt :15672"
             Write-Svc "MinIO (S3)"    "localhost:9000"       "console :9001"
             Write-Svc "Elasticsearch" "localhost:9200"
+            Write-Svc "pgAdmin 4 (DB)" "localhost:5050"      "no login · DB pwd: flexcms"
         }
-        if ("author"  -in $services) { Write-Svc "Author (CMS+DAM+PIM)" "localhost:8080" ".dev-logs/author.log" }
-        if ("publish" -in $services) { Write-Svc "Publish (read-only)"  "localhost:8081" ".dev-logs/publish.log" }
+        if ($backendOk) {
+            if ("author"  -in $services) { Write-Svc "Author (CMS+DAM+PIM)" "localhost:8080" ".dev-logs/author.log" }
+            if ("publish" -in $services) { Write-Svc "Publish (read-only)"  "localhost:8081" ".dev-logs/publish.log" }
+        } else {
+            if ("author"  -in $services) { Write-Host "    Author (CMS+DAM+PIM)       SKIPPED  (compile error)" -ForegroundColor Red }
+            if ("publish" -in $services) { Write-Host "    Publish (read-only)        SKIPPED  (compile error)" -ForegroundColor Red }
+        }
         if ("admin"   -in $services) { Write-Svc "Admin UI"             "localhost:3000" ".dev-logs/admin.log" }
         Write-Host ""
         Write-Host "    flex status      check health" -ForegroundColor DarkGray
         Write-Host "    flex stop local  stop everything" -ForegroundColor DarkGray
         Write-Host "    flex logs author tail logs" -ForegroundColor DarkGray
         Write-Host ""
+        if (-not $backendOk) {
+            Write-Host "    ⚠  Backend was not started due to compile errors." -ForegroundColor Yellow
+            Write-Host "       Fix the errors and run: flex start local author" -ForegroundColor Yellow
+            Write-Host ""
+        }
     }
 
     "stop" {
         Write-Banner "Stopping all FlexCMS services"
 
-        if ($IsWindows -or [System.Environment]::OSVersion.Platform -eq 'Win32NT') {
-            # Windows: close spawned terminal windows
-            Get-Process powershell -ErrorAction SilentlyContinue |
-                Where-Object { try { $_.MainWindowTitle -match "FlexCMS" } catch { $false } } |
-                ForEach-Object {
-                    Write-Host "    Closing: $($_.MainWindowTitle)" -ForegroundColor DarkGray
-                    Stop-Process $_ -Force -ErrorAction SilentlyContinue
-                }
-        }
-        else {
-            # macOS/Linux: stop background PowerShell jobs
+        Stop-AllServices
+
+        # macOS/Linux: also clean up background PowerShell jobs
+        if (-not ($IsWindows -or [System.Environment]::OSVersion.Platform -eq 'Win32NT')) {
             $jobFile = Join-Path $LogDir ".jobs"
             if (Test-Path $jobFile) {
                 Get-Content $jobFile | ForEach-Object {
                     $parts = $_ -split ':'
                     if ($parts.Count -ge 2) {
                         $jid = [int]$parts[1]
-                        Write-Host "    Stopping job $($parts[0]) (ID $jid)" -ForegroundColor DarkGray
                         Stop-Job -Id $jid -ErrorAction SilentlyContinue
                         Remove-Job -Id $jid -Force -ErrorAction SilentlyContinue
                     }
@@ -287,22 +353,6 @@ switch ($Command) {
                 Remove-Item $jobFile -Force -ErrorAction SilentlyContinue
             }
         }
-
-        # Kill Java processes
-        Get-Process java -ErrorAction SilentlyContinue |
-            Where-Object { try { $_.CommandLine -match "flexcms" } catch { $false } } |
-            ForEach-Object {
-                Write-Host "    Stopping Java PID $($_.Id)" -ForegroundColor DarkGray
-                Stop-Process $_ -Force -ErrorAction SilentlyContinue
-            }
-
-        # Kill Node processes
-        Get-Process node -ErrorAction SilentlyContinue |
-            Where-Object { try { $_.CommandLine -match "flexcms|apps.admin" } catch { $false } } |
-            ForEach-Object {
-                Write-Host "    Stopping Node PID $($_.Id)" -ForegroundColor DarkGray
-                Stop-Process $_ -Force -ErrorAction SilentlyContinue
-            }
 
         # Stop containers
         Ensure-Env
@@ -323,6 +373,7 @@ switch ($Command) {
             @{ Name = "RabbitMQ       :5672"; Url = "http://localhost:15672" },
             @{ Name = "MinIO          :9000"; Url = "http://localhost:9001" },
             @{ Name = "Elasticsearch  :9200"; Url = "http://localhost:9200" },
+            @{ Name = "pgAdmin 4      :5050"; Url = "http://localhost:5050" },
             @{ Name = "Author API     :8080"; Url = "http://localhost:8080/actuator/health" },
             @{ Name = "Publish API    :8081"; Url = "http://localhost:8081/actuator/health" },
             @{ Name = "Admin UI       :3000"; Url = "http://localhost:3000" }

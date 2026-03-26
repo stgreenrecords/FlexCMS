@@ -3,8 +3,10 @@ package com.flexcms.author.controller;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.dam.service.AssetIngestService;
+import com.flexcms.dam.service.S3Service;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +36,9 @@ public class AuthorAssetController {
     @Autowired
     private AssetIngestService assetService;
 
+    @Autowired
+    private S3Service s3Service;
+
     /** Upload a new asset. */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
@@ -57,6 +62,20 @@ public class AuthorAssetController {
         );
     }
 
+    /** Stream asset binary content from storage. */
+    @GetMapping("/{id}/content")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<byte[]> streamAssetContent(@PathVariable UUID id) {
+        Asset asset = assetService.getAssetById(id)
+                .orElseThrow(() -> NotFoundException.forId("Asset", id));
+        byte[] data = s3Service.download(asset.getStorageKey());
+        String mimeType = asset.getMimeType() != null ? asset.getMimeType() : "application/octet-stream";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, mimeType)
+                .header(HttpHeaders.CACHE_CONTROL, "max-age=3600")
+                .body(data);
+    }
+
     /** List assets in a folder with pagination. */
     @GetMapping("/folder")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
@@ -66,6 +85,30 @@ public class AuthorAssetController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         Page<Asset> result = assetService.listFolder(folderPath, siteId, page, size);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("items", result.getContent());
+        response.put("totalCount", result.getTotalElements());
+        response.put("page", result.getNumber());
+        response.put("size", result.getSize());
+        response.put("hasNextPage", result.hasNext());
+        return ResponseEntity.ok(response);
+    }
+
+    /** List all assets with optional search and pagination. */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<Map<String, Object>> listAll(
+            @RequestParam(required = false, defaultValue = "") String q,
+            @RequestParam(required = false) String siteId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        Page<Asset> result;
+        String effectiveSite = (siteId != null && !siteId.isBlank()) ? siteId : "corporate";
+        if (q != null && !q.isBlank()) {
+            result = assetService.searchAssets(effectiveSite, q, page, size);
+        } else {
+            result = assetService.listAll(page, size);
+        }
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("items", result.getContent());
         response.put("totalCount", result.getTotalElements());

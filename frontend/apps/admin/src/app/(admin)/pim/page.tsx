@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem,
@@ -27,67 +27,32 @@ interface Catalog {
 }
 
 // ---------------------------------------------------------------------------
-// Mock data
+// API
 // ---------------------------------------------------------------------------
 
-const CATALOGS: Catalog[] = [
-  {
-    id: '1',
-    catalogId: 'CAT-2026-S1',
-    name: 'Summer 2026 Main Collection',
-    season: 'Summer 2026',
-    status: 'active',
-    productCount: 1248,
-    productDelta: 12,
-    lastSync: '2 mins ago',
-  },
-  {
-    id: '2',
-    catalogId: 'CAT-ESS-25',
-    name: 'Essentials Core Line',
-    season: 'Permanent',
-    status: 'draft',
-    productCount: 452,
-    lastSync: '14 hours ago',
-  },
-  {
-    id: '3',
-    catalogId: 'CAT-2025-W4',
-    name: 'Fall/Winter 2025 Archive',
-    season: 'Winter 2025',
-    status: 'archived',
-    productCount: 3890,
-    lastSync: 'Oct 12, 2025',
-  },
-  {
-    id: '4',
-    catalogId: 'CAT-LTD-F1',
-    name: 'Limited Footwear Drops',
-    season: 'Spring 2026',
-    status: 'active',
-    productCount: 24,
-    lastSync: 'Yesterday',
-  },
-  {
-    id: '5',
-    catalogId: 'CAT-2026-SP2',
-    name: 'Spring 2026 Accessories',
-    season: 'Spring 2026',
-    status: 'draft',
-    productCount: 187,
-    productDelta: 5,
-    lastSync: '3 hours ago',
-  },
-  {
-    id: '6',
-    catalogId: 'CAT-CORE-24',
-    name: 'Core Basics 2024',
-    season: 'Permanent',
-    status: 'archived',
-    productCount: 621,
-    lastSync: 'Jan 5, 2025',
-  },
-];
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
+
+function apiToCatalog(c: Record<string, unknown>): Catalog {
+  const statusRaw = ((c.status as string) ?? 'DRAFT').toUpperCase();
+  const statusMap: Record<string, CatalogStatus> = {
+    ACTIVE: 'active',
+    DRAFT: 'draft',
+    ARCHIVED: 'archived',
+  };
+  const season = (c.season as string) ?? `${c.year ?? ''}`;
+  return {
+    id: (c.id as string) ?? '',
+    catalogId: `CAT-${(c.year as number) ?? ''}-${((c.season as string) ?? '').slice(0, 2).toUpperCase() || 'XX'}`,
+    name: (c.name as string) ?? 'Unnamed Catalog',
+    season,
+    status: statusMap[statusRaw] ?? 'draft',
+    productCount: 0,
+    lastSync: c.updatedAt
+      ? new Date(c.updatedAt as string).toLocaleDateString()
+      : '—',
+  };
+}
+
 
 const STATUS_CONFIG: Record<CatalogStatus, { label: string; bg: string; color: string; dot: string }> = {
   active: {
@@ -150,7 +115,8 @@ function CatalogListSkeleton() {
 // ---------------------------------------------------------------------------
 
 export default function PimCatalogListPage() {
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [search, setSearch] = useState('');
   const [seasonFilter, setSeasonFilter] = useState('All Seasons');
   const [statusFilter, setStatusFilter] = useState('All Status');
@@ -158,15 +124,28 @@ export default function PimCatalogListPage() {
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const pageSize = 10;
 
+  // Fetch catalogs from PIM API
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(`${API_BASE}/api/pim/v1/catalogs`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data: Record<string, unknown>[]) => {
+        const items = data.map(apiToCatalog);
+        setCatalogs(items);
+      })
+      .catch(() => setCatalogs([]))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return CATALOGS.filter((c) => {
+    return catalogs.filter((c) => {
       const matchSearch = c.name.toLowerCase().includes(q) || c.catalogId.toLowerCase().includes(q);
       const matchSeason = seasonFilter === 'All Seasons' || c.season === seasonFilter;
       const matchStatus = statusFilter === 'All Status' || c.status === statusFilter.toLowerCase();
       return matchSearch && matchSeason && matchStatus;
     });
-  }, [search, seasonFilter, statusFilter]);
+  }, [search, seasonFilter, statusFilter, catalogs]);
 
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));

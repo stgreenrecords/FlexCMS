@@ -2,6 +2,7 @@ package com.flexcms.core.model;
 
 import com.flexcms.core.converter.JsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -26,14 +27,17 @@ public class TemplateDefinition {
     private String resourceType = "flexcms/page";
 
     @Column(name = "structure", columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> structure;
 
     @Column(name = "initial_content", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> initialContent;
 
     @Column(name = "page_properties", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> pageProperties;
 

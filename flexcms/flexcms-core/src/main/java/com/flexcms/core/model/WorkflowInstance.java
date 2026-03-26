@@ -2,6 +2,7 @@ package com.flexcms.core.model;
 
 import com.flexcms.core.converter.JsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.Map;
@@ -56,6 +57,7 @@ public class WorkflowInstance {
     private String lastComment;
 
     @Column(name = "metadata", columnDefinition = "jsonb")
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = JsonbConverter.class)
     private Map<String, Object> metadata;
 

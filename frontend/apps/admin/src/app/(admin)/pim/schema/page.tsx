@@ -44,7 +44,7 @@ const FIELD_TYPES: Array<{ type: FieldType; label: string; description: string; 
 ];
 
 // ---------------------------------------------------------------------------
-// Initial mock schema
+// Initial schema template
 // ---------------------------------------------------------------------------
 
 const INITIAL_GROUPS: AttributeGroup[] = [

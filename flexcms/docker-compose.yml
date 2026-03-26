@@ -79,8 +79,29 @@ services:
       timeout: 5s
       retries: 10
 
+  # pgAdmin 4 — PostgreSQL Web UI (http://localhost:5050)
+  # Desktop mode: no login screen. Password for DB connections: flexcms
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: flexcms-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@flexcms.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   minio_data:
   es_data:
+  pgadmin_data:
 

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import {
   Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
   BreadcrumbPage, BreadcrumbSeparator,
@@ -12,6 +13,12 @@ import {
   Textarea,
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from '@flexcms/ui';
+
+// ---------------------------------------------------------------------------
+// API
+// ---------------------------------------------------------------------------
+
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -49,39 +56,6 @@ interface AssetDetail {
   usageRefs: UsageRef[];
 }
 
-// ---------------------------------------------------------------------------
-// Mock data
-// ---------------------------------------------------------------------------
-
-const MOCK_RENDITIONS: Rendition[] = [
-  { id: 'r1', label: 'Thumbnail', spec: '250×250 • WebP • 12kb', icon: <ImageThumbnailIcon />, hasThumbnail: true },
-  { id: 'r2', label: 'Social Hero', spec: '1200×630 • PNG • 450kb', icon: <SocialIcon /> },
-  { id: 'r3', label: 'Mobile App', spec: '800×1200 • JPG • 180kb', icon: <SmartphoneIcon /> },
-  { id: 'r4', label: 'Print High-Res', spec: '300 DPI • TIFF • 24MB', icon: <PrintIcon /> },
-];
-
-const MOCK_USAGE: UsageRef[] = [
-  { label: 'CMS Pages', count: 12 },
-  { label: 'Product Gallery', count: 4 },
-  { label: 'Email Campaigns', count: 2 },
-];
-
-const MOCK_ASSET: AssetDetail = {
-  id: 'IMG_2024_082',
-  filename: 'IMG_2024_082.JPG',
-  title: 'Abstract Flow #82 - Deep Blue',
-  altText: 'Digital abstract artwork featuring deep blue organic waves and iridescent glowing lines in a professional composition.',
-  tags: ['Abstract', 'Digital Art', 'Hero Image'],
-  copyright: 'FlexCorp Media Ltd.',
-  status: 'published',
-  format: 'JPEG Image',
-  colorSpace: 'Display P3',
-  dimensions: '6000 × 4000 px',
-  fileSize: '8.4 MB',
-  type: 'image',
-  renditions: MOCK_RENDITIONS,
-  usageRefs: MOCK_USAGE,
-};
 
 // ---------------------------------------------------------------------------
 // Status badge config
@@ -99,12 +73,51 @@ const STATUS_BADGE: Record<AssetStatus, { label: string; className: string }> = 
 // ---------------------------------------------------------------------------
 
 export default function AssetDetailPage() {
-  const [loading]             = useState(false);
-  const [asset]               = useState<AssetDetail | null>(MOCK_ASSET);
-  const [title, setTitle]     = useState(MOCK_ASSET.title);
-  const [altText, setAltText] = useState(MOCK_ASSET.altText);
-  const [tags, setTags]       = useState<string[]>(MOCK_ASSET.tags);
-  const [copyright, setCopyright] = useState(MOCK_ASSET.copyright);
+  const params = useParams();
+  const assetId = params?.id as string;
+  const [loading, setLoading]   = useState(true);
+  const [asset, setAsset]       = useState<AssetDetail | null>(null);
+  const [title, setTitle]       = useState('');
+  const [altText, setAltText]   = useState('');
+  const [tags, setTags]         = useState<string[]>([]);
+  const [copyright, setCopyright] = useState('');
+
+  // Fetch asset from API
+  useEffect(() => {
+    if (!assetId) { setLoading(false); return; }
+    setLoading(true);
+    fetch(`${API_BASE}/api/author/assets/${assetId}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data: Record<string, unknown>) => {
+        const det: AssetDetail = {
+          id: (data.id as string) ?? assetId,
+          filename: (data.originalFilename as string) ?? (data.name as string) ?? 'unnamed',
+          title: (data.name as string) ?? '',
+          altText: '',
+          tags: (data.tags as string[]) ?? [],
+          copyright: '',
+          status: ((data.status as string) ?? 'ACTIVE').toLowerCase() === 'active' ? 'published' : 'draft',
+          format: (data.mimeType as string) ?? '',
+          colorSpace: 'sRGB',
+          dimensions: data.width && data.height ? `${data.width} × ${data.height} px` : '—',
+          fileSize: data.fileSize ? formatDetailBytes(data.fileSize as number) : '—',
+          type: ((data.mimeType as string) ?? '').startsWith('image/') ? 'image'
+            : ((data.mimeType as string) ?? '').startsWith('video/') ? 'video'
+            : 'other',
+          renditions: [],
+          usageRefs: [],
+        };
+        setAsset(det);
+        setTitle(det.title);
+        setAltText(det.altText);
+        setTags(det.tags);
+        setCopyright(det.copyright);
+      })
+      .catch(() => {
+        setAsset(null);
+      })
+      .finally(() => setLoading(false));
+  }, [assetId]);
 
   // Loading skeleton
   if (loading) {
@@ -233,7 +246,7 @@ export default function AssetDetailPage() {
               Back to Library
             </Link>
             <div className="h-4 w-[1px] bg-[var(--color-border)]" aria-hidden="true" />
-            <h1 className="text-sm font-semibold tracking-wide text-[var(--color-foreground)]">
+            <h1 className="text-sm font-semibold tracking-wide text-[var(--color-foreground]">
               ASSET_ID: {asset.filename}
             </h1>
             <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBadge.className}`}>
@@ -747,3 +760,8 @@ function TrashIcon() {
   );
 }
 
+function formatDetailBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}

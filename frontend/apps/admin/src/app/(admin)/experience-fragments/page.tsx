@@ -1,7 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from '@flexcms/ui';
+
+// ---------------------------------------------------------------------------
+// API
+// ---------------------------------------------------------------------------
+
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -22,230 +28,6 @@ interface XFNode {
   children?: XFNode[];
 }
 
-// ---------------------------------------------------------------------------
-// Mock data — organised: site → locale → category → XF
-// ---------------------------------------------------------------------------
-
-const MOCK_XF_NODES: XFNode[] = [
-  {
-    id: 'site-1',
-    name: 'Corporate Portal',
-    icon: 'language',
-    status: 'live',
-    path: '/content/experience-fragments/corporate-portal',
-    variationCount: 0,
-    lastModified: '2 mins ago',
-    author: { initials: 'JD', name: 'Jane Doe', color: 'var(--color-primary)' },
-    depth: 0,
-    children: [
-      {
-        id: 'site-1-en',
-        name: 'en-GB',
-        icon: 'translate',
-        status: 'live',
-        path: '/content/experience-fragments/corporate-portal/en-gb',
-        variationCount: 0,
-        lastModified: '2 mins ago',
-        author: { initials: 'JD', name: 'Jane Doe', color: 'var(--color-primary)' },
-        depth: 1,
-        children: [
-          {
-            id: 'site-1-en-footer',
-            name: 'Footer',
-            icon: 'folder',
-            status: 'live',
-            path: '/content/experience-fragments/corporate-portal/en-gb/footer',
-            variationCount: 0,
-            lastModified: '5 mins ago',
-            author: { initials: 'JD', name: 'Jane Doe', color: 'var(--color-primary)' },
-            depth: 2,
-            children: [
-              {
-                id: 'xf-1',
-                name: 'Global Footer — 2024',
-                icon: 'widgets',
-                status: 'live',
-                path: '/content/experience-fragments/corporate-portal/en-gb/footer/global-footer-2024',
-                variationCount: 3,
-                lastModified: '5 mins ago',
-                author: { initials: 'JD', name: 'Jane Doe', color: 'var(--color-primary)' },
-                depth: 3,
-              },
-              {
-                id: 'xf-2',
-                name: 'Minimal Footer',
-                icon: 'widgets',
-                status: 'draft',
-                path: '/content/experience-fragments/corporate-portal/en-gb/footer/minimal-footer',
-                variationCount: 1,
-                lastModified: '1 hour ago',
-                author: { initials: 'MK', name: 'Marc K.', color: '#b3c5fd' },
-                depth: 3,
-              },
-            ],
-          },
-          {
-            id: 'site-1-en-header',
-            name: 'Header',
-            icon: 'folder',
-            status: 'live',
-            path: '/content/experience-fragments/corporate-portal/en-gb/header',
-            variationCount: 0,
-            lastModified: '1 day ago',
-            author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-            depth: 2,
-            children: [
-              {
-                id: 'xf-3',
-                name: 'Primary Header Nav',
-                icon: 'widgets',
-                status: 'live',
-                path: '/content/experience-fragments/corporate-portal/en-gb/header/primary-nav',
-                variationCount: 2,
-                lastModified: '1 day ago',
-                author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-                depth: 3,
-              },
-            ],
-          },
-          {
-            id: 'site-1-en-promo',
-            name: 'Promotional Banners',
-            icon: 'folder',
-            status: 'review',
-            path: '/content/experience-fragments/corporate-portal/en-gb/promo',
-            variationCount: 0,
-            lastModified: '3 days ago',
-            author: { initials: 'MK', name: 'Marc K.', color: '#b3c5fd' },
-            depth: 2,
-            children: [
-              {
-                id: 'xf-4',
-                name: 'Spring Sale Banner',
-                icon: 'widgets',
-                status: 'review',
-                path: '/content/experience-fragments/corporate-portal/en-gb/promo/spring-sale',
-                variationCount: 4,
-                lastModified: '3 days ago',
-                author: { initials: 'MK', name: 'Marc K.', color: '#b3c5fd' },
-                depth: 3,
-              },
-              {
-                id: 'xf-5',
-                name: 'Announcement Bar',
-                icon: 'widgets',
-                status: 'draft',
-                path: '/content/experience-fragments/corporate-portal/en-gb/promo/announcement-bar',
-                variationCount: 1,
-                lastModified: '5 days ago',
-                author: { initials: 'JD', name: 'Jane Doe', color: 'var(--color-primary)' },
-                depth: 3,
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'site-1-de',
-        name: 'de-DE',
-        icon: 'translate',
-        status: 'draft',
-        path: '/content/experience-fragments/corporate-portal/de-de',
-        variationCount: 0,
-        lastModified: '2 days ago',
-        author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-        depth: 1,
-        children: [
-          {
-            id: 'site-1-de-footer',
-            name: 'Footer',
-            icon: 'folder',
-            status: 'draft',
-            path: '/content/experience-fragments/corporate-portal/de-de/footer',
-            variationCount: 0,
-            lastModified: '2 days ago',
-            author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-            depth: 2,
-            children: [
-              {
-                id: 'xf-6',
-                name: 'Global Footer — DE',
-                icon: 'widgets',
-                status: 'draft',
-                path: '/content/experience-fragments/corporate-portal/de-de/footer/global-footer-de',
-                variationCount: 2,
-                lastModified: '2 days ago',
-                author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-                depth: 3,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'site-2',
-    name: 'E-Commerce Store',
-    icon: 'language',
-    status: 'live',
-    path: '/content/experience-fragments/ecommerce',
-    variationCount: 0,
-    lastModified: '1 week ago',
-    author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-    depth: 0,
-    children: [
-      {
-        id: 'site-2-en',
-        name: 'en-US',
-        icon: 'translate',
-        status: 'live',
-        path: '/content/experience-fragments/ecommerce/en-us',
-        variationCount: 0,
-        lastModified: '1 week ago',
-        author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-        depth: 1,
-        children: [
-          {
-            id: 'site-2-en-cart',
-            name: 'Cart & Checkout',
-            icon: 'folder',
-            status: 'live',
-            path: '/content/experience-fragments/ecommerce/en-us/cart',
-            variationCount: 0,
-            lastModified: '1 week ago',
-            author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-            depth: 2,
-            children: [
-              {
-                id: 'xf-7',
-                name: 'Cart Upsell Block',
-                icon: 'widgets',
-                status: 'live',
-                path: '/content/experience-fragments/ecommerce/en-us/cart/cart-upsell',
-                variationCount: 2,
-                lastModified: '1 week ago',
-                author: { initials: 'SA', name: 'Sarah A.', color: '#b0c6ff' },
-                depth: 3,
-              },
-              {
-                id: 'xf-8',
-                name: 'Checkout Trust Badges',
-                icon: 'widgets',
-                status: 'archived',
-                path: '/content/experience-fragments/ecommerce/en-us/cart/trust-badges',
-                variationCount: 1,
-                lastModified: 'Oct 12, 2023',
-                author: { initials: 'JD', name: 'Jane Doe', color: 'var(--color-primary)' },
-                depth: 3,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-];
 
 // ---------------------------------------------------------------------------
 // Status badge config
@@ -288,15 +70,41 @@ function flattenAll(nodes: XFNode[]): XFNode[] {
 // ---------------------------------------------------------------------------
 
 export default function ExperienceFragmentsPage() {
+  const [xfNodes, setXfNodes]           = useState<XFNode[]>([]);
+  const [loading, setLoading]           = useState(true);
   const [view, setView]                 = useState<'list' | 'tree'>('tree');
   const [search, setSearch]             = useState('');
   const [selected, setSelected]         = useState<Set<string>>(new Set());
-  const [expanded, setExpanded]         = useState<Set<string>>(new Set(['site-1', 'site-1-en', 'site-1-en-footer', 'site-2']));
+  const [expanded, setExpanded]         = useState<Set<string>>(new Set());
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API_BASE}/api/author/xf/list?siteId=corporate&locale=en`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data: Record<string, unknown>[]) => {
+        if (data.length > 0) {
+          const items: XFNode[] = data.map((n, i) => ({
+            id: (n.id as string) ?? String(i),
+            name: (n.name as string) ?? 'Untitled',
+            icon: 'widgets',
+            status: 'live' as XFStatus,
+            path: (n.path as string) ?? '',
+            variationCount: 0,
+            lastModified: n.modifiedAt ? new Date(n.modifiedAt as string).toLocaleDateString() : '—',
+            author: { initials: ((n.createdBy as string) ?? 'SY').slice(0, 2).toUpperCase(), name: (n.createdBy as string) ?? 'System', color: '#b0c6ff' },
+            depth: 0,
+          }));
+          setXfNodes(items);
+        }
+      })
+      .catch(() => { /* API unavailable */ })
+      .finally(() => setLoading(false));
+  }, []);
 
   const visibleNodes = useMemo(() => {
     if (view === 'list') {
-      const all = flattenAll(MOCK_XF_NODES);
+      const all = flattenAll(xfNodes);
       if (!search.trim()) return all;
       return all.filter(
         (n) =>
@@ -304,14 +112,14 @@ export default function ExperienceFragmentsPage() {
           n.path.toLowerCase().includes(search.toLowerCase()),
       );
     }
-    const flat = flattenTree(MOCK_XF_NODES, expanded);
+    const flat = flattenTree(xfNodes, expanded);
     if (!search.trim()) return flat;
     return flat.filter(
       (n) =>
         n.name.toLowerCase().includes(search.toLowerCase()) ||
         n.path.toLowerCase().includes(search.toLowerCase()),
     );
-  }, [view, search, expanded]);
+  }, [view, search, expanded, xfNodes]);
 
   function toggleSelect(id: string) {
     setSelected((prev) => {

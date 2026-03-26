@@ -2,6 +2,7 @@ package com.flexcms.pim.model;
 
 import com.flexcms.pim.converter.PimJsonbConverter;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -42,11 +43,13 @@ public class FieldMappingProfile {
 
     /** Maps source field names → schema attribute names */
     @Column(name = "field_mappings", columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> fieldMappings = new HashMap<>();
 
     /** Default values applied when a source field is absent */
     @Column(name = "defaults", columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> defaults = new HashMap<>();
 
@@ -56,6 +59,7 @@ public class FieldMappingProfile {
      * {@code prefix:<value>}, {@code suffix:<value>}.
      */
     @Column(name = "transforms", columnDefinition = "jsonb", nullable = false)
+    @ColumnTransformer(write = "?::jsonb")
     @Convert(converter = PimJsonbConverter.class)
     private Map<String, Object> transforms = new HashMap<>();
 

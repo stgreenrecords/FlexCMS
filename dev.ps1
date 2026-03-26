@@ -189,35 +189,49 @@ switch ($Command) {
 
         # 2. Build backend once (shared by author + publish)
         $needsBackend = ("author" -in $starting) -or ("publish" -in $starting)
+        $backendOk = $true
         if ($needsBackend) {
             Write-Banner "Compiling backend (mvn clean compile)"
             Push-Location $FlexcmsDir
-            mvn clean compile -B -q 2>&1 | ForEach-Object { Write-Host "  $_" }
+            mvn clean compile -B 2>&1 | ForEach-Object { Write-Host "  $_" }
             if ($LASTEXITCODE -ne 0) {
-                Write-Host "  ERROR: Maven compile failed!" -ForegroundColor Red
-                Pop-Location
-                exit 1
+                $backendOk = $false
+                Write-Host ""
+                Write-Host "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Red
+                Write-Host "  ERROR: Maven compile failed (exit code $LASTEXITCODE)" -ForegroundColor Red
+                Write-Host "  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Red
+                Write-Host "  Fix the errors above, then run:" -ForegroundColor Yellow
+                Write-Host "    .\dev.ps1 up" -ForegroundColor White
+                Write-Host ""
+                Write-Host "  Infrastructure is still running. Non-backend services will still start." -ForegroundColor DarkGray
+                Write-Host ""
+            } else {
+                Write-Host "  Build OK." -ForegroundColor Green
             }
-            Write-Host "  Build OK." -ForegroundColor Green
             Pop-Location
         }
 
-        # 3. Author
+        # 3. Author (skip if compile failed)
         if ("author" -in $starting) {
-            Start-Author
+            if ($backendOk) { Start-Author }
+            else { Write-Host "  Skipping Author — backend compile failed" -ForegroundColor Yellow }
         } else {
             Write-Host "  Skipping Author backend." -ForegroundColor DarkGray
         }
 
-        # 4. Publish (brief delay so author grabs :8080 first)
+        # 4. Publish (brief delay so author grabs :8080 first; skip if compile failed)
         if ("publish" -in $starting) {
-            if ("author" -in $starting) { Start-Sleep 5 }
-            Start-Publish
+            if ($backendOk) {
+                if ("author" -in $starting) { Start-Sleep 5 }
+                Start-Publish
+            } else {
+                Write-Host "  Skipping Publish — backend compile failed" -ForegroundColor Yellow
+            }
         } else {
             Write-Host "  Skipping Publish backend." -ForegroundColor DarkGray
         }
 
-        # 5. Admin UI
+        # 5. Admin UI (always starts — no backend dependency)
         if ("admin" -in $starting) {
             Start-Admin
         } else {
@@ -236,11 +250,20 @@ switch ($Command) {
             Write-Host "  MinIO (S3)               localhost:9000  console:9001 (docker)" -ForegroundColor Gray
             Write-Host "  Elasticsearch            localhost:9200                (docker)" -ForegroundColor Gray
         }
-        if ("author" -in $starting) {
-            Write-Host "  Author (CMS+DAM+PIM)     localhost:8080               .dev-logs/author.log" -ForegroundColor Cyan
-        }
-        if ("publish" -in $starting) {
-            Write-Host "  Publish (read-only)      localhost:8081               .dev-logs/publish.log" -ForegroundColor Cyan
+        if ($backendOk) {
+            if ("author" -in $starting) {
+                Write-Host "  Author (CMS+DAM+PIM)     localhost:8080               .dev-logs/author.log" -ForegroundColor Cyan
+            }
+            if ("publish" -in $starting) {
+                Write-Host "  Publish (read-only)      localhost:8081               .dev-logs/publish.log" -ForegroundColor Cyan
+            }
+        } else {
+            if ("author" -in $starting) {
+                Write-Host "  Author (CMS+DAM+PIM)     SKIPPED  (compile error)" -ForegroundColor Red
+            }
+            if ("publish" -in $starting) {
+                Write-Host "  Publish (read-only)      SKIPPED  (compile error)" -ForegroundColor Red
+            }
         }
         if ("admin" -in $starting) {
             Write-Host "  Admin UI                 localhost:3000               .dev-logs/admin.log" -ForegroundColor Cyan
@@ -250,6 +273,11 @@ switch ($Command) {
         Write-Host "  Tip: .\dev.ps1 down     -> stop everything" -ForegroundColor DarkGray
         Write-Host "  Tip: .\dev.ps1 logs author -> tail author log" -ForegroundColor DarkGray
         Write-Host ""
+        if (-not $backendOk) {
+            Write-Host "  ⚠  Backend was not started due to compile errors." -ForegroundColor Yellow
+            Write-Host "     Fix the errors and run: .\dev.ps1 up" -ForegroundColor Yellow
+            Write-Host ""
+        }
     }
 
     # ===== DOWN — stop everything =====
