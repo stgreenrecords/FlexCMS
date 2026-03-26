@@ -91,6 +91,32 @@ public class ImportService {
     }
 
     /**
+     * Infer a draft JSON Schema from a sample of the input stream.
+     *
+     * <p>Delegates to {@link ProductImportSource#inferSchema} for the resolved source type.
+     * Returns an empty map if the source does not support schema inference.
+     *
+     * @param input      input stream containing sample data (file upload, etc.)
+     * @param sourceType one of: CSV, EXCEL, JSON
+     * @return draft JSON Schema (draft-07) as a map, or empty map if inference not supported
+     */
+    public Map<String, Object> inferSchema(InputStream input, String sourceType) {
+        ProductImportSource source = resolveSource(sourceType);
+        ImportConfig config = new ImportConfig();
+        config.setSourceType(sourceType);
+        Map<String, Object> schema = source.inferSchema(input, config);
+        log.info("Schema inferred from source type '{}': {} properties detected",
+                sourceType, countSchemaProperties(schema));
+        return schema;
+    }
+
+    private int countSchemaProperties(Map<String, Object> schema) {
+        if (schema == null || schema.isEmpty()) return 0;
+        Object props = schema.get("properties");
+        return (props instanceof Map<?, ?> m) ? m.size() : 0;
+    }
+
+    /**
      * Save a new field mapping profile.
      */
     @Transactional("pimTransactionManager")

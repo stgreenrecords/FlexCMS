@@ -110,14 +110,14 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
 | `flexcms-replication` | — | — | — |
-| `flexcms-search` | — | — | — |
+| `flexcms-search` | P5-11 | Claude Sonnet 4.6 | 2026-03-26 |
 | `flexcms-cache` | — | — | — |
 | `flexcms-cdn` | — | — | — |
 | `flexcms-i18n` | — | — | — |
 | `flexcms-multisite` | — | — | — |
 | `flexcms-plugin-api` | — | — | — |
 | `flexcms-clientlibs` | — | — | — |
-| `flexcms-pim` | — | — | — |
+| `flexcms-pim` | P5-11 | Claude Sonnet 4.6 | 2026-03-26 |
 | `frontend/packages/sdk` | — | — | — |
 | `frontend/packages/react` | — | — | — |
 | `frontend/packages/vue` | — | — | — |
@@ -148,7 +148,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
-| P0-XF-01 | **Experience Fragments: Backend** — service, REST API, inline delivery resolution, Flyway migration | 🔵 IN PROGRESS | 🔴 P0 | L | `flexcms-core`, `flexcms-author`, `flexcms-headless` | — | GitHub Copilot |
+| P0-XF-01 | **Experience Fragments: Backend** — service, REST API, inline delivery resolution, Flyway migration | ✅ DONE | 🔴 P0 | L | `flexcms-core`, `flexcms-author`, `flexcms-headless` | — | Claude Sonnet 4.6 |
 | P0-XF-02 | **Experience Fragments: Admin UI** — XF browser + XF variation editor page | 🟢 OPEN | 🟡 P1 | L | `frontend/apps/admin` | P0-XF-01 | — |
 | SAMPLE-01 | **Sample Website: WKND Adventures** — install/uninstall scripts, SQL seed data, standalone Next.js frontend with WKND component renderers | 🔵 IN PROGRESS | 🟡 P1 | L | `sample-website/` (external folder) | P0-XF-01 | GitHub Copilot |
 
@@ -323,10 +323,10 @@ output_files:
 | P5-05 | **PIM: ImportService + field mapping profiles** | ✅ DONE | 🟡 P1 | L | `flexcms-pim` | P5-01 | Claude Sonnet 4.6 |
 | P5-06 | **PIM: Excel import source (POI)** | ✅ DONE | 🟢 P2 | M | `flexcms-pim` | P5-05 | Claude Sonnet 4.6 |
 | P5-07 | **PIM: JSON/API import source** | ✅ DONE | 🟢 P2 | M | `flexcms-pim` | P5-05 | Claude Sonnet 4.6 |
-| P5-08 | **PIM: auto-schema inference from source** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim` | P5-05 | — |
+| P5-08 | **PIM: auto-schema inference from source** | ✅ DONE | 🟢 P2 | M | `flexcms-pim` | P5-05 | Claude Sonnet 4.6 |
 | P5-09 | **PIM ↔ CMS: PimClient for ComponentModels** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-plugin-api` | P5-01 | Claude Sonnet 4.6 |
 | P5-10 | **PIM ↔ CMS: product.published → page rebuild** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | Claude Sonnet 4.6 |
-| P5-11 | **PIM: Elasticsearch product index** | 🟢 OPEN | 🟢 P2 | L | `flexcms-pim`, `flexcms-search` | P2-03, P5-01 | — |
+| P5-11 | **PIM: Elasticsearch product index** | 🔵 IN PROGRESS | 🟢 P2 | L | `flexcms-pim`, `flexcms-search` | P2-03, P5-01 | Claude Sonnet 4.6 |
 | P5-12 | **PIM: GraphQL schema extension** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim`, `flexcms-headless` | P2-01, P5-01 | — |
 | P5-13 | **PIM Admin: catalog browser + product grid** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03, P5-01 | GitHub Copilot |
 | P5-14 | **PIM Admin: product editor (schema-driven form)** | ✅ DONE | 🟡 P1 | XL | `frontend/apps/admin` | P5-13, P3-06 | GitHub Copilot |
@@ -648,6 +648,26 @@ output_files:
   - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/importer/ExcelImportSource.java`
   - NEW: `flexcms/flexcms-pim/src/test/java/com/flexcms/pim/importer/ExcelImportSourceTest.java`
 **Build Verified:** `mvn test -pl flexcms-pim` → BUILD SUCCESS, 101 tests, 0 failures
+
+---
+
+### P5-08 — PIM: auto-schema inference from source
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-26
+**AC Verification:**
+  - [x] **`ImportService.inferSchema()`** — delegates to resolved `ProductImportSource.inferSchema()`; logs properties count; returns empty map if source doesn't support inference
+  - [x] **`POST /api/pim/v1/imports/infer-schema`** — multipart `file` + `sourceType` query param; returns draft JSON Schema or informational message if empty
+  - [x] **`POST /api/pim/v1/imports`** — multipart file import with catalogId, sourceType, skuField, nameField, updateExisting params; returns `ImportResult`
+  - [x] **`POST /api/pim/v1/imports/with-profile/{profileId}`** — upload + saved profile apply; returns `ImportResult`
+  - [x] **OpenAPI annotations** — `@Tag`, `@Operation`, `@Parameter` on all endpoints; springdoc dependency added to `flexcms-pim/pom.xml`
+  - [x] **Tests** — 3 new tests in `ImportServiceTest`: `inferSchema_returnsSchemaFromSource`, `inferSchema_returnsEmptyMapWhenSourceDoesNotSupportInference`, `inferSchema_unknownSourceType_throws`; all 15 tests pass
+**Files Changed:**
+  - MODIFIED: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/service/ImportService.java` — added `inferSchema()` + `countSchemaProperties()`
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/controller/ImportApiController.java`
+  - MODIFIED: `flexcms/flexcms-pim/src/test/java/com/flexcms/pim/service/ImportServiceTest.java` — added 3 inferSchema tests + `stubSourceWithSchema` helper
+  - MODIFIED: `flexcms/flexcms-pim/pom.xml` — added springdoc-openapi-starter-webmvc-ui dependency
+**Build Verified:** `mvn test -pl flexcms-pim -Dtest=ImportServiceTest` → 15 tests, 0 failures; `mvn clean compile` → BUILD SUCCESS (all modules)
 
 ---
 

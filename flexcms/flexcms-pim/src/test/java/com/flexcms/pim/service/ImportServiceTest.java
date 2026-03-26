@@ -45,6 +45,19 @@ class ImportServiceTest {
         };
     }
 
+    // A stub that also overrides inferSchema
+    private ProductImportSource stubSourceWithSchema(String type, Map<String, Object> schema) {
+        return new ProductImportSource() {
+            @Override public String getSourceType() { return type; }
+            @Override public Stream<Map<String, Object>> parse(InputStream input, ImportConfig config) {
+                return Stream.empty();
+            }
+            @Override public Map<String, Object> inferSchema(InputStream input, ImportConfig config) {
+                return schema;
+            }
+        };
+    }
+
     @BeforeEach
     void setUp() {
         // Inject our stub source into the importSources list
@@ -264,5 +277,44 @@ class ImportServiceTest {
                 InputStream.nullInputStream(), profileId, "user"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Mapping profile not found");
+    }
+
+    // ── Schema inference ────────────────────────────────────────────────────────
+
+    @Test
+    void inferSchema_returnsSchemaFromSource() {
+        Map<String, Object> expectedSchema = Map.of(
+                "$schema", "http://json-schema.org/draft-07/schema#",
+                "properties", Map.of(
+                        "sku",  Map.of("type", "string"),
+                        "name", Map.of("type", "string"),
+                        "price", Map.of("type", "number")));
+        ReflectionTestUtils.setField(importService, "importSources",
+                List.of(stubSourceWithSchema("CSV", expectedSchema)));
+
+        Map<String, Object> result = importService.inferSchema(InputStream.nullInputStream(), "CSV");
+
+        assertThat(result).containsKey("properties");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> props = (Map<String, Object>) result.get("properties");
+        assertThat(props).containsKey("sku").containsKey("name").containsKey("price");
+    }
+
+    @Test
+    void inferSchema_returnsEmptyMapWhenSourceDoesNotSupportInference() {
+        // Default interface method returns empty map — use a plain stub (no override)
+        ReflectionTestUtils.setField(importService, "importSources",
+                List.of(stubSource("CSV", List.of())));
+
+        Map<String, Object> result = importService.inferSchema(InputStream.nullInputStream(), "CSV");
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void inferSchema_unknownSourceType_throws() {
+        assertThatThrownBy(() -> importService.inferSchema(InputStream.nullInputStream(), "XML"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("No import source registered for type 'XML'");
     }
 }

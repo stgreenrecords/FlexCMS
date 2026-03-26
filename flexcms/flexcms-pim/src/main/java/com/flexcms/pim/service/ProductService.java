@@ -36,6 +36,7 @@ public class ProductService {
     @Autowired private ProductSchemaRepository schemaRepo;
     @Autowired private ProductVersionRepository productVersionRepo;
     @Autowired private SchemaValidationService schemaValidationService;
+    @Autowired private ProductSearchService productSearchService;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -89,6 +90,7 @@ public class ProductService {
 
         product = productRepo.save(product);
         productVersionRepo.save(ProductVersion.fromProduct(product));
+        productSearchService.index(product);
         return product;
     }
 
@@ -120,6 +122,7 @@ public class ProductService {
         product.setUpdatedBy(userId);
         product = productRepo.save(product);
         productVersionRepo.save(ProductVersion.fromProduct(product));
+        productSearchService.index(product);
         return product;
     }
 
@@ -196,6 +199,7 @@ public class ProductService {
         ProductVersion snapshot = ProductVersion.fromProduct(product);
         snapshot.setChangeSummary("Merged inherited attributes — inheritance chain broken");
         productVersionRepo.save(snapshot);
+        productSearchService.index(product);
 
         log.info("Merged inherited attributes for product {} ({})", product.getId(), sku);
         return product;
@@ -262,6 +266,7 @@ public class ProductService {
         Product product = productRepo.findBySku(sku)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
         productRepo.delete(product);
+        productSearchService.remove(sku);
     }
 
     @Transactional("pimTransactionManager")
@@ -282,6 +287,7 @@ public class ProductService {
             log.info("Published product '{}' — sent page-rebuild notification", sku);
         }
 
+        productSearchService.index(product);
         return product;
     }
 
@@ -317,6 +323,7 @@ public class ProductService {
         ProductVersion restoredSnapshot = ProductVersion.fromProduct(product);
         restoredSnapshot.setChangeSummary("Restored from version " + versionNumber);
         productVersionRepo.save(restoredSnapshot);
+        productSearchService.index(product);
 
         log.info("Restored product {} to version {} (new version: {})", productId, versionNumber, product.getVersion());
         return product;
