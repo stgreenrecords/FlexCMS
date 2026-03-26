@@ -69,7 +69,7 @@ const INITIAL_GROUPS: AttributeGroup[] = [
 // Schema Visual Editor
 // ---------------------------------------------------------------------------
 
-export function SchemaVisualEditorPage() {
+function SchemaVisualEditorPage() {
   const [groups, setGroups] = useState<AttributeGroup[]>(INITIAL_GROUPS);
   const [selectedField, setSelectedField] = useState<SchemaField | null>(INITIAL_GROUPS[0].fields[0]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>('g1');
