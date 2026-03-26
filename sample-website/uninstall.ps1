@@ -4,8 +4,8 @@
 param(
     [string]$DbHost     = $env:FLEXCMS_DB_HOST     ?? "localhost",
     [string]$DbPort     = $env:FLEXCMS_DB_PORT     ?? "5432",
-    [string]$DbName     = $env:FLEXCMS_DB_NAME     ?? "flexcms",
-    [string]$DbUser     = $env:FLEXCMS_DB_USER     ?? "postgres",
+    [string]$DbName     = $env:FLEXCMS_DB_NAME     ?? "flexcms_author",
+    [string]$DbUser     = $env:FLEXCMS_DB_USER     ?? "flexcms",
     [string]$DbPassword = $env:FLEXCMS_DB_PASSWORD ?? ""
 )
 

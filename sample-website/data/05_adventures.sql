@@ -104,7 +104,7 @@ VALUES
                "resourceType": "wknd/components/contentfragment",
                "data": {
                  "panelTitle": "Overview",
-                 "text": "Surfing in Bali is on the bucket list of every surfer — whether you're a beginner or someone who's been surfing for decades, there will be a break to cater to your ability.",
+                 "text": "Surfing in Bali is on the bucket list of every surfer — whether you''re a beginner or someone who''s been surfing for decades, there will be a break to cater to your ability.",
                  "elementNames": ["description"]
                }
              },
@@ -169,7 +169,7 @@ VALUES
  'wknd.language-masters.en.adventures',
  '{
    "title": "Downhill Skiing Wyoming",
-   "description": "A skier's paradise far from crowds and close to nature with terrain so vast it appears uncharted.",
+   "description": "A skier''s paradise far from crowds and close to nature with terrain so vast it appears uncharted.",
    "template": "wknd/templates/adventure-page",
    "thumbnail": "/content/dam/wknd-shared/en/adventures/downhill-skiing-wyoming/adobestock-185234795.jpeg",
    "activity": "Skiing", "adventureType": "Overnight Trip",
@@ -289,7 +289,7 @@ VALUES
  'wknd.language-masters.en.adventures',
  '{
    "title": "Surf Camp Costa Rica",
-   "description": "Learn to surf on the warm Pacific swells of Nosara, Costa Rica — one of the world's most consistent beginner breaks.",
+   "description": "Learn to surf on the warm Pacific swells of Nosara, Costa Rica — one of the world''s most consistent beginner breaks.",
    "template": "wknd/templates/adventure-page",
    "thumbnail": "/content/dam/wknd-shared/en/adventures/surf-camp-in-costa-rica/adobestock-266405335.jpeg",
    "activity": "Surfing", "adventureType": "Overnight Trip",

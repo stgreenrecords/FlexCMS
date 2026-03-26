@@ -8,8 +8,8 @@ set -euo pipefail
 
 DB_HOST="${FLEXCMS_DB_HOST:-localhost}"
 DB_PORT="${FLEXCMS_DB_PORT:-5432}"
-DB_NAME="${FLEXCMS_DB_NAME:-flexcms}"
-DB_USER="${FLEXCMS_DB_USER:-postgres}"
+DB_NAME="${FLEXCMS_DB_NAME:-flexcms_author}"
+DB_USER="${FLEXCMS_DB_USER:-flexcms}"
 DB_PASSWORD="${FLEXCMS_DB_PASSWORD:-}"
 
 while [[ $# -gt 0 ]]; do

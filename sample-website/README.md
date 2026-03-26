@@ -63,13 +63,13 @@ cd sample-website
 
 You can also configure via env vars:
 
-| Variable              | Default     |
-|-----------------------|-------------|
-| `FLEXCMS_DB_HOST`     | `localhost` |
-| `FLEXCMS_DB_PORT`     | `5432`      |
-| `FLEXCMS_DB_NAME`     | `flexcms`   |
-| `FLEXCMS_DB_USER`     | `flexcms`   |
-| `FLEXCMS_DB_PASSWORD` | *(empty)*   |
+| Variable              | Default          |
+|-----------------------|------------------|
+| `FLEXCMS_DB_HOST`     | `localhost`      |
+| `FLEXCMS_DB_PORT`     | `5432`           |
+| `FLEXCMS_DB_NAME`     | `flexcms_author` |
+| `FLEXCMS_DB_USER`     | `flexcms`        |
+| `FLEXCMS_DB_PASSWORD` | *(empty)*        |
 
 ## Uninstall
 

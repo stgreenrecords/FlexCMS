@@ -37,7 +37,7 @@ VALUES
                    "resourceType": "wknd/components/teaser",
                    "data": {
                      "title": "WKND Adventures",
-                     "description": "<p>With WKND Adventures, you don't just see the world — you experience its cultures, flavors and wonders.</p>",
+                     "description": "<p>With WKND Adventures, you don''t just see the world — you experience its cultures, flavors and wonders.</p>",
                      "fileReference": "/content/dam/wknd-shared/en/adventures/riverside-camping-australia/adobestock-216674449.jpeg",
                      "actionsEnabled": true,
                      "actions": [{"text": "View Trips", "link": "/wknd/language-masters/en/adventures"}]
@@ -119,7 +119,7 @@ VALUES
                "resourceType": "wknd/components/teaser",
                "data": {
                  "title": "Experience the world with us",
-                 "description": "<p>With WKND Adventures, you don't just see the world — you experience its cultures, flavors and wonders.</p>",
+                 "description": "<p>With WKND Adventures, you don''t just see the world — you experience its cultures, flavors and wonders.</p>",
                  "fileReference": "/content/dam/wknd-shared/en/adventures/climbing-new-zealand/adobestock-140634652.jpeg",
                  "actionsEnabled": true,
                  "actions": [{"text": "See Trip", "link": "/wknd/language-masters/en/adventures/climbing-new-zealand"}]
