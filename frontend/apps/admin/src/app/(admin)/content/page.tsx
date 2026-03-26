@@ -662,6 +662,17 @@ function ContentRow({
                 boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
               }}
             >
+              {/* Preview — navigates to the preview page */}
+              <a
+                href={`/preview?path=${encodeURIComponent(node.urlPath)}`}
+                className="w-full text-left px-4 py-2 text-sm transition-colors flex items-center gap-2"
+                style={{ color: '#b0c6ff', display: 'flex' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = '#2a2a2a'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; }}
+                onClick={() => onActionMenu(null)}
+              >
+                Preview
+              </a>
               {['Edit', 'Publish', 'Duplicate', 'Move', 'Delete'].map((action) => (
                 <button
                   key={action}

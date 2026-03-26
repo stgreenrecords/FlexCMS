@@ -292,7 +292,7 @@ output_files:
 | P3-15 | **DAM asset detail page** | ✅ DONE | 🟡 P1 | M | `frontend/apps/admin` | P3-14 | Claude Sonnet 4.6 |
 | P3-16 | **Workflow inbox page** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03 | Claude Sonnet 4.6 |
 | P3-17 | **Component registry browser page** | ✅ DONE | 🟡 P1 | M | `frontend/apps/admin` | P3-09, P3-03 | GitHub Copilot |
-| P3-18 | **Content preview (iframe + viewport toggle)** | 🟢 OPEN | 🟡 P1 | M | `frontend/apps/admin` | P3-13 | — |
+| P3-18 | **Content preview (iframe + viewport toggle)** | ✅ DONE | 🟡 P1 | M | `frontend/apps/admin` | P3-13 | Claude Sonnet 4.6 |
 | P3-19 | **Translation manager page** | ✅ DONE | 🟢 P2 | M | `frontend/apps/admin` | P3-09, P3-03 | GitHub Copilot |
 | P3-20 | **Login page** | ✅ DONE | 🔴 P0 | S | `frontend/apps/admin` | P1-01 | Claude Sonnet 4.6 |
 
@@ -565,6 +565,35 @@ output_files:
 ## §5. Completion Notes & Handoff Log
 
 > When you finish or pause an item, add an entry here. This is the most critical section — it enables handoff between agents.
+
+### P3-18 — Content Preview (iframe + viewport toggle)
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-26
+**AC Verification:**
+  - [x] Dedicated `/preview` route (outside AppShell — full-screen like the page editor)
+  - [x] Viewport toggle: Desktop (full width) / Tablet (768px) / Mobile (390px) with icon buttons + active state
+  - [x] iframe rendering `NEXT_PUBLIC_FLEXCMS_PUBLISH_URL + path` with sandbox attributes
+  - [x] Loading overlay with spinner shown while iframe loads; disappears on `onLoad`
+  - [x] URL bar showing the full preview URL (read-only, font-mono)
+  - [x] Refresh button (increments `iframeKey` to force re-render)
+  - [x] Copy URL button with "Copied!" feedback (2s)
+  - [x] Open in new tab link
+  - [x] Edit button linking to `/editor?path=...`
+  - [x] Breadcrumb derived from URL path segments
+  - [x] Status bar at bottom: loading/ready indicator, path, viewport info
+  - [x] Device label badge shown below frame in tablet/mobile mode
+  - [x] "Preview" added to Content group in SidebarNav with eye icon
+  - [x] "Preview" added as first action in content tree row action menu (links to `/preview?path=urlPath`)
+  - [x] All colors via `var(--color-*)` tokens — no hardcoded values
+  - [x] `npx tsc --noEmit` → 0 errors
+**Files Changed:**
+  - NEW: `frontend/apps/admin/src/app/preview/page.tsx`
+  - MODIFIED: `frontend/apps/admin/src/components/SidebarNav.tsx` (added Preview nav item + PreviewIcon)
+  - MODIFIED: `frontend/apps/admin/src/app/(admin)/content/page.tsx` (added Preview to row action menu)
+**Build Verified:** `npx tsc --noEmit` → 0 errors
+
+---
 
 ### SAMPLE-01 — Sample Website: WKND Adventures
 **Status:** ✅ DONE
