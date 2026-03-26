@@ -135,14 +135,14 @@ public class ExperienceFragmentController {
      * </pre>
      */
     @Operation(summary = "Add a variation to an Experience Fragment")
-    @PostMapping("/{*xfPath}/variations")
+    @PostMapping("/variations")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> addVariation(
-            @PathVariable String xfPath,
+            @RequestParam @NotBlank String path,
             @Valid @RequestBody AddVariationRequest request) {
 
-        String path = xfPath.startsWith("/") ? xfPath.substring(1).replace('/', '.') : xfPath;
-        ContentNode variation = xfService.addVariation(path, request.variationType(),
+        String normPath = path.startsWith("/") ? path.substring(1).replace('/', '.') : path;
+        ContentNode variation = xfService.addVariation(normPath, request.variationType(),
                 request.title(), request.userId());
         return ResponseEntity.ok(variation);
     }
@@ -151,26 +151,26 @@ public class ExperienceFragmentController {
      * List variations of an Experience Fragment.
      */
     @Operation(summary = "List all variations of an Experience Fragment")
-    @GetMapping("/{*xfPath}/variations")
+    @GetMapping("/variations")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
-    public ResponseEntity<List<ContentNode>> listVariations(@PathVariable String xfPath) {
-        String path = xfPath.startsWith("/") ? xfPath.substring(1).replace('/', '.') : xfPath;
-        return ResponseEntity.ok(xfService.listVariations(path));
+    public ResponseEntity<List<ContentNode>> listVariations(@RequestParam @NotBlank String path) {
+        String normPath = path.startsWith("/") ? path.substring(1).replace('/', '.') : path;
+        return ResponseEntity.ok(xfService.listVariations(normPath));
     }
 
     /**
      * Delete a specific variation of an Experience Fragment.
      */
     @Operation(summary = "Delete a specific variation")
-    @DeleteMapping("/{*xfPath}/variations/{variationType}")
+    @DeleteMapping("/variation/{variationType}")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<Void> deleteVariation(
-            @PathVariable String xfPath,
+            @RequestParam @NotBlank String path,
             @PathVariable String variationType,
             @RequestParam @NotBlank String userId) {
 
-        String path = xfPath.startsWith("/") ? xfPath.substring(1).replace('/', '.') : xfPath;
-        xfService.deleteVariation(path, variationType, userId);
+        String normPath = path.startsWith("/") ? path.substring(1).replace('/', '.') : path;
+        xfService.deleteVariation(normPath, variationType, userId);
         return ResponseEntity.noContent().build();
     }
 

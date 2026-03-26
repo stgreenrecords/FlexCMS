@@ -14,7 +14,7 @@ VALUES
  'header', 'flexcms/xf-folder',
  'experience-fragments.wknd.language-masters.en.site',
  '{"title":"Header","description":"Global site header with logo, navigation, search and sign-in."}'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 (md5('xf-header-master')::uuid,
  'experience-fragments.wknd.language-masters.en.site.header.master',
@@ -74,7 +74,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;
 
@@ -94,7 +94,7 @@ VALUES
  'footer', 'flexcms/xf-folder',
  'experience-fragments.wknd.language-masters.en.site',
  '{"title":"Footer","description":"Global site footer with navigation, social links and copyright."}'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 (md5('xf-footer-master')::uuid,
  'experience-fragments.wknd.language-masters.en.site.footer.master',
@@ -172,7 +172,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;
 
@@ -192,7 +192,7 @@ VALUES
  'sign-in', 'flexcms/xf-folder',
  'experience-fragments.wknd.language-masters.en.site',
  '{"title":"Sign In","description":"Sign-in dialog experience fragment."}'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 (md5('xf-signin-master')::uuid,
  'experience-fragments.wknd.language-masters.en.site.sign-in.master',
@@ -222,7 +222,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;
 
@@ -242,14 +242,14 @@ VALUES
  'contributors', 'flexcms/xf-folder',
  'experience-fragments.wknd.language-masters.en',
  '{"title":"Contributors","description":"Author byline experience fragments."}'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 (md5('xf-jacob-folder')::uuid,
  'experience-fragments.wknd.language-masters.en.contributors.jacob-wester',
  'jacob-wester', 'flexcms/xf-folder',
  'experience-fragments.wknd.language-masters.en.contributors',
  '{"title":"Jacob Wester","description":"Adventure sports contributor."}'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 (md5('xf-jacob-master')::uuid,
  'experience-fragments.wknd.language-masters.en.contributors.jacob-wester.master',
@@ -290,7 +290,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 (md5('xf-jacob-byline')::uuid,
  'experience-fragments.wknd.language-masters.en.contributors.jacob-wester.byline',
@@ -327,7 +327,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;
 

@@ -42,7 +42,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- FAQs
 (md5('wknd-page-faqs')::uuid,
@@ -77,6 +77,6 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;

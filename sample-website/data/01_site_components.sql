@@ -34,46 +34,46 @@ VALUES
     (md5('wknd-root')::uuid,
      'wknd', 'wknd', 'wknd/components/site-root', NULL,
      '{"title":"WKND Adventures"}'::jsonb,
-     'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+     'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
     (md5('wknd-language-masters')::uuid,
      'wknd.language-masters', 'language-masters', 'wknd/components/container', 'wknd',
      '{}'::jsonb,
-     'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+     'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
     (md5('wknd-language-masters-en')::uuid,
      'wknd.language-masters.en', 'en', 'wknd/components/site-root', 'wknd.language-masters',
      '{"title":"WKND Adventures and Travel","locale":"en"}'::jsonb,
-     'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+     'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
     -- XF ancestry
     (md5('xf-root')::uuid,
      'experience-fragments', 'experience-fragments', 'flexcms/xf-folder', NULL,
      '{}'::jsonb,
-     'LIVE', NULL, NULL, 'wknd-install', 'wknd-install'),
+     'PUBLISHED', NULL, NULL, 'wknd-install', 'wknd-install'),
 
     (md5('xf-wknd')::uuid,
      'experience-fragments.wknd', 'wknd', 'flexcms/xf-folder', 'experience-fragments',
      '{}'::jsonb,
-     'LIVE', 'wknd', NULL, 'wknd-install', 'wknd-install'),
+     'PUBLISHED', 'wknd', NULL, 'wknd-install', 'wknd-install'),
 
     (md5('xf-wknd-lm')::uuid,
      'experience-fragments.wknd.language-masters', 'language-masters', 'flexcms/xf-folder',
      'experience-fragments.wknd',
      '{}'::jsonb,
-     'LIVE', 'wknd', NULL, 'wknd-install', 'wknd-install'),
+     'PUBLISHED', 'wknd', NULL, 'wknd-install', 'wknd-install'),
 
     (md5('xf-wknd-lm-en')::uuid,
      'experience-fragments.wknd.language-masters.en', 'en', 'flexcms/xf-folder',
      'experience-fragments.wknd.language-masters',
      '{}'::jsonb,
-     'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+     'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
     (md5('xf-wknd-lm-en-site')::uuid,
      'experience-fragments.wknd.language-masters.en.site', 'site', 'flexcms/xf-folder',
      'experience-fragments.wknd.language-masters.en',
      '{}'::jsonb,
-     'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+     'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;
 

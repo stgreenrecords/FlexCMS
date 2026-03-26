@@ -38,21 +38,21 @@ public class ExperienceFragmentApiController {
     private ContentDeliveryService deliveryService;
 
     @Operation(summary = "Get resolved component tree for an XF variation")
-    @GetMapping("/{*xfPath}/variations/{variationType}")
+    @GetMapping("/variation/{variationType}")
     @Transactional(readOnly = true)
     public ResponseEntity<Map<String, Object>> getVariation(
             @Parameter(description = "Dot-path of the XF folder")
-            @PathVariable String xfPath,
+            @RequestParam String path,
             @Parameter(description = "Variation name, e.g. master | mobile | email")
             @PathVariable String variationType) {
 
-        String path = normalise(xfPath);
-        String varPath = path + "." + variationType.toLowerCase();
+        String normPath = normalise(path);
+        String varPath = normPath + "." + variationType.toLowerCase();
 
         ContentNode variation = nodeRepository.findByPath(varPath)
                 .filter(n -> "flexcms/xf-page".equals(n.getResourceType()))
                 .orElseThrow(() -> new NotFoundException(
-                        "XF variation '" + variationType + "' not found at: " + path));
+                        "XF variation '" + variationType + "' not found at: " + normPath));
 
         RenderContext ctx = new RenderContext();
         return ResponseEntity.ok(deliveryService.renderXfVariation(variation, ctx));
@@ -78,11 +78,11 @@ public class ExperienceFragmentApiController {
     }
 
     @Operation(summary = "List available variations for an XF")
-    @GetMapping("/{*xfPath}/variations")
+    @GetMapping("/variations")
     @Transactional(readOnly = true)
-    public ResponseEntity<List<Map<String, Object>>> listVariations(@PathVariable String xfPath) {
-        String path = normalise(xfPath);
-        List<Map<String, Object>> result = nodeService.getChildren(path).stream()
+    public ResponseEntity<List<Map<String, Object>>> listVariations(@RequestParam String path) {
+        String normPath = normalise(path);
+        List<Map<String, Object>> result = nodeService.getChildren(normPath).stream()
                 .filter(n -> "flexcms/xf-page".equals(n.getResourceType()))
                 .map(v -> Map.<String, Object>of(
                         "variationType", v.getProperty("variationType", v.getName()),

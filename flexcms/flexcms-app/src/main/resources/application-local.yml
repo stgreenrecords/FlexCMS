@@ -1,0 +1,14 @@
+# ==============================================================================
+# FlexCMS — Local development profile
+# Disables OAuth2/JWT so the app runs without Keycloak.
+# All requests are treated as ROLE_ADMIN (see SecurityConfig).
+# ==============================================================================
+flexcms:
+  local-dev: true
+
+spring:
+  # Prevent Spring Boot auto-config from trying to connect to the JWT issuer
+  # (Keycloak) at startup. SecurityConfig handles auth in local mode itself.
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration

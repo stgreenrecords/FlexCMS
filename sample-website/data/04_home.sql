@@ -163,7 +163,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 ON CONFLICT (path) DO UPDATE
     SET properties = EXCLUDED.properties,
         modified_by = EXCLUDED.modified_by;

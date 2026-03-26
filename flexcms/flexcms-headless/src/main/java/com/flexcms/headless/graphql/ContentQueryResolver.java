@@ -96,10 +96,14 @@ public class ContentQueryResolver {
 
     /**
      * Returns a single content node (any type, not just pages).
+     * Accepts either dot-separated paths (wknd.language-masters.en) or
+     * slash-separated paths (/wknd/language-masters/en) — both resolve
+     * to the same node. Does NOT add a "content." prefix, unlike the
+     * page() resolver, so WKND/XF paths work as-is.
      */
     @QueryMapping
     public Map<String, Object> node(@Argument String path) {
-        String contentPath = toContentPath(path);
+        String contentPath = path.startsWith("/") ? path.substring(1).replace("/", ".") : path;
         return nodeService.getByPath(contentPath)
                 .map(this::nodeToMap)
                 .orElse(null);

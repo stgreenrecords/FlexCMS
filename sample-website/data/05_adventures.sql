@@ -47,7 +47,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 ON CONFLICT (path) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
@@ -130,7 +130,7 @@ VALUES
      }
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 2. Climbing New Zealand
 (md5('wknd-adv-climbing-nz')::uuid,
@@ -160,7 +160,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 3. Downhill Skiing Wyoming
 (md5('wknd-adv-skiing-wyoming')::uuid,
@@ -190,7 +190,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 4. Cycling Tuscany
 (md5('wknd-adv-cycling-tuscany')::uuid,
@@ -220,7 +220,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 5. Napa Wine Tasting
 (md5('wknd-adv-napa')::uuid,
@@ -250,7 +250,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 6. Riverside Camping Australia
 (md5('wknd-adv-camping-aus')::uuid,
@@ -280,7 +280,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 7. Surf Camp Costa Rica
 (md5('wknd-adv-surf-cr')::uuid,
@@ -310,7 +310,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 8. Yosemite Backpacking
 (md5('wknd-adv-yosemite')::uuid,
@@ -340,6 +340,6 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;

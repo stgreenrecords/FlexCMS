@@ -30,7 +30,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 ON CONFLICT (path) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 2. Guide to LA Skateparks
 (md5('wknd-art-la-skate')::uuid,
@@ -113,7 +113,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 3. San Diego Surf
 (md5('wknd-art-sandiego')::uuid,
@@ -141,7 +141,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 4. Ski Touring
 (md5('wknd-art-skitouring')::uuid,
@@ -171,7 +171,7 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install'),
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install'),
 
 -- 5. Camping Western Australia
 (md5('wknd-art-western-aus')::uuid,
@@ -199,6 +199,6 @@ VALUES
      ]}
    ]
  }'::jsonb,
- 'LIVE', 'wknd', 'en', 'wknd-install', 'wknd-install')
+ 'PUBLISHED', 'wknd', 'en', 'wknd-install', 'wknd-install')
 
 ON CONFLICT (path) DO NOTHING;

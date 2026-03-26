@@ -1,6 +1,7 @@
 package com.flexcms.app.config;
 
 import com.flexcms.core.security.NodePermissionEvaluator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -49,6 +50,9 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Value("${flexcms.local-dev:false}")
+    private boolean localDev;
+
     /**
      * Registers the per-node {@link NodePermissionEvaluator} so that
      * {@code @PreAuthorize("hasPermission(#path, 'WRITE')")} expressions work.
@@ -72,37 +76,47 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // ── Public: headless content delivery ──────────────────────────
-                        .requestMatchers(HttpMethod.GET, "/api/content/**").permitAll()
-                        .requestMatchers("/graphql/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/dam/renditions/**").permitAll()
-                        .requestMatchers("/clientlibs/**").permitAll()
-                        .requestMatchers("/static/**").permitAll()
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                        // ── Public: infrastructure ──────────────────────────────────────
-                        .requestMatchers("/actuator/health", "/actuator/health/**",
-                                         "/actuator/info", "/actuator/prometheus").permitAll()
+        if (localDev) {
+            // Local development: permit everything, anonymous user has ROLE_ADMIN
+            // so @PreAuthorize and ACL checks pass without Keycloak running.
+            http
+                    .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                    .anonymous(anon -> anon.authorities("ROLE_ADMIN", "ROLE_USER"));
+        } else {
+            http
+                    .authorizeHttpRequests(auth -> auth
+                            // ── Public: headless content delivery ──────────────────────────
+                            .requestMatchers(HttpMethod.GET, "/api/content/**").permitAll()
+                            .requestMatchers("/graphql/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/dam/renditions/**").permitAll()
+                            .requestMatchers("/clientlibs/**").permitAll()
+                            .requestMatchers("/static/**").permitAll()
 
-                        // ── Protected: author & PIM APIs ────────────────────────────────
-                        .requestMatchers("/api/author/**").authenticated()
-                        .requestMatchers("/api/pim/**").authenticated()
+                            // ── Public: infrastructure ──────────────────────────────────────
+                            .requestMatchers("/actuator/health", "/actuator/health/**",
+                                             "/actuator/info", "/actuator/prometheus").permitAll()
 
-                        // ── Protected: DAM management (reads are public, mutations need auth) ──
-                        .requestMatchers(HttpMethod.POST, "/api/dam/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/dam/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/dam/**").authenticated()
+                            // ── Protected: author & PIM APIs ────────────────────────────────
+                            .requestMatchers("/api/author/**").authenticated()
+                            .requestMatchers("/api/pim/**").authenticated()
 
-                        // ── Protected: actuator management ──────────────────────────────
-                        .requestMatchers("/actuator/**").authenticated()
+                            // ── Protected: DAM management (reads are public, mutations need auth) ──
+                            .requestMatchers(HttpMethod.POST, "/api/dam/**").authenticated()
+                            .requestMatchers(HttpMethod.PUT, "/api/dam/**").authenticated()
+                            .requestMatchers(HttpMethod.DELETE, "/api/dam/**").authenticated()
 
-                        // ── Everything else requires authentication ──────────────────────
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtRoleConverter()))
-                );
+                            // ── Protected: actuator management ──────────────────────────────
+                            .requestMatchers("/actuator/**").authenticated()
+
+                            // ── Everything else requires authentication ──────────────────────
+                            .anyRequest().authenticated()
+                    )
+                    .oauth2ResourceServer(oauth2 -> oauth2
+                            .jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtRoleConverter()))
+                    );
+        }
 
         return http.build();
     }

@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "com.flexcms")
-@EnableElasticsearchRepositories(basePackages = "com.flexcms.search.repository")
+@EnableElasticsearchRepositories(basePackages = {"com.flexcms.search.repository", "com.flexcms.pim.search"})
 @EnableAsync
 @EnableScheduling
 public class FlexCmsApplication {
