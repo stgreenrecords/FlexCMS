@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.flexcms.pim.service.ProductSearchService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,6 +50,9 @@ class ProductServiceTest {
 
     @Mock
     private RabbitTemplate rabbitTemplate;
+
+    @Mock
+    private ProductSearchService productSearchService;
 
     @InjectMocks
     private ProductService productService;

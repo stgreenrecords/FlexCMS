@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.*;
 
@@ -27,6 +28,8 @@ class ProductVersionServiceTest {
     @Mock private ProductSchemaRepository schemaRepo;
     @Mock private ProductVersionRepository productVersionRepo;
     @Mock private SchemaValidationService schemaValidationService;
+    @Mock private ProductSearchService productSearchService;
+    @Mock private RabbitTemplate rabbitTemplate;
 
     @InjectMocks
     private ProductService productService;
