@@ -30,6 +30,10 @@
             <groupId>com.flexcms</groupId>
             <artifactId>flexcms-search</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-pim</artifactId>
+        </dependency>
 
         <!-- Web -->
         <dependency>

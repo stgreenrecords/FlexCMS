@@ -110,14 +110,14 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | `flexcms-headless` | — | — | — |
 | `flexcms-dam` | — | — | — |
 | `flexcms-replication` | — | — | — |
-| `flexcms-search` | P5-11 | Claude Sonnet 4.6 | 2026-03-26 |
+| `flexcms-search` | — | — | — |
 | `flexcms-cache` | — | — | — |
 | `flexcms-cdn` | — | — | — |
 | `flexcms-i18n` | — | — | — |
 | `flexcms-multisite` | — | — | — |
 | `flexcms-plugin-api` | — | — | — |
 | `flexcms-clientlibs` | — | — | — |
-| `flexcms-pim` | P5-11 | Claude Sonnet 4.6 | 2026-03-26 |
+| `flexcms-pim` | — | — | — |
 | `frontend/packages/sdk` | — | — | — |
 | `frontend/packages/react` | — | — | — |
 | `frontend/packages/vue` | — | — | — |
@@ -326,8 +326,8 @@ output_files:
 | P5-08 | **PIM: auto-schema inference from source** | ✅ DONE | 🟢 P2 | M | `flexcms-pim` | P5-05 | Claude Sonnet 4.6 |
 | P5-09 | **PIM ↔ CMS: PimClient for ComponentModels** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-plugin-api` | P5-01 | Claude Sonnet 4.6 |
 | P5-10 | **PIM ↔ CMS: product.published → page rebuild** | ✅ DONE | 🟡 P1 | M | `flexcms-pim`, `flexcms-replication` | P5-09, P2H-01 | Claude Sonnet 4.6 |
-| P5-11 | **PIM: Elasticsearch product index** | 🔵 IN PROGRESS | 🟢 P2 | L | `flexcms-pim`, `flexcms-search` | P2-03, P5-01 | Claude Sonnet 4.6 |
-| P5-12 | **PIM: GraphQL schema extension** | 🟢 OPEN | 🟢 P2 | M | `flexcms-pim`, `flexcms-headless` | P2-01, P5-01 | — |
+| P5-11 | **PIM: Elasticsearch product index** | ✅ DONE | 🟢 P2 | L | `flexcms-pim`, `flexcms-search` | P2-03, P5-01 | Claude Sonnet 4.6 |
+| P5-12 | **PIM: GraphQL schema extension** | ✅ DONE | 🟢 P2 | M | `flexcms-pim`, `flexcms-headless` | P2-01, P5-01 | Claude Sonnet 4.6 |
 | P5-13 | **PIM Admin: catalog browser + product grid** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03, P5-01 | GitHub Copilot |
 | P5-14 | **PIM Admin: product editor (schema-driven form)** | ✅ DONE | 🟡 P1 | XL | `frontend/apps/admin` | P5-13, P3-06 | GitHub Copilot |
 | P5-15 | **PIM Admin: import wizard** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P5-13, P3-05, P5-05 | GitHub Copilot |
@@ -668,6 +668,50 @@ output_files:
   - MODIFIED: `flexcms/flexcms-pim/src/test/java/com/flexcms/pim/service/ImportServiceTest.java` — added 3 inferSchema tests + `stubSourceWithSchema` helper
   - MODIFIED: `flexcms/flexcms-pim/pom.xml` — added springdoc-openapi-starter-webmvc-ui dependency
 **Build Verified:** `mvn test -pl flexcms-pim -Dtest=ImportServiceTest` → 15 tests, 0 failures; `mvn clean compile` → BUILD SUCCESS (all modules)
+
+---
+
+### P5-12 — PIM: GraphQL schema extension
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-26
+**AC Verification:**
+  - [x] **Schema extension** — `schema.graphqls` extended with `Product`, `ProductConnection`, `Catalog`, `ProductSearchResult`, `ProductSearchHit` types
+  - [x] **New queries** — `product(sku)`, `products(catalogId, status, limit, offset)`, `catalogs()`, `searchProducts(query, catalogId, status, limit)` added to the Query root type
+  - [x] **`ProductQueryResolver`** — `@Controller` with `@QueryMapping` for each new query; calls `ProductService`, `CatalogRepository`, `ProductSearchService` directly (same JVM)
+  - [x] **`flexcms-pim` added as dependency** of `flexcms-headless/pom.xml`
+  - [x] **Build** — `mvn clean compile` → BUILD SUCCESS (all 14 modules)
+**Files Changed:**
+  - MODIFIED: `flexcms/flexcms-headless/src/main/resources/graphql/schema.graphqls` — added PIM types + queries
+  - NEW: `flexcms/flexcms-headless/src/main/java/com/flexcms/headless/graphql/ProductQueryResolver.java`
+  - MODIFIED: `flexcms/flexcms-headless/pom.xml` — added flexcms-pim dependency
+**Build Verified:** `mvn clean compile` → BUILD SUCCESS (all modules)
+
+---
+
+### P5-11 — PIM: Elasticsearch product index
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-26
+**AC Verification:**
+  - [x] **`ProductDocument`** — `@Document(indexName="flexcms-products")`; fields: id, sku, name, catalogId, catalogName, status, attributes (Object), fullText (Text), createdAt, updatedAt, updatedBy
+  - [x] **`ProductSearchRepository`** — `ElasticsearchRepository<ProductDocument, String>`; findByCatalogId, findByStatus, findByCatalogIdAndStatus, deleteBySku, deleteByCatalogId
+  - [x] **`ProductSearchService`** — `index()`, `indexAll()`, `remove()`, `removeByCatalog()`; `search()` with optional catalogId/status filter; `searchWithFacets()` with status + catalog aggregations; `fullText` built from name + sku + all string attributes
+  - [x] **`ProductIndexRebuildService`** — `rebuildCatalog()`, `purgeAndRebuildCatalog()`, `rebuildAll()` with BATCH_SIZE=500
+  - [x] **ProductService wired** — `index()` called after create/update/publish/mergeInheritedAttributes/restoreVersion; `remove()` called after delete
+  - [x] **`ProductSearchApiController`** — `GET /api/pim/v1/search?q=...`, `GET /api/pim/v1/search/facets?q=...`, `POST /api/pim/v1/search/reindex/catalog/{id}`, `POST /api/pim/v1/search/reindex/catalog/{id}/purge`, `POST /api/pim/v1/search/reindex/all`
+  - [x] **`spring-boot-starter-data-elasticsearch`** added to `flexcms-pim/pom.xml`
+  - [x] **Tests** — 8 tests in `ProductSearchServiceTest`; all 23 PIM tests pass
+**Files Changed:**
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/search/ProductDocument.java`
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/search/ProductSearchRepository.java`
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/service/ProductSearchService.java`
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/service/ProductIndexRebuildService.java`
+  - NEW: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/controller/ProductSearchApiController.java`
+  - MODIFIED: `flexcms/flexcms-pim/src/main/java/com/flexcms/pim/service/ProductService.java` — wired search indexing
+  - NEW: `flexcms/flexcms-pim/src/test/java/com/flexcms/pim/service/ProductSearchServiceTest.java`
+  - MODIFIED: `flexcms/flexcms-pim/pom.xml` — added spring-boot-starter-data-elasticsearch
+**Build Verified:** `mvn test -pl flexcms-pim` → 23 tests, 0 failures; `mvn clean compile` → BUILD SUCCESS (all modules)
 
 ---
 

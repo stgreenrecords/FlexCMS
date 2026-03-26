@@ -6,6 +6,12 @@ type Query {
     navigation(site: String!, locale: String!, depth: Int): [NavigationItem!]!
     asset(id: ID!): Asset
     components: [ComponentDefinition!]!
+
+    # PIM — Product queries
+    product(sku: String!): Product
+    products(catalogId: ID!, status: String, limit: Int, offset: Int): ProductConnection!
+    catalogs: [Catalog!]!
+    searchProducts(query: String!, catalogId: ID, status: String, limit: Int): ProductSearchResult!
 }
 
 type Page {
@@ -92,6 +98,49 @@ type ComponentDefinition {
     isContainer: Boolean
     dataSchema: JSON
     dialog: JSON
+}
+
+# ── PIM types ──────────────────────────────────────────────────────────────
+
+type Product {
+    id: ID!
+    sku: String!
+    name: String!
+    status: String!
+    catalogId: String!
+    attributes: JSON
+    version: Long
+    createdAt: String
+    updatedAt: String
+    updatedBy: String
+}
+
+type ProductConnection {
+    totalCount: Int!
+    items: [Product!]!
+    hasNextPage: Boolean!
+}
+
+type Catalog {
+    id: ID!
+    name: String!
+    year: Int!
+    season: String
+    description: String
+    status: String!
+}
+
+type ProductSearchResult {
+    totalCount: Int!
+    items: [ProductSearchHit!]!
+}
+
+type ProductSearchHit {
+    sku: String!
+    name: String!
+    catalogId: String!
+    status: String!
+    score: Float!
 }
 
 scalar JSON
