@@ -64,6 +64,28 @@ public class AuthorContentController {
         );
     }
 
+    /**
+     * List content nodes for a site, paginated.
+     * Used by the admin Content Tree UI.
+     *
+     * @param site   site ID (e.g. "wknd") — required
+     * @param locale locale (e.g. "en") — optional, omit to list all locales
+     * @param page   zero-based page index (default 0)
+     * @param size   page size (default 50, max 200)
+     */
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<Page<ContentNode>> listNodes(
+            @RequestParam String site,
+            @RequestParam(required = false) String locale,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        int clampedSize = Math.min(size, 200);
+        return ResponseEntity.ok(
+                nodeService.listBySite(site, locale, PageRequest.of(page, clampedSize))
+        );
+    }
+
     /** Get a page with full component tree. */
     @GetMapping("/page")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")

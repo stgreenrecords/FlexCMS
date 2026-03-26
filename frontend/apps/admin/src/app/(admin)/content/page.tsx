@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from '@flexcms/ui';
 
 // ---------------------------------------------------------------------------
@@ -21,8 +21,55 @@ interface ContentNode {
   children?: ContentNode[];
 }
 
+// API node shape returned by /api/author/content/list
+interface ApiContentNode {
+  id: string;
+  name: string;
+  path: string;
+  resourceType: string;
+  status: string;
+  modifiedAt?: string;
+  updatedBy?: string;
+  siteId?: string;
+  locale?: string;
+}
+
+const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
+
+function apiToUiNode(n: ApiContentNode): ContentNode {
+  const statusMap: Record<string, ContentStatus> = {
+    PUBLISHED: 'live',
+    DRAFT: 'draft',
+    IN_REVIEW: 'review',
+    APPROVED: 'review',
+    ARCHIVED: 'archived',
+  };
+  const initials = n.updatedBy
+    ? n.updatedBy.slice(0, 2).toUpperCase()
+    : 'SY';
+  const lastMod = n.modifiedAt
+    ? new Date(n.modifiedAt).toLocaleDateString()
+    : '—';
+  const iconMap: Record<string, string> = {
+    'flexcms/page': 'description',
+    'flexcms/site-root': 'language',
+    'flexcms/container': 'article',
+    'flexcms/xf-page': 'auto_stories',
+  };
+  return {
+    id: n.id,
+    name: n.name,
+    icon: iconMap[n.resourceType] ?? 'article',
+    status: statusMap[n.status] ?? 'draft',
+    urlPath: '/' + n.path.replace(/\./g, '/'),
+    lastModified: lastMod,
+    author: { initials, name: n.updatedBy ?? 'System', color: '#8d90a0' },
+    depth: 0,
+  };
+}
+
 // ---------------------------------------------------------------------------
-// Mock data
+// Legacy mock — kept only so tree-view helpers compile; replaced at runtime
 // ---------------------------------------------------------------------------
 
 const MOCK_NODES: ContentNode[] = [
@@ -210,13 +257,31 @@ export default function ContentTreePage() {
   const [view, setView]               = useState<'list' | 'tree'>('list');
   const [search, setSearch]           = useState('');
   const [selected, setSelected]       = useState<Set<string>>(new Set());
-  const [expanded, setExpanded]       = useState<Set<string>>(new Set(['1', '3', '7']));
+  const [expanded, setExpanded]       = useState<Set<string>>(new Set());
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
+  const [nodes, setNodes]             = useState<ContentNode[]>([]);
+  const [totalCount, setTotalCount]   = useState(0);
+  const [loading, setLoading]         = useState(true);
+  const [site, setSite]               = useState('wknd');
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API_BASE}/api/author/content/list?site=${encodeURIComponent(site)}&size=200`)
+      .then((r) => r.ok ? r.json() : Promise.reject(r.status))
+      .then((data) => {
+        const items: ContentNode[] = (data.content ?? []).map(apiToUiNode);
+        setNodes(items);
+        setTotalCount(data.totalElements ?? items.length);
+      })
+      .catch(() => setNodes([]))
+      .finally(() => setLoading(false));
+  }, [site]);
 
   // Determine visible rows
   const visibleNodes = useMemo(() => {
+    const source = nodes;
     if (view === 'list') {
-      const all = flattenAll(MOCK_NODES);
+      const all = flattenAll(source);
       if (!search.trim()) return all;
       return all.filter(
         (n) =>
@@ -224,15 +289,14 @@ export default function ContentTreePage() {
           n.urlPath.toLowerCase().includes(search.toLowerCase()),
       );
     }
-    // tree view: only top-level + expanded children
-    const flat = flattenTree(MOCK_NODES, expanded);
+    const flat = flattenTree(source, expanded);
     if (!search.trim()) return flat;
     return flat.filter(
       (n) =>
         n.name.toLowerCase().includes(search.toLowerCase()) ||
         n.urlPath.toLowerCase().includes(search.toLowerCase()),
     );
-  }, [view, search, expanded]);
+  }, [view, search, expanded, nodes]);
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -412,7 +476,14 @@ export default function ContentTreePage() {
                 </tr>
               </thead>
               <tbody>
-                {visibleNodes.map((node) => (
+                {loading && (
+                  <tr>
+                    <td colSpan={7} className="py-16 text-center text-sm" style={{ color: '#8d90a0' }}>
+                      Loading…
+                    </td>
+                  </tr>
+                )}
+                {!loading && visibleNodes.map((node) => (
                   <ContentRow
                     key={node.id}
                     node={node}
@@ -424,14 +495,14 @@ export default function ContentTreePage() {
                     onActionMenu={(id) => setActionMenuId(id)}
                   />
                 ))}
-                {visibleNodes.length === 0 && (
+                {!loading && visibleNodes.length === 0 && (
                   <tr>
                     <td
                       colSpan={7}
                       className="py-16 text-center text-sm"
                       style={{ color: '#8d90a0' }}
                     >
-                      No pages found matching &quot;{search}&quot;
+                      {search ? `No pages found matching "${search}"` : 'No content nodes found.'}
                     </td>
                   </tr>
                 )}
@@ -447,7 +518,7 @@ export default function ContentTreePage() {
                 Showing{' '}
                 <span style={{ color: '#e5e2e1' }}>1 – {visibleNodes.length}</span>
                 {' '}of{' '}
-                <span style={{ color: '#e5e2e1' }}>124</span> pages
+                <span style={{ color: '#e5e2e1' }}>{totalCount}</span> nodes
               </p>
               <PaginationControls />
             </div>

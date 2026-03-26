@@ -263,6 +263,15 @@ public class ContentNodeService {
     }
 
     /**
+     * List all content nodes for a site, paginated.
+     * Pass {@code null} for locale to return nodes for all locales.
+     */
+    @Transactional(readOnly = true)
+    public Page<ContentNode> listBySite(String siteId, String locale, Pageable pageable) {
+        return nodeRepository.findBySiteIdAndOptionalLocale(siteId, locale, pageable);
+    }
+
+    /**
      * Search content across a site.
      */
     public Page<ContentNode> search(String siteId, String locale, String query, Pageable pageable) {

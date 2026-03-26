@@ -70,6 +70,16 @@ public interface ContentNodeRepository extends JpaRepository<ContentNode, UUID> 
     List<ContentNode> findByResourceType(String resourceType);
 
     /**
+     * Find all nodes for a site, paginated (no status filter).
+     * When locale is provided, also filters by locale.
+     */
+    @Query("SELECT n FROM ContentNode n WHERE n.siteId = :siteId " +
+           "AND (:locale IS NULL OR n.locale = :locale) ORDER BY n.path")
+    Page<ContentNode> findBySiteIdAndOptionalLocale(@Param("siteId") String siteId,
+                                                    @Param("locale") String locale,
+                                                    Pageable pageable);
+
+    /**
      * Find nodes by site and status.
      */
     Page<ContentNode> findBySiteIdAndStatus(String siteId, NodeStatus status, Pageable pageable);
