@@ -32,6 +32,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/sites', label: 'Sites', icon: <GlobeIcon /> },
       { href: '/workflows', label: 'Workflows', icon: <WorkflowIcon />, badge: 38 },
       { href: '/components', label: 'Components', icon: <ComponentIcon /> },
+      { href: '/experience-fragments', label: 'Experience Fragments', icon: <ExperienceFragmentIcon /> },
     ],
   },
   {
@@ -276,6 +277,17 @@ function TranslateIcon() {
       <path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" />
       <path d="M2 5h12" /><path d="M7 2h1" />
       <path d="m22 22-5-10-5 10" /><path d="M14 18h6" />
+    </svg>
+  );
+}
+
+function ExperienceFragmentIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="17" x2="12" y2="21" />
     </svg>
   );
 }

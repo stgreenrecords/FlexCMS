@@ -50,9 +50,27 @@ Run the appropriate build commands:
 1. If task is COMPLETE: update status to ✅ DONE in §3. Clear module locks in §2. Add a Completion Note in §5 using the DONE template (list all AC verifications, files changed, build status).
 2. If you must STOP before finishing: update status to 🟠 PAUSED in §3. Add a Handoff Note in §5 using the PAUSED template (progress %, what was done, what remains, where you stopped, exact continuation steps).
 
-## Step 8: Continue Automatically
+## Step 8: Push to GitHub
 
-After updating the work board, immediately invoke the `/implement` command again to pick up the next task. Do not wait for the user — keep working through the backlog until the user interrupts the session.
+After the work board is updated, commit and push all changes to the `main` branch:
+
+```bash
+git add -A
+git commit -m "feat(<item-id>): <short description of what was implemented>
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+git push origin main
+```
+
+Rules:
+- Use the item ID as the commit scope (e.g., `feat(P0-XF-02): ...`).
+- Keep the subject line under 72 characters.
+- If `git push` fails due to a diverged remote, run `git pull --rebase origin main` first, then push again.
+- Do NOT force-push. If rebase produces conflicts, stop and report to the user.
+
+## Step 9: Continue Automatically
+
+After pushing, immediately invoke the `/implement` command again to pick up the next task. Do not wait for the user — keep working through the backlog until the user interrupts the session.
 
 ## Begin
 

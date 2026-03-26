@@ -43,7 +43,18 @@ FlexCMS has three independent pillars: Content (CMS), Digital Assets (DAM), and 
    - Change item status to ✅ DONE.
    - Clear the Module Lock Table entry in §2.
    - Add a Completion Note entry in §5 with: AC verification, files changed, build status.
-4. If you could NOT finish: change status to 🟠 PAUSED, write a detailed handoff note in §5 explaining exactly where you stopped, what remains, and step-by-step instructions for the next agent.
+4. **Push to GitHub** — after the work board is updated, commit and push all changes:
+   ```bash
+   git add -A
+   git commit -m "feat(<item-id>): <short description>
+
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+   git push origin main
+   ```
+   - Use the item ID as the commit scope (e.g., `feat(P0-XF-02): ...`).
+   - If `git push` fails due to a diverged remote, run `git pull --rebase origin main` then push again.
+   - Do NOT force-push. If rebase produces conflicts, stop and report to the user.
+5. If you could NOT finish: change status to 🟠 PAUSED, write a detailed handoff note in §5 explaining exactly where you stopped, what remains, and step-by-step instructions for the next agent.
 
 ## Build Commands
 

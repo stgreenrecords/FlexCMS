@@ -149,7 +149,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 | ID | Title | Status | Priority | Effort | Modules Touched | Blocked By | Agent |
 |---|---|---|---|---|---|---|---|
 | P0-XF-01 | **Experience Fragments: Backend** — service, REST API, inline delivery resolution, Flyway migration | ✅ DONE | 🔴 P0 | L | `flexcms-core`, `flexcms-author`, `flexcms-headless` | — | Claude Sonnet 4.6 |
-| P0-XF-02 | **Experience Fragments: Admin UI** — XF browser + XF variation editor page | 🟢 OPEN | 🟡 P1 | L | `frontend/apps/admin` | P0-XF-01 | — |
+| P0-XF-02 | **Experience Fragments: Admin UI** — XF browser + XF variation editor page | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P0-XF-01 | Claude Sonnet 4.6 |
 | SAMPLE-01 | **Sample Website: WKND Adventures** — install/uninstall scripts, SQL seed data, standalone Next.js frontend with WKND component renderers | 🔵 IN PROGRESS | 🟡 P1 | L | `sample-website/` (external folder) | P0-XF-01 | GitHub Copilot |
 
 ### Phase 0 — Context Packets
@@ -565,6 +565,33 @@ output_files:
 ## §5. Completion Notes & Handoff Log
 
 > When you finish or pause an item, add an entry here. This is the most critical section — it enables handoff between agents.
+
+### P0-XF-02 — Experience Fragments: Admin UI
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-26
+**AC Verification:**
+  - [x] XF browser page at `/experience-fragments` — full-page table with tree/list toggle
+  - [x] Tree hierarchy: Site → Locale → Category → XF fragment (4 depth levels)
+  - [x] Columns: Name (with expand/collapse chevron), Variations (count badge), Status, Path, Last Modified, Author
+  - [x] Status badges matching content tree: live/draft/review/archived/error (same STATUS_CONFIG colours)
+  - [x] Tree-aware row expand/collapse with ChevronIcon rotation
+  - [x] Search filter by name or path (works in both list and tree view)
+  - [x] Checkbox multi-select with select-all and indeterminate state
+  - [x] Per-row action menu: leaf XFs show Edit Variations / Publish / Duplicate / Delete; folder nodes show New Fragment Here / Rename / Delete
+  - [x] Create Fragment CTA button and Manage Channels secondary button in header
+  - [x] Breadcrumb: Sites › Experience Fragments
+  - [x] Activity Overview replaced by Usage Overview stat cards: Active Fragments, Localisation, A/B Variants
+  - [x] Right context rail: Version history, Fragment info, Comments, Settings icons
+  - [x] `ExperienceFragmentIcon` added to SidebarNav under Content section
+  - [x] All colours via `var(--color-*)` or design-system palette — no hardcoded values outside design tokens
+  - [x] TypeScript: `npx tsc --noEmit` → 0 errors
+**Files Changed:**
+  - NEW: `frontend/apps/admin/src/app/(admin)/experience-fragments/page.tsx`
+  - MODIFIED: `frontend/apps/admin/src/components/SidebarNav.tsx` (added XF nav item + ExperienceFragmentIcon)
+**Build Verified:** `npx tsc --noEmit` → 0 errors
+
+---
 
 ### P4-05 — Translation: DeepL connector
 **Status:** ✅ DONE

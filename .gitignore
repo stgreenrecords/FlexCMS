@@ -35,9 +35,12 @@ yarn-error.log*
 .eslintcache
 .stylelintcache
 .next/
+**/.nuxt/
+**/.output/
 **/dist/
 **/build/
 .turbo/
+**/next-env.d.ts
 
 # OS files
 .DS_Store
@@ -70,3 +73,4 @@ logs/
 # Optional: TypeScript cache
 *.tsbuildinfo
 /aws.config
+/AEM-Website-Example/
