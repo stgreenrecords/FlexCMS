@@ -331,7 +331,7 @@ output_files:
 | P5-13 | **PIM Admin: catalog browser + product grid** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P3-09, P3-03, P5-01 | GitHub Copilot |
 | P5-14 | **PIM Admin: product editor (schema-driven form)** | ✅ DONE | 🟡 P1 | XL | `frontend/apps/admin` | P5-13, P3-06 | GitHub Copilot |
 | P5-15 | **PIM Admin: import wizard** | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P5-13, P3-05, P5-05 | GitHub Copilot |
-| P5-16 | **PIM Admin: schema visual editor** | 🟢 OPEN | 🟢 P2 | XL | `frontend/apps/admin` | P5-13 | — |
+| P5-16 | **PIM Admin: schema visual editor** | ✅ DONE | 🟢 P2 | XL | `frontend/apps/admin` | P5-13 | Claude Sonnet 4.6 |
 
 ### Bugs & Tech Debt
 
@@ -668,6 +668,27 @@ output_files:
   - MODIFIED: `flexcms/flexcms-pim/src/test/java/com/flexcms/pim/service/ImportServiceTest.java` — added 3 inferSchema tests + `stubSourceWithSchema` helper
   - MODIFIED: `flexcms/flexcms-pim/pom.xml` — added springdoc-openapi-starter-webmvc-ui dependency
 **Build Verified:** `mvn test -pl flexcms-pim -Dtest=ImportServiceTest` → 15 tests, 0 failures; `mvn clean compile` → BUILD SUCCESS (all modules)
+
+---
+
+### P5-16 — PIM Admin: schema visual editor
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-26
+**AC Verification:**
+  - [x] **Design followed** — read `schema_editor_visual_builder/screen.png` + `code.html`; implemented 3-column layout matching design exactly
+  - [x] **Column 1: Field Type Picker** — 6 draggable field type cards (Text Input, Numeric, Select, Assets, Date & Time, Relation) with CSS custom property colors; HTML5 drag-and-drop
+  - [x] **Column 2: Visual Attribute Group Builder** — schema name header, Builder/Diff View toggle, attribute groups with drag-drop zones, field rows (label/internalId/inherited badge/actions), Add New Attribute Group button
+  - [x] **Column 3: Field Properties** — Label input, Internal ID (# prefixed), Required toggle, Validation Regex textarea, Reset/Update buttons, Schema Summary card
+  - [x] **Interactions** — click field → updates properties panel; drag type card to group → adds field; delete button removes field; update button saves property changes
+  - [x] **Navigation** — Schema Editor added to PIM section in SidebarNav with SchemaIcon
+  - [x] **Routing** — page at `/pim/schema`
+  - [x] **CSS custom properties** — uses `var(--color-*)` tokens throughout, no hardcoded colors
+  - [x] **TypeScript** — `npx tsc --noEmit` → 0 errors
+**Files Changed:**
+  - NEW: `frontend/apps/admin/src/app/(admin)/pim/schema/page.tsx`
+  - MODIFIED: `frontend/apps/admin/src/components/SidebarNav.tsx` — added Schema Editor + SchemaIcon
+**Build Verified:** `npx tsc --noEmit` in `apps/admin` → 0 errors
 
 ---
 
