@@ -1,0 +1,35 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "FlexCMS Author DB",
+      "Group": "FlexCMS Local",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "flexcms_author",
+      "Username": "flexcms",
+      "SSLMode": "prefer",
+      "Comment": "CMS author content tree, DAM asset metadata, workflow"
+    },
+    "2": {
+      "Name": "FlexCMS Publish DB",
+      "Group": "FlexCMS Local",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "flexcms_publish",
+      "Username": "flexcms",
+      "SSLMode": "prefer",
+      "Comment": "Read-only replicated content for delivery tier"
+    },
+    "3": {
+      "Name": "FlexCMS PIM DB",
+      "Group": "FlexCMS Local",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "flexcms_pim",
+      "Username": "flexcms",
+      "SSLMode": "prefer",
+      "Comment": "Product Information Management — products, catalogs, schemas"
+    }
+  }
+}
+
