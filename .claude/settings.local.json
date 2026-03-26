@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for f:*)",
+      "Bash(do)",
+      "Bash(sed -i \"s/''LIVE''/''PUBLISHED''/g\" \"$f\")",
+      "Bash(done)",
+      "Bash(grep -c \"''PUBLISHED''\" c:/Users/Viach/IdeaProjects/FlexCMS/sample-website/data/*.sql)",
+      "Bash(chmod +x c:/Users/Viach/IdeaProjects/FlexCMS/sample-website/smoke-test.sh)",
+      "Bash(bash c:/Users/Viach/IdeaProjects/FlexCMS/sample-website/smoke-test.sh)"
+    ]
+  }
+}

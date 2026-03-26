@@ -35,14 +35,14 @@ class ExperienceFragmentServiceTest {
 
     private ContentNode xfFolder(String path) {
         ContentNode n = new ContentNode(path, path.substring(path.lastIndexOf('.') + 1), "flexcms/xf-folder");
-        n.setSiteId("wknd");
+        n.setSiteId("demo-site");
         n.setLocale("en");
         return n;
     }
 
     private ContentNode xfPage(String path) {
         ContentNode n = new ContentNode(path, path.substring(path.lastIndexOf('.') + 1), "flexcms/xf-page");
-        n.setSiteId("wknd");
+        n.setSiteId("demo-site");
         n.setLocale("en");
         return n;
     }
@@ -51,16 +51,16 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void createExperienceFragment_savesXfFolderAndMetadata() {
-        // The path would be experience-fragments.wknd.en.site.header
+        // The path would be experience-fragments.demo-site.en.site.header
         when(nodeRepository.existsByPath(anyString())).thenReturn(false);
         when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(jdbc.update(anyString(), any(Object[].class))).thenReturn(1);
 
         ContentNode result = xfService.createExperienceFragment(
-                "wknd", "en", "site", "header", "Site Header", "Global header", "admin");
+                "demo-site", "en", "site", "header", "Site Header", "Global header", "admin");
 
         assertThat(result.getResourceType()).isEqualTo("flexcms/xf-folder");
-        assertThat(result.getSiteId()).isEqualTo("wknd");
+        assertThat(result.getSiteId()).isEqualTo("demo-site");
         assertThat(result.getLocale()).isEqualTo("en");
         verify(nodeRepository, atLeastOnce()).save(any(ContentNode.class));
     }
@@ -70,7 +70,7 @@ class ExperienceFragmentServiceTest {
         when(nodeRepository.existsByPath(contains("header"))).thenReturn(true);
 
         assertThatThrownBy(() ->
-                xfService.createExperienceFragment("wknd", "en", "site", "header",
+                xfService.createExperienceFragment("demo-site", "en", "site", "header",
                         "Site Header", "Global header", "admin"))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("already exists");
@@ -83,7 +83,7 @@ class ExperienceFragmentServiceTest {
         when(jdbc.update(anyString(), any(Object[].class))).thenReturn(1);
 
         ContentNode result = xfService.createExperienceFragment(
-                "wknd", "en", null, "footer", "Footer", null, "admin");
+                "demo-site", "en", null, "footer", "Footer", null, "admin");
 
         // path should not contain a category segment
         assertThat(result.getPath()).doesNotContain("null");
@@ -93,7 +93,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void addVariation_createsXfPageUnderFolder() {
-        String xfPath = "experience-fragments.wknd.en.site.header";
+        String xfPath = "experience-fragments.demo-site.en.site.header";
         ContentNode folder = xfFolder(xfPath);
         when(nodeRepository.findByPath(xfPath)).thenReturn(Optional.of(folder));
         when(nodeRepository.existsByPath(xfPath + ".master")).thenReturn(false);
@@ -108,7 +108,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void addVariation_throwsConflictWhenVariationAlreadyExists() {
-        String xfPath = "experience-fragments.wknd.en.site.header";
+        String xfPath = "experience-fragments.demo-site.en.site.header";
         when(nodeRepository.findByPath(xfPath)).thenReturn(Optional.of(xfFolder(xfPath)));
         when(nodeRepository.existsByPath(xfPath + ".master")).thenReturn(true);
 
@@ -121,7 +121,7 @@ class ExperienceFragmentServiceTest {
         when(nodeRepository.findByPath(anyString())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
-                xfService.addVariation("experience-fragments.wknd.en.site.missing",
+                xfService.addVariation("experience-fragments.demo-site.en.site.missing",
                         "master", "Master", "admin"))
                 .isInstanceOf(NotFoundException.class);
     }
@@ -131,12 +131,12 @@ class ExperienceFragmentServiceTest {
     @Test
     void listExperienceFragments_returnsRowsFromJdbc() {
         List<Map<String, Object>> rows = List.of(
-                Map.of("xf_path", "experience-fragments.wknd.en.site.header", "title", "Header"),
-                Map.of("xf_path", "experience-fragments.wknd.en.site.footer", "title", "Footer")
+                Map.of("xf_path", "experience-fragments.demo-site.en.site.header", "title", "Header"),
+                Map.of("xf_path", "experience-fragments.demo-site.en.site.footer", "title", "Footer")
         );
-        when(jdbc.queryForList(anyString(), eq("wknd"), eq("en"))).thenReturn(rows);
+        when(jdbc.queryForList(anyString(), eq("demo-site"), eq("en"))).thenReturn(rows);
 
-        List<Map<String, Object>> result = xfService.listExperienceFragments("wknd", "en");
+        List<Map<String, Object>> result = xfService.listExperienceFragments("demo-site", "en");
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).get("title")).isEqualTo("Header");
@@ -144,7 +144,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void getExperienceFragment_returnsNodeWhenResourceTypeMatches() {
-        String path = "experience-fragments.wknd.en.site.header";
+        String path = "experience-fragments.demo-site.en.site.header";
         when(nodeRepository.findByPath(path)).thenReturn(Optional.of(xfFolder(path)));
 
         Optional<ContentNode> result = xfService.getExperienceFragment(path);
@@ -155,7 +155,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void getExperienceFragment_returnsEmptyForWrongResourceType() {
-        String path = "experience-fragments.wknd.en.site.header";
+        String path = "experience-fragments.demo-site.en.site.header";
         ContentNode notAFolder = new ContentNode(path, "header", "flexcms/page");
         when(nodeRepository.findByPath(path)).thenReturn(Optional.of(notAFolder));
 
@@ -166,7 +166,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void listVariations_returnsOnlyXfPageChildren() {
-        String xfPath = "experience-fragments.wknd.en.site.header";
+        String xfPath = "experience-fragments.demo-site.en.site.header";
         ContentNode masterPage = xfPage(xfPath + ".master");
         ContentNode mobilePage = xfPage(xfPath + ".mobile");
         ContentNode container  = new ContentNode(xfPath + ".meta", "meta", "flexcms/container");
@@ -183,7 +183,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void getVariation_returnsVariationByType() {
-        String xfPath = "experience-fragments.wknd.en.site.header";
+        String xfPath = "experience-fragments.demo-site.en.site.header";
         ContentNode master = xfPage(xfPath + ".master");
         when(nodeRepository.findByPath(xfPath + ".master")).thenReturn(Optional.of(master));
 
@@ -194,7 +194,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void getDefaultVariation_prefersMasterVariation() {
-        String xfPath = "experience-fragments.wknd.en.site.header";
+        String xfPath = "experience-fragments.demo-site.en.site.header";
         ContentNode master = xfPage(xfPath + ".master");
         when(nodeRepository.findByPath(xfPath + ".master")).thenReturn(Optional.of(master));
 
@@ -206,7 +206,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void getDefaultVariation_fallsBackToFirstVariationIfNoMaster() {
-        String xfPath = "experience-fragments.wknd.en.site.header";
+        String xfPath = "experience-fragments.demo-site.en.site.header";
         ContentNode email = xfPage(xfPath + ".email");
         when(nodeRepository.findByPath(xfPath + ".master")).thenReturn(Optional.empty());
         when(nodeService.getChildren(xfPath)).thenReturn(List.of(email));
@@ -221,7 +221,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void resolveReference_returnsVariationWithChildren() {
-        String varPath = "experience-fragments.wknd.en.site.header.master";
+        String varPath = "experience-fragments.demo-site.en.site.header.master";
         ContentNode loaded = xfPage(varPath);
         when(nodeService.getWithChildren(varPath)).thenReturn(Optional.of(loaded));
 
@@ -232,7 +232,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void resolveReference_returnsEmptyForNonXfPage() {
-        String path = "experience-fragments.wknd.en.site.header.master";
+        String path = "experience-fragments.demo-site.en.site.header.master";
         ContentNode wrongType = new ContentNode(path, "master", "flexcms/page");
         when(nodeService.getWithChildren(path)).thenReturn(Optional.of(wrongType));
 
@@ -245,7 +245,7 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void deleteExperienceFragment_deletesSubtreeAndMetadata() {
-        String path = "experience-fragments.wknd.en.site.header";
+        String path = "experience-fragments.demo-site.en.site.header";
         when(nodeRepository.findByPath(path)).thenReturn(Optional.of(xfFolder(path)));
 
         xfService.deleteExperienceFragment(path, "admin");
@@ -259,13 +259,13 @@ class ExperienceFragmentServiceTest {
         when(nodeRepository.findByPath(anyString())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() ->
-                xfService.deleteExperienceFragment("experience-fragments.wknd.en.site.missing", "admin"))
+                xfService.deleteExperienceFragment("experience-fragments.demo-site.en.site.missing", "admin"))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void deleteVariation_deletesSubtreeAndUpdatesTimestamp() {
-        String xfPath = "experience-fragments.wknd.en.site.header";
+        String xfPath = "experience-fragments.demo-site.en.site.header";
         String varPath = xfPath + ".mobile";
         when(nodeRepository.findByPath(varPath)).thenReturn(Optional.of(xfPage(varPath)));
 

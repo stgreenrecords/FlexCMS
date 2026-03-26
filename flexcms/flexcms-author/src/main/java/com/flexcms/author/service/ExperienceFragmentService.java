@@ -256,7 +256,7 @@ public class ExperienceFragmentService {
 
     /**
      * Builds the full dot-separated path of the XF folder node.
-     * Example: {@code experience-fragments.wknd.en.site.header}
+     * Example: {@code experience-fragments.my-site.en.site.header}
      */
     private String buildXfPath(String siteId, String locale, String category, String name) {
         StringBuilder sb = new StringBuilder(XF_ROOT)

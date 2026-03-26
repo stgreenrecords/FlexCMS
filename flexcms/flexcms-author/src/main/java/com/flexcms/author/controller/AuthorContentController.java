@@ -68,7 +68,7 @@ public class AuthorContentController {
      * List content nodes for a site, paginated.
      * Used by the admin Content Tree UI.
      *
-     * @param site   site ID (e.g. "wknd") — required
+     * @param site   site ID (e.g. "my-site") — required
      * @param locale locale (e.g. "en") — optional, omit to list all locales
      * @param page   zero-based page index (default 0)
      * @param size   page size (default 50, max 200)

@@ -262,7 +262,7 @@ export default function ContentTreePage() {
   const [nodes, setNodes]             = useState<ContentNode[]>([]);
   const [totalCount, setTotalCount]   = useState(0);
   const [loading, setLoading]         = useState(true);
-  const [site, setSite]               = useState('wknd');
+  const [site, setSite]               = useState('');
 
   useEffect(() => {
     setLoading(true);

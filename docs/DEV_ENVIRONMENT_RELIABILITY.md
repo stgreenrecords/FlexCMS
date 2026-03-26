@@ -82,7 +82,7 @@ Every time a new developer (or AI agent) runs FlexCMS locally, they hit a cascad
 
 ### 7. GraphQL `node()` resolver prepended `content.` to every path
 
-**What happened:** `ContentQueryResolver.toContentPath()` always rewrote `wknd.language-masters.en` → `content.wknd.language-masters.en`. The WKND data lives at `wknd.*`, not `content.wknd.*`. Every `node()` query returned null.
+**What happened:** `ContentQueryResolver.toContentPath()` always rewrote `mysite.language-masters.en` → `content.mysite.language-masters.en`. Content data lives at `mysite.*`, not `content.mysite.*`. Every `node()` query returned null.
 
 **Root cause:** `toContentPath` was a general-purpose helper designed for the `page()` resolver's URL-to-path conversion. It was reused in `node()` where the path is already absolute and must not be modified.
 
@@ -92,21 +92,21 @@ Every time a new developer (or AI agent) runs FlexCMS locally, they hit a cascad
 
 ---
 
-### 8. No smoke test for the sample website install
+### 8. No smoke test for the reference site install
 
 **What happened:** All the above errors were invisible until someone actually ran the app. There is no test that verifies: "after running the install scripts, a GraphQL query for the home page returns a non-null result."
 
-**Root cause:** The sample website was treated as demo content, not as a tested artifact.
+**Root cause:** The reference site was treated as demo content, not as a tested artifact.
 
 **Time lost:** Accumulated across all the above items — total ~4 hours.
 
-**Prevention rule:** Add a minimal `install-smoke-test.sh` to `sample-website/` that:
+**Prevention rule:** Add a minimal `install-smoke-test.sh` to `reference-site/` that:
 1. Runs the SQL seed files
 2. Runs the backend with the local profile
-3. Issues one GraphQL query: `{ node(path: "wknd.language-masters.en") { path } }`
+3. Issues one GraphQL query: `{ node(path: "mysite.language-masters.en") { path } }`
 4. Fails if the result is null
 
-This script should run in CI in the `sample-website` job.
+This script should run in CI in the `reference-site` job.
 
 ---
 

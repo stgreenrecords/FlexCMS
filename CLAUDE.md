@@ -99,7 +99,7 @@ frontend/                         # pnpm + Turborepo monorepo
     └── build-worker/             # Static site compilation worker (Node.js)
 ```
 
-**Content is a tree:** all content lives as PostgreSQL rows with `ltree` paths (`.` separator, e.g. `content.wknd.en.homepage`). URLs use `/` — conversion happens in controllers. JSONB stores component properties per node.
+**Content is a tree:** all content lives as PostgreSQL rows with `ltree` paths (`.` separator, e.g. `content.mysite.en.homepage`). URLs use `/` — conversion happens in controllers. JSONB stores component properties per node.
 
 **Author/Publish separation:** Author (:8080) is read-write; Publish (:8081) is read-only. Changes replicate via RabbitMQ → cache invalidation → CDN purge.
 

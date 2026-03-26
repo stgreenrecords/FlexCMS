@@ -42,7 +42,7 @@ public class ExperienceFragmentController {
      * <p>Example request body:
      * <pre>
      * {
-     *   "siteId":      "wknd",
+     *   "siteId":      "my-site",
      *   "locale":      "en",
      *   "category":    "site",
      *   "name":        "header",
