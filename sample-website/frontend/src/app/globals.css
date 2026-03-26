@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* WKND brand fonts (loaded via Google Fonts in layout) */
+:root {
+  --wknd-yellow: #f7c948;
+  --wknd-black: #202020;
+  --wknd-gray: #f4f4f4;
+  --wknd-white: #ffffff;
+}
+
+body {
+  background: var(--wknd-white);
+  color: var(--wknd-black);
+  font-family: 'Asar', Georgia, serif;
+}
+
+/* Rich text body styles */
+.wknd-richtext h1 { @apply text-4xl font-bold mt-8 mb-4; }
+.wknd-richtext h2 { @apply text-2xl font-bold mt-6 mb-3; }
+.wknd-richtext h3 { @apply text-xl font-semibold mt-5 mb-2; }
+.wknd-richtext p  { @apply mb-4 leading-relaxed; }
+.wknd-richtext a  { @apply underline text-yellow-600 hover:text-yellow-800; }
+.wknd-richtext ul { @apply list-disc list-inside mb-4 space-y-1; }
+.wknd-richtext ol { @apply list-decimal list-inside mb-4 space-y-1; }

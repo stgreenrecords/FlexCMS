@@ -150,7 +150,7 @@ cd apps/site-nextjs && pnpm dev  # Ref site on :3001
 |---|---|---|---|---|---|---|---|
 | P0-XF-01 | **Experience Fragments: Backend** — service, REST API, inline delivery resolution, Flyway migration | ✅ DONE | 🔴 P0 | L | `flexcms-core`, `flexcms-author`, `flexcms-headless` | — | Claude Sonnet 4.6 |
 | P0-XF-02 | **Experience Fragments: Admin UI** — XF browser + XF variation editor page | ✅ DONE | 🟡 P1 | L | `frontend/apps/admin` | P0-XF-01 | Claude Sonnet 4.6 |
-| SAMPLE-01 | **Sample Website: WKND Adventures** — install/uninstall scripts, SQL seed data, standalone Next.js frontend with WKND component renderers | 🔵 IN PROGRESS | 🟡 P1 | L | `sample-website/` (external folder) | P0-XF-01 | GitHub Copilot |
+| SAMPLE-01 | **Sample Website: WKND Adventures** — install/uninstall scripts, SQL seed data, standalone Next.js frontend with WKND component renderers | ✅ DONE | 🟡 P1 | L | `sample-website/` (external folder) | P0-XF-01 | Claude Sonnet 4.6 |
 
 ### Phase 0 — Context Packets
 
@@ -565,6 +565,32 @@ output_files:
 ## §5. Completion Notes & Handoff Log
 
 > When you finish or pause an item, add an entry here. This is the most critical section — it enables handoff between agents.
+
+### SAMPLE-01 — Sample Website: WKND Adventures
+**Status:** ✅ DONE
+**Agent:** Claude Sonnet 4.6
+**Date:** 2026-03-26
+**AC Verification:**
+  - [x] `sample-website/` at project root — zero files inside `flexcms/` or `frontend/`
+  - [x] `install.sh` + `install.ps1`: idempotent (check `SELECT COUNT(*) FROM sites WHERE site_id='wknd'` before inserting)
+  - [x] `uninstall.sh` + `uninstall.ps1`: removes all WKND data with YES confirmation prompt
+  - [x] SQL data files: `01_site_components.sql`, `02_templates.sql`, `03_experience_fragments.sql`, `04_home.sql`, `05_adventures.sql`, `06_magazine.sql`, `07_faqs_about.sql`
+  - [x] All WKND component resource types have a React renderer (Container, Title, Text, Image, Teaser, Carousel, Tabs, Breadcrumb, Navigation, Button, Separator, ImageList, Search, ExperienceFragment)
+  - [x] ExperienceFragmentRenderer fetches XF node via GraphQL and renders inline
+  - [x] README.md explains prerequisites, install steps, run instructions, content paths table
+  - [x] Frontend starts with `cd sample-website/frontend && npm install && npm run dev` (port 3100)
+**Files Changed:**
+  - NEW: `sample-website/data/01_site_components.sql` through `07_faqs_about.sql`
+  - NEW: `sample-website/install.sh`, `install.ps1`, `uninstall.sh`, `uninstall.ps1`
+  - NEW: `sample-website/README.md`
+  - NEW: `sample-website/frontend/package.json`, `tsconfig.json`, `next.config.js`, `tailwind.config.ts`, `postcss.config.js`
+  - NEW: `sample-website/frontend/src/app/globals.css`, `layout.tsx`, `(site)/[[...slug]]/page.tsx`
+  - NEW: `sample-website/frontend/src/lib/flexcms.ts`
+  - NEW: `sample-website/frontend/src/components/ComponentRenderer.tsx`, `component-map.ts`
+  - NEW: `sample-website/frontend/src/components/renderers/` (14 renderer components)
+**Build Verified:** TypeScript checked — standalone Next.js app with no cross-dependencies to main monorepo
+
+---
 
 ### P0-XF-02 — Experience Fragments: Admin UI
 **Status:** ✅ DONE
