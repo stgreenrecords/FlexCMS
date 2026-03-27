@@ -38,8 +38,15 @@ Resources:
     Properties:
       Family: postgres16
       Description: !Sub FlexCMS ${EnvironmentName} PostgreSQL 16 params
+      # NOTE: Do NOT override shared_preload_libraries here.
+      # The RDS default postgres16 parameter group already preloads pg_stat_statements,
+      # auto_explain, and other AWS-managed libraries. Overriding the parameter with a
+      # partial list strips those defaults and causes an immediate CreateDBInstance
+      # rejection. pg_stat_statements is available via: CREATE EXTENSION pg_stat_statements;
       Parameters:
-        shared_preload_libraries: pg_stat_statements
+        log_min_duration_statement: !If [IsProd, '500', '1000']   # log slow queries (ms); dynamic param, no reboot needed
+        log_connections: '1'
+        log_disconnections: '1'
 
   DBInstance:
     Type: AWS::RDS::DBInstance
@@ -47,21 +54,26 @@ Resources:
     Properties:
       DBInstanceIdentifier: !Sub flexcms-${EnvironmentName}
       Engine: postgres
-      EngineVersion: '16.4'
+      EngineVersion: '16.6'
       DBInstanceClass: !Ref DBInstanceClass
       AllocatedStorage: !Ref DBAllocatedStorage
       StorageType: gp3
       MasterUsername: flexcms
       MasterUserPassword: !Ref DBMasterPassword
-      DBName: flexcms
+      # 'postgres' is the standard initial DB. The application databases
+      # (flexcms_author, flexcms_publish, flexcms_pim) are created by Flyway at
+      # first boot — they must not be specified here.
+      DBName: postgres
       DBSubnetGroupName: !Ref DBSubnetGroup
       DBParameterGroupName: !Ref DBParameterGroup
       VPCSecurityGroups:
         - !Ref DatabaseSecurityGroup
       MultiAZ: !If [IsProd, true, false]
       StorageEncrypted: !If [IsProd, true, false]
-      BackupRetentionPeriod: !If [IsProd, 14, 3]
-      PreferredBackupWindow: '03:00-04:00'
+      BackupRetentionPeriod: !If [IsProd, 14, 0]
+      # BackupRetentionPeriod=0 (QA) means automated backups are disabled.
+      # AWS rejects PreferredBackupWindow when backups are off, so gate on prod.
+      PreferredBackupWindow: !If [IsProd, '03:00-04:00', !Ref 'AWS::NoValue']
       PreferredMaintenanceWindow: 'sun:04:00-sun:05:00'
       PubliclyAccessible: false
       CopyTagsToSnapshot: true

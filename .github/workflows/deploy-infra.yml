@@ -1,0 +1,84 @@
+name: Deploy Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'qa'
+        type: choice
+        options: [qa, prod]
+      action:
+        description: 'CloudFormation action'
+        required: true
+        default: 'create'
+        type: choice
+        options: [create, update]
+      image_tag:
+        description: 'Backend Docker image tag'
+        required: false
+        default: 'latest'
+
+env:
+  AWS_REGION: eu-central-1
+
+jobs:
+  deploy:
+    name: Deploy CFN — ${{ inputs.environment }} (${{ inputs.action }})
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Deploy CloudFormation stacks
+        env:
+          FLEXCMS_DB_PASSWORD: ${{ secrets.FLEXCMS_DB_PASSWORD }}
+          FLEXCMS_MQ_PASSWORD: ${{ secrets.FLEXCMS_MQ_PASSWORD }}
+        run: |
+          chmod +x infra/scripts/deploy.sh
+          infra/scripts/deploy.sh \
+            --env        "${{ inputs.environment }}" \
+            --action     "${{ inputs.action }}" \
+            --image-tag  "${{ inputs.image_tag }}" \
+            --region     "${{ env.AWS_REGION }}"
+
+      - name: Show DNS records to configure
+        if: success()
+        env:
+          ENV: ${{ inputs.environment }}
+        run: |
+          STACK="flexcms-${ENV}"
+          query() { aws cloudformation describe-stacks --stack-name "$STACK" \
+            --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" \
+            --output text --region ${{ env.AWS_REGION }}; }
+
+          CF_DOMAIN=$(query CloudFrontDomain)
+          AUTHOR=$(query AuthorALBDns)
+          ADMIN=$(query AdminALBDns)
+          SITE=$(query SiteALBDns)
+          RDS=$(query RDSEndpoint)
+
+          echo ""
+          echo "════════════════════════════════════════════"
+          echo "  DNS RECORDS FOR ${ENV}.flexcmsdemo.store"
+          echo "════════════════════════════════════════════"
+          printf "%-40s  CNAME  %s\n" "${ENV}.flexcmsdemo.store"       "$CF_DOMAIN"
+          printf "%-40s  CNAME  %s\n" "api.${ENV}.flexcmsdemo.store"   "$AUTHOR"
+          printf "%-40s  CNAME  %s\n" "admin.${ENV}.flexcmsdemo.store" "$ADMIN"
+          printf "%-40s  CNAME  %s\n" "site.${ENV}.flexcmsdemo.store"  "$SITE"
+          echo ""
+          echo "RDS endpoint (internal): $RDS"
+          echo ""
+          echo "Next: run init-rds.sh to create flexcms_author/publish/pim databases:"
+          echo "  bash infra/scripts/init-rds.sh ${ENV} ${RDS}"
+
