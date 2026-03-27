@@ -2,6 +2,7 @@ package com.flexcms.pim.component;
 
 import com.flexcms.plugin.annotation.FlexCmsComponent;
 import com.flexcms.plugin.annotation.ValueMapValue;
+import com.flexcms.plugin.dam.DamClient;
 import com.flexcms.plugin.pim.PimClient;
 import com.flexcms.plugin.pim.PimProductData;
 import com.flexcms.plugin.spi.AbstractComponentModel;
@@ -56,12 +57,16 @@ public class ProductTeaserModel extends AbstractComponentModel {
     @ValueMapValue
     private String ctaLink;
 
-    // ── PIM-enriched data (resolved at render time) ───────────────────────────
+    // ── PIM + DAM enriched data (resolved at render time) ────────────────────
 
     private PimProductData product;
+    private List<Map<String, Object>> enrichedAssets;
 
     @Autowired
     private PimClient pimClient;
+
+    @Autowired
+    private DamClient damClient;
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -72,7 +77,13 @@ public class ProductTeaserModel extends AbstractComponentModel {
             if (product == null) {
                 log.debug("ProductTeaserModel: product not found for SKU '{}' at path '{}'",
                         productSku, getResource() != null ? getResource().getPath() : "unknown");
+                enrichedAssets = List.of();
+            } else {
+                // Enrich asset refs with actual DAM URLs, dimensions, and MIME types
+                enrichedAssets = damClient.enrichProductAssets(product.getAssets());
             }
+        } else {
+            enrichedAssets = List.of();
         }
     }
 
@@ -86,33 +97,37 @@ public class ProductTeaserModel extends AbstractComponentModel {
     }
 
     /**
-     * Hero image URL derived from the product's DAM assets (role = "hero").
-     * Returns null if no hero asset is linked.
+     * Product asset refs enriched with DAM metadata (url, thumbnailUrl, width, height, mimeType).
+     * In template order: hero first, then gallery, thumbnail, swatch, document.
      */
-    public String getHeroImagePath() {
-        if (product == null || product.getAssets() == null) return null;
-        return product.getAssets().stream()
+    public List<Map<String, Object>> getAssets() {
+        return enrichedAssets;
+    }
+
+    /**
+     * Hero image URL — first asset with role "hero", resolved via DAM.
+     */
+    public String getHeroImageUrl() {
+        return enrichedAssets.stream()
                 .filter(a -> "hero".equals(a.get("role")))
-                .map(a -> (String) a.get("path"))
+                .map(a -> (String) a.get("url"))
                 .findFirst()
                 .orElse(null);
     }
 
     /**
-     * Thumbnail image URL (role = "thumbnail" or first available asset).
+     * Thumbnail URL — first asset with role "thumbnail", or first asset if none.
      */
-    public String getThumbnailPath() {
-        if (product == null || product.getAssets() == null) return null;
-        List<Map<String, Object>> assets = product.getAssets();
-        String thumbnail = assets.stream()
+    public String getThumbnailUrl() {
+        String url = enrichedAssets.stream()
                 .filter(a -> "thumbnail".equals(a.get("role")))
-                .map(a -> (String) a.get("path"))
+                .map(a -> (String) a.get("url"))
                 .findFirst()
                 .orElse(null);
-        if (thumbnail == null && !assets.isEmpty()) {
-            thumbnail = (String) assets.get(0).get("path");
+        if (url == null && !enrichedAssets.isEmpty()) {
+            url = (String) enrichedAssets.get(0).get("url");
         }
-        return thumbnail;
+        return url;
     }
 
     /**

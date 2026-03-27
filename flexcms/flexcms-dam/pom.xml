@@ -18,6 +18,10 @@
             <groupId>com.flexcms</groupId>
             <artifactId>flexcms-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-plugin-api</artifactId>
+        </dependency>
 
         <!-- MinIO S3 client -->
         <dependency>

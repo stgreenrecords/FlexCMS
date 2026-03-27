@@ -129,7 +129,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P1-10 | ✅ DONE | **Admin UI — DAM browser with upload** | 4d | `apps/admin`, `packages/ui` | P0-06 |
 | P1-11 | ✅ DONE | **Admin UI — Site management page (real data, no mocks)** | 2d | `apps/admin` | P0-06 |
 | P1-12 | ✅ DONE | **PIM ↔ CMS integration — product enrichment in ComponentModels** | 3d | `flexcms-pim`, `flexcms-core`, `flexcms-plugin-api` | — |
-| P1-13 | 🟢 OPEN | **PIM ↔ DAM integration — product asset linking** | 2d | `flexcms-pim`, `flexcms-dam` | — |
+| P1-13 | ✅ DONE | **PIM ↔ DAM integration — product asset linking** | 2d | `flexcms-pim`, `flexcms-dam` | — |
 | P1-14 | ✅ DONE | **Automated data seeding script — re-runnable setup for TUT sample website** | 2d | `scripts`, `flexcms-app` | P0-11 |
 | P1-15 | ✅ DONE | **Admin UI — Content Tree folder-style navigation (lazy-load children on row click)** | 4h | `apps/admin`, `flexcms-author` | — |
 
@@ -522,6 +522,28 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-13 — PIM ↔ DAM Integration — Product Asset Linking
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `DamAssetData` DTO created in `flexcms-plugin-api` (`com.flexcms.plugin.dam`): fields path, name, mimeType, fileSize, width, height, streamUrl, thumbnailUrl; isImage()/isVideo() helpers
+  - [x] AC2 — `DamClient` interface created in `flexcms-plugin-api`: getAssetByPath(), getBulkByPath(), getRenditionUrl(), enrichProductAssets(), exists()
+  - [x] AC3 — `DirectDamClient` implemented in `flexcms-dam` (`com.flexcms.dam.client`): delegates to AssetIngestService; builds stream URLs as `/api/author/assets/{id}/content`; enrichProductAssets() adds url, thumbnailUrl, width, height, mimeType, name, fileSize to each ref map
+  - [x] AC4 — `flexcms-dam/pom.xml` updated to add `flexcms-plugin-api` dependency
+  - [x] AC5 — `ProductTeaserModel` updated to inject `DamClient`; `postInject()` calls `damClient.enrichProductAssets()` after PIM resolution; getAssets(), getHeroImageUrl(), getThumbnailUrl() return DAM-enriched data
+  - [x] AC6 — `ProductAssetRef` model, service, and REST endpoints already existed (link/unlink/update via `/api/pim/v1/products/{sku}/assets`) — verified complete
+  - [x] AC7 — `mvn clean compile` passes all modules; 125 PIM tests + DAM tests, 0 failures
+**Files Changed:**
+  - `flexcms-plugin-api/.../dam/DamAssetData.java` — NEW
+  - `flexcms-plugin-api/.../dam/DamClient.java` — NEW
+  - `flexcms-dam/.../client/DirectDamClient.java` — NEW
+  - `flexcms-dam/pom.xml` — added flexcms-plugin-api dependency
+  - `flexcms-pim/.../component/ProductTeaserModel.java` — updated to inject DamClient + enrich assets
+**Build Verified:** Yes — `mvn clean compile` passes; 125 tests, 0 failures
 
 ---
 
