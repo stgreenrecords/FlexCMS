@@ -128,7 +128,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P1-09 | ✅ DONE | **Admin UI — Content tree browser** | 5d | `apps/admin`, `packages/ui` | P0-06 |
 | P1-10 | ✅ DONE | **Admin UI — DAM browser with upload** | 4d | `apps/admin`, `packages/ui` | P0-06 |
 | P1-11 | ✅ DONE | **Admin UI — Site management page (real data, no mocks)** | 2d | `apps/admin` | P0-06 |
-| P1-12 | 🟢 OPEN | **PIM ↔ CMS integration — product enrichment in ComponentModels** | 3d | `flexcms-pim`, `flexcms-core`, `flexcms-plugin-api` | — |
+| P1-12 | ✅ DONE | **PIM ↔ CMS integration — product enrichment in ComponentModels** | 3d | `flexcms-pim`, `flexcms-core`, `flexcms-plugin-api` | — |
 | P1-13 | 🟢 OPEN | **PIM ↔ DAM integration — product asset linking** | 2d | `flexcms-pim`, `flexcms-dam` | — |
 | P1-14 | ✅ DONE | **Automated data seeding script — re-runnable setup for TUT sample website** | 2d | `scripts`, `flexcms-app` | P0-11 |
 | P1-15 | ✅ DONE | **Admin UI — Content Tree folder-style navigation (lazy-load children on row click)** | 4h | `apps/admin`, `flexcms-author` | — |
@@ -522,6 +522,26 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-12 — PIM ↔ CMS Integration — Product Enrichment in ComponentModels
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `ProductTeaserModel` (`tut/product-teaser`): resolves single product by SKU via PimClient; exposes product data, heroImagePath, thumbnailPath, price derived getters; authored props: productSku, displayMode, showPrice, ctaLabel, ctaLink
+  - [x] AC2 — `ProductSpecsModel` (`tut/product-specs`): resolves product and builds ordered spec rows; author controls highlighted spec keys; remaining attributes appended in natural order; camelCase-to-label conversion
+  - [x] AC3 — `ModelComparisonModel` (`tut/model-comparison`): bulk-resolves 2–4 products via PimClient.getBulk(); builds comparison grid rows {attribute, label, values[]}; exposed as getComparisonRows(), getProductNames(), getProductSkuList()
+  - [x] AC4 — All three models use `@FlexCmsComponent` → auto-registered in ComponentRegistry at startup
+  - [x] AC5 — All models extend `AbstractComponentModel`, use `@ValueMapValue` for authored props, `@Autowired PimClient` for enrichment; postInject() pattern followed correctly
+  - [x] AC6 — Null-safe when SKU missing or product not in PIM: isProductFound() returns false, specs/products are empty lists
+  - [x] AC7 — `mvn clean compile -pl flexcms-pim -am` passes; 125 PIM tests pass, 0 failures
+**Files Changed:**
+  - `flexcms-pim/src/main/java/com/flexcms/pim/component/ProductTeaserModel.java` — NEW
+  - `flexcms-pim/src/main/java/com/flexcms/pim/component/ProductSpecsModel.java` — NEW
+  - `flexcms-pim/src/main/java/com/flexcms/pim/component/ModelComparisonModel.java` — NEW
+**Build Verified:** Yes — `mvn clean compile` passes; 125 tests, 0 failures
 
 ---
 
