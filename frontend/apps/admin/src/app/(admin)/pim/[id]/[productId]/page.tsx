@@ -197,6 +197,11 @@ export default function ProductEditorPage() {
   const [category, setCategory] = useState('');
   const [sku, setSku] = useState('');
   const [specPanel, setSpecPanel] = useState('');
+  const [msrp, setMsrp] = useState('');
+  const [productStatus, setProductStatus] = useState('DRAFT');
+  const [description, setDescription] = useState('');
+  const [modifiedAt, setModifiedAt] = useState('');
+  const [modifiedBy, setModifiedBy] = useState('');
   const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [assets] = useState<LinkedAsset[]>([]);
   const [activeQuickNav, setActiveQuickNav] = useState('general');
@@ -210,13 +215,42 @@ export default function ProductEditorPage() {
       .then((data: Record<string, unknown>) => {
         setProductName((data.name as string) ?? '');
         setSku((data.sku as string) ?? productId);
+        setProductStatus((data.status as string) ?? 'DRAFT');
+        setModifiedAt((data.updatedAt as string) ?? '');
+        setModifiedBy((data.updatedBy as string) ?? '');
         const attrs = (data.attributes as Record<string, unknown>) ?? {};
         setBrand((attrs.brand as string) ?? '');
         setCategory((attrs.category as string) ?? '');
         setSpecPanel((attrs.panel as string) ?? '');
+        setMsrp(attrs.price != null ? String(attrs.price) : '');
+        setDescription((attrs.description as string) ?? '');
       })
       .catch(() => {
         // API unavailable — leave fields empty
+      });
+
+    fetch(`${API_BASE}/api/pim/v1/products/${productId}/variants`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data: Record<string, unknown>[]) => {
+        const mapped: ProductVariant[] = data.map((v) => {
+          const inv = (v.inventory as Record<string, unknown>) ?? {};
+          const variantAttrs = (v.attributes as Record<string, unknown>) ?? {};
+          const apiStatus = (v.status as string ?? '').toUpperCase();
+          let status: VariantStatus = 'draft';
+          if (apiStatus === 'ACTIVE') status = 'live';
+          else if (apiStatus === 'OUT_OF_STOCK' || apiStatus === 'INACTIVE') status = 'oos';
+          return {
+            id: String(v.id ?? ''),
+            skuSuffix: (v.variantSku as string) ?? '',
+            region: (variantAttrs.region as string) ?? '',
+            stock: Number(inv.stock ?? inv.quantity ?? 0),
+            status,
+          };
+        });
+        setVariants(mapped);
+      })
+      .catch(() => {
+        // variants unavailable — leave empty
       })
       .finally(() => setIsLoading(false));
   }, [productId]);
@@ -225,12 +259,29 @@ export default function ProductEditorPage() {
 
   const handleSaveDraft = () => {
     setIsSaving(true);
-    setTimeout(() => { setIsSaving(false); setIsDirty(false); }, 1200);
+    fetch(`${API_BASE}/api/pim/v1/products/${sku}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        attributes: { brand, category, panel: specPanel, price: msrp ? Number(msrp) : undefined, description },
+        userId: 'admin',
+      }),
+    })
+      .then((r) => { if (r.ok) setIsDirty(false); })
+      .catch(() => {})
+      .finally(() => setIsSaving(false));
   };
 
   const handlePublish = () => {
     setIsPublishing(true);
-    setTimeout(() => { setIsPublishing(false); setIsDirty(false); }, 1500);
+    fetch(`${API_BASE}/api/pim/v1/products/${sku}/status`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'PUBLISHED', userId: 'admin' }),
+    })
+      .then((r) => { if (r.ok) { setProductStatus('PUBLISHED'); setIsDirty(false); } })
+      .catch(() => {})
+      .finally(() => setIsPublishing(false));
   };
 
   const dataHealth: DataHealthItem[] = [
@@ -280,7 +331,10 @@ export default function ProductEditorPage() {
             SKU: {sku}
           </h1>
           <p className="text-sm mt-0.5" style={{ color: '#8d90a0' }}>
-            Last modified: 2 hours ago by <span style={{ color: '#e5e2e1' }}>Alex Rivera</span>
+            {modifiedAt
+              ? <>Last modified: <span style={{ color: '#e5e2e1' }}>{new Date(modifiedAt).toLocaleDateString()}</span>{modifiedBy ? <> by <span style={{ color: '#e5e2e1' }}>{modifiedBy}</span></> : null}</>
+              : 'Last modified: —'
+            }
             {isDirty && <span className="ml-2 text-xs font-bold" style={{ color: '#ffb59b' }}>• Unsaved changes</span>}
           </p>
         </div>
@@ -342,15 +396,13 @@ export default function ProductEditorPage() {
               </Field>
 
               <Field label="Brand">
-                <select
+                <input
                   style={inputStyle}
                   value={brand}
                   onChange={(e) => { setBrand(e.target.value); markDirty(); }}
-                >
-                  <option>Quantum Electronics</option>
-                  <option>Aether Home</option>
-                  <option>NovaTech</option>
-                </select>
+                  onFocus={(e) => (e.currentTarget.style.borderBottomColor = '#b0c6ff')}
+                  onBlur={(e) => (e.currentTarget.style.borderBottomColor = 'transparent')}
+                />
               </Field>
 
               <Field label="Primary Category">
@@ -366,18 +418,22 @@ export default function ProductEditorPage() {
               <Field label="MSRP (USD)">
                 <input
                   type="number"
-                  defaultValue={1299}
+                  value={msrp}
                   style={inputStyle}
-                  onChange={markDirty}
+                  onChange={(e) => { setMsrp(e.target.value); markDirty(); }}
                   onFocus={(e) => (e.currentTarget.style.borderBottomColor = '#b0c6ff')}
                   onBlur={(e) => (e.currentTarget.style.borderBottomColor = 'transparent')}
                 />
               </Field>
 
               <Field label="Status">
-                <select style={inputStyle} onChange={markDirty}>
+                <select
+                  style={inputStyle}
+                  value={productStatus}
+                  onChange={(e) => { setProductStatus(e.target.value); markDirty(); }}
+                >
                   <option value="DRAFT">Draft</option>
-                  <option value="PUBLISHED" selected>Published</option>
+                  <option value="PUBLISHED">Published</option>
                   <option value="ARCHIVED">Archived</option>
                 </select>
               </Field>
@@ -385,9 +441,9 @@ export default function ProductEditorPage() {
               <Field label="Long Description" colSpan={2}>
                 <textarea
                   rows={4}
-                  defaultValue="Experience the future of home entertainment with the Quantum X-Series Ultra OLED 55. Featuring True-Black OLED technology, a 120Hz native refresh rate, and AI-powered upscaling."
+                  value={description}
                   style={{ ...inputStyle, borderRadius: 6, resize: 'vertical' }}
-                  onChange={markDirty}
+                  onChange={(e) => { setDescription(e.target.value); markDirty(); }}
                   onFocus={(e) => (e.currentTarget.style.borderBottomColor = '#b0c6ff')}
                   onBlur={(e) => (e.currentTarget.style.borderBottomColor = 'transparent')}
                 />

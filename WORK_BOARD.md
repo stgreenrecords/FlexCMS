@@ -139,7 +139,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 |----|--------|-------|--------|-----------------|------------|
 | P2-01 | ✅ DONE | **Admin UI — Page editor with auto-generated forms from component schema** | 5d | `apps/admin`, `packages/ui` | P1-09 |
 | P2-02 | ✅ DONE | **Admin UI — Workflow inbox (submit/approve/reject)** | 3d | `apps/admin`, `packages/ui` | P1-09 |
-| P2-03 | 🟢 OPEN | **Admin UI — PIM product grid + editor** | 4d | `apps/admin`, `packages/ui` | P0-06 |
+| P2-03 | ✅ DONE | **Admin UI — PIM product grid + editor** | 4d | `apps/admin`, `packages/ui` | P0-06 |
 | P2-04 | 🟢 OPEN | **Content preview — iframe-based preview in admin** | 3d | `apps/admin`, `apps/site-nextjs` | P2-01 |
 | P2-05 | 🟢 OPEN | **Scheduled publishing — timer-based workflow step** | 2d | `flexcms-author`, `flexcms-core` | — |
 | P2-06 | 🟢 OPEN | **Live copy / content sharing — cross-site inheritance** | 3d | `flexcms-core`, `flexcms-i18n` | — |
@@ -522,6 +522,24 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P2-03 — Admin UI — PIM Product Grid + Editor
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `handleSaveDraft` wired to `PUT /api/pim/v1/products/{sku}` with `{attributes: {brand, category, panel, price, description}, userId: "admin"}` — no mock `setTimeout`
+  - [x] AC2 — `handlePublish` wired to `PUT /api/pim/v1/products/{sku}/status` with `{status: "PUBLISHED", userId: "admin"}` — no mock `setTimeout`
+  - [x] AC3 — Variants fetched from `GET /api/pim/v1/products/{sku}/variants` in `useEffect`; mapped to frontend `ProductVariant` type (variantSku, attributes.region, inventory.stock, status→live/oos/draft)
+  - [x] AC4 — "Last modified" line uses real `updatedAt` and `updatedBy` from API response (formatted as date + user)
+  - [x] AC5 — Brand input changed from hardcoded `<select>` to controlled text input backed by API `attributes.brand`
+  - [x] AC6 — MSRP, Status select, Long Description all use controlled state populated from API (`attributes.price`, `status`, `attributes.description`)
+  - [x] AC7 — `pnpm build` passes with 0 errors
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/pim/[id]/[productId]/page.tsx` — wired save/publish to real API, variants fetch, removed all mock data and `defaultValue` uncontrolled inputs
+**Build Verified:** Yes — `pnpm build` ✅ 0 errors, 18/18 routes
 
 ---
 
