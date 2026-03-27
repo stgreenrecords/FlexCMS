@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: FlexCMS — S3 buckets for DAM assets, static site, and CFN templates.
+Description: FlexCMS — S3 buckets for DAM assets and static site output.
 
 Parameters:
   EnvironmentName:
@@ -10,6 +10,7 @@ Resources:
   AssetsBucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       BucketName: !Sub flexcms-${EnvironmentName}-assets-${AWS::AccountId}
       VersioningConfiguration:
@@ -31,6 +32,8 @@ Resources:
 
   StaticSiteBucket:
     Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       BucketName: !Sub flexcms-${EnvironmentName}-static-${AWS::AccountId}
       PublicAccessBlockConfiguration:
@@ -42,15 +45,11 @@ Resources:
         - Key: Environment
           Value: !Ref EnvironmentName
 
-  TemplatesBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub flexcms-${EnvironmentName}-cfn-templates-${AWS::AccountId}
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+  # NOTE: The CFN templates bucket (flexcms-<env>-cfn-templates-<accountId>) is a
+  # BOOTSTRAP resource — deploy.sh creates it with `aws s3 mb` before this stack runs
+  # and uploads nested templates into it. Do NOT manage it here: if it were defined as a
+  # CFN resource with DeletionPolicy:Retain, every redeploy after a rollback would fail
+  # with "bucket already exists" because CFN tries to CREATE it again.
 
 Outputs:
   AssetsBucketName:
@@ -69,6 +68,4 @@ Outputs:
     Value: !GetAtt StaticSiteBucket.Arn
     Export:
       Name: !Sub ${AWS::StackName}-StaticBucketArn
-  TemplatesBucketName:
-    Value: !Ref TemplatesBucket
 

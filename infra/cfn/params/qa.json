@@ -1,7 +1,7 @@
 [
   {"ParameterKey": "EnvironmentName",            "ParameterValue": "qa"},
-  {"ParameterKey": "DBInstanceClass",            "ParameterValue": "db.t3.medium"},
-  {"ParameterKey": "DBAllocatedStorage",         "ParameterValue": "50"},
+  {"ParameterKey": "DBInstanceClass",            "ParameterValue": "db.t3.micro"},
+  {"ParameterKey": "DBAllocatedStorage",         "ParameterValue": "20"},
   {"ParameterKey": "CacheNodeType",              "ParameterValue": "cache.t3.micro"},
   {"ParameterKey": "BrokerInstanceType",         "ParameterValue": "mq.m5.large"},
   {"ParameterKey": "AuthorDesiredCount",         "ParameterValue": "1"},

@@ -7,7 +7,7 @@ Parameters:
     AllowedValues: [qa, prod]
   DBInstanceClass:
     Type: String
-    Default: db.t3.medium
+    Default: db.t3.micro
   DBAllocatedStorage:
     Type: Number
     Default: 50
