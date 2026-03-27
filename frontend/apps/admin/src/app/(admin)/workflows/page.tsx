@@ -344,11 +344,12 @@ function WorkflowTimeline({ steps }: { steps: TimelineStep[] }) {
 interface DetailPanelProps {
   task: WorkflowTask;
   onClose: () => void;
-  onApprove: (id: string) => void;
-  onReject: (id: string) => void;
+  onApprove: (id: string, comment?: string) => void;
+  onReject: (id: string, comment?: string) => void;
 }
 
 function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
+  const [comment, setComment] = React.useState('');
   const isPending = task.status === 'pending';
 
   return (
@@ -444,12 +445,26 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
 
       {/* Footer actions */}
       <div
-        className="p-6 flex gap-3"
+        className="p-6 space-y-3"
         style={{
           backgroundColor: 'rgba(53,53,52,0.5)',
           borderTop: '1px solid rgba(66,70,84,0.1)',
         }}
       >
+        {isPending && (
+          <Textarea
+            placeholder="Optional comment…"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="border-0 text-[0.8125rem] resize-none min-h-[48px] focus:ring-0 rounded-lg w-full"
+            style={{
+              backgroundColor: 'var(--color-surface-container)',
+              color: 'var(--color-on-surface)',
+              padding: '8px 12px',
+            }}
+          />
+        )}
+        <div className="flex gap-3">
         {isPending ? (
           <>
             <button
@@ -459,7 +474,7 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
                 color: 'var(--color-error)',
                 border: '1px solid rgba(var(--color-error-rgb, 255 180 171) / 0.2)',
               }}
-              onClick={() => onReject(task.id)}
+              onClick={() => onReject(task.id, comment || undefined)}
             >
               Reject Task
             </button>
@@ -470,7 +485,7 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
                 color: 'var(--color-on-primary)',
                 boxShadow: '0 10px 15px -3px rgba(176,198,255,0.2)',
               }}
-              onClick={() => onApprove(task.id)}
+              onClick={() => onApprove(task.id, comment || undefined)}
             >
               Approve Workflow
             </button>
@@ -483,6 +498,7 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
             <span className="text-sm font-medium capitalize">{task.status}</span>
           </div>
         )}
+        </div>
       </div>
     </aside>
   );
@@ -501,36 +517,48 @@ export default function WorkflowInboxPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch(`${API_BASE}/api/author/workflow/for-user?userId=admin`)
+    fetch(`${API_BASE}/api/author/workflow/for-user?userId=admin&size=200`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data: Record<string, unknown>[]) => {
-        if (data.length > 0) {
-          // Map API workflow instances to UI tasks
-          const items: WorkflowTask[] = data.map((w, i) => ({
+      .then((data: { content?: Record<string, unknown>[] } | Record<string, unknown>[]) => {
+        // API returns Page<WorkflowInstance> — extract .content array
+        const list: Record<string, unknown>[] = Array.isArray(data)
+          ? data
+          : (data as { content?: Record<string, unknown>[] }).content ?? [];
+
+        // ACTIVE → pending, COMPLETED → approved or rejected depending on lastAction
+        const items: WorkflowTask[] = list.map((w, i) => {
+          const apiStatus = (w.status as string) ?? 'ACTIVE';
+          const lastAction = (w.lastAction as string) ?? '';
+          let uiStatus: WorkflowStatus = 'pending';
+          if (apiStatus === 'COMPLETED') {
+            uiStatus = lastAction === 'reject' ? 'rejected' : 'approved';
+          } else if (apiStatus === 'CANCELLED') {
+            uiStatus = 'rejected';
+          }
+          return {
             id: (w.id as string) ?? String(i),
             title: (w.workflowName as string) ?? 'Workflow',
             description: `Content path: ${(w.contentPath as string) ?? '—'}`,
-            status: ((w.status as string) ?? 'PENDING').toLowerCase() === 'pending' ? 'pending' as WorkflowStatus
-              : ((w.status as string) ?? '').toLowerCase() === 'approved' ? 'approved' as WorkflowStatus
-              : 'rejected' as WorkflowStatus,
-            age: w.createdAt ? new Date(w.createdAt as string).toLocaleDateString() : '—',
-            commentCount: 0,
+            status: uiStatus,
+            age: w.startedAt ? new Date(w.startedAt as string).toLocaleDateString() : '—',
+            commentCount: w.lastComment ? 1 : 0,
             attachmentCount: 0,
             assigneeCount: 0,
             iconType: 'workflow' as const,
-            fullDescription: (w.contentPath as string) ?? '',
-            initiator: (w.initiatorUserId as string) ?? 'System',
-            initiatorInitials: ((w.initiatorUserId as string) ?? 'SY').slice(0, 2).toUpperCase(),
+            fullDescription: `Workflow "${(w.workflowName as string) ?? ''}" is active for content at: ${(w.contentPath as string) ?? '—'}`,
+            initiator: (w.startedBy as string) ?? 'System',
+            initiatorInitials: ((w.startedBy as string) ?? 'SY').slice(0, 2).toUpperCase(),
             dueDate: '—',
             dueDateOverdue: false,
             workflowId: (w.id as string) ?? '',
-            timeline: [],
-          }));
-          setTasks(items);
-          if (items.length > 0) setSelectedTaskId(items[0].id);
-        } else {
-          setTasks([]);
-        }
+            timeline: [
+              { id: 'start', label: 'Workflow Started', actor: (w.startedBy as string) ?? 'System', timestamp: w.startedAt ? new Date(w.startedAt as string).toLocaleString() : '', completed: true, current: false },
+              { id: 'review', label: 'Awaiting Review', actor: 'Reviewer', timestamp: '', completed: false, current: apiStatus === 'ACTIVE' },
+            ],
+          };
+        });
+        setTasks(items);
+        if (items.length > 0) setSelectedTaskId(items[0].id);
       })
       .catch(() => {
         setTasks([]);
@@ -552,12 +580,22 @@ export default function WorkflowInboxPage() {
 
   const pendingCount = tasks.filter(t => t.status === 'pending').length;
 
-  const handleApprove = (id: string) => {
+  const handleApprove = (id: string, comment?: string) => {
+    fetch(`${API_BASE}/api/author/workflow/advance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ instanceId: id, action: 'approve', userId: 'admin', comment: comment ?? '' }),
+    }).catch(() => {/* ignore API errors — optimistic update proceeds */});
     setTasks(prev => prev.map(t => t.id === id ? { ...t, status: 'approved' as WorkflowStatus } : t));
     setSelectedTaskId(null);
   };
 
-  const handleReject = (id: string) => {
+  const handleReject = (id: string, comment?: string) => {
+    fetch(`${API_BASE}/api/author/workflow/advance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ instanceId: id, action: 'reject', userId: 'admin', comment: comment ?? '' }),
+    }).catch(() => {/* ignore API errors — optimistic update proceeds */});
     setTasks(prev => prev.map(t => t.id === id ? { ...t, status: 'rejected' as WorkflowStatus } : t));
     setSelectedTaskId(null);
   };

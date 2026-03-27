@@ -138,7 +138,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
 | P2-01 | ✅ DONE | **Admin UI — Page editor with auto-generated forms from component schema** | 5d | `apps/admin`, `packages/ui` | P1-09 |
-| P2-02 | 🟢 OPEN | **Admin UI — Workflow inbox (submit/approve/reject)** | 3d | `apps/admin`, `packages/ui` | P1-09 |
+| P2-02 | ✅ DONE | **Admin UI — Workflow inbox (submit/approve/reject)** | 3d | `apps/admin`, `packages/ui` | P1-09 |
 | P2-03 | 🟢 OPEN | **Admin UI — PIM product grid + editor** | 4d | `apps/admin`, `packages/ui` | P0-06 |
 | P2-04 | 🟢 OPEN | **Content preview — iframe-based preview in admin** | 3d | `apps/admin`, `apps/site-nextjs` | P2-01 |
 | P2-05 | 🟢 OPEN | **Scheduled publishing — timer-based workflow step** | 2d | `flexcms-author`, `flexcms-core` | — |
@@ -522,6 +522,27 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P2-02 — Admin UI — Workflow Inbox (Submit/Approve/Reject)
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — Backend: `GET /api/author/workflow/for-user?userId=&page=&size=` added to `AuthorWorkflowController`; returns `Page<WorkflowInstance>` of all ACTIVE instances
+  - [x] AC2 — Backend: `GET /api/author/workflow/list?status=&page=&size=` added for listing by status (ACTIVE/COMPLETED/CANCELLED)
+  - [x] AC3 — Backend: `WorkflowEngine.listByStatus()` and `listForUser()` service methods added; controller never calls repository directly
+  - [x] AC4 — Frontend: API response correctly parsed as `Page<WorkflowInstance>` (extracts `.content` array); maps `lastAction` to approved/rejected UI status
+  - [x] AC5 — Frontend: Approve calls `POST /api/author/workflow/advance` with `{instanceId, action:"approve", userId, comment}`
+  - [x] AC6 — Frontend: Reject calls `POST /api/author/workflow/advance` with `{instanceId, action:"reject", userId, comment}`
+  - [x] AC7 — Frontend: Optional comment textarea in DetailPanel footer for approve/reject actions
+  - [x] AC8 — `mvn clean compile` passes; `pnpm build` passes
+**Files Changed:**
+  - `flexcms-author/.../service/WorkflowEngine.java` — added `listByStatus()` and `listForUser()` methods
+  - `flexcms-author/.../controller/AuthorWorkflowController.java` — added `GET /list` and `GET /for-user` endpoints
+  - `frontend/apps/admin/src/app/(admin)/workflows/page.tsx` — real API integration, comment textarea, wired approve/reject
+**Build Verified:** Yes — `mvn clean compile` ✅; `pnpm build` ✅
 
 ---
 

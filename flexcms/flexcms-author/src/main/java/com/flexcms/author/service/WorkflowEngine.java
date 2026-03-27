@@ -17,6 +17,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.Instant;
 import java.util.*;
 
@@ -153,6 +156,22 @@ public class WorkflowEngine {
      */
     public Optional<WorkflowInstance> getActiveWorkflow(String contentPath) {
         return instanceRepo.findByContentPathAndStatus(contentPath, WorkflowStatus.ACTIVE);
+    }
+
+    /**
+     * List workflow instances by status, paginated.
+     */
+    public Page<WorkflowInstance> listByStatus(WorkflowStatus status, Pageable pageable) {
+        return instanceRepo.findByStatus(status, pageable);
+    }
+
+    /**
+     * List workflow instances pending action by the given user.
+     * In this implementation returns all ACTIVE instances (no per-user step filtering
+     * is performed — all reviewers/publishers see the same inbox in local dev).
+     */
+    public Page<WorkflowInstance> listForUser(String userId, Pageable pageable) {
+        return instanceRepo.findByStatus(WorkflowStatus.ACTIVE, pageable);
     }
 
     // --- Private helpers ---

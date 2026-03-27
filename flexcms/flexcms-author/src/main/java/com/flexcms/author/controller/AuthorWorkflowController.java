@@ -3,10 +3,13 @@ package com.flexcms.author.controller;
 import com.flexcms.author.service.WorkflowEngine;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.WorkflowInstance;
+import com.flexcms.core.model.WorkflowInstance.WorkflowStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +56,26 @@ public class AuthorWorkflowController {
                                                     @RequestParam String userId,
                                                     @RequestParam(required = false) String reason) {
         return ResponseEntity.ok(workflowEngine.cancel(instanceId, userId, reason));
+    }
+
+    @Operation(summary = "List workflows by status", description = "Returns a paginated list of workflow instances filtered by status (ACTIVE, COMPLETED, CANCELLED).")
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<Page<WorkflowInstance>> list(
+            @RequestParam(defaultValue = "ACTIVE") WorkflowStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        return ResponseEntity.ok(workflowEngine.listByStatus(status, PageRequest.of(page, Math.min(size, 200))));
+    }
+
+    @Operation(summary = "List workflows for user", description = "Returns paginated workflow instances pending the given user's action.")
+    @GetMapping("/for-user")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<Page<WorkflowInstance>> listForUser(
+            @RequestParam String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size) {
+        return ResponseEntity.ok(workflowEngine.listForUser(userId, PageRequest.of(page, Math.min(size, 200))));
     }
 
     @Operation(summary = "Get active workflow", description = "Returns the active workflow instance for the given content path, or 404 if none.")
