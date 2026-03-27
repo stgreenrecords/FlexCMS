@@ -1,0 +1,326 @@
+# ==============================================================================
+# FlexCMS Helm Chart — Default Values
+# ==============================================================================
+# Override these values in values-qa.yaml or values-prod.yaml.
+# All sensitive credentials should be provided via --set or an external secret
+# manager (AWS Secrets Manager, Vault, Sealed Secrets).
+
+# ------------------------------------------------------------------------------
+# Global image settings
+# ------------------------------------------------------------------------------
+image:
+  # Backend image (author + publish share the same image; mode set via SPRING_PROFILES_ACTIVE)
+  backend:
+    repository: ghcr.io/flexcms/flexcms-app
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+  # Admin UI image (Next.js)
+  admin:
+    repository: ghcr.io/flexcms/flexcms-admin
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# ------------------------------------------------------------------------------
+# Service Account
+# ------------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# ------------------------------------------------------------------------------
+# Author tier — read-write API (Content + DAM + PIM)
+# Profile: SPRING_PROFILES_ACTIVE=author
+# ------------------------------------------------------------------------------
+author:
+  enabled: true
+  replicaCount: 1
+
+  # Ports
+  containerPort: 8080
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "768Mi"
+    limits:
+      cpu: "2000m"
+      memory: "1536Mi"
+
+  service:
+    type: ClusterIP   # Internal only — expose via Ingress with auth annotations
+    port: 8080
+
+  # Pod disruption budget
+  podDisruptionBudget:
+    enabled: false   # Author runs fixed replicas; PDB unnecessary
+
+  # Rolling update strategy (zero-downtime redeploys)
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  # Startup / liveness / readiness probes
+  probes:
+    startup:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      failureThreshold: 12       # allow up to 2 min for startup
+    liveness:
+      initialDelaySeconds: 0
+      periodSeconds: 30
+      failureThreshold: 3
+    readiness:
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      failureThreshold: 3
+
+  # Extra annotations on the author Deployment pods
+  podAnnotations: {}
+
+  # Node selector / tolerations / affinity
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+  # Extra environment variables
+  extraEnv: []
+
+# ------------------------------------------------------------------------------
+# Publish tier — read-only headless delivery
+# Profile: SPRING_PROFILES_ACTIVE=publish
+# ------------------------------------------------------------------------------
+publish:
+  enabled: true
+  replicaCount: 2
+
+  containerPort: 8081
+
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1024Mi"
+
+  service:
+    type: ClusterIP
+    port: 8081
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 60
+    targetMemoryUtilizationPercentage: 80
+
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1   # always keep at least 1 publish pod alive
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+
+  probes:
+    startup:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      failureThreshold: 12
+    liveness:
+      initialDelaySeconds: 0
+      periodSeconds: 30
+      failureThreshold: 3
+    readiness:
+      initialDelaySeconds: 0
+      periodSeconds: 10
+      failureThreshold: 3
+
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+
+# ------------------------------------------------------------------------------
+# Admin UI — Next.js frontend (port 3000)
+# ------------------------------------------------------------------------------
+admin:
+  enabled: true
+  replicaCount: 1
+
+  containerPort: 3000
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+
+  probes:
+    liveness:
+      path: /api/health
+      initialDelaySeconds: 15
+      periodSeconds: 30
+    readiness:
+      path: /api/health
+      initialDelaySeconds: 5
+      periodSeconds: 10
+
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnv: []
+
+# ------------------------------------------------------------------------------
+# Ingress
+# ------------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+  hosts:
+    # Public headless delivery (Publish tier)
+    - host: api.flexcms.example.com
+      paths:
+        - path: /api/content
+          pathType: Prefix
+          backend: publish
+        - path: /graphql
+          pathType: Prefix
+          backend: publish
+        - path: /graphiql
+          pathType: Prefix
+          backend: publish
+        - path: /dam/renditions
+          pathType: Prefix
+          backend: publish
+        - path: /actuator/health
+          pathType: Prefix
+          backend: publish
+    # Author API (internal — protect with auth annotations in prod)
+    - host: author.flexcms.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: author
+    # Admin UI
+    - host: admin.flexcms.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: admin
+  tls: []
+  # tls:
+  #   - secretName: flexcms-tls
+  #     hosts:
+  #       - api.flexcms.example.com
+  #       - author.flexcms.example.com
+  #       - admin.flexcms.example.com
+
+# ------------------------------------------------------------------------------
+# External dependencies — connection details
+# These do NOT deploy the dependencies; use separate charts (bitnami/postgresql,
+# bitnami/redis, bitnami/rabbitmq) or managed cloud services.
+# ------------------------------------------------------------------------------
+postgresql:
+  # CMS databases (author + publish share the same PostgreSQL cluster)
+  host: "postgresql"
+  port: 5432
+  authorDatabase: "flexcms_author"
+  publishDatabase: "flexcms_publish"
+  pimDatabase: "flexcms_pim"
+  username: "flexcms"
+  # password — set via --set postgresql.password=... or existingSecret
+  password: ""
+  existingSecret: ""        # name of a pre-existing Secret with key "postgresql-password"
+
+redis:
+  host: "redis-master"
+  port: 6379
+
+rabbitmq:
+  host: "rabbitmq"
+  port: 5672
+  username: "guest"
+  # password — set via --set rabbitmq.password=... or existingSecret
+  password: ""
+  existingSecret: ""        # key: "rabbitmq-password"
+
+s3:
+  endpoint: ""              # leave blank for AWS S3; set "http://minio:9000" for MinIO
+  bucket: "flexcms-assets"
+  region: "us-east-1"
+  accessKeyId: ""
+  # secretAccessKey — set via --set s3.secretAccessKey=... or existingSecret
+  secretAccessKey: ""
+  existingSecret: ""        # keys: "s3-access-key-id", "s3-secret-access-key"
+
+elasticsearch:
+  uris: "http://elasticsearch:9200"
+
+# ------------------------------------------------------------------------------
+# Application security
+# ------------------------------------------------------------------------------
+security:
+  jwt:
+    # Keycloak / Auth0 / Okta issuer URI
+    issuerUri: "http://keycloak:8080/realms/flexcms"
+    existingSecret: ""      # key: "jwt-issuer-uri"
+
+# ------------------------------------------------------------------------------
+# FlexCMS feature flags
+# ------------------------------------------------------------------------------
+flexcms:
+  # Author-tier specific flags
+  author:
+    runmode: author
+  # Publish-tier specific flags
+  publish:
+    runmode: publish
+    cacheWarming:
+      enabled: true
+      concurrency: 4
+      connectTimeoutMs: 5000
+      readTimeoutMs: 10000
+
+# ------------------------------------------------------------------------------
+# Pod Security Context
+# ------------------------------------------------------------------------------
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false   # Spring Boot writes temp files
+  capabilities:
+    drop:
+      - ALL
+

@@ -1,0 +1,27 @@
+apiVersion: v2
+name: flexcms
+description: >
+  FlexCMS – Enterprise Headless CMS with Content (CMS), Digital Assets (DAM), and
+  Products (PIM) pillars. Deploys the Author (read-write) and Publish (read-only)
+  backend tiers plus the Admin UI frontend.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - cms
+  - headless
+  - content-management
+  - dam
+  - pim
+
+home: https://github.com/FlexCMS/flexcms
+sources:
+  - https://github.com/FlexCMS/flexcms
+
+maintainers:
+  - name: FlexCMS Team
+
+# Minimum Helm version required
+engine: gotpl
+

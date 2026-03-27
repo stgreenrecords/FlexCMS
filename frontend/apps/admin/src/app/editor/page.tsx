@@ -1,7 +1,26 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  closestCenter,
+  useDraggable,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -192,8 +211,14 @@ function EditorInner() {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
-  const dragSrc = useRef<string | null>(null);
+  // dnd-kit drag state
+  const [activeDrag, setActiveDrag] = useState<{ type: 'canvas'; component: PageComponent } | { type: 'palette'; item: PaletteItem } | null>(null);
+  // Insert-preview index: which canvas slot the palette item will land in
+  const [insertPreviewIdx, setInsertPreviewIdx] = useState<number | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+  );
 
   // ── Fetch registry + page on mount ────────────────────────────────────────
 
@@ -261,6 +286,74 @@ function EditorInner() {
     setSelectedId(newComp.instanceId);
   }
 
+  function addComponentAtIndex(item: PaletteItem, idx: number) {
+    instanceCounter++;
+    const newComp: PageComponent = {
+      instanceId: `inst-${instanceCounter}`,
+      resourceType: item.resourceType,
+      label: item.label,
+      props: { ...item.defaultProps },
+    };
+    setComponents((prev) => {
+      const clamped = Math.max(0, Math.min(idx, prev.length));
+      return [...prev.slice(0, clamped), newComp, ...prev.slice(clamped)];
+    });
+    setSelectedId(newComp.instanceId);
+  }
+
+  // ── dnd-kit handlers ──────────────────────────────────────────────────────
+
+  function handleDragStart(event: DragStartEvent) {
+    const { active } = event;
+    const id = String(active.id);
+    if (id.startsWith('palette:')) {
+      // Use data passed via useDraggable's data option
+      const item = (active.data.current as { item?: PaletteItem } | undefined)?.item;
+      if (item) setActiveDrag({ type: 'palette', item });
+    } else {
+      const comp = components.find((c) => c.instanceId === id);
+      if (comp) setActiveDrag({ type: 'canvas', component: comp });
+    }
+    setInsertPreviewIdx(null);
+  }
+
+  function handleDragOver(event: DragOverEvent) {
+    const { over } = event;
+    if (!over || activeDrag?.type !== 'palette') return;
+    const overId = String(over.id);
+    // over a canvas item → preview insert before it
+    const idx = components.findIndex((c) => c.instanceId === overId);
+    setInsertPreviewIdx(idx >= 0 ? idx : components.length);
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    const activeId = String(active.id);
+
+    try {
+      if (activeDrag?.type === 'palette') {
+        // Drop from palette
+        const item = activeDrag.item;
+        const overIdx = over
+          ? components.findIndex((c) => c.instanceId === String(over.id))
+          : -1;
+        addComponentAtIndex(item, overIdx >= 0 ? overIdx : components.length);
+      } else if (activeDrag?.type === 'canvas') {
+        // Reorder within canvas
+        if (over && activeId !== String(over.id)) {
+          setComponents((prev) => {
+            const oldIdx = prev.findIndex((c) => c.instanceId === activeId);
+            const newIdx = prev.findIndex((c) => c.instanceId === String(over.id));
+            return arrayMove(prev, oldIdx, newIdx);
+          });
+        }
+      }
+    } finally {
+      setActiveDrag(null);
+      setInsertPreviewIdx(null);
+    }
+  }
+
   function deleteComponent(instanceId: string) {
     setComponents((prev) => prev.filter((c) => c.instanceId !== instanceId));
     if (selectedId === instanceId) setSelectedId(null);
@@ -288,24 +381,6 @@ function EditorInner() {
       ),
     );
   }, [selectedId]);
-
-  function handleDropAtIndex(idx: number) {
-    const paletteId = dragSrc.current;
-    if (!paletteId) return;
-    const item = palette.find((p) => p.resourceType === paletteId);
-    if (!item) return;
-    instanceCounter++;
-    const newComp: PageComponent = {
-      instanceId: `inst-${instanceCounter}`,
-      resourceType: item.resourceType,
-      label: item.label,
-      props: { ...item.defaultProps },
-    };
-    setComponents((prev) => [...prev.slice(0, idx), newComp, ...prev.slice(idx)]);
-    setSelectedId(newComp.instanceId);
-    setDragOverIdx(null);
-    dragSrc.current = null;
-  }
 
   async function handleSave() {
     if (isSaving) return;
@@ -532,20 +607,11 @@ function EditorInner() {
                       </p>
                       <div className="grid grid-cols-2 gap-2">
                         {items.map((item) => (
-                          <div
+                          <DraggablePaletteItem
                             key={item.resourceType}
-                            draggable
-                            onDragStart={() => { dragSrc.current = item.resourceType; }}
-                            onClick={() => addComponent(item)}
-                            className="flex flex-col items-center justify-center p-3 rounded-lg border transition-all cursor-grab select-none"
-                            style={{ background: '#201f1f', border: '1px solid rgba(66,70,84,0.2)' }}
-                            title={`Drag or click to add ${item.label}`}
-                          >
-                            <span className="mb-2" style={{ color: '#8d90a0' }}><BlockIcon /></span>
-                            <span className="text-[11px] text-center leading-tight" style={{ color: '#c3c6d6' }}>
-                              {item.label}
-                            </span>
-                          </div>
+                            item={item}
+                            onAdd={() => addComponent(item)}
+                          />
                         ))}
                       </div>
                     </div>
@@ -610,53 +676,94 @@ function EditorInner() {
               transition: 'width 0.3s ease',
             }}
           >
-            <DropZone
-              isActive={dragOverIdx === 0}
-              onDragOver={() => setDragOverIdx(0)}
-              onDragLeave={() => setDragOverIdx(null)}
-              onDrop={() => handleDropAtIndex(0)}
-            />
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={components.map((c) => c.instanceId)}
+                strategy={verticalListSortingStrategy}
+              >
+                {/* Insert-preview drop hint at the top */}
+                {activeDrag?.type === 'palette' && insertPreviewIdx === 0 && (
+                  <InsertPreview />
+                )}
 
-            {components.map((comp, idx) => (
-              <React.Fragment key={comp.instanceId}>
-                <CanvasComponent
-                  component={comp}
-                  isSelected={selectedId === comp.instanceId}
-                  onClick={(e) => { e.stopPropagation(); setSelectedId(comp.instanceId); }}
-                  onDelete={() => deleteComponent(comp.instanceId)}
-                  onDuplicate={() => duplicateComponent(comp.instanceId)}
-                  onMoveUp={() => {
-                    if (idx === 0) return;
-                    setComponents((prev) => {
-                      const arr = [...prev];
-                      [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
-                      return arr;
-                    });
-                  }}
-                  onMoveDown={() => {
-                    if (idx === components.length - 1) return;
-                    setComponents((prev) => {
-                      const arr = [...prev];
-                      [arr[idx + 1], arr[idx]] = [arr[idx], arr[idx + 1]];
-                      return arr;
-                    });
-                  }}
-                />
-                <DropZone
-                  isActive={dragOverIdx === idx + 1}
-                  onDragOver={() => setDragOverIdx(idx + 1)}
-                  onDragLeave={() => setDragOverIdx(null)}
-                  onDrop={() => handleDropAtIndex(idx + 1)}
-                />
-              </React.Fragment>
-            ))}
+                {components.map((comp, idx) => (
+                  <React.Fragment key={comp.instanceId}>
+                    <SortableCanvasItem
+                      component={comp}
+                      isSelected={selectedId === comp.instanceId}
+                      isDragging={activeDrag?.type === 'canvas' && activeDrag.component.instanceId === comp.instanceId}
+                      onClick={(e) => { e.stopPropagation(); setSelectedId(comp.instanceId); }}
+                      onDelete={() => deleteComponent(comp.instanceId)}
+                      onDuplicate={() => duplicateComponent(comp.instanceId)}
+                      onMoveUp={() => {
+                        if (idx === 0) return;
+                        setComponents((prev) => arrayMove(prev, idx, idx - 1));
+                      }}
+                      onMoveDown={() => {
+                        if (idx === components.length - 1) return;
+                        setComponents((prev) => arrayMove(prev, idx, idx + 1));
+                      }}
+                    />
+                    {/* Insert-preview between items when dragging from palette */}
+                    {activeDrag?.type === 'palette' && insertPreviewIdx === idx + 1 && (
+                      <InsertPreview />
+                    )}
+                  </React.Fragment>
+                ))}
+              </SortableContext>
 
-            {components.length === 0 && (
-              <div className="flex flex-col items-center justify-center gap-4 py-32" style={{ color: '#8d90a0' }}>
-                <PlusIcon />
-                <p className="text-sm">Select a component from the left panel to start building</p>
-              </div>
-            )}
+              {/* Default drop hint at the bottom when no specific preview */}
+              {activeDrag?.type === 'palette' && insertPreviewIdx === null && (
+                <InsertPreview />
+              )}
+
+              {components.length === 0 && !activeDrag && (
+                <div className="flex flex-col items-center justify-center gap-4 py-32" style={{ color: '#8d90a0' }}>
+                  <PlusIcon />
+                  <p className="text-sm">Select a component from the left panel to start building</p>
+                </div>
+              )}
+
+              {/* Drag overlay — floating "ghost" while dragging */}
+              <DragOverlay dropAnimation={{ duration: 180, easing: 'ease' }}>
+                {activeDrag?.type === 'canvas' && (
+                  <div
+                    style={{
+                      border: '2px solid #b0c6ff',
+                      borderRadius: 4,
+                      boxShadow: '0 8px 32px rgba(176,198,255,0.15)',
+                      opacity: 0.85,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <ComponentPreview component={activeDrag.component} />
+                  </div>
+                )}
+                {activeDrag?.type === 'palette' && (
+                  <div
+                    className="flex flex-col items-center justify-center p-3 rounded-lg"
+                    style={{
+                      width: 110,
+                      background: '#324575',
+                      border: '1px solid rgba(176,198,255,0.5)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                      opacity: 0.95,
+                    }}
+                  >
+                    <span className="mb-2" style={{ color: '#b0c6ff' }}><BlockIcon /></span>
+                    <span className="text-[11px] text-center leading-tight font-semibold" style={{ color: '#b0c6ff' }}>
+                      {activeDrag.item.label}
+                    </span>
+                  </div>
+                )}
+              </DragOverlay>
+            </DndContext>
           </div>
         </section>
 
@@ -758,40 +865,117 @@ function EditorInner() {
 }
 
 // ---------------------------------------------------------------------------
-// DropZone
+// InsertPreview — visual indicator of where a palette item will be dropped
 // ---------------------------------------------------------------------------
 
-function DropZone({ isActive, onDragOver, onDragLeave, onDrop }: {
-  isActive: boolean;
-  onDragOver: () => void;
-  onDragLeave: () => void;
-  onDrop: () => void;
-}) {
+function InsertPreview() {
   return (
     <div
-      onDragOver={(e) => { e.preventDefault(); onDragOver(); }}
-      onDragLeave={onDragLeave}
-      onDrop={(e) => { e.preventDefault(); onDrop(); }}
-      className="flex items-center justify-center transition-all"
+      className="flex items-center justify-center"
       style={{
-        height: isActive ? 80 : 24,
+        height: 64,
         margin: '0 24px',
-        border: isActive ? '2px dashed rgba(176,198,255,0.6)' : '2px dashed rgba(66,70,84,0.2)',
+        border: '2px dashed rgba(176,198,255,0.6)',
         borderRadius: 12,
-        background: isActive ? 'rgba(176,198,255,0.05)' : 'transparent',
+        background: 'rgba(176,198,255,0.05)',
       }}
     >
-      {isActive && (
-        <p className="text-xs font-medium flex items-center gap-2" style={{ color: '#b0c6ff' }}>
-          <PlusIcon /> Drop component here
-        </p>
-      )}
+      <p className="text-xs font-medium flex items-center gap-2" style={{ color: '#b0c6ff' }}>
+        <PlusIcon /> Drop component here
+      </p>
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// CanvasComponent — renders a component with selection overlay
+// DraggablePaletteItem — palette card that can be dragged onto the canvas
+// ---------------------------------------------------------------------------
+
+function DraggablePaletteItem({ item, onAdd }: { item: PaletteItem; onAdd: () => void }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `palette:${item.resourceType}`,
+    data: { type: 'palette', item },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      onClick={onAdd}
+      className="flex flex-col items-center justify-center p-3 rounded-lg border transition-all cursor-grab select-none"
+      style={{
+        background: isDragging ? 'rgba(176,198,255,0.1)' : '#201f1f',
+        border: isDragging ? '1px solid rgba(176,198,255,0.5)' : '1px solid rgba(66,70,84,0.2)',
+        opacity: isDragging ? 0.5 : 1,
+        touchAction: 'none',
+      }}
+      title={`Drag or click to add ${item.label}`}
+    >
+      <span className="mb-2" style={{ color: '#8d90a0' }}><BlockIcon /></span>
+      <span className="text-[11px] text-center leading-tight" style={{ color: '#c3c6d6' }}>
+        {item.label}
+      </span>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// SortableCanvasItem — wraps CanvasComponent with dnd-kit sortable behaviour
+// ---------------------------------------------------------------------------
+
+function SortableCanvasItem({
+  component,
+  isSelected,
+  isDragging,
+  onClick,
+  onDelete,
+  onDuplicate,
+  onMoveUp,
+  onMoveDown,
+}: {
+  component: PageComponent;
+  isSelected: boolean;
+  isDragging: boolean;
+  onClick: (e: React.MouseEvent) => void;
+  onDelete: () => void;
+  onDuplicate: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({ id: component.instanceId });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isSortableDragging || isDragging ? 0.35 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <CanvasComponent
+        component={component}
+        isSelected={isSelected}
+        onClick={onClick}
+        onDelete={onDelete}
+        onDuplicate={onDuplicate}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CanvasComponent — renders a component with selection overlay + drag handle
 // ---------------------------------------------------------------------------
 
 function CanvasComponent({
@@ -802,6 +986,7 @@ function CanvasComponent({
   onDuplicate,
   onMoveUp,
   onMoveDown,
+  dragHandleProps,
 }: {
   component: PageComponent;
   isSelected: boolean;
@@ -810,6 +995,7 @@ function CanvasComponent({
   onDuplicate: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  dragHandleProps?: Record<string, unknown>;
 }) {
   return (
     <div
@@ -825,6 +1011,15 @@ function CanvasComponent({
           className="absolute flex items-center gap-3 px-3 py-1 rounded-t-lg text-[11px] font-bold"
           style={{ top: -36, left: -2, background: '#b0c6ff', color: '#002d6f', zIndex: 10 }}
         >
+          {/* Drag handle — activates dnd-kit sortable */}
+          <span
+            {...(dragHandleProps as React.HTMLAttributes<HTMLSpanElement>)}
+            title="Drag to reorder"
+            style={{ cursor: 'grab', display: 'flex', alignItems: 'center', color: '#002d6f' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <DragHandleIcon />
+          </span>
           <span>{component.label}</span>
           <div className="flex gap-2">
             <button title="Move up"   onClick={(e) => { e.stopPropagation(); onMoveUp(); }}   style={{ color: '#002d6f' }}><ArrowUpIcon /></button>
@@ -1131,3 +1326,4 @@ function TrashIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fi
 function ArrowUpIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>; }
 function ArrowDownIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>; }
 function BlockIcon() { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>; }
+function DragHandleIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="7" r="1.5"/><circle cx="15" cy="7" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="17" r="1.5"/><circle cx="15" cy="17" r="1.5"/></svg>; }

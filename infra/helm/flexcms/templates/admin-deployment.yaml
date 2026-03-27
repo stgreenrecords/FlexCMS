@@ -1,0 +1,104 @@
+{{- if .Values.admin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flexcms.fullname" . }}-admin
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexcms.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admin
+spec:
+  {{- if not .Values.admin.autoscaling.enabled }}
+  replicas: {{ .Values.admin.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "flexcms.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: admin
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "flexcms.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: admin
+      {{- with .Values.admin.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "flexcms.serviceAccountName" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: admin
+          image: "{{ .Values.image.admin.repository }}:{{ .Values.image.admin.tag }}"
+          imagePullPolicy: {{ .Values.image.admin.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: {{ .Values.admin.containerPort }}
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: NEXT_TELEMETRY_DISABLED
+              value: "1"
+            # Author API URL (internal cluster address)
+            - name: NEXT_PUBLIC_FLEXCMS_API
+              value: "http://{{ include "flexcms.fullname" . }}-author:{{ .Values.author.service.port }}"
+            # Publish API URL
+            - name: NEXT_PUBLIC_FLEXCMS_PUBLISH_URL
+              value: "http://{{ include "flexcms.fullname" . }}-publish:{{ .Values.publish.service.port }}"
+            {{- with .Values.admin.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.admin.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.admin.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admin.probes.liveness.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.admin.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.admin.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.admin.probes.readiness.periodSeconds }}
+          resources:
+            {{- toYaml .Values.admin.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /.next/cache
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+      {{- with .Values.admin.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+

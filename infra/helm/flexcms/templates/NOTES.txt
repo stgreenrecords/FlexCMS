@@ -1,0 +1,38 @@
+Thank you for installing {{ .Chart.Name }} v{{ .Chart.AppVersion }}!
+
+{{- if .Values.author.enabled }}
+Author API (read-write):
+  kubectl port-forward svc/{{ include "flexcms.fullname" . }}-author 8080:{{ .Values.author.service.port }}
+  http://localhost:8080/api/author/
+  http://localhost:8080/swagger-ui.html
+  http://localhost:8080/graphiql
+{{- end }}
+
+{{- if .Values.publish.enabled }}
+Publish API (read-only delivery):
+  kubectl port-forward svc/{{ include "flexcms.fullname" . }}-publish 8081:{{ .Values.publish.service.port }}
+  http://localhost:8081/api/content/v1/
+{{- end }}
+
+{{- if .Values.admin.enabled }}
+Admin UI:
+  kubectl port-forward svc/{{ include "flexcms.fullname" . }}-admin 3000:{{ .Values.admin.service.port }}
+  http://localhost:3000
+{{- end }}
+
+{{- if .Values.ingress.enabled }}
+Ingress hosts configured:
+{{- range .Values.ingress.hosts }}
+  https://{{ .host }}
+{{- end }}
+{{- end }}
+
+External dependencies required (not deployed by this chart):
+  - PostgreSQL {{ .Values.postgresql.host }}:{{ .Values.postgresql.port }}
+  - Redis       {{ .Values.redis.host }}:{{ .Values.redis.port }}
+  - RabbitMQ    {{ .Values.rabbitmq.host }}:{{ .Values.rabbitmq.port }}
+  - Elasticsearch {{ .Values.elasticsearch.uris }}
+  - S3/MinIO    {{ if .Values.s3.endpoint }}{{ .Values.s3.endpoint }}{{ else }}AWS S3 (native){{ end }}
+
+Docs: https://github.com/FlexCMS/flexcms/blob/main/infra/README.md
+

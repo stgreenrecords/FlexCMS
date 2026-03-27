@@ -93,6 +93,14 @@ flexcms:
   cache:
     redis:
       enabled: true
+    warming:
+      enabled: false           # Enable on publish tier via application-publish.yml
+      publish-base-url: http://localhost:8081
+      paths:
+        - /
+      concurrency: 4
+      connect-timeout-ms: 5000
+      read-timeout-ms: 10000
 
   # CDN providers (all disabled by default — enable in publish-tier YAML)
   cdn:

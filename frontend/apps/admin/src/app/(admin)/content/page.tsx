@@ -563,7 +563,6 @@ function ContentRow({
       }}
       onMouseLeave={(e) => {
         if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.background = 'transparent';
-        if (showActionMenu) onActionMenu(null);
       }}
     >
       {/* Checkbox — stops propagation so clicking it doesn't navigate */}

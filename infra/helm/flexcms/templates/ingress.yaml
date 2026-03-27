@@ -1,0 +1,47 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "flexcms.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexcms.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.ingress.className }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    {{- toYaml .Values.ingress.tls | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                {{- if eq .backend "author" }}
+                name: {{ include "flexcms.fullname" $ }}-author
+                port:
+                  number: {{ $.Values.author.service.port }}
+                {{- else if eq .backend "publish" }}
+                name: {{ include "flexcms.fullname" $ }}-publish
+                port:
+                  number: {{ $.Values.publish.service.port }}
+                {{- else if eq .backend "admin" }}
+                name: {{ include "flexcms.fullname" $ }}-admin
+                port:
+                  number: {{ $.Values.admin.service.port }}
+                {{- end }}
+          {{- end }}
+    {{- end }}
+{{- end }}
+

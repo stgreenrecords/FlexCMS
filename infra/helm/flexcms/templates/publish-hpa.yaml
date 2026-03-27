@@ -1,0 +1,48 @@
+{{- if and .Values.publish.enabled .Values.publish.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "flexcms.fullname" . }}-publish
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexcms.labels" . | nindent 4 }}
+    app.kubernetes.io/component: publish
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "flexcms.fullname" . }}-publish
+  minReplicas: {{ .Values.publish.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.publish.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.publish.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.publish.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.publish.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.publish.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 4
+          periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300   # 5 min cool-down before scaling down
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 120
+{{- end }}
+

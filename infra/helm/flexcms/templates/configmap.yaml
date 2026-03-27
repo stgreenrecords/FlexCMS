@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flexcms.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexcms.labels" . | nindent 4 }}
+data:
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  POSTGRESQL_HOST: {{ .Values.postgresql.host | quote }}
+  POSTGRESQL_PORT: {{ .Values.postgresql.port | quote }}
+  POSTGRESQL_USERNAME: {{ .Values.postgresql.username | quote }}
+  POSTGRESQL_AUTHOR_DB: {{ .Values.postgresql.authorDatabase | quote }}
+  POSTGRESQL_PUBLISH_DB: {{ .Values.postgresql.publishDatabase | quote }}
+  POSTGRESQL_PIM_DB: {{ .Values.postgresql.pimDatabase | quote }}
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  REDIS_HOST: {{ .Values.redis.host | quote }}
+  REDIS_PORT: {{ .Values.redis.port | quote }}
+
+  # ── RabbitMQ ───────────────────────────────────────────────────────────────
+  RABBITMQ_HOST: {{ .Values.rabbitmq.host | quote }}
+  RABBITMQ_PORT: {{ .Values.rabbitmq.port | quote }}
+  RABBITMQ_USERNAME: {{ .Values.rabbitmq.username | quote }}
+
+  # ── Elasticsearch ──────────────────────────────────────────────────────────
+  ELASTICSEARCH_URIS: {{ .Values.elasticsearch.uris | quote }}
+
+  # ── S3 / MinIO ─────────────────────────────────────────────────────────────
+  S3_ENDPOINT: {{ .Values.s3.endpoint | quote }}
+  S3_BUCKET: {{ .Values.s3.bucket | quote }}
+  S3_REGION: {{ .Values.s3.region | quote }}
+
+  # ── Cache warming (publish tier) ───────────────────────────────────────────
+  CACHE_WARMING_ENABLED: {{ .Values.flexcms.publish.cacheWarming.enabled | quote }}
+  CACHE_WARMING_CONCURRENCY: {{ .Values.flexcms.publish.cacheWarming.concurrency | quote }}
+  CACHE_WARMING_CONNECT_TIMEOUT_MS: {{ .Values.flexcms.publish.cacheWarming.connectTimeoutMs | quote }}
+  CACHE_WARMING_READ_TIMEOUT_MS: {{ .Values.flexcms.publish.cacheWarming.readTimeoutMs | quote }}
+

@@ -1,0 +1,83 @@
+# ==============================================================================
+# FlexCMS Helm Chart — QA Environment Overrides
+# ==============================================================================
+# Apply with: helm upgrade --install flexcms ./flexcms -f values-qa.yaml
+
+image:
+  backend:
+    tag: "latest"
+  admin:
+    tag: "latest"
+
+author:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1024Mi"
+
+publish:
+  replicaCount: 2
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 60
+
+admin:
+  replicaCount: 1
+
+ingress:
+  hosts:
+    - host: api.qa.flexcms.example.com
+      paths:
+        - path: /api/content
+          pathType: Prefix
+          backend: publish
+        - path: /graphql
+          pathType: Prefix
+          backend: publish
+        - path: /graphiql
+          pathType: Prefix
+          backend: publish
+        - path: /dam/renditions
+          pathType: Prefix
+          backend: publish
+        - path: /actuator/health
+          pathType: Prefix
+          backend: publish
+    - host: author.qa.flexcms.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: author
+    - host: admin.qa.flexcms.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: admin
+
+postgresql:
+  host: "flexcms-postgresql"
+  authorDatabase: "flexcms_author"
+  publishDatabase: "flexcms_publish"
+  pimDatabase: "flexcms_pim"
+  username: "flexcms"
+
+redis:
+  host: "flexcms-redis-master"
+
+rabbitmq:
+  host: "flexcms-rabbitmq"
+  username: "flexcms"
+
+elasticsearch:
+  uris: "http://flexcms-elasticsearch:9200"
+
+security:
+  jwt:
+    issuerUri: "http://keycloak:8080/realms/flexcms"
+

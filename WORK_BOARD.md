@@ -141,26 +141,26 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P2-02 | ✅ DONE | **Admin UI — Workflow inbox (submit/approve/reject)** | 3d | `apps/admin`, `packages/ui` | P1-09 |
 | P2-03 | ✅ DONE | **Admin UI — PIM product grid + editor** | 4d | `apps/admin`, `packages/ui` | P0-06 |
 | P2-04 | ✅ DONE | **Content preview — iframe-based preview in admin** | 3d | `apps/admin`, `apps/site-nextjs` | P2-01 |
-| P2-05 | 🟢 OPEN | **Scheduled publishing — timer-based workflow step** | 2d | `flexcms-author`, `flexcms-core` | — |
-| P2-06 | 🟢 OPEN | **Live copy / content sharing — cross-site inheritance** | 3d | `flexcms-core`, `flexcms-i18n` | — |
-| P2-07 | 🟢 OPEN | **Translation connector — DeepL / Google Translate SPI** | 2d | `flexcms-i18n` | — |
-| P2-08 | 🟢 OPEN | **Audit trail — admin API for `audit_log` table** | 1d | `flexcms-author`, `flexcms-core` | — |
-| P2-09 | 🟢 OPEN | **Bulk operations — publish/delete/import multiple nodes** | 2d | `flexcms-author`, `flexcms-core` | — |
-| P2-10 | 🟢 OPEN | **Sitemap.xml + robots.txt generation** | 1d | `flexcms-publish`, `flexcms-headless` | — |
-| P2-11 | 🟢 OPEN | **Static site compilation — complete build worker** | 5d | `apps/build-worker`, `flexcms-cdn` | P1-01 |
+| P2-05 | ✅ DONE | **Scheduled publishing — timer-based workflow step** | 2d | `flexcms-author`, `flexcms-core` | — |
+| P2-06 | ✅ DONE | **Live copy / content sharing — cross-site inheritance** | 3d | `flexcms-core`, `flexcms-i18n` | — |
+| P2-07 | ✅ DONE | **Translation connector — DeepL / Google Translate SPI** | 2d | `flexcms-i18n` | — |
+| P2-08 | ✅ DONE | **Audit trail — admin API for `audit_log` table** | 1d | `flexcms-author`, `flexcms-core` | — |
+| P2-09 | ✅ DONE | **Bulk operations — publish/delete/import multiple nodes** | 2d | `flexcms-author`, `flexcms-core` | — |
+| P2-10 | ✅ DONE | **Sitemap.xml + robots.txt generation** | 1d | `flexcms-publish`, `flexcms-headless` | — |
+| P2-11 | ✅ DONE | **Static site compilation — complete build worker** | 5d | `apps/build-worker`, `flexcms-cdn` | P1-01 |
 
 ### 🟢 P3 — Nice-to-have (Polish & Optimization)
 
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
-| P3-01 | 🟢 OPEN | **CDN provider — CloudFront implementation** | 2d | `flexcms-cdn` | — |
-| P3-02 | 🟢 OPEN | **CDN provider — Cloudflare implementation** | 2d | `flexcms-cdn` | P3-01 |
-| P3-03 | 🟢 OPEN | **Cache warming service** | 1d | `flexcms-cache` | — |
-| P3-04 | 🟢 OPEN | **Kubernetes Helm charts** | 3d | `infra/` | — |
-| P3-05 | 🟢 OPEN | **Performance load testing with Gatling** | 2d | `flexcms-app` | P1-05 |
-| P3-06 | 🟢 OPEN | **Admin UI — visual drag-and-drop page editor (dnd-kit)** | 5d | `apps/admin`, `packages/ui` | P2-01 |
-| P3-07 | 🟢 OPEN | **PIM — visual schema editor** | 4d | `apps/admin`, `flexcms-pim` | P2-03 |
-| P3-08 | 🟢 OPEN | **PIM — GraphQL extension (Product, Catalog types)** | 3d | `flexcms-headless`, `flexcms-pim` | P1-01 |
+| P3-01 | ✅ DONE | **CDN provider — CloudFront implementation** | 2d | `flexcms-cdn` | — |
+| P3-02 | ✅ DONE | **CDN provider — Cloudflare implementation** | 2d | `flexcms-cdn` | P3-01 |
+| P3-03 | ✅ DONE | **Cache warming service** | 1d | `flexcms-cache` | — |
+| P3-04 | ✅ DONE | **Kubernetes Helm charts** | 3d | `infra/` | — |
+| P3-05 | ✅ DONE | **Performance load testing with Gatling** | 2d | `flexcms-app` | P1-05 |
+| P3-06 | ✅ DONE | **Admin UI — visual drag-and-drop page editor (dnd-kit)** | 5d | `apps/admin`, `packages/ui` | P2-01 |
+| P3-07 | ✅ DONE | **PIM — visual schema editor** | 4d | `apps/admin`, `flexcms-pim` | P2-03 |
+| P3-08 | ✅ DONE | **PIM — GraphQL extension (Product, Catalog types)** | 3d | `flexcms-headless`, `flexcms-pim` | P1-01 |
 
 ### 🐛 BUG — Defects
 
@@ -522,6 +522,178 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P3-07 — PIM Visual Schema Editor
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** GitHub Copilot
+**AC Verification:**
+  - [x] AC1 — Schema list loaded on mount from `GET /api/pim/v1/schemas?size=50`; first schema auto-selected; schema picker dropdown in Column 1 allows switching
+  - [x] AC2 — `loadSchema()` deserialises `attributeGroups.groups[]` (or falls back to `schemaDef.properties`) into `AttributeGroup[]` state
+  - [x] AC3 — Save FAB calls `PUT /api/pim/v1/schemas/{id}` with serialised `schemaDef` (JSON Schema) + `attributeGroups` (visual layout); shows Saved/Failed pill badge
+  - [x] AC4 — "New Schema" button opens modal; `POST /api/pim/v1/schemas` with name/version; new schema auto-loaded into editor
+  - [x] AC5 — dnd-kit `useDraggable` on `DraggableFieldType` palette items; dragging onto a group (via `handleDragEnd` overId lookup) calls `addFieldToGroup` → inserts new field, selects it
+  - [x] AC6 — dnd-kit `useSortable` on `SortableFieldRow` — fields reorder within a group using `arrayMove`; opacity fades to 0.3 while dragging; `DragOverlay` shows floating field card
+  - [x] AC7 — dnd-kit `useSortable` on `SortableGroup` — groups reorder via drag on `drag_indicator` handle; opacity fades to 0.4 while dragging
+  - [x] AC8 — Inline group rename: double-click group name → `<input>` with auto-focus; `Enter` or blur commits; rename button in group toolbar also triggers
+  - [x] AC9 — Group toolbar: rename (✏️), toggle required (⭐ highlights blue when required), delete group (🗑️ turns red on hover)
+  - [x] AC10 — Field Properties panel (Column 3): Label, Internal ID (#prefix), Required toggle, Localized toggle, Validation Regex textarea; "Apply Changes" updates groups state; "Reset" restores from `selectedField`
+  - [x] AC11 — Field type badge shown in properties panel (icon + label matching palette)
+  - [x] AC12 — JSON preview mode: toggle between Builder / JSON; shows live `schemaDef` derived from current group state
+  - [x] AC13 — Loading skeleton (2 placeholder blocks) shown during API fetch; empty state shown when no schemas exist
+  - [x] AC14 — Schema name/version/description are editable inline in the column-2 header; focus shows blue border; changes serialised on save
+  - [x] AC15 — `groupsToApiPayload()` derives JSON Schema from all groups: numeric→`number`, datetime→`date-time`, assets→`uri`; regex stripped of delimiters; `x-localized`/`x-inherited` extension properties added
+  - [x] AC16 — `pnpm build` → 8/8 tasks, 0 TypeScript errors, 0 lint errors
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/pim/schema/page.tsx` — complete rewrite: real API integration, dnd-kit DnD, schema picker, save/create, inline editing, JSON preview; 730→730 lines (replaced entirely)
+**Build Verified:** Yes — `pnpm build` ✅ 8/8 tasks, 0 errors
+
+---
+
+### P3-06 — Admin UI — Visual Drag-and-Drop Page Editor (dnd-kit)
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** GitHub Copilot
+**AC Verification:**
+  - [x] AC1 — Installed `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` via `pnpm --filter @flexcms/admin add`
+  - [x] AC2 — Removed all native HTML5 drag-and-drop state (`dragSrc`, `dragOverIdx`, native `onDragStart`/`onDragOver`/`onDrop` handlers, `DropZone` component)
+  - [x] AC3 — Canvas wrapped in `<DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart/Over/End>` + `<SortableContext items={instanceIds} strategy={verticalListSortingStrategy}>`
+  - [x] AC4 — `SortableCanvasItem` wrapper uses `useSortable(id=instanceId)` — applies CSS transform+transition for smooth animation; fades to 0.35 opacity while source item is being dragged
+  - [x] AC5 — `DraggablePaletteItem` uses `useDraggable(id="palette:<resourceType>")` — palette cards act as drag sources; `PointerSensor` with `activationConstraint: { distance: 6 }` prevents accidental drags on clicks
+  - [x] AC6 — `<DragOverlay>` renders a floating "ghost": canvas-to-canvas shows a faded component preview; palette-to-canvas shows a compact blue card with label
+  - [x] AC7 — `InsertPreview` component shows a blue dashed drop zone at the exact insertion point while dragging from palette (via `insertPreviewIdx` state updated in `handleDragOver`)
+  - [x] AC8 — `handleDragEnd`: palette→canvas drops call `addComponentAtIndex(item, idx)` inserting at the hovered position; canvas→canvas reordering calls `arrayMove(prev, oldIdx, newIdx)`
+  - [x] AC9 — Drag handle icon (⠿) added to the selected component's toolbar — `dragHandleProps` spread onto it, so only the handle activates the drag (not the whole component)
+  - [x] AC10 — Move Up / Move Down buttons kept as keyboard-accessible alternatives (now use `arrayMove` internally)
+  - [x] AC11 — `pnpm build` → 8/8 tasks successful, 0 TypeScript errors
+**Files Changed:**
+  - `frontend/apps/admin/package.json` — added `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+  - `frontend/apps/admin/src/app/editor/page.tsx` — replaced native drag with dnd-kit: new imports, new state (`activeDrag`, `insertPreviewIdx`, `sensors`), `handleDragStart/Over/End`, `SortableCanvasItem`, `DraggablePaletteItem`, `InsertPreview`, `DragOverlay`, `DragHandleIcon`; removed `DropZone`, `dragSrc`, `dragOverIdx`, `handleDropAtIndex`
+**Build Verified:** Yes — `pnpm build` ✅ 8/8 tasks, 0 errors
+
+---
+
+### P3-04 — Kubernetes Helm Charts
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** GitHub Copilot
+**AC Verification:**
+  - [x] AC1 — `infra/helm/flexcms/Chart.yaml` — chart metadata (name, version, appVersion)
+  - [x] AC2 — `values.yaml` — full default values: image repos, author/publish/admin deployments, ingress, external dependency endpoints (PostgreSQL, Redis, RabbitMQ, S3, Elasticsearch), security, HPA, PDB, resource requests/limits, probes
+  - [x] AC3 — `values-qa.yaml` — QA overrides: 1 author, 2–6 publish replicas, QA hostnames
+  - [x] AC4 — `values-prod.yaml` — Production overrides: 2 author, 5–20 publish replicas, HA affinity rules, prod hostnames, TLS, cert-manager annotation, Amazon MQ TLS port
+  - [x] AC5 — `templates/_helpers.tpl` — named templates: fullname, labels, selectorLabels, serviceAccountName, secretName, postgresql.password, rabbitmq.password, s3.secretAccessKey, backendEnv (shared env for author+publish)
+  - [x] AC6 — `templates/NOTES.txt` — post-install kubectl port-forward commands and external dependency checklist
+  - [x] AC7 — `templates/serviceaccount.yaml`, `templates/secret.yaml`, `templates/configmap.yaml` — infra resources
+  - [x] AC8 — `templates/author-deployment.yaml` + `author-service.yaml` — Author tier: fixed replicas, `SPRING_PROFILES_ACTIVE=author`, CMS + PIM datasources, shared env, probes, rolling update
+  - [x] AC9 — `templates/publish-deployment.yaml` + `publish-service.yaml` + `publish-hpa.yaml` (autoscaling/v2 HPA with scale-up/scale-down behavior) + `publish-pdb.yaml` (PodDisruptionBudget) — Publish tier: `SPRING_PROFILES_ACTIVE=publish`, cache warming env vars
+  - [x] AC10 — `templates/admin-deployment.yaml` + `admin-service.yaml` — Admin UI: Next.js image, `NEXT_PUBLIC_FLEXCMS_API` + `NEXT_PUBLIC_FLEXCMS_PUBLISH_URL` pointing to in-cluster services, optional HPA
+  - [x] AC11 — `templates/ingress.yaml` — multi-host ingress routing: publish paths → publish service, author.* → author service, admin.* → admin service; TLS-ready
+  - [x] All YAML files validated: `Chart.yaml`, `values.yaml`, `values-qa.yaml`, `values-prod.yaml` — 0 YAML parse errors
+**Files Changed:**
+  - `infra/helm/flexcms/Chart.yaml` — NEW
+  - `infra/helm/flexcms/values.yaml` — NEW
+  - `infra/helm/flexcms/values-qa.yaml` — NEW
+  - `infra/helm/flexcms/values-prod.yaml` — NEW
+  - `infra/helm/flexcms/templates/_helpers.tpl` — NEW
+  - `infra/helm/flexcms/templates/NOTES.txt` — NEW
+  - `infra/helm/flexcms/templates/serviceaccount.yaml` — NEW
+  - `infra/helm/flexcms/templates/secret.yaml` — NEW
+  - `infra/helm/flexcms/templates/configmap.yaml` — NEW
+  - `infra/helm/flexcms/templates/author-deployment.yaml` — NEW
+  - `infra/helm/flexcms/templates/author-service.yaml` — NEW
+  - `infra/helm/flexcms/templates/publish-deployment.yaml` — NEW
+  - `infra/helm/flexcms/templates/publish-service.yaml` — NEW
+  - `infra/helm/flexcms/templates/publish-hpa.yaml` — NEW
+  - `infra/helm/flexcms/templates/publish-pdb.yaml` — NEW
+  - `infra/helm/flexcms/templates/admin-deployment.yaml` — NEW
+  - `infra/helm/flexcms/templates/admin-service.yaml` — NEW
+  - `infra/helm/flexcms/templates/ingress.yaml` — NEW
+**Build Verified:** Yes — `helm lint` unavailable on this machine; all non-template YAML files validated via Python `yaml.safe_load` — 0 errors
+**Notes:**
+  - One Docker image (`flexcms-app`) serves both author (port 8080) and publish (port 8081) via `SPRING_PROFILES_ACTIVE`
+  - Credentials support both inline values and `existingSecret` references (for Sealed Secrets / AWS SM)
+  - HPA uses `autoscaling/v2` (stable since Kubernetes 1.23) with configurable scale-up/scale-down stabilisation windows
+  - Install: `helm upgrade --install flexcms ./infra/helm/flexcms -f infra/helm/flexcms/values-qa.yaml --set postgresql.password=$DB_PW`
+
+---
+
+### P3-03 — Cache Warming Service
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** GitHub Copilot
+**AC Verification:**
+  - [x] AC1 — `CacheWarmingService` created in `flexcms-cache/service/`; `@ConditionalOnProperty(name = "flexcms.cache.warming.enabled", havingValue = "true", matchIfMissing = true)` guards activation
+  - [x] AC2 — On `ApplicationReadyEvent`, warms all paths from `CacheWarmingProperties.getPaths()` asynchronously via `@Async`
+  - [x] AC3 — On `ContentIndexEvent` (Action.INDEX), warms the URL path derived from the activated node's ltree path (dot→slash conversion)
+  - [x] AC4 — Bounded concurrency via `Semaphore(properties.getConcurrency())` wrapping a `newFixedThreadPool` with Java 21 virtual threads
+  - [x] AC5 — `warmPath(String urlPath)` sends HTTP GET to `publishBaseUrl + urlPath` with configurable connect/read timeouts using `java.net.http.HttpClient`; failures are warned, never propagated
+  - [x] AC6 — `CacheWarmingProperties` already existed (`@ConfigurationProperties(prefix = "flexcms.cache.warming")`) — no changes needed
+  - [x] AC7 — `application.yml` updated: warming disabled by default on author tier; `application-publish.yml` enables it with `enabled: true`
+  - [x] AC8 — `mvn clean compile -pl flexcms-cache -am` → BUILD SUCCESS, 6 source files compiled, 0 errors
+**Files Changed:**
+  - `flexcms-cache/src/main/java/com/flexcms/cache/service/CacheWarmingService.java` — NEW
+  - `flexcms-app/src/main/resources/application.yml` — added `flexcms.cache.warming.*` defaults (disabled)
+  - `flexcms-app/src/main/resources/application-publish.yml` — added warming config (enabled)
+**Build Verified:** Yes — `mvn clean compile -pl flexcms-cache -am` ✅ BUILD SUCCESS
+**Notes:**
+  - `@Async` relies on `@EnableAsync` already present in `FlexCmsApplication`
+  - Warming requests include `X-Cache-Warm: true` header so CDN/logs can identify them
+  - `@PreDestroy` gracefully shuts down the executor (5 s timeout before forced shutdown)
+
+---
+
+### AGENTS.md — Generated AI Agent Quick Reference
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** GitHub Copilot
+**Notes:** `AGENTS.md` created in project root — concise reference covering architecture, build gates, layer rules, content path conventions, key files, Flyway rules, NodeStatus enum, Admin UI rules, local dev auth bypass, service endpoints, Component Model SPI, and common gotchas.
+
+---
+
+### BUG — Content Tree Edit Button Not Working
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** GitHub Copilot
+**Root Cause:** The action menu dropdown (3-dot ⋮) in `ContentRow` is positioned with `top: 100%` on the `<tr>`, placing it visually below the table row. Moving the mouse from the ⋮ button down to "Edit" in the dropdown crossed the row boundary, triggering `onMouseLeave` on the `<tr>`, which called `onActionMenu(null)` and closed the menu before the click could register.
+**Fix:** Removed `if (showActionMenu) onActionMenu(null)` from the `<tr>` `onMouseLeave` handler. The menu already closes when a menu item is clicked (`onClick={() => onActionMenu(null)}`) or another row's ⋮ button opens a different menu.
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/content/page.tsx` — removed premature menu-close from `onMouseLeave`
+**Verified:** TypeScript compile — 0 errors
+
+---
+
+### P2-06 through P2-11 — Batch Verification
+**Status:** ✅ DONE (all 6 tasks)
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**Findings:** All 6 tasks were already fully implemented. No code changes required.
+- P2-06 (Live copy): `LiveCopyService` (flexcms-multisite) + `LiveCopyController` (flexcms-author) + `LiveCopyRelationship` model + repository — create/rollout/detach/list/status endpoints
+- P2-07 (Translation connector): `DeepLTranslationConnector` + `DeepLProperties` + `TranslationService` + `I18nService` in flexcms-i18n
+- P2-08 (Audit trail): `AuditLogController` at `/api/author/audit` + `AuditService` + `AuditLogEntry` model
+- P2-09 (Bulk operations): `bulkPublish`, `bulkDelete`, `bulkMove` endpoints in `AuthorContentController`; `bulkUpdateStatus`, `bulkDelete`, `bulkMove` in `ContentNodeService`
+- P2-10 (Sitemap): `SitemapController` + `SitemapService` in flexcms-publish; serves `sitemap.xml`, `sitemap-index.xml`, `robots.txt`
+- P2-11 (Build worker): Complete Node.js build worker in `apps/build-worker/src/`: event-consumer, page-renderer, s3-publisher, manifest-manager, dependency-resolver
+**Build Verified:** Yes — `mvn clean compile` ✅ 0 errors
+
+---
+
+### P2-05 — Scheduled Publishing — Timer-based Workflow Step
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `ScheduledPublishingService` fully implemented: `schedulePublish()`, `scheduleDeactivate()`, `processScheduledPublishes()` (`@Scheduled(fixedDelay=60_000)`), `processScheduledDeactivations()` (`@Scheduled(fixedDelay=60_000)`)
+  - [x] AC2 — `ContentNode` model has `scheduledPublishAt` and `scheduledDeactivateAt` fields
+  - [x] AC3 — `ContentNodeRepository` has `findDueForPublish(@Param("now") Instant)` and `findDueForDeactivation(@Param("now") Instant)` JPQL queries with partial indexes
+  - [x] AC4 — `AuthorContentController` exposes `PUT /api/author/content/node/schedule-publish` and `PUT /api/author/content/node/schedule-deactivate` REST endpoints
+  - [x] AC5 — `@EnableScheduling` configured in `FlexCmsApplication`
+  - [x] AC6 — Flyway migration `V10__scheduled_publish_columns.sql` adds columns + partial indexes
+  - [x] AC7 — `mvn clean compile` passes
+**Findings:** All components were already fully implemented. No code changes required.
+**Build Verified:** Yes — `mvn clean compile` ✅ 0 errors
 
 ---
 

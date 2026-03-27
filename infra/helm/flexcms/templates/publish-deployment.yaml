@@ -1,0 +1,139 @@
+{{- if .Values.publish.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flexcms.fullname" . }}-publish
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexcms.labels" . | nindent 4 }}
+    app.kubernetes.io/component: publish
+spec:
+  {{- if not .Values.publish.autoscaling.enabled }}
+  replicas: {{ .Values.publish.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "flexcms.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: publish
+  strategy:
+    {{- toYaml .Values.publish.strategy | nindent 4 }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "flexcms.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: publish
+      {{- with .Values.publish.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "flexcms.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: publish
+          image: "{{ .Values.image.backend.repository }}:{{ .Values.image.backend.tag }}"
+          imagePullPolicy: {{ .Values.image.backend.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.publish.containerPort }}
+              protocol: TCP
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "publish"
+            - name: SERVER_PORT
+              value: {{ .Values.publish.containerPort | quote }}
+            # ── Database (Publish DB) ────────────────────────────────────────
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://$(POSTGRESQL_HOST):$(POSTGRESQL_PORT)/$(POSTGRESQL_PUBLISH_DB)"
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "flexcms.fullname" . }}-config
+                  key: POSTGRESQL_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                {{- include "flexcms.postgresql.password" . | nindent 16 }}
+            # PIM datasource (read-only on publish tier)
+            - name: FLEXCMS_PIM_DATASOURCE_URL
+              value: "jdbc:postgresql://$(POSTGRESQL_HOST):$(POSTGRESQL_PORT)/$(POSTGRESQL_PIM_DB)"
+            - name: FLEXCMS_PIM_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "flexcms.fullname" . }}-config
+                  key: POSTGRESQL_USERNAME
+            - name: FLEXCMS_PIM_DATASOURCE_PASSWORD
+              valueFrom:
+                {{- include "flexcms.postgresql.password" . | nindent 16 }}
+            # ── Cache warming ────────────────────────────────────────────────
+            - name: FLEXCMS_CACHE_WARMING_ENABLED
+              value: {{ .Values.flexcms.publish.cacheWarming.enabled | quote }}
+            - name: FLEXCMS_CACHE_WARMING_PUBLISH_BASE_URL
+              value: "http://localhost:{{ .Values.publish.containerPort }}"
+            - name: FLEXCMS_CACHE_WARMING_CONCURRENCY
+              value: {{ .Values.flexcms.publish.cacheWarming.concurrency | quote }}
+            - name: FLEXCMS_CACHE_WARMING_CONNECT_TIMEOUT_MS
+              value: {{ .Values.flexcms.publish.cacheWarming.connectTimeoutMs | quote }}
+            - name: FLEXCMS_CACHE_WARMING_READ_TIMEOUT_MS
+              value: {{ .Values.flexcms.publish.cacheWarming.readTimeoutMs | quote }}
+            # ── Shared infra env vars ────────────────────────────────────────
+            {{- include "flexcms.backendEnv" . | nindent 12 }}
+            # ── Extra env vars ───────────────────────────────────────────────
+            {{- with .Values.publish.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "flexcms.fullname" . }}-config
+          # ── Probes ──────────────────────────────────────────────────────────
+          startupProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: {{ .Values.publish.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.publish.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.publish.probes.startup.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: {{ .Values.publish.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.publish.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.publish.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            initialDelaySeconds: {{ .Values.publish.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.publish.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.publish.probes.readiness.failureThreshold }}
+          resources:
+            {{- toYaml .Values.publish.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      {{- with .Values.publish.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.publish.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.publish.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+

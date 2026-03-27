@@ -62,7 +62,80 @@ infra/
 
 ---
 
-## Local Development
+## Kubernetes — Helm Charts
+
+FlexCMS ships a production-ready Helm chart at `infra/helm/flexcms/`.
+
+### Chart Structure
+
+```
+infra/helm/flexcms/
+├── Chart.yaml               # Chart metadata (name, version, appVersion)
+├── values.yaml              # Default values (all environments)
+├── values-qa.yaml           # QA overrides
+├── values-prod.yaml         # Production overrides
+└── templates/
+    ├── _helpers.tpl         # Named template helpers
+    ├── NOTES.txt            # Post-install hints
+    ├── serviceaccount.yaml  # ServiceAccount
+    ├── secret.yaml          # Credentials Secret (optional — prefers existingSecret)
+    ├── configmap.yaml       # Non-sensitive configuration
+    ├── author-deployment.yaml    # Author tier Deployment (read-write, fixed replicas)
+    ├── author-service.yaml       # Author ClusterIP Service
+    ├── publish-deployment.yaml   # Publish tier Deployment (read-only, auto-scalable)
+    ├── publish-service.yaml      # Publish ClusterIP Service
+    ├── publish-hpa.yaml          # HorizontalPodAutoscaler (autoscaling/v2)
+    ├── publish-pdb.yaml          # PodDisruptionBudget
+    ├── admin-deployment.yaml     # Admin UI (Next.js) Deployment
+    ├── admin-service.yaml        # Admin ClusterIP Service + optional HPA
+    └── ingress.yaml              # Ingress (nginx) — multi-host routing
+```
+
+### External Dependencies
+
+The chart does **not** deploy PostgreSQL, Redis, RabbitMQ, Elasticsearch, or S3.
+Use separate charts (e.g. `bitnami/postgresql`, `bitnami/redis`, `bitnami/rabbitmq`,
+`elastic/elasticsearch`) or managed cloud services, then point the chart at them.
+
+### Quick Install (QA)
+
+```bash
+# 1. Add chart dependencies (if using in-cluster infra)
+helm repo add bitnami https://charts.bitnami.com/bitnami
+
+# 2. Install FlexCMS (QA)
+helm upgrade --install flexcms ./infra/helm/flexcms \
+  -f infra/helm/flexcms/values-qa.yaml \
+  --namespace flexcms-qa --create-namespace \
+  --set postgresql.password="$DB_PASSWORD" \
+  --set rabbitmq.password="$MQ_PASSWORD" \
+  --set s3.accessKeyId="$S3_KEY_ID" \
+  --set s3.secretAccessKey="$S3_SECRET"
+```
+
+### Production Install (with Sealed Secrets)
+
+```bash
+# Pre-create a Secret named "flexcms-credentials" in the target namespace, then:
+helm upgrade --install flexcms ./infra/helm/flexcms \
+  -f infra/helm/flexcms/values-prod.yaml \
+  --namespace flexcms-prod --create-namespace \
+  --set postgresql.existingSecret="flexcms-credentials" \
+  --set rabbitmq.existingSecret="flexcms-credentials" \
+  --set s3.existingSecret="flexcms-credentials" \
+  --set image.backend.tag="$IMAGE_TAG" \
+  --set image.admin.tag="$IMAGE_TAG"
+```
+
+### Key Design Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| One image, two profiles | `SPRING_PROFILES_ACTIVE=author` or `publish` — no rebuild needed |
+| Publish HPA (autoscaling/v2) | Scale on CPU + memory; separate scale-up (fast) and scale-down (slow, 5 min stabilisation) |
+| Author: fixed replicas | Author requires sticky session for Admin UI; auto-scaling adds complexity without benefit |
+| PDB on Publish | Prevents all publish pods from being evicted during cluster maintenance |
+| `existingSecret` support | Integrates with Sealed Secrets, AWS Secrets Manager, and Vault without storing secrets in values files |
 
 ### Option A: Infrastructure-only (Recommended — fastest iteration)
 

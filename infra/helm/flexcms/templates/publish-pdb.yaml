@@ -1,0 +1,18 @@
+{{- if and .Values.publish.enabled .Values.publish.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "flexcms.fullname" . }}-publish
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flexcms.labels" . | nindent 4 }}
+    app.kubernetes.io/component: publish
+spec:
+  minAvailable: {{ .Values.publish.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "flexcms.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: publish
+{{- end }}
+
