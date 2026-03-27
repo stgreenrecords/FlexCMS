@@ -121,7 +121,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P1-02 | ✅ DONE | **Elasticsearch integration — full-text indexing on publish** | 3d | `flexcms-search`, `flexcms-core`, `flexcms-replication` | — |
 | P1-03 | ✅ DONE | **Unit tests — core services (ContentNodeService, ContentDeliveryService, WorkflowEngine)** | 3d | `flexcms-core`, `flexcms-author` | — |
 | P1-04 | ✅ DONE | **Unit tests — PIM services (ProductService, CarryforwardService)** | 2d | `flexcms-pim` | — |
-| P1-05 | 🟢 OPEN | **Integration tests — Testcontainers for repositories** | 3d | `flexcms-core`, `flexcms-pim` | P1-03, P1-04 |
+| P1-05 | ✅ DONE | **Integration tests — Testcontainers for repositories** | 3d | `flexcms-core`, `flexcms-pim` | P1-03, P1-04 |
 | P1-06 | 🟢 OPEN | **Security — Spring Security OAuth2 Resource Server + JWT + RBAC** | 5d | `flexcms-app`, `flexcms-core` | — |
 | P1-07 | 🟢 OPEN | **API documentation — SpringDoc OpenAPI for all REST endpoints** | 2d | `flexcms-headless`, `flexcms-author`, `flexcms-pim`, `flexcms-app` | — |
 | P1-08 | 🟢 OPEN | **Observability — Micrometer + Prometheus metrics + structured logging** | 3d | `flexcms-app`, `flexcms-core`, `flexcms-replication` | — |
@@ -522,6 +522,25 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-05 — Integration Tests — Testcontainers for Repositories
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] `ContentNodeRepositoryIT` — already implemented: 22 tests covering findByPath, findByParentPath, findDescendants, findAncestors, existsByPath, deleteSubtree, searchContent (LIKE, case-insensitive), findBySiteIdAndStatus — tests ltree path prefix queries and ILIKE search against real PostgreSQL
+  - [x] `ProductRepositoryIT` — NEW: 13 tests covering findBySku, existsBySku, findByCatalogId (pagination, isolation), findByCatalogIdAndStatus (filter), searchGlobal (sku match, name case-insensitive, no match), JSONB attribute round-trip
+  - [x] Both IT classes excluded from regular `mvn test` run via surefire `<exclude>**/*IT.java</exclude>`; runnable with `-Dtest=ProductRepositoryIT` when Docker is available
+  - [x] `mvn clean compile` passes — all modules
+  - [x] `mvn test -pl flexcms-pim` — 125 unit tests pass, 0 failures (IT tests excluded)
+**Files Changed:**
+  - `flexcms-pim/pom.xml` — added `testcontainers:junit-jupiter`, `testcontainers:postgresql`, `spring-boot-testcontainers` test deps; added surefire `**/*IT.java` exclusion
+  - `flexcms-pim/src/test/java/com/flexcms/pim/PimTestApplication.java` — NEW: minimal `@SpringBootApplication` for test slice
+  - `flexcms-pim/src/test/resources/application-integration.properties` — NEW: excludes conflicting auto-configs (DataSource, Hibernate JPA, Flyway, ES, AMQP, Security); PIM datasource injected via `@DynamicPropertySource`
+  - `flexcms-pim/src/test/java/com/flexcms/pim/repository/ProductRepositoryIT.java` — NEW: 13 integration tests using Testcontainers PostgreSQL; PIM Flyway migrations run automatically against fresh container
+**Build Verified:** Yes — `mvn clean compile` passes; unit tests 125/125 pass
 
 ---
 
