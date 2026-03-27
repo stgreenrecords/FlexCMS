@@ -92,12 +92,26 @@ export default function ContentTreePage() {
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const [nodes, setNodes]             = useState<ContentNode[]>([]);
   const [loading, setLoading]         = useState(true);
+  const [viewMode, setViewMode]       = useState<'list' | 'tree'>('list');
+  const [stats, setStats]             = useState<{ totalPages: number; siteCount: number } | null>(null);
 
   // Folder navigation state
   const [currentPath, setCurrentPath] = useState<string>('content');
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
     { name: 'Content', path: 'content' },
   ]);
+
+  // Fetch aggregate stats once on mount
+  useEffect(() => {
+    Promise.all([
+      fetch(`${API_BASE}/api/author/content/list?size=1`).then((r) => r.ok ? r.json() : null),
+      fetch(`${API_BASE}/api/author/sites`).then((r) => r.ok ? r.json() : null),
+    ]).then(([listResp, sitesResp]) => {
+      const totalPages = listResp?.totalElements ?? 0;
+      const siteCount  = Array.isArray(sitesResp) ? sitesResp.length : 0;
+      setStats({ totalPages, siteCount });
+    }).catch(() => { /* stats are non-critical */ });
+  }, []);
 
   // Fetch direct children whenever currentPath changes
   useEffect(() => {
@@ -245,6 +259,25 @@ export default function ContentTreePage() {
             </div>
 
             <div className="flex items-center gap-2">
+              {/* List / Tree toggle */}
+              <div
+                className="flex rounded-lg p-1"
+                style={{ background: '#201f1f', border: '1px solid rgba(66,70,84,0.15)' }}
+              >
+                {(['list', 'tree'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => setViewMode(mode)}
+                    className="px-3 py-1 rounded text-xs font-semibold transition-colors capitalize flex items-center gap-1"
+                    style={viewMode === mode
+                      ? { background: '#2a2a2a', color: '#b0c6ff' }
+                      : { color: '#8d90a0' }}
+                  >
+                    {mode === 'list' ? <ListIcon /> : <TreeIcon />}
+                    {mode === 'list' ? 'List' : 'Tree'}
+                  </button>
+                ))}
+              </div>
               <ToolbarButton icon={<FilterIcon />} label="Filter" />
               <ToolbarButton icon={<SortIcon />}   label="Sort" />
               <ToolbarButton icon={<MoreIcon />} />
@@ -391,6 +424,91 @@ export default function ContentTreePage() {
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Activity Overview */}
+          <div className="mt-8 pb-8">
+            <h3 className="text-lg font-bold mb-4" style={{ color: '#e5e2e1' }}>Activity Overview</h3>
+            <div className="grid grid-cols-1 gap-4" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
+              {/* Content Velocity */}
+              <div
+                className="rounded-xl p-5"
+                style={{ background: '#1c1b1b', border: '1px solid rgba(66,70,84,0.1)' }}
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-2 rounded-lg" style={{ background: 'rgba(176,198,255,0.1)' }}>
+                    <EditNoteIcon />
+                  </div>
+                  <span
+                    className="text-[0.6rem] font-bold px-2 py-0.5 rounded-full"
+                    style={{ color: '#b0c6ff', background: 'rgba(176,198,255,0.1)' }}
+                  >
+                    +12%
+                  </span>
+                </div>
+                <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#8d90a0' }}>
+                  Content Velocity
+                </p>
+                <h4 className="text-2xl font-bold" style={{ color: '#e5e2e1' }}>
+                  {stats ? `${stats.totalPages} Pages` : '—'}
+                </h4>
+                <p className="text-[0.6875rem] mt-2" style={{ color: '#8d90a0' }}>
+                  Total published across all sites.
+                </p>
+              </div>
+
+              {/* Localization Health */}
+              <div
+                className="rounded-xl p-5"
+                style={{ background: '#1c1b1b', border: '1px solid rgba(66,70,84,0.1)' }}
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-2 rounded-lg" style={{ background: 'rgba(255,181,155,0.1)' }}>
+                    <TranslateIcon />
+                  </div>
+                  <span
+                    className="text-[0.6rem] font-bold px-2 py-0.5 rounded-full"
+                    style={{ color: '#8d90a0', background: '#201f1f' }}
+                  >
+                    85% Complete
+                  </span>
+                </div>
+                <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#8d90a0' }}>
+                  Localization Health
+                </p>
+                <h4 className="text-2xl font-bold" style={{ color: '#e5e2e1' }}>
+                  {stats ? `${stats.siteCount} Site${stats.siteCount !== 1 ? 's' : ''}` : '—'}
+                </h4>
+                <p className="text-[0.6875rem] mt-2" style={{ color: '#8d90a0' }}>
+                  Active sites across all regions.
+                </p>
+              </div>
+
+              {/* Performance Index */}
+              <div
+                className="rounded-xl p-5"
+                style={{ background: '#1c1b1b', border: '1px solid rgba(66,70,84,0.1)' }}
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-2 rounded-lg" style={{ background: 'rgba(179,197,253,0.1)' }}>
+                    <InsightsIcon />
+                  </div>
+                  <span
+                    className="text-[0.6rem] font-bold px-2 py-0.5 rounded-full"
+                    style={{ color: '#ffb4ab', background: 'rgba(147,0,10,0.2)' }}
+                  >
+                    -2%
+                  </span>
+                </div>
+                <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#8d90a0' }}>
+                  Performance Index
+                </p>
+                <h4 className="text-2xl font-bold" style={{ color: '#e5e2e1' }}>94/100</h4>
+                <p className="text-[0.6875rem] mt-2" style={{ color: '#8d90a0' }}>
+                  Avg Core Web Vitals for live pages.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -747,6 +865,50 @@ function SettingsIcon() {
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  );
+}
+
+function ListIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+      <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+    </svg>
+  );
+}
+
+function TreeIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  );
+}
+
+function EditNoteIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="#b0c6ff" aria-hidden="true">
+      <path d="M3 10h11v2H3zm0-4h11v2H3zm0 8h7v2H3zm13.41-1.5L18 11l1.59 1.5L15.5 17 14 17l0-1.5zM20 9l-1.5-1.5L20 6l1.5 1.5L20 9z"/>
+    </svg>
+  );
+}
+
+function TranslateIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffb59b" aria-hidden="true">
+      <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+    </svg>
+  );
+}
+
+function InsightsIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="#b3c5fd" aria-hidden="true">
+      <path d="M21 8c-1.45 0-2.26 1.44-1.93 2.51l-3.55 3.56c-.3-.09-.74-.09-1.04 0l-2.55-2.55C12.27 10.45 11.46 9 10 9c-1.45 0-2.27 1.44-1.93 2.52l-4.56 4.55C2.44 15.74 1 16.55 1 18c0 1.1.9 2 2 2 1.45 0 2.26-1.44 1.93-2.51l4.55-4.56c.3.09.74.09 1.04 0l2.55 2.55C12.73 16.55 13.54 18 15 18c1.45 0 2.27-1.44 1.93-2.52l3.56-3.55c1.07.33 2.51-.48 2.51-1.93 0-1.1-.9-2-2-2z"/>
     </svg>
   );
 }
