@@ -7,6 +7,7 @@ import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ReplicationLogRepository;
 import com.flexcms.replication.config.ReplicationQueueConfig;
 import com.flexcms.replication.model.ReplicationEvent;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -42,6 +43,7 @@ public class ReplicationAgent {
     /**
      * Replicate a single content node to all publish instances.
      */
+    @Timed(value = "flexcms.replication.replicate", description = "Time to send a replication event to the queue")
     @Transactional
     public UUID replicate(String path, ReplicationEvent.ReplicationAction action, String userId) {
         ContentNode node = nodeRepository.findByPath(path)

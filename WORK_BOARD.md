@@ -124,7 +124,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P1-05 | ✅ DONE | **Integration tests — Testcontainers for repositories** | 3d | `flexcms-core`, `flexcms-pim` | P1-03, P1-04 |
 | P1-06 | ✅ DONE | **Security — Spring Security OAuth2 Resource Server + JWT + RBAC** | 5d | `flexcms-app`, `flexcms-core` | — |
 | P1-07 | ✅ DONE | **API documentation — SpringDoc OpenAPI for all REST endpoints** | 2d | `flexcms-headless`, `flexcms-author`, `flexcms-pim`, `flexcms-app` | — |
-| P1-08 | 🟢 OPEN | **Observability — Micrometer + Prometheus metrics + structured logging** | 3d | `flexcms-app`, `flexcms-core`, `flexcms-replication` | — |
+| P1-08 | ✅ DONE | **Observability — Micrometer + Prometheus metrics + structured logging** | 3d | `flexcms-app`, `flexcms-core`, `flexcms-replication` | — |
 | P1-09 | 🟢 OPEN | **Admin UI — Content tree browser** | 5d | `apps/admin`, `packages/ui` | P0-06 |
 | P1-10 | 🟢 OPEN | **Admin UI — DAM browser with upload** | 4d | `apps/admin`, `packages/ui` | P0-06 |
 | P1-11 | 🟢 OPEN | **Admin UI — Site management page (real data, no mocks)** | 2d | `apps/admin` | P0-06 |
@@ -522,6 +522,28 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-08 — Observability — Micrometer + Prometheus Metrics + Structured Logging
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] `MetricsConfig.java` — already implemented: `TimedAspect` + JVM/GC/thread/CPU/uptime metrics auto-registered
+  - [x] `TracingConfig.java` — already implemented: `ObservedAspect` for `@Observed` + OTel tracing bridge; spans written to OTLP endpoint; traceId/spanId injected into SLF4J MDC
+  - [x] `logback-spring.xml` — already implemented: dev=coloured console, prod/docker=structured JSON via `logstash-logback-encoder` with MDC fields (traceId, spanId, userId, siteId, requestId) + rolling file appender
+  - [x] `application.yml` — already implemented: `/actuator/prometheus` enabled, HTTP request histograms (p50/p90/p95/p99), SLO buckets (10ms–1s), distributed tracing with configurable sampling rate
+  - [x] `@Timed` added to key service methods: `ContentNodeService.create`, `ContentNodeService.updateStatus`, `ContentDeliveryService.renderPage`, `ReplicationAgent.replicate` — metrics names: `flexcms.content.node.create`, `flexcms.content.node.status`, `flexcms.content.page.render`, `flexcms.replication.replicate`
+  - [x] `micrometer-core` added to `flexcms-core/pom.xml` (no version needed — managed by Spring Boot BOM); `flexcms-replication` gets it transitively
+  - [x] `mvn clean compile` passes — 0 errors
+  - [x] 319 tests, 0 failures
+**Files Changed:**
+  - `flexcms-core/pom.xml` — added `io.micrometer:micrometer-core` dependency
+  - `flexcms-core/.../service/ContentNodeService.java` — `@Timed` on `create`, `updateStatus`
+  - `flexcms-core/.../service/ContentDeliveryService.java` — `@Timed` on `renderPage`
+  - `flexcms-replication/.../service/ReplicationAgent.java` — `@Timed` on `replicate`
+**Build Verified:** Yes — `mvn clean compile` passes; 319 tests, 0 failures
 
 ---
 

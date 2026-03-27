@@ -5,6 +5,7 @@ import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.plugin.model.RenderContext;
 import com.flexcms.plugin.spi.ComponentModel;
 import com.flexcms.plugin.spi.ContentNodeData;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class ContentDeliveryService {
     /**
      * Render a page as a structured JSON response for headless delivery.
      */
+    @Timed(value = "flexcms.content.page.render", description = "Time to render a page component tree")
     @Transactional(readOnly = true)
     public Map<String, Object> renderPage(String path, RenderContext context) {
         ContentNode page = nodeService.getWithChildren(path)

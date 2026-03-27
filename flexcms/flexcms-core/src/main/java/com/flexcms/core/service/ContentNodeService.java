@@ -9,6 +9,7 @@ import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ContentNodeVersionRepository;
 import com.flexcms.core.util.RichTextSanitizer;
+import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -57,6 +58,7 @@ public class ContentNodeService {
     /**
      * Create a new content node.
      */
+    @Timed(value = "flexcms.content.node.create", description = "Time to create a content node")
     @PreAuthorize("hasPermission(#parentPath, 'WRITE')")
     @Transactional
     public ContentNode create(String parentPath, String name, String resourceType,
@@ -210,6 +212,7 @@ public class ContentNodeService {
     /**
      * Update node status.
      */
+    @Timed(value = "flexcms.content.node.status", description = "Time to update a content node status")
     @PreAuthorize("hasPermission(#path, 'PUBLISH')")
     @Transactional
     public ContentNode updateStatus(String path, NodeStatus status, String userId) {
