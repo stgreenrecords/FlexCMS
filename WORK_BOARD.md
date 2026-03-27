@@ -140,7 +140,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P2-01 | ✅ DONE | **Admin UI — Page editor with auto-generated forms from component schema** | 5d | `apps/admin`, `packages/ui` | P1-09 |
 | P2-02 | ✅ DONE | **Admin UI — Workflow inbox (submit/approve/reject)** | 3d | `apps/admin`, `packages/ui` | P1-09 |
 | P2-03 | ✅ DONE | **Admin UI — PIM product grid + editor** | 4d | `apps/admin`, `packages/ui` | P0-06 |
-| P2-04 | 🟢 OPEN | **Content preview — iframe-based preview in admin** | 3d | `apps/admin`, `apps/site-nextjs` | P2-01 |
+| P2-04 | ✅ DONE | **Content preview — iframe-based preview in admin** | 3d | `apps/admin`, `apps/site-nextjs` | P2-01 |
 | P2-05 | 🟢 OPEN | **Scheduled publishing — timer-based workflow step** | 2d | `flexcms-author`, `flexcms-core` | — |
 | P2-06 | 🟢 OPEN | **Live copy / content sharing — cross-site inheritance** | 3d | `flexcms-core`, `flexcms-i18n` | — |
 | P2-07 | 🟢 OPEN | **Translation connector — DeepL / Google Translate SPI** | 2d | `flexcms-i18n` | — |
@@ -522,6 +522,25 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P2-04 — Content Preview — iframe-based preview in admin
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — Admin preview page (`/preview`) existed with full iframe implementation: viewport toggle (Desktop/Tablet/Mobile), URL bar, refresh, copy URL, open-in-new-tab, edit button, loading overlay, status bar
+  - [x] AC2 — Added Draft/Live mode toggle to admin preview page; draft mode targets `NEXT_PUBLIC_FLEXCMS_SITE_URL/preview/...` (site-nextjs draft route), live mode targets `NEXT_PUBLIC_FLEXCMS_PUBLISH_URL/...` (publish service)
+  - [x] AC3 — Editor Preview button fixed: was hardcoded `http://localhost:3001${contentPath}`, now opens `/preview?path=...&mode=draft` (admin preview page)
+  - [x] AC4 — Content tree already linked to `/preview?path=...` (line 665 of content/page.tsx) — verified intact
+  - [x] AC5 — New `/preview/[[...slug]]/page.tsx` added to site-nextjs with `force-dynamic` + `revalidate=0` to bypass Next.js cache; renders draft content from author API
+  - [x] AC6 — `pnpm build` passes with 0 errors, all routes build successfully
+**Files Changed:**
+  - `frontend/apps/admin/src/app/preview/page.tsx` — added Draft/Live mode toggle + DRAFT_BASE constant + mode-aware previewUrl
+  - `frontend/apps/admin/src/app/editor/page.tsx` — fixed Preview button href to `/preview?path=...&mode=draft`
+  - `frontend/apps/site-nextjs/src/app/preview/[[...slug]]/page.tsx` — NEW: draft preview route with no-cache
+**Build Verified:** Yes — `pnpm build` ✅ 0 errors
 
 ---
 

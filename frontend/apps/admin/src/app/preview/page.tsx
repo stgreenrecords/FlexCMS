@@ -79,6 +79,13 @@ const PUBLISH_BASE =
     ? (process.env.NEXT_PUBLIC_FLEXCMS_PUBLISH_URL ?? 'http://localhost:8081')
     : 'http://localhost:8081';
 
+const DRAFT_BASE =
+  typeof window !== 'undefined'
+    ? (process.env.NEXT_PUBLIC_FLEXCMS_SITE_URL ?? 'http://localhost:3001')
+    : 'http://localhost:3001';
+
+type PreviewMode = 'live' | 'draft';
+
 // ---------------------------------------------------------------------------
 // Inner component (uses useSearchParams — must be inside Suspense)
 // ---------------------------------------------------------------------------
@@ -86,14 +93,18 @@ const PUBLISH_BASE =
 function PreviewContent() {
   const searchParams = useSearchParams();
   const rawPath = searchParams.get('path') ?? '/';
+  const initialMode = (searchParams.get('mode') === 'draft' ? 'draft' : 'live') as PreviewMode;
 
   const [viewport, setViewport] = useState<Viewport>('desktop');
+  const [previewMode, setPreviewMode] = useState<PreviewMode>(initialMode);
   const [iframeKey, setIframeKey] = useState(0); // increment to force refresh
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const previewUrl = `${PUBLISH_BASE}${rawPath.startsWith('/') ? rawPath : '/' + rawPath}`;
+  const normalizedPath = rawPath.startsWith('/') ? rawPath : '/' + rawPath;
+  const base = previewMode === 'draft' ? DRAFT_BASE : PUBLISH_BASE;
+  const previewUrl = `${base}/preview${normalizedPath}`;
   const currentVP = VIEWPORTS.find((v) => v.id === viewport)!;
 
   const refresh = useCallback(() => {
@@ -174,6 +185,38 @@ function PreviewContent() {
           className="w-px h-5 shrink-0"
           style={{ background: 'var(--color-border)' }}
         />
+
+        {/* Preview mode toggle */}
+        <div
+          className="flex items-center rounded-[var(--radius-md)] overflow-hidden border shrink-0"
+          style={{ borderColor: 'var(--color-border)' }}
+          role="group"
+          aria-label="Preview mode"
+        >
+          {(['draft', 'live'] as PreviewMode[]).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => { setPreviewMode(mode); setIframeKey((k) => k + 1); setLoading(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors capitalize"
+              style={{
+                background: previewMode === mode ? 'var(--color-primary)' : 'transparent',
+                color: previewMode === mode ? 'var(--color-primary-foreground)' : 'var(--color-muted-foreground)',
+              }}
+              aria-pressed={previewMode === mode}
+            >
+              {mode === 'draft' ? (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              ) : (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              )}
+              {mode}
+            </button>
+          ))}
+        </div>
 
         {/* Viewport toggle */}
         <div
@@ -408,7 +451,10 @@ function PreviewContent() {
         </span>
         <span className="font-mono">{rawPath}</span>
         <span>
-          {currentVP.label}{currentVP.width ? ` · ${currentVP.width}px` : ' · Full width'}
+          {currentVP.label}{currentVP.width ? ` · ${currentVP.width}px` : ' · Full width'}{' '}
+          · <span style={{ color: previewMode === 'draft' ? 'var(--color-warning, #f59e0b)' : 'var(--color-success, #22c55e)' }}>
+            {previewMode === 'draft' ? 'Draft' : 'Live'}
+          </span>
         </span>
       </footer>
     </div>

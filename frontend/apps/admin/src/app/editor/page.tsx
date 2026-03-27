@@ -448,7 +448,7 @@ function EditorInner() {
             <IconButton title="Undo"><UndoIcon /></IconButton>
             <IconButton title="Redo"><RedoIcon /></IconButton>
             <div style={{ width: 1, height: 16, background: 'rgba(66,70,84,0.4)', margin: '0 4px' }} />
-            <IconButton title="Preview" onClick={() => contentPath && window.open(`http://localhost:3001${contentPath}`, '_blank')}>
+            <IconButton title="Preview" onClick={() => contentPath && window.open(`/preview?path=${encodeURIComponent(contentPath)}&mode=draft`, '_blank')}>
               <EyeIcon />
             </IconButton>
             <IconButton title="Settings"><GearIcon /></IconButton>
