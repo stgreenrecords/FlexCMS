@@ -12,7 +12,7 @@ import { ComponentMapper } from '@flexcms/sdk';
 import type { FlexCmsRenderer } from '@flexcms/react';
 
 // ---------------------------------------------------------------------------
-// Component Renderers
+// Core component renderers
 // ---------------------------------------------------------------------------
 
 /** flexcms/rich-text — renders HTML content */
@@ -74,20 +74,82 @@ function Footer({ data }: { data: Record<string, unknown> }) {
 }
 
 // ---------------------------------------------------------------------------
+// TUT component renderers
+// ---------------------------------------------------------------------------
+
+export { HeroBanner } from './tut/HeroBanner';
+export { TextImage } from './tut/TextImage';
+export { CardGrid } from './tut/CardGrid';
+export { Card } from './tut/Card';
+export { ProductTeaser } from './tut/ProductTeaser';
+export { ProductSpecs } from './tut/ProductSpecs';
+export { Gallery } from './tut/Gallery';
+export { CtaBanner } from './tut/CtaBanner';
+export { Accordion } from './tut/Accordion';
+export { AccordionItem } from './tut/AccordionItem';
+export { VideoEmbed } from './tut/VideoEmbed';
+export { Navigation } from './tut/Navigation';
+export { Breadcrumb } from './tut/Breadcrumb';
+export { FooterLinks } from './tut/FooterLinks';
+export { LanguageSelector } from './tut/LanguageSelector';
+export { StatCounter } from './tut/StatCounter';
+export { Testimonial } from './tut/Testimonial';
+export { ModelComparison } from './tut/ModelComparison';
+
+import { HeroBanner } from './tut/HeroBanner';
+import { TextImage } from './tut/TextImage';
+import { CardGrid } from './tut/CardGrid';
+import { Card } from './tut/Card';
+import { ProductTeaser } from './tut/ProductTeaser';
+import { ProductSpecs } from './tut/ProductSpecs';
+import { Gallery } from './tut/Gallery';
+import { CtaBanner } from './tut/CtaBanner';
+import { Accordion } from './tut/Accordion';
+import { AccordionItem } from './tut/AccordionItem';
+import { VideoEmbed } from './tut/VideoEmbed';
+import { Navigation } from './tut/Navigation';
+import { Breadcrumb } from './tut/Breadcrumb';
+import { FooterLinks } from './tut/FooterLinks';
+import { LanguageSelector } from './tut/LanguageSelector';
+import { StatCounter } from './tut/StatCounter';
+import { Testimonial } from './tut/Testimonial';
+import { ModelComparison } from './tut/ModelComparison';
+import React from 'react';
+
+// ---------------------------------------------------------------------------
 // Build the component map (the bridge between contract and rendering)
 // ---------------------------------------------------------------------------
 
 export const componentMap = new ComponentMapper<any>()
   .registerAll({
+    // Core components
     'flexcms/rich-text': RichText,
     'flexcms/image': Image,
     'flexcms/container': Container,
     'flexcms/shared-header': Header,
     'flexcms/shared-footer': Footer,
+    // TUT components
+    'tut/hero-banner': HeroBanner,
+    'tut/text-image': TextImage,
+    'tut/card-grid': CardGrid,
+    'tut/card': Card,
+    'tut/product-teaser': ProductTeaser,
+    'tut/product-specs': ProductSpecs,
+    'tut/gallery': Gallery,
+    'tut/cta-banner': CtaBanner,
+    'tut/accordion': Accordion,
+    'tut/accordion-item': AccordionItem,
+    'tut/video-embed': VideoEmbed,
+    'tut/navigation': Navigation,
+    'tut/breadcrumb': Breadcrumb,
+    'tut/footer-links': FooterLinks,
+    'tut/language-selector': LanguageSelector,
+    'tut/stat-counter': StatCounter,
+    'tut/testimonial': Testimonial,
+    'tut/model-comparison': ModelComparison,
   })
   .setFallback(({ data }: any) => (
     <div className="p-4 border border-dashed border-gray-300 rounded">
       <pre className="text-xs">{JSON.stringify(data, null, 2)}</pre>
     </div>
   ));
-

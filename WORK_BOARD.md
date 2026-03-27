@@ -111,7 +111,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P0-09 | ✅ DONE | **Fix headless module test failure (Mockito stubbing mismatch)** | 2h | `flexcms-headless` | — |
 | P0-10 | ✅ DONE | **Register 18 TUT component definitions (V14 migration)** | 4h | `flexcms-app` (Flyway migration) | — |
 | P0-11 | ✅ DONE | **Seed TUT sample website — DAM assets + PIM products + sites + XFs + 85 pages** | 3d | `flexcms-app`, `flexcms-pim`, `flexcms-dam`, `scripts` | P0-10 |
-| P0-12 | 🟢 OPEN | **Implement 18 TUT frontend component renderers in site-nextjs** | 2d | `apps/site-nextjs` | P0-10 |
+| P0-12 | ✅ DONE | **Implement 18 TUT frontend component renderers in site-nextjs** | 2d | `apps/site-nextjs` | P0-10 |
 
 ### 🟠 P1 — High (Blocks Enterprise Deployment)
 
@@ -522,6 +522,23 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P0-12 — Implement 18 TUT Frontend Component Renderers
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — All 18 TUT component renderers implemented as named-export React components
+  - [x] AC2 — All 18 registered in `component-map.tsx` under their `tut/*` resource type keys
+  - [x] AC3 — Container components (`tut/card-grid`, `tut/accordion`) render `{children}` correctly
+  - [x] AC4 — Product components (`tut/product-teaser`, `tut/product-specs`, `tut/model-comparison`) fetch from `GET /api/pim/v1/products?sku=` with loading skeletons
+  - [x] AC5 — `cd frontend && pnpm build` passes — 8/8 tasks successful
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut/` — 18 NEW component files
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — registered all 18 tut/* types
+**Build Verified:** Yes — 0 errors, 0 TypeScript errors
 
 ---
 
