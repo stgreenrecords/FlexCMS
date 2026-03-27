@@ -3,6 +3,7 @@ package com.flexcms.headless.controller;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.repository.ContentNodeRepository;
+import com.flexcms.core.util.PathUtils;
 import com.flexcms.core.service.ContentDeliveryService;
 import com.flexcms.core.service.ContentNodeService;
 import com.flexcms.plugin.model.RenderContext;
@@ -46,7 +47,7 @@ public class ExperienceFragmentApiController {
             @Parameter(description = "Variation name, e.g. master | mobile | email")
             @PathVariable String variationType) {
 
-        String normPath = normalise(path);
+        String normPath = PathUtils.toContentPath(path);
         String varPath = normPath + "." + variationType.toLowerCase();
 
         ContentNode variation = nodeRepository.findByPath(varPath)
@@ -62,7 +63,7 @@ public class ExperienceFragmentApiController {
     @GetMapping("/{*xfPath}")
     @Transactional(readOnly = true)
     public ResponseEntity<Map<String, Object>> getDefaultVariation(@PathVariable String xfPath) {
-        String path = normalise(xfPath);
+        String path = PathUtils.toContentPath(xfPath);
 
         Optional<ContentNode> master = nodeRepository.findByPath(path + ".master")
                 .filter(n -> "flexcms/xf-page".equals(n.getResourceType()));
@@ -81,7 +82,7 @@ public class ExperienceFragmentApiController {
     @GetMapping("/variations")
     @Transactional(readOnly = true)
     public ResponseEntity<List<Map<String, Object>>> listVariations(@RequestParam String path) {
-        String normPath = normalise(path);
+        String normPath = PathUtils.toContentPath(path);
         List<Map<String, Object>> result = nodeService.getChildren(normPath).stream()
                 .filter(n -> "flexcms/xf-page".equals(n.getResourceType()))
                 .map(v -> Map.<String, Object>of(
@@ -94,7 +95,4 @@ public class ExperienceFragmentApiController {
         return ResponseEntity.ok(result);
     }
 
-    private static String normalise(String path) {
-        return path.startsWith("/") ? path.substring(1).replace('/', '.') : path;
-    }
 }

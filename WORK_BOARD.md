@@ -168,7 +168,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 |----|--------|-------|--------|-----------------|------------|
 | BUG-01 | ✅ DONE | **GraphQL `node()` resolver should NOT prepend `content.` prefix** | 1h | `flexcms-headless` | — |
 | BUG-02 | ✅ DONE | **`@EnableElasticsearchRepositories` must scan all packages** | 30m | `flexcms-app` | — |
-| BUG-03 | 🟢 OPEN | **Content path `.` vs `/` conversion inconsistent across controllers** | 4h | `flexcms-headless`, `flexcms-author`, `flexcms-publish` | — |
+| BUG-03 | ✅ DONE | **Content path `.` vs `/` conversion inconsistent across controllers** | 4h | `flexcms-headless`, `flexcms-author`, `flexcms-publish` | — |
 
 ---
 
@@ -522,6 +522,24 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### BUG-03 — Content Path Conversion Inconsistent Across Controllers
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] Created `PathUtils.toContentPath()` in `flexcms-core/util/` — the single canonical implementation
+  - [x] `ExperienceFragmentApiController` (headless): replaced `normalise()` (missing `content.` prefix) with `PathUtils.toContentPath()` — 3 call sites + deleted dead method
+  - [x] `ExperienceFragmentController` (author): replaced 5 inline conversions with `PathUtils.toContentPath()`
+  - [x] `mvn clean compile` passes
+**Root Cause:** `normalise()` only stripped `/` and replaced with `.` but never added `content.` prefix. Callers had to include `content/` in the URL or paths would not resolve.
+**Files Changed:**
+  - `flexcms-core/.../util/PathUtils.java` — NEW
+  - `flexcms-headless/.../ExperienceFragmentApiController.java` — replaced `normalise()`
+  - `flexcms-author/.../ExperienceFragmentController.java` — replaced 5 inline conversions
+**Build Verified:** Yes — `mvn clean compile` passes
 
 ---
 

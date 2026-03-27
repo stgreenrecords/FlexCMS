@@ -2,6 +2,7 @@ package com.flexcms.author.controller;
 
 import com.flexcms.author.service.ExperienceFragmentService;
 import com.flexcms.core.model.ContentNode;
+import com.flexcms.core.util.PathUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -88,8 +89,7 @@ public class ExperienceFragmentController {
     public ResponseEntity<Map<String, Object>> getExperienceFragment(
             @PathVariable String xfPath) {
 
-        // Normalise: strip leading slash that Spring may inject
-        String path = xfPath.startsWith("/") ? xfPath.substring(1).replace('/', '.') : xfPath;
+        String path = PathUtils.toContentPath(xfPath);
 
         ContentNode folder = xfService.getExperienceFragment(path)
                 .orElseThrow(() -> new com.flexcms.core.exception.NotFoundException(
@@ -113,7 +113,7 @@ public class ExperienceFragmentController {
             @PathVariable String xfPath,
             @RequestParam @NotBlank String userId) {
 
-        String path = xfPath.startsWith("/") ? xfPath.substring(1).replace('/', '.') : xfPath;
+        String path = PathUtils.toContentPath(xfPath);
         xfService.deleteExperienceFragment(path, userId);
         return ResponseEntity.noContent().build();
     }
@@ -141,7 +141,7 @@ public class ExperienceFragmentController {
             @RequestParam @NotBlank String path,
             @Valid @RequestBody AddVariationRequest request) {
 
-        String normPath = path.startsWith("/") ? path.substring(1).replace('/', '.') : path;
+        String normPath = PathUtils.toContentPath(path);
         ContentNode variation = xfService.addVariation(normPath, request.variationType(),
                 request.title(), request.userId());
         return ResponseEntity.ok(variation);
@@ -154,7 +154,7 @@ public class ExperienceFragmentController {
     @GetMapping("/variations")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<List<ContentNode>> listVariations(@RequestParam @NotBlank String path) {
-        String normPath = path.startsWith("/") ? path.substring(1).replace('/', '.') : path;
+        String normPath = PathUtils.toContentPath(path);
         return ResponseEntity.ok(xfService.listVariations(normPath));
     }
 
@@ -169,7 +169,7 @@ public class ExperienceFragmentController {
             @PathVariable String variationType,
             @RequestParam @NotBlank String userId) {
 
-        String normPath = path.startsWith("/") ? path.substring(1).replace('/', '.') : path;
+        String normPath = PathUtils.toContentPath(path);
         xfService.deleteVariation(normPath, variationType, userId);
         return ResponseEntity.noContent().build();
     }
