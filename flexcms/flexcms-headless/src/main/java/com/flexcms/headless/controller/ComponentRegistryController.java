@@ -2,6 +2,7 @@ package com.flexcms.headless.controller;
 
 import com.flexcms.core.model.ComponentDefinition;
 import com.flexcms.core.service.ComponentRegistry;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,10 +26,7 @@ public class ComponentRegistryController {
     @Autowired
     private ComponentRegistry componentRegistry;
 
-    /**
-     * Get the full component registry with data schemas.
-     * This is the primary contract endpoint for frontend teams.
-     */
+    @Operation(summary = "Get full component registry", description = "Returns all registered component types with their data schemas — the primary backend/frontend contract.")
     @GetMapping
     public ResponseEntity<Map<String, Object>> getRegistry() {
         List<Map<String, Object>> components = componentRegistry.getAllDefinitions().stream()
@@ -43,9 +41,7 @@ public class ComponentRegistryController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Get a single component's contract by resourceType.
-     */
+    @Operation(summary = "Get component by resource type", description = "Returns the data schema contract for a single component type (e.g. tut/hero-banner).")
     @GetMapping("/{resourceType}")
     public ResponseEntity<Map<String, Object>> getComponent(@PathVariable String resourceType) {
         return componentRegistry.getDefinition(resourceType)

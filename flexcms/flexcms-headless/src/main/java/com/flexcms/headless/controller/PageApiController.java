@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 
 /**
@@ -27,9 +28,7 @@ public class PageApiController {
     @Autowired
     private ContentNodeService nodeService;   // FIX BUG-01: injected via DI, not new()
 
-    /**
-     * Get a page with full component tree.
-     */
+    @Operation(summary = "Get rendered page", description = "Returns a fully rendered page with its component tree for the given content path.")
     @GetMapping("/{*path}")
     public ResponseEntity<Map<String, Object>> getPage(
             @PathVariable String path,
@@ -46,10 +45,7 @@ public class PageApiController {
         // NotFoundException from deliveryService propagates to GlobalExceptionHandler
     }
 
-    /**
-     * Get child pages (for navigation).
-     * URL: GET /api/content/v1/pages/children/{*path}
-     */
+    @Operation(summary = "Get child pages", description = "Returns direct child pages of a content node — used for navigation building.")
     @GetMapping("/children/{*path}")
     public ResponseEntity<?> getChildren(
             @PathVariable String path,

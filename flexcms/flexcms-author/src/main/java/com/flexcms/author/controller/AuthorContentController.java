@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.flexcms.author.service.ScheduledPublishingService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -53,7 +54,7 @@ public class AuthorContentController {
     @Autowired
     private ReplicationAgent replicationAgent;
 
-    /** Get a content node by path. */
+    @Operation(summary = "Get content node", description = "Returns a single content node by its path.")
     @GetMapping("/node")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<ContentNode> getNode(@RequestParam String path) {
@@ -73,6 +74,7 @@ public class AuthorContentController {
      * @param page   zero-based page index (default 0)
      * @param size   page size (default 50, max 200)
      */
+    @Operation(summary = "List content nodes", description = "Returns a paginated list of content nodes, optionally filtered by site and locale.")
     @GetMapping("/list")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Page<ContentNode>> listNodes(
@@ -95,6 +97,7 @@ public class AuthorContentController {
      *             Defaults to {@code "content"} so the UI can load the first level
      *             without an explicit parameter.
      */
+    @Operation(summary = "Get direct children", description = "Returns direct children of a content node (one level). Used by the admin Content Tree UI.")
     @GetMapping("/children")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<List<ContentNode>> getChildren(
@@ -102,7 +105,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(nodeService.getChildren(path));
     }
 
-    /** Get a page with full component tree. */
+    @Operation(summary = "Get page with component tree", description = "Returns a page node with its full nested component tree.")
     @GetMapping("/page")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<ContentNode> getPage(@RequestParam String path) {
@@ -113,7 +116,7 @@ public class AuthorContentController {
         );
     }
 
-    /** Create a new content node. */
+    @Operation(summary = "Create content node", description = "Creates a new content node under the specified parent path.")
     @PostMapping("/node")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> createNode(@Valid @RequestBody CreateNodeRequest request) {
@@ -127,7 +130,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(node);
     }
 
-    /** Update node properties (partial merge). */
+    @Operation(summary = "Update node properties", description = "Partially merges the provided properties into an existing content node.")
     @PutMapping("/node/properties")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> updateProperties(@Valid @RequestBody UpdatePropertiesRequest request) {
@@ -135,7 +138,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(node);
     }
 
-    /** Move a node to a new parent. */
+    @Operation(summary = "Move content node", description = "Moves a content node and all its descendants to a new parent path.")
     @PostMapping("/node/move")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> moveNode(@Valid @RequestBody MoveNodeRequest request) {
@@ -143,7 +146,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(node);
     }
 
-    /** Delete a node and all descendants. */
+    @Operation(summary = "Delete content node", description = "Deletes a content node and all its descendants.")
     @DeleteMapping("/node")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<Void> deleteNode(@RequestParam String path, @RequestParam String userId) {
@@ -151,21 +154,21 @@ public class AuthorContentController {
         return ResponseEntity.ok().build();
     }
 
-    /** Lock a node for editing. */
+    @Operation(summary = "Lock node", description = "Locks a content node for exclusive editing by the specified user.")
     @PostMapping("/node/lock")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> lock(@RequestParam String path, @RequestParam String userId) {
         return ResponseEntity.ok(nodeService.lock(toContentPath(path), userId));
     }
 
-    /** Unlock a node. */
+    @Operation(summary = "Unlock node", description = "Releases the edit lock on a content node.")
     @PostMapping("/node/unlock")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> unlock(@RequestParam String path, @RequestParam String userId) {
         return ResponseEntity.ok(nodeService.unlock(toContentPath(path), userId));
     }
 
-    /** Update node status (DRAFT → REVIEW → PUBLISHED → ARCHIVED). */
+    @Operation(summary = "Update node status", description = "Transitions a content node to a new status (DRAFT, IN_REVIEW, APPROVED, PUBLISHED, ARCHIVED).")
     @PostMapping("/node/status")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_PUBLISHER')")
     public ResponseEntity<ContentNode> updateStatus(@RequestParam String path,
@@ -174,7 +177,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(nodeService.updateStatus(toContentPath(path), status, userId));
     }
 
-    /** Get version history. */
+    @Operation(summary = "Get version history", description = "Returns the paginated version history for a content node.")
     @GetMapping("/node/versions")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Page<ContentNodeVersion>> getVersions(
@@ -184,7 +187,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(nodeService.getVersionHistory(nodeId, PageRequest.of(page, size)));
     }
 
-    /** Schedule a node for future publishing. Pass null publishAt to clear the schedule. */
+    @Operation(summary = "Schedule publishing", description = "Schedules a content node for future publishing. Pass null publishAt to clear the schedule.")
     @PutMapping("/node/schedule-publish")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
     public ResponseEntity<Void> schedulePublish(
@@ -194,7 +197,7 @@ public class AuthorContentController {
         return ResponseEntity.ok().build();
     }
 
-    /** Schedule a node for future deactivation. Pass null deactivateAt to clear the schedule. */
+    @Operation(summary = "Schedule deactivation", description = "Schedules a content node for future deactivation. Pass null deactivateAt to clear the schedule.")
     @PutMapping("/node/schedule-deactivate")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
     public ResponseEntity<Void> scheduleDeactivate(
@@ -206,7 +209,7 @@ public class AuthorContentController {
 
     // ── Bulk operations ────────────────────────────────────────────────────────
 
-    /** Bulk publish: publish all listed paths and trigger replication for each. */
+    @Operation(summary = "Bulk publish", description = "Publishes all listed content paths and triggers replication for each.")
     @PostMapping("/bulk/publish")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
     public ResponseEntity<BulkOperationResult> bulkPublish(@Valid @RequestBody BulkPathsRequest req) {
@@ -225,7 +228,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(result);
     }
 
-    /** Bulk delete: delete all listed paths and their descendants. */
+    @Operation(summary = "Bulk delete", description = "Deletes all listed content paths and their descendants.")
     @DeleteMapping("/bulk")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<BulkOperationResult> bulkDelete(@Valid @RequestBody BulkPathsRequest req) {
@@ -235,7 +238,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(result);
     }
 
-    /** Bulk move: move all listed paths to a common target parent. */
+    @Operation(summary = "Bulk move", description = "Moves all listed content paths to a common target parent.")
     @PostMapping("/bulk/move")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<BulkOperationResult> bulkMove(@Valid @RequestBody BulkMoveRequest req) {
@@ -246,7 +249,7 @@ public class AuthorContentController {
         return ResponseEntity.ok(result);
     }
 
-    /** Restore a specific version. */
+    @Operation(summary = "Restore version", description = "Restores a content node to a specific historical version.")
     @PostMapping("/node/restore")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<ContentNode> restoreVersion(@RequestParam UUID nodeId,

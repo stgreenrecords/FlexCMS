@@ -2,6 +2,8 @@ package com.flexcms.pim.controller;
 
 import com.flexcms.pim.model.Catalog;
 import com.flexcms.pim.service.CatalogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -22,6 +24,7 @@ import java.util.UUID;
  * <p>Catalogs group products by year/season and go through a lifecycle:
  * DRAFT → ACTIVE → ARCHIVED.</p>
  */
+@Tag(name = "PIM Catalogs", description = "Catalog management — create, activate, archive, and delete product catalogs")
 @RestController
 @RequestMapping("/api/pim/v1/catalogs")
 public class CatalogApiController {
@@ -29,6 +32,7 @@ public class CatalogApiController {
     @Autowired
     private CatalogService catalogService;
 
+    @Operation(summary = "List catalogs", description = "Returns paginated catalogs, optionally filtered by year.")
     @GetMapping
     public ResponseEntity<Map<String, Object>> listAll(
             @RequestParam(required = false) Integer year,
@@ -48,6 +52,7 @@ public class CatalogApiController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get catalog by ID", description = "Returns a single catalog by its UUID.")
     @GetMapping("/{id}")
     public ResponseEntity<Catalog> getById(@PathVariable UUID id) {
         return catalogService.getById(id)
@@ -55,6 +60,7 @@ public class CatalogApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Create catalog", description = "Creates a new product catalog for a given year and season.")
     @PostMapping
     public ResponseEntity<Catalog> create(@Valid @RequestBody CreateCatalogRequest request) {
         Catalog catalog = catalogService.create(
@@ -64,6 +70,7 @@ public class CatalogApiController {
         return ResponseEntity.ok(catalog);
     }
 
+    @Operation(summary = "Update catalog", description = "Updates a catalog's name, description, and settings.")
     @PutMapping("/{id}")
     public ResponseEntity<Catalog> update(
             @PathVariable UUID id,
@@ -73,16 +80,19 @@ public class CatalogApiController {
         return ResponseEntity.ok(catalog);
     }
 
+    @Operation(summary = "Activate catalog", description = "Transitions a catalog from DRAFT to ACTIVE status.")
     @PostMapping("/{id}/activate")
     public ResponseEntity<Catalog> activate(@PathVariable UUID id) {
         return ResponseEntity.ok(catalogService.activate(id));
     }
 
+    @Operation(summary = "Archive catalog", description = "Archives a catalog — no further modifications allowed.")
     @PostMapping("/{id}/archive")
     public ResponseEntity<Catalog> archive(@PathVariable UUID id) {
         return ResponseEntity.ok(catalogService.archive(id));
     }
 
+    @Operation(summary = "Delete catalog", description = "Permanently deletes a catalog and all its products.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         catalogService.delete(id);

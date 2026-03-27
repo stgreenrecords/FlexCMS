@@ -1,6 +1,7 @@
 package com.flexcms.headless.controller;
 
 import com.flexcms.headless.service.SitemapService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ public class SitemapApiController {
      * @param locale the content locale (e.g., {@code en}, {@code fr})
      * @return list of sitemap entries with url, title, lastModified, and priority
      */
+    @Operation(summary = "Get sitemap entries", description = "Returns all sitemap-eligible published pages for a site and locale.")
     @GetMapping("/{siteId}/{locale}")
     public ResponseEntity<List<SitemapService.SitemapEntry>> getSitemapEntries(
             @PathVariable String siteId,

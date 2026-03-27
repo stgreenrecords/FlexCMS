@@ -89,4 +89,17 @@ public class OpenApiConfig {
                 .pathsToMatch("/api/content/**", "/api/pages/**")
                 .build();
     }
+
+    /**
+     * PIM (Product Information Management) API group.
+     * Authenticated endpoints for product, catalog, and schema management.
+     */
+    @Bean
+    public GroupedOpenApi pimApiGroup() {
+        return GroupedOpenApi.builder()
+                .group("pim")
+                .displayName("PIM API")
+                .pathsToMatch("/api/pim/**")
+                .build();
+    }
 }

@@ -3,6 +3,8 @@ package com.flexcms.author.controller;
 import com.flexcms.core.model.NodeAcl;
 import com.flexcms.core.model.NodePermission;
 import com.flexcms.core.service.NodeAclService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -21,6 +23,7 @@ import java.util.Set;
  * <p>All endpoints require ADMIN or MANAGE_ACL permission on the target node.
  * Regular content authors can only be granted access by an ADMIN.
  */
+@Tag(name = "Author ACL", description = "Per-node access control list management — grant and revoke permissions for principals on content nodes")
 @ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 @RestController
 @RequestMapping("/api/author/acl")
@@ -29,7 +32,7 @@ public class NodeAclController {
     @Autowired
     private NodeAclService nodeAclService;
 
-    /** List all ACL entries directly on a node. */
+    @Operation(summary = "Get node ACLs", description = "Returns all ACL entries directly set on a node (not inherited).")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN') or hasPermission(#nodePath, 'MANAGE_ACL')")
     public ResponseEntity<List<NodeAcl>> getAcls(
@@ -37,7 +40,7 @@ public class NodeAclController {
         return ResponseEntity.ok(nodeAclService.getAclsForPath(nodePath));
     }
 
-    /** List effective ACL entries (direct + inherited from ancestors). */
+    @Operation(summary = "Get effective ACLs", description = "Returns effective ACL entries — direct entries plus those inherited from ancestor nodes.")
     @GetMapping("/effective")
     @PreAuthorize("hasAnyRole('ADMIN') or hasPermission(#nodePath, 'MANAGE_ACL')")
     public ResponseEntity<List<NodeAcl>> getEffectiveAcls(
@@ -45,7 +48,7 @@ public class NodeAclController {
         return ResponseEntity.ok(nodeAclService.getEffectiveAcls(nodePath));
     }
 
-    /** Grant or update permissions for a principal on a node. */
+    @Operation(summary = "Grant permissions", description = "Grants or updates permissions for a principal (user/group) on a content node.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasPermission(#request.nodePath, 'MANAGE_ACL')")
     public ResponseEntity<NodeAcl> grant(@Valid @RequestBody GrantAclRequest request) {
@@ -58,7 +61,7 @@ public class NodeAclController {
         return ResponseEntity.ok(acl);
     }
 
-    /** Revoke all permissions for a principal on a node. */
+    @Operation(summary = "Revoke permissions", description = "Revokes all permissions for a principal on a content node.")
     @DeleteMapping
     @PreAuthorize("hasRole('ADMIN') or hasPermission(#nodePath, 'MANAGE_ACL')")
     public ResponseEntity<Void> revoke(

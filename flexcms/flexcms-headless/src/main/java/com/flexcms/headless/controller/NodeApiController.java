@@ -3,6 +3,8 @@ package com.flexcms.headless.controller;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.service.ContentNodeService;
 import com.flexcms.plugin.spi.ContentNodeData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +23,7 @@ public class NodeApiController {
     @Autowired
     private ContentNodeService nodeService;
 
-    /**
-     * Get a raw content node by path.
-     */
+    @Operation(summary = "Get raw content node", description = "Returns a single content node by its content path (e.g. content/site/en/home).")
     @GetMapping("/{*path}")
     public ResponseEntity<Map<String, Object>> getNode(@PathVariable String path) {
         String contentPath = toContentPath(path);
@@ -40,10 +40,11 @@ public class NodeApiController {
      *
      * @param depth maximum traversal depth (1 = direct children only, default 5, max 10)
      */
+    @Operation(summary = "Get descendant nodes", description = "Returns a flat list of descendant nodes up to the given depth (1–10, default 5).")
     @GetMapping("/descendants/{*path}")
     public ResponseEntity<Map<String, Object>> getDescendants(
             @PathVariable String path,
-            @RequestParam(defaultValue = "5") int depth) {
+            @Parameter(description = "Maximum traversal depth (1 = direct children, max 10)") @RequestParam(defaultValue = "5") int depth) {
         String contentPath = toContentPath(path);
         int cappedDepth = Math.min(Math.max(depth, 1), 10);
 

@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,7 @@ public class AuthorAssetController {
     @Autowired
     private S3Service s3Service;
 
-    /** Upload a new asset. */
+    @Operation(summary = "Upload asset", description = "Uploads a new asset binary and registers it in the DAM.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<Asset> uploadAsset(
@@ -52,7 +53,7 @@ public class AuthorAssetController {
         return ResponseEntity.ok(asset);
     }
 
-    /** Get asset details. */
+    @Operation(summary = "Get asset details", description = "Returns asset metadata by ID.")
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Asset> getAsset(@PathVariable UUID id) {
@@ -62,7 +63,7 @@ public class AuthorAssetController {
         );
     }
 
-    /** Stream asset binary content from storage. */
+    @Operation(summary = "Stream asset content", description = "Streams the raw binary content of an asset from object storage.")
     @GetMapping("/{id}/content")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<byte[]> streamAssetContent(@PathVariable UUID id) {
@@ -76,7 +77,7 @@ public class AuthorAssetController {
                 .body(data);
     }
 
-    /** List assets in a folder with pagination. */
+    @Operation(summary = "List assets in folder", description = "Returns paginated assets in a DAM folder.")
     @GetMapping("/folder")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Map<String, Object>> listFolder(
@@ -94,7 +95,7 @@ public class AuthorAssetController {
         return ResponseEntity.ok(response);
     }
 
-    /** List all assets with optional search and pagination. */
+    @Operation(summary = "List all assets", description = "Returns paginated assets with optional keyword search.")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Map<String, Object>> listAll(
@@ -118,7 +119,7 @@ public class AuthorAssetController {
         return ResponseEntity.ok(response);
     }
 
-    /** Delete an asset. */
+    @Operation(summary = "Delete asset", description = "Deletes an asset from the DAM and object storage by its path.")
     @DeleteMapping
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<Void> deleteAsset(

@@ -4,6 +4,8 @@ import com.flexcms.core.model.DomainMapping;
 import com.flexcms.core.model.Site;
 import com.flexcms.i18n.service.TranslationService;
 import com.flexcms.multisite.service.SiteManagementService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -20,6 +22,7 @@ import java.util.Map;
  * Author-side REST API for site administration.
  * All site-management operations require at minimum ADMIN role.
  */
+@Tag(name = "Admin Sites", description = "Site administration — create sites, manage domains and language copies (ADMIN only)")
 @ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 @RestController
 @RequestMapping("/api/admin/sites")
@@ -31,7 +34,7 @@ public class SiteAdminController {
     @Autowired
     private TranslationService translationService;
 
-    /** Create a new site. */
+    @Operation(summary = "Create site", description = "Creates a new site with its root content tree and locale structure.")
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Site> createSite(@Valid @RequestBody CreateSiteRequest request) {
@@ -41,21 +44,21 @@ public class SiteAdminController {
         return ResponseEntity.ok(site);
     }
 
-    /** List all sites. */
+    @Operation(summary = "List sites", description = "Returns all registered sites.")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<List<Site>> listSites() {
         return ResponseEntity.ok(siteService.listSites());
     }
 
-    /** Get a summary of a specific site. */
+    @Operation(summary = "Get site summary", description = "Returns a summary for a specific site including page count and locale info.")
     @GetMapping("/{siteId}")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<Map<String, Object>> getSiteSummary(@PathVariable String siteId) {
         return ResponseEntity.ok(siteService.getSiteSummary(siteId));
     }
 
-    /** Add a domain to a site. */
+    @Operation(summary = "Add domain", description = "Adds a domain mapping to a site.")
     @PostMapping("/{siteId}/domains")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DomainMapping> addDomain(
@@ -64,7 +67,7 @@ public class SiteAdminController {
         return ResponseEntity.ok(siteService.addDomain(siteId, request.domain(), request.primary()));
     }
 
-    /** Add a language to a site by copying from an existing locale. */
+    @Operation(summary = "Add language", description = "Adds a language to a site by creating a language copy from an existing locale.")
     @PostMapping("/{siteId}/languages/{locale}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TranslationService.LanguageCopyResult> addLanguage(

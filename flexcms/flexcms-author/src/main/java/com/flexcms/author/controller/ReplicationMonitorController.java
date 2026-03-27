@@ -3,6 +3,8 @@ package com.flexcms.author.controller;
 import com.flexcms.core.model.ReplicationLogEntry;
 import com.flexcms.core.model.ReplicationLogEntry.ReplicationStatus;
 import com.flexcms.core.repository.ReplicationLogRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,7 @@ import java.util.Map;
  * Replication monitoring dashboard API.
  * Restricted to ADMIN — this exposes internal infrastructure state.
  */
+@Tag(name = "Admin Replication", description = "Replication monitoring — queue status and event log (ADMIN only)")
 @ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
 @RestController
 @RequestMapping("/api/admin/replication")
@@ -26,7 +29,7 @@ public class ReplicationMonitorController {
     @Autowired
     private ReplicationLogRepository replicationLog;
 
-    /** Get replication queue status counts. */
+    @Operation(summary = "Get replication status", description = "Returns counts of pending, failed, and completed replication events.")
     @GetMapping("/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getStatus() {
@@ -37,7 +40,7 @@ public class ReplicationMonitorController {
         ));
     }
 
-    /** Get paginated replication log entries. */
+    @Operation(summary = "Get replication log", description = "Returns paginated replication log entries ordered newest-first.")
     @GetMapping("/log")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ReplicationLogEntry>> getLog(

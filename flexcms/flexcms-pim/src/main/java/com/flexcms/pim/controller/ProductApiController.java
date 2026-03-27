@@ -9,6 +9,8 @@ import com.flexcms.pim.model.ProductVersion;
 import com.flexcms.pim.service.ProductAssetRefService;
 import com.flexcms.pim.service.ProductService;
 import com.flexcms.pim.service.VariantService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +35,7 @@ import java.util.UUID;
  *   <li>Frontend SDK (direct product queries)</li>
  * </ul></p>
  */
+@Tag(name = "PIM Products", description = "Product CRUD, status management, carryforward, variants, asset links, and version history")
 @RestController
 @RequestMapping("/api/pim/v1/products")
 public class ProductApiController {
@@ -50,7 +53,7 @@ public class ProductApiController {
     // Product CRUD
     // -------------------------------------------------------------------------
 
-    /** Get a product by SKU with fully resolved attributes */
+    @Operation(summary = "Get product by SKU", description = "Returns a product with fully resolved attributes (carryforward inheritance applied).")
     @GetMapping("/{sku}")
     public ResponseEntity<Map<String, Object>> getProduct(@PathVariable String sku) {
         return productService.getResolvedProduct(sku)
@@ -58,7 +61,7 @@ public class ProductApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /** List products in a catalog or search globally (paginated) */
+    @Operation(summary = "List or search products", description = "Returns paginated products filtered by catalog or full-text search query.")
     @GetMapping
     public ResponseEntity<Page<Product>> listProducts(
             @RequestParam(required = false) UUID catalogId,
@@ -76,7 +79,7 @@ public class ProductApiController {
         return ResponseEntity.ok(result);
     }
 
-    /** Create a product */
+    @Operation(summary = "Create product", description = "Creates a new product in the specified catalog.")
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody CreateProductRequest request) {
         Product product = productService.create(
@@ -86,7 +89,7 @@ public class ProductApiController {
         return ResponseEntity.ok(product);
     }
 
-    /** Update product attributes */
+    @Operation(summary = "Update product", description = "Updates a product's attributes by SKU.")
     @PutMapping("/{sku}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable String sku,
@@ -95,14 +98,14 @@ public class ProductApiController {
         return ResponseEntity.ok(updated);
     }
 
-    /** Delete a product and all its variants and asset refs */
+    @Operation(summary = "Delete product", description = "Deletes a product and all its variants and asset references.")
     @DeleteMapping("/{sku}")
     public ResponseEntity<Void> deleteProduct(@PathVariable String sku) {
         productService.delete(sku);
         return ResponseEntity.noContent().build();
     }
 
-    /** Update product status (DRAFT / ACTIVE / ARCHIVED / DISCONTINUED) */
+    @Operation(summary = "Update product status", description = "Transitions a product to a new status (DRAFT, PUBLISHED, ARCHIVED).")
     @PutMapping("/{sku}/status")
     public ResponseEntity<Product> updateStatus(
             @PathVariable String sku,
@@ -111,7 +114,7 @@ public class ProductApiController {
         return ResponseEntity.ok(updated);
     }
 
-    /** Carryforward products from one catalog to another (year rollover) */
+    @Operation(summary = "Carryforward products", description = "Copies products from a source catalog to a target catalog for year rollover.")
     @PostMapping("/carryforward")
     public ResponseEntity<Map<String, Object>> carryforward(@Valid @RequestBody CarryforwardRequest request) {
         int count = productService.carryforward(
@@ -125,6 +128,7 @@ public class ProductApiController {
      * and break the carryforward inheritance chain. Use when the product is fully reviewed
      * for the new year and should stand on its own.
      */
+    @Operation(summary = "Merge inherited attributes", description = "Merges carryforward-inherited attributes into the product's own map, breaking the inheritance chain.")
     @PostMapping("/{sku}/merge-inherited")
     public ResponseEntity<Product> mergeInherited(
             @PathVariable String sku,
@@ -139,6 +143,7 @@ public class ProductApiController {
      * Shows which products were modified, which are brand-new, and which source products
      * were not carried forward.
      */
+    @Operation(summary = "Get carryforward delta", description = "Returns a delta report comparing products between source and target catalogs.")
     @GetMapping("/carryforward/delta")
     public ResponseEntity<CarryforwardDeltaReport> getCarryforwardDelta(
             @RequestParam UUID sourceCatalogId,
@@ -151,6 +156,7 @@ public class ProductApiController {
     // Variants
     // -------------------------------------------------------------------------
 
+    @Operation(summary = "List variants", description = "Returns all variants for a product.")
     @GetMapping("/{sku}/variants")
     public ResponseEntity<List<ProductVariant>> listVariants(@PathVariable String sku) {
         return productService.getBysku(sku)
@@ -158,6 +164,7 @@ public class ProductApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Create variant", description = "Creates a new variant for a product.")
     @PostMapping("/{sku}/variants")
     public ResponseEntity<ProductVariant> createVariant(
             @PathVariable String sku,
@@ -169,6 +176,7 @@ public class ProductApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Update variant", description = "Updates a product variant's attributes, pricing, and inventory.")
     @PutMapping("/variants/{variantId}")
     public ResponseEntity<ProductVariant> updateVariant(
             @PathVariable UUID variantId,
@@ -178,6 +186,7 @@ public class ProductApiController {
         return ResponseEntity.ok(updated);
     }
 
+    @Operation(summary = "Delete variant", description = "Deletes a product variant by ID.")
     @DeleteMapping("/variants/{variantId}")
     public ResponseEntity<Void> deleteVariant(@PathVariable UUID variantId) {
         variantService.delete(variantId);
@@ -188,6 +197,7 @@ public class ProductApiController {
     // Asset references
     // -------------------------------------------------------------------------
 
+    @Operation(summary = "List product assets", description = "Returns all DAM asset references linked to a product.")
     @GetMapping("/{sku}/assets")
     public ResponseEntity<List<ProductAssetRef>> listAssets(@PathVariable String sku) {
         return productService.getBysku(sku)
@@ -195,6 +205,7 @@ public class ProductApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Link asset to product", description = "Links a DAM asset to a product with a role and display order.")
     @PostMapping("/{sku}/assets")
     public ResponseEntity<ProductAssetRef> linkAsset(
             @PathVariable String sku,
@@ -205,6 +216,7 @@ public class ProductApiController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @Operation(summary = "Update asset reference", description = "Updates the role and display order of a product-asset link.")
     @PutMapping("/assets/{refId}")
     public ResponseEntity<ProductAssetRef> updateAssetRef(
             @PathVariable UUID refId,
@@ -213,6 +225,7 @@ public class ProductApiController {
         return ResponseEntity.ok(updated);
     }
 
+    @Operation(summary = "Unlink asset", description = "Removes a DAM asset link from a product.")
     @DeleteMapping("/assets/{refId}")
     public ResponseEntity<Void> unlinkAsset(@PathVariable UUID refId) {
         assetRefService.unlink(refId);
@@ -267,13 +280,13 @@ public class ProductApiController {
     // Version history
     // -------------------------------------------------------------------------
 
-    /** Get the full version history for a product (newest first). */
+    @Operation(summary = "Get version history", description = "Returns the full version history for a product ordered newest-first.")
     @GetMapping("/{id}/versions")
     public ResponseEntity<List<ProductVersion>> getVersionHistory(@PathVariable UUID id) {
         return ResponseEntity.ok(productService.getVersionHistory(id));
     }
 
-    /** Restore a product to a specific historical version. */
+    @Operation(summary = "Restore product version", description = "Restores a product to a specific historical version.")
     @PostMapping("/{id}/versions/{versionNumber}/restore")
     public ResponseEntity<Product> restoreVersion(
             @PathVariable UUID id,

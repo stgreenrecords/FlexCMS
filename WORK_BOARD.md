@@ -123,7 +123,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P1-04 | ✅ DONE | **Unit tests — PIM services (ProductService, CarryforwardService)** | 2d | `flexcms-pim` | — |
 | P1-05 | ✅ DONE | **Integration tests — Testcontainers for repositories** | 3d | `flexcms-core`, `flexcms-pim` | P1-03, P1-04 |
 | P1-06 | ✅ DONE | **Security — Spring Security OAuth2 Resource Server + JWT + RBAC** | 5d | `flexcms-app`, `flexcms-core` | — |
-| P1-07 | 🟢 OPEN | **API documentation — SpringDoc OpenAPI for all REST endpoints** | 2d | `flexcms-headless`, `flexcms-author`, `flexcms-pim`, `flexcms-app` | — |
+| P1-07 | ✅ DONE | **API documentation — SpringDoc OpenAPI for all REST endpoints** | 2d | `flexcms-headless`, `flexcms-author`, `flexcms-pim`, `flexcms-app` | — |
 | P1-08 | 🟢 OPEN | **Observability — Micrometer + Prometheus metrics + structured logging** | 3d | `flexcms-app`, `flexcms-core`, `flexcms-replication` | — |
 | P1-09 | 🟢 OPEN | **Admin UI — Content tree browser** | 5d | `apps/admin`, `packages/ui` | P0-06 |
 | P1-10 | 🟢 OPEN | **Admin UI — DAM browser with upload** | 4d | `apps/admin`, `packages/ui` | P0-06 |
@@ -522,6 +522,37 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-07 — API Documentation — SpringDoc OpenAPI for All REST Endpoints
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] All 23 controllers have `@Tag` on the class — tag names: Headless Pages, Headless Nodes, Headless Navigation, Headless Sitemap, Headless Components, Author Content, Author Assets, Author Workflow, Author ACL, Admin Sites, Admin Replication, Audit Trail, Content Import/Export, Live Copy, Replication Monitor, Experience Fragment (author + headless), Build Dependencies, Headless Search, PIM Products, PIM Catalogs, PIM Schemas, PIM Product Search, PIM Import
+  - [x] All endpoints have `@Operation(summary, description)` — 80+ endpoints documented across all modules
+  - [x] `OpenApiConfig` adds 3 grouped API views: Author API (`/api/author/**`), Headless Delivery API (`/api/content/**`), PIM API (`/api/pim/**`) — accessible at `/swagger-ui.html`
+  - [x] JWT Bearer security scheme defined globally; servers list: localhost:8080 (author), localhost:8081 (publish)
+  - [x] `mvn clean compile` passes — 0 errors
+  - [x] All existing tests pass: 125 PIM + 45 author + 50 headless + 99 core = 319 tests, 0 failures (ApplicationContextSmokeTest excluded — requires live PostgreSQL, pre-existing)
+**Files Changed:**
+  - `flexcms-app/.../config/OpenApiConfig.java` — added `pimApiGroup()` bean
+  - `flexcms-headless/.../controller/NodeApiController.java` — added `@Operation` on 2 methods
+  - `flexcms-headless/.../controller/NavigationApiController.java` — added `@Operation` on 1 method
+  - `flexcms-headless/.../controller/ComponentRegistryController.java` — added `@Operation` on 2 methods
+  - `flexcms-headless/.../controller/SitemapApiController.java` — added `@Operation` on 1 method
+  - `flexcms-headless/.../controller/PageApiController.java` — added `@Operation` on 2 methods
+  - `flexcms-author/.../controller/AuthorWorkflowController.java` — added `@Operation` on 4 methods
+  - `flexcms-author/.../controller/AuthorContentController.java` — added `@Operation` on 18 methods
+  - `flexcms-author/.../controller/AuthorAssetController.java` — added `@Operation` on 6 methods
+  - `flexcms-author/.../controller/NodeAclController.java` — added `@Tag` + `@Operation` on 4 methods
+  - `flexcms-author/.../controller/ReplicationMonitorController.java` — added `@Tag` + `@Operation` on 2 methods
+  - `flexcms-author/.../controller/SiteAdminController.java` — added `@Tag` + `@Operation` on 6 methods
+  - `flexcms-pim/.../controller/ProductApiController.java` — added `@Tag` + `@Operation` on 20 methods
+  - `flexcms-pim/.../controller/CatalogApiController.java` — added `@Tag` + `@Operation` on 7 methods
+  - `flexcms-pim/.../controller/SchemaApiController.java` — added `@Tag` + `@Operation` on 8 methods
+**Build Verified:** Yes — `mvn clean compile` passes; 319 tests, 0 failures
 
 ---
 

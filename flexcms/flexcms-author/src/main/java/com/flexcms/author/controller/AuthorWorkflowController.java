@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import java.util.UUID;
@@ -27,7 +28,7 @@ public class AuthorWorkflowController {
     @Autowired
     private WorkflowEngine workflowEngine;
 
-    /** Start a new workflow for content. */
+    @Operation(summary = "Start workflow", description = "Starts a new approval workflow for the specified content path.")
     @PostMapping("/start")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<WorkflowInstance> startWorkflow(@Valid @RequestBody StartWorkflowRequest request) {
@@ -36,7 +37,7 @@ public class AuthorWorkflowController {
         return ResponseEntity.ok(instance);
     }
 
-    /** Advance a workflow (approve, reject, publish, etc.). */
+    @Operation(summary = "Advance workflow", description = "Advances a workflow by performing an action (approve, reject, publish, etc.).")
     @PostMapping("/advance")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<WorkflowInstance> advance(@Valid @RequestBody AdvanceWorkflowRequest request) {
@@ -45,7 +46,7 @@ public class AuthorWorkflowController {
         return ResponseEntity.ok(instance);
     }
 
-    /** Cancel an active workflow. */
+    @Operation(summary = "Cancel workflow", description = "Cancels an active workflow instance.")
     @PostMapping("/cancel")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<WorkflowInstance> cancel(@RequestParam UUID instanceId,
@@ -54,7 +55,7 @@ public class AuthorWorkflowController {
         return ResponseEntity.ok(workflowEngine.cancel(instanceId, userId, reason));
     }
 
-    /** Get the active workflow for a content path. */
+    @Operation(summary = "Get active workflow", description = "Returns the active workflow instance for the given content path, or 404 if none.")
     @GetMapping("/active")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
     public ResponseEntity<WorkflowInstance> getActive(@RequestParam String contentPath) {
