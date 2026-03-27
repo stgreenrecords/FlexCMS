@@ -105,7 +105,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P0-03 | ✅ DONE | **Fix `PageApiController.getChildren()` — DI instead of `new ContentNodeService()`** | 1h | `flexcms-headless` | — |
 | P0-04 | ✅ DONE | **Fix N+1 in `ContentNode.getChildren()` / `loadChildrenRecursive()`** | 4h | `flexcms-core` | — |
 | P0-05 | ✅ DONE | **Add pagination to all list endpoints** | 1d | `flexcms-headless`, `flexcms-author`, `flexcms-pim` | — |
-| P0-06 | 🟢 OPEN | **Remove all mock/dummy data from frontend markup** | 4h | `apps/admin` | — |
+| P0-06 | ✅ DONE | **Remove all mock/dummy data from frontend markup** | 4h | `apps/admin` | — |
 | P0-07 | ✅ DONE | **Ensure SQL seed data uses only valid `NodeStatus` enum values** | 2h | `flexcms-app` (migrations) | — |
 | P0-08 | ✅ DONE | **Database constraint: CHECK on `content_nodes.status`** | 1h | `flexcms-app` (Flyway migration) | P0-07 |
 | P0-09 | ✅ DONE | **Fix headless module test failure (Mockito stubbing mismatch)** | 2h | `flexcms-headless` | — |
@@ -166,8 +166,8 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
-| BUG-01 | 🟢 OPEN | **GraphQL `node()` resolver should NOT prepend `content.` prefix** | 1h | `flexcms-headless` | — |
-| BUG-02 | 🟢 OPEN | **`@EnableElasticsearchRepositories` must scan all packages** | 30m | `flexcms-app` | — |
+| BUG-01 | ✅ DONE | **GraphQL `node()` resolver should NOT prepend `content.` prefix** | 1h | `flexcms-headless` | — |
+| BUG-02 | ✅ DONE | **`@EnableElasticsearchRepositories` must scan all packages** | 30m | `flexcms-app` | — |
 | BUG-03 | 🟢 OPEN | **Content path `.` vs `/` conversion inconsistent across controllers** | 4h | `flexcms-headless`, `flexcms-author`, `flexcms-publish` | — |
 
 ---
@@ -522,6 +522,23 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P0-06 — Remove Mock Data from Frontend
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — Removed all hardcoded fake data arrays: `INITIAL_MAPPINGS`, `VALIDATION_ISSUES`, `PREVIEW_ROWS` from `pim/import/page.tsx`
+  - [x] AC2 — Import wizard now fetches real catalogs from `GET /api/pim/v1/catalogs`; calls `POST /api/pim/v1/imports/infer-schema` to detect columns; calls `POST /api/pim/v1/imports` to execute import
+  - [x] AC3 — Step 3 (mapping) shows empty state with message when no columns detected; Step 4 shows empty state until mapping is done
+  - [x] AC4 — Loading skeleton renders while catalogs are fetching in Step 1
+  - [x] AC5 — `cd frontend && pnpm build` passes — 8/8 tasks successful, 18/18 pages built
+**Files Changed:**
+  - `frontend/apps/admin/src/app/(admin)/pim/import/page.tsx` — full rewrite: removed fake constants, added `catalogs`/`inferring`/`importResult` state, wired catalog dropdown to API, added `inferSchema()` call on Step 2→3 transition, real import API call in `handleStartImport`
+**Build Verified:** Yes — frontend pnpm build passes
+**Notes:** Other admin pages (dashboard, content, sites, DAM, PIM, workflows) were already fetching real API data. Only the PIM import wizard had hardcoded fake arrays. All other "constants" (DESTINATION_OPTIONS, STEP_LABELS, filter arrays) are valid UI config, not mock data.
 
 ---
 

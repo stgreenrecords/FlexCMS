@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem,
@@ -30,23 +30,27 @@ interface ColumnMapping {
   status: 'mapped' | 'unmapped' | 'error';
 }
 
-interface ValidationIssue {
-  type: 'error' | 'warning';
-  field: string;
-  message: string;
+interface Catalog {
+  id: string;
+  name: string;
+  year: number;
+  season: string | null;
+  status: string;
 }
 
-interface PreviewRow {
-  sku: string;
-  name: string;
-  price: string;
-  inventory: string;
-  [key: string]: string;
+interface ImportResult {
+  created: number;
+  updated: number;
+  skipped: number;
+  errorCount: number;
+  errors: string[];
 }
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
+
+const API_BASE = '/api/pim/v1';
 
 const STEP_LABELS: Record<WizardStep, string> = {
   1: 'Upload',
@@ -76,42 +80,20 @@ const DESTINATION_OPTIONS = [
   '— Skip this column —',
 ];
 
-const INITIAL_MAPPINGS: ColumnMapping[] = [
-  { sourceColumn: 'SKU_ID',           sampleValue: 'PRD-99201-X',            destination: 'Unique Identifier (SKU)',    status: 'mapped' },
-  { sourceColumn: 'Product_Name_EN',  sampleValue: 'Ergonomic Office Chair',  destination: 'Display Title (Localized)', status: 'mapped' },
-  { sourceColumn: 'Price_USD',        sampleValue: '299.00',                  destination: 'MSRP (Price)',              status: 'mapped' },
-  { sourceColumn: 'Inventory_Count',  sampleValue: '142',                     destination: '',                          status: 'unmapped' },
-  { sourceColumn: 'Description_Long', sampleValue: 'A premium ergonomic...',  destination: 'Long Description',         status: 'mapped' },
-  { sourceColumn: 'Brand',            sampleValue: 'ErgoTech',                destination: 'Manufacturer',             status: 'mapped' },
-  { sourceColumn: 'Category_Path',    sampleValue: 'Furniture/Office',        destination: 'Category',                 status: 'mapped' },
-  { sourceColumn: 'Weight_KG',        sampleValue: '18.5',                    destination: 'Weight (kg)',              status: 'mapped' },
-];
-
-const VALIDATION_ISSUES: ValidationIssue[] = [
-  { type: 'error',   field: 'Price_USD',       message: "3 rows contain non-numeric characters." },
-  { type: 'warning', field: 'Product_Name_EN', message: "12 records are missing this value." },
-];
-
-const PREVIEW_ROWS: PreviewRow[] = [
-  { sku: 'PRD-99201-X', name: 'Ergonomic Office Chair Pro',  price: '299.00', inventory: '142' },
-  { sku: 'PRD-99202-Y', name: 'Standing Desk Frame XL',       price: '449.00', inventory: '87'  },
-  { sku: 'PRD-99203-Z', name: 'Monitor Arm Dual',             price: '129.00', inventory: '0'   },
-  { sku: 'PRD-99204-A', name: 'Mesh Lumbar Support Cushion',  price: '59.99',  inventory: '320' },
-  { sku: 'PRD-99205-B', name: 'Cable Management Kit',         price: '24.99',  inventory: '512' },
-];
-
 // ---------------------------------------------------------------------------
 // Step 1 — Upload
 // ---------------------------------------------------------------------------
 
 interface Step1Props {
-  onFileSelected: (file: UploadedFile) => void;
+  onFileSelected: (file: UploadedFile, raw: File) => void;
   onCatalogSelected: (catalogId: string) => void;
   file: UploadedFile | null;
   catalogId: string;
+  catalogs: Catalog[];
+  catalogsLoading: boolean;
 }
 
-function Step1Upload({ onFileSelected, onCatalogSelected, file, catalogId }: Step1Props) {
+function Step1Upload({ onFileSelected, onCatalogSelected, file, catalogId, catalogs, catalogsLoading }: Step1Props) {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -119,14 +101,14 @@ function Step1Upload({ onFileSelected, onCatalogSelected, file, catalogId }: Ste
     setIsDragging(false);
     const dropped = e.dataTransfer.files[0];
     if (dropped) {
-      onFileSelected({ name: dropped.name, size: dropped.size, type: dropped.type });
+      onFileSelected({ name: dropped.name, size: dropped.size, type: dropped.type }, dropped);
     }
   }, [onFileSelected]);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
-      onFileSelected({ name: selected.name, size: selected.size, type: selected.type });
+      onFileSelected({ name: selected.name, size: selected.size, type: selected.type }, selected);
     }
   };
 
@@ -143,18 +125,23 @@ function Step1Upload({ onFileSelected, onCatalogSelected, file, catalogId }: Ste
         <label className="block text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#c3c6d6' }}>
           Target Catalog
         </label>
-        <select
-          value={catalogId}
-          onChange={(e) => onCatalogSelected(e.target.value)}
-          className="w-full text-sm rounded-lg px-4 py-3 appearance-none"
-          style={{ background: '#353534', border: 'none', color: '#e5e2e1', outline: 'none' }}
-        >
-          <option value="">Select a catalog...</option>
-          <option value="CAT-2026-S1">Summer 2026 Main Collection</option>
-          <option value="CAT-ESS-25">Essentials Core Line</option>
-          <option value="CAT-LTD-F1">Limited Footwear Drops</option>
-          <option value="CAT-2026-SP2">Spring 2026 Accessories</option>
-        </select>
+        {catalogsLoading ? (
+          <Skeleton className="h-11 w-full rounded-lg" />
+        ) : (
+          <select
+            value={catalogId}
+            onChange={(e) => onCatalogSelected(e.target.value)}
+            className="w-full text-sm rounded-lg px-4 py-3 appearance-none"
+            style={{ background: '#353534', border: 'none', color: '#e5e2e1', outline: 'none' }}
+          >
+            <option value="">Select a catalog...</option>
+            {catalogs.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}{cat.season ? ` — ${cat.season}` : ''} ({cat.year})
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Drop zone */}
@@ -180,7 +167,7 @@ function Step1Upload({ onFileSelected, onCatalogSelected, file, catalogId }: Ste
             <button
               className="text-xs font-bold mt-2 px-4 py-2 rounded-lg transition-colors"
               style={{ background: 'rgba(66,70,84,0.3)', color: '#c3c6d6' }}
-              onClick={(e) => { e.stopPropagation(); onFileSelected({ name: '', size: 0, type: '' }); }}
+              onClick={(e) => { e.stopPropagation(); onFileSelected({ name: '', size: 0, type: '' }, new File([], '')); }}
             >
               Replace file
             </button>
@@ -236,10 +223,11 @@ interface Step2Props {
   delimiter: Delimiter;
   hasHeader: boolean;
   encoding: string;
+  fileName: string;
   onChange: (key: string, value: unknown) => void;
 }
 
-function Step2Format({ format, delimiter, hasHeader, encoding, onChange }: Step2Props) {
+function Step2Format({ format, delimiter, hasHeader, encoding, fileName, onChange }: Step2Props) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="space-y-5">
@@ -331,25 +319,22 @@ function Step2Format({ format, delimiter, hasHeader, encoding, onChange }: Step2
         </div>
       </div>
 
-      {/* Preview panel */}
+      {/* File info panel */}
       <div className="rounded-xl overflow-hidden" style={{ background: '#1c1b1b', border: '1px solid rgba(66,70,84,0.1)' }}>
         <div className="px-5 py-4" style={{ borderBottom: '1px solid rgba(66,70,84,0.1)' }}>
-          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#8d90a0' }}>Raw Preview (first 3 rows)</p>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#8d90a0' }}>Selected File</p>
         </div>
-        <div className="p-5 overflow-x-auto">
-          <pre className="text-[11px] font-mono leading-relaxed" style={{ color: '#b0c6ff' }}>
-{format === 'csv' ? `SKU_ID${delimiter}Product_Name_EN${delimiter}Price_USD
-PRD-99201-X${delimiter}Ergonomic Office Chair${delimiter}299.00
-PRD-99202-Y${delimiter}Standing Desk Frame XL${delimiter}449.00`
-: format === 'json' ? `[
-  {"sku":"PRD-99201-X","name":"Ergonomic Chair","price":299.0},
-  {"sku":"PRD-99202-Y","name":"Standing Desk","price":449.0}
-]`
-: `(Excel binary format detected — 1,240 rows, 8 columns)`}
-          </pre>
+        <div className="p-5 flex flex-col items-center justify-center gap-4" style={{ minHeight: 160 }}>
+          <div className="p-4 rounded-xl" style={{ background: 'rgba(176,198,255,0.1)' }}>
+            <span className="material-symbols-outlined text-3xl" style={{ color: '#b0c6ff' }}>description</span>
+          </div>
+          <p className="text-sm font-bold text-center" style={{ color: '#e5e2e1' }}>{fileName}</p>
+          <p className="text-xs text-center" style={{ color: '#8d90a0' }}>
+            Column detection will run when you proceed to mapping.
+          </p>
         </div>
         <div className="px-5 py-3" style={{ borderTop: '1px solid rgba(66,70,84,0.1)', background: 'rgba(66,70,84,0.1)' }}>
-          <p className="text-[10px]" style={{ color: '#8d90a0' }}>Detected: 1,240 data rows • 8 columns • {encoding}</p>
+          <p className="text-[10px]" style={{ color: '#8d90a0' }}>Encoding: {encoding}</p>
         </div>
       </div>
     </div>
@@ -362,13 +347,36 @@ PRD-99202-Y${delimiter}Standing Desk Frame XL${delimiter}449.00`
 
 interface Step3Props {
   mappings: ColumnMapping[];
+  inferring: boolean;
   onMappingChange: (index: number, destination: string) => void;
 }
 
-function Step3Mapping({ mappings, onMappingChange }: Step3Props) {
+function Step3Mapping({ mappings, inferring, onMappingChange }: Step3Props) {
   const mappedCount = mappings.filter((m) => m.status === 'mapped').length;
   const totalCount = mappings.length;
-  const schemaMatch = Math.round((mappedCount / totalCount) * 100);
+  const schemaMatch = totalCount > 0 ? Math.round((mappedCount / totalCount) * 100) : 0;
+
+  if (inferring) {
+    return (
+      <div className="space-y-4">
+        {[...Array(5)].map((_, i) => (
+          <Skeleton key={i} className="h-16 w-full rounded-xl" />
+        ))}
+      </div>
+    );
+  }
+
+  if (mappings.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="p-5 rounded-2xl mb-5" style={{ background: 'rgba(66,70,84,0.2)' }}>
+          <span className="material-symbols-outlined text-5xl" style={{ color: '#8d90a0' }}>table_chart</span>
+        </div>
+        <p className="text-base font-bold mb-2" style={{ color: '#e5e2e1' }}>No columns detected</p>
+        <p className="text-sm" style={{ color: '#8d90a0' }}>Upload and configure your file to begin column mapping.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -381,13 +389,6 @@ function Step3Mapping({ mappings, onMappingChange }: Step3Props) {
               <h2 className="text-base font-bold" style={{ color: '#e5e2e1' }}>Attribute Mapping</h2>
               <p className="text-xs mt-0.5" style={{ color: '#8d90a0' }}>Map source columns to PIM destination properties</p>
             </div>
-            <button
-              className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-lg transition-all"
-              style={{ color: '#b0c6ff', border: '1px solid rgba(176,198,255,0.3)', background: 'rgba(176,198,255,0.05)' }}
-            >
-              <span className="material-symbols-outlined text-sm">auto_fix_high</span>
-              Re-run Auto-Match
-            </button>
           </div>
 
           {/* Table */}
@@ -431,7 +432,9 @@ function Step3Mapping({ mappings, onMappingChange }: Step3Props) {
                           </div>
                           <div>
                             <p className="text-sm font-bold" style={{ color: '#e5e2e1' }}>{mapping.sourceColumn}</p>
-                            <p className="text-[10px] font-mono mt-0.5" style={{ color: '#8d90a0' }}>e.g. {mapping.sampleValue}</p>
+                            {mapping.sampleValue && (
+                              <p className="text-[10px] font-mono mt-0.5" style={{ color: '#8d90a0' }}>e.g. {mapping.sampleValue}</p>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -493,41 +496,6 @@ function Step3Mapping({ mappings, onMappingChange }: Step3Props) {
             </table>
           </div>
         </div>
-
-        {/* Mapping Insights */}
-        <div className="p-6 rounded-xl" style={{ background: 'rgba(53,53,52,0.8)', border: '1px solid rgba(66,70,84,0.1)' }}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg" style={{ background: 'rgba(176,198,255,0.1)' }}>
-              <span className="material-symbols-outlined" style={{ color: '#b0c6ff' }}>lightbulb</span>
-            </div>
-            <h3 className="font-bold text-sm" style={{ color: '#e5e2e1' }}>Mapping Insights</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg" style={{ background: 'rgba(14,14,14,0.5)', border: '1px solid rgba(66,70,84,0.05)' }}>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#b0c6ff' }}>Auto-Match Logic</span>
-                <span className="text-[10px] font-mono" style={{ color: '#8d90a0' }}>Conf: 98%</span>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
-                <span style={{ color: '#e5e2e1', fontWeight: 700 }}>SKU_ID</span> was matched to{' '}
-                <span style={{ color: '#e5e2e1', fontWeight: 700 }}>Unique Identifier</span> because the column
-                contains unique alphanumeric patterns found in 1,240 existing records.
-              </p>
-            </div>
-            <div className="p-4 rounded-lg" style={{ background: 'rgba(14,14,14,0.5)', border: '1px solid rgba(66,70,84,0.05)' }}>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#ffb59b' }}>Uncertainty Alert</span>
-                <span className="text-[10px] font-mono" style={{ color: '#8d90a0' }}>Conf: 42%</span>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
-                <span style={{ color: '#e5e2e1', fontWeight: 700 }}>Inventory_Count</span> remains unmapped as it
-                shares naming patterns with both{' '}
-                <span style={{ color: '#b0c6ff', cursor: 'pointer' }}>Warehouse Qty</span> and{' '}
-                <span style={{ color: '#b0c6ff', cursor: 'pointer' }}>Reserved Stock</span>.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Validation sidebar — 1 col */}
@@ -548,48 +516,16 @@ function Step3Mapping({ mappings, onMappingChange }: Step3Props) {
               </div>
             </div>
 
-            {/* Potential issues */}
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: '#8d90a0' }}>
-                Potential Issues
-              </p>
-              <div className="space-y-2">
-                {VALIDATION_ISSUES.map((issue) => (
-                  <div
-                    key={issue.field}
-                    className="flex gap-3 p-3 rounded-lg"
-                    style={{
-                      background: issue.type === 'error' ? 'rgba(147,0,10,0.1)' : 'rgba(169,56,2,0.1)',
-                      border: `1px solid ${issue.type === 'error' ? 'rgba(255,180,171,0.1)' : 'rgba(255,181,155,0.1)'}`,
-                    }}
-                  >
-                    <span
-                      className="material-symbols-outlined text-sm flex-shrink-0"
-                      style={{ color: issue.type === 'error' ? '#ffb4ab' : '#ffb59b' }}
-                    >
-                      {issue.type === 'error' ? 'error' : 'priority_high'}
-                    </span>
-                    <div>
-                      <p className="text-[11px] font-bold" style={{ color: '#e5e2e1' }}>
-                        {issue.type === 'error' ? 'Data Type Mismatch' : 'Missing Values'}
-                      </p>
-                      <p className="text-[10px] leading-tight mt-0.5" style={{ color: '#8d90a0' }}>
-                        {issue.message}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+            {mappedCount === totalCount && totalCount > 0 ? (
+              <div className="flex gap-3 p-3 rounded-lg" style={{ background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.1)' }}>
+                <span className="material-symbols-outlined text-sm flex-shrink-0" style={{ color: '#4ade80' }}>check_circle</span>
+                <p className="text-[11px] font-bold" style={{ color: '#4ade80' }}>All columns mapped</p>
               </div>
-            </div>
-
-            <button
-              className="w-full py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors"
-              style={{ background: '#353534', border: '1px solid rgba(66,70,84,0.2)', color: '#8d90a0' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#e5e2e1')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = '#8d90a0')}
-            >
-              Download Full Report
-            </button>
+            ) : (
+              <p className="text-[11px]" style={{ color: '#8d90a0' }}>
+                {totalCount - mappedCount} column{totalCount - mappedCount !== 1 ? 's' : ''} still need mapping.
+              </p>
+            )}
           </div>
         </div>
 
@@ -616,88 +552,15 @@ function Step3Mapping({ mappings, onMappingChange }: Step3Props) {
 // ---------------------------------------------------------------------------
 
 function Step4Preview() {
-  const [showErrors, setShowErrors] = useState(false);
-
   return (
-    <div className="space-y-6">
-      {/* Summary chips */}
-      <div className="flex flex-wrap gap-3">
-        {[
-          { icon: 'table_rows', label: '1,240 total rows', color: '#e5e2e1', bg: 'rgba(66,70,84,0.3)' },
-          { icon: 'check_circle', label: '1,225 valid records', color: '#4ade80', bg: 'rgba(74,222,128,0.1)' },
-          { icon: 'error', label: '15 rows with issues', color: '#ffb4ab', bg: 'rgba(255,180,171,0.1)' },
-        ].map(({ icon, label, color, bg }) => (
-          <div key={label} className="flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: bg }}>
-            <span className="material-symbols-outlined text-sm" style={{ color }}>{icon}</span>
-            <span className="text-xs font-bold" style={{ color }}>{label}</span>
-          </div>
-        ))}
-        <button
-          onClick={() => setShowErrors(!showErrors)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all"
-          style={{ background: showErrors ? 'rgba(176,198,255,0.15)' : 'rgba(66,70,84,0.2)', color: showErrors ? '#b0c6ff' : '#8d90a0' }}
-        >
-          {showErrors ? 'Show all rows' : 'Show errors only'}
-        </button>
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="p-5 rounded-2xl mb-5" style={{ background: 'rgba(66,70,84,0.2)' }}>
+        <span className="material-symbols-outlined text-5xl" style={{ color: '#8d90a0' }}>preview</span>
       </div>
-
-      {/* Preview table */}
-      <div className="rounded-xl overflow-hidden" style={{ background: '#1c1b1b', border: '1px solid rgba(66,70,84,0.1)' }}>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr style={{ background: 'rgba(42,42,42,0.3)' }}>
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest" style={{ color: '#8d90a0', width: 40 }}>#</th>
-                {['SKU', 'Product Name', 'Price (USD)', 'Inventory'].map((col) => (
-                  <th key={col} className="px-6 py-4 text-[10px] font-black uppercase tracking-widest" style={{ color: '#8d90a0' }}>{col}</th>
-                ))}
-                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest" style={{ color: '#8d90a0' }}>Validation</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PREVIEW_ROWS.map((row, i) => {
-                const hasIssue = i === 2; // simulate one row with issue
-                return (
-                  <tr
-                    key={row.sku}
-                    className="transition-colors"
-                    style={{
-                      borderTop: '1px solid rgba(66,70,84,0.05)',
-                      background: hasIssue ? 'rgba(255,180,171,0.03)' : 'transparent',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = hasIssue ? 'rgba(255,180,171,0.06)' : 'rgba(53,53,52,0.2)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = hasIssue ? 'rgba(255,180,171,0.03)' : 'transparent')}
-                  >
-                    <td className="px-6 py-4 text-xs" style={{ color: '#8d90a0' }}>{i + 1}</td>
-                    <td className="px-6 py-4 text-xs font-mono" style={{ color: '#b0c6ff' }}>{row.sku}</td>
-                    <td className="px-6 py-4 text-sm font-medium" style={{ color: '#e5e2e1' }}>{row.name}</td>
-                    <td className="px-6 py-4 text-sm font-bold" style={{ color: '#e5e2e1' }}>${row.price}</td>
-                    <td className="px-6 py-4 text-sm" style={{ color: parseInt(row.inventory) === 0 ? '#ffb4ab' : '#c3c6d6' }}>
-                      {parseInt(row.inventory) === 0 ? 'Out of Stock' : row.inventory}
-                    </td>
-                    <td className="px-6 py-4">
-                      {hasIssue ? (
-                        <span className="flex items-center gap-1.5 text-[10px] font-bold" style={{ color: '#ffb4ab' }}>
-                          <span className="material-symbols-outlined text-sm">warning</span>
-                          Missing name
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 text-[10px] font-bold" style={{ color: '#4ade80' }}>
-                          <span className="material-symbols-outlined text-sm">check</span>
-                          Valid
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="px-6 py-3 text-xs" style={{ borderTop: '1px solid rgba(66,70,84,0.05)', color: '#8d90a0', background: 'rgba(42,42,42,0.2)' }}>
-          Showing 5 of 1,240 rows — <button className="font-bold" style={{ color: '#b0c6ff' }}>Download full preview CSV</button>
-        </div>
-      </div>
+      <p className="text-base font-bold mb-2" style={{ color: '#e5e2e1' }}>Preview ready after mapping</p>
+      <p className="text-sm max-w-md" style={{ color: '#8d90a0' }}>
+        Complete the column mapping step and proceed here to review the first rows of your import before executing.
+      </p>
     </div>
   );
 }
@@ -709,43 +572,66 @@ function Step4Preview() {
 interface Step5Props {
   isRunning: boolean;
   progress: number;
-  isDone: boolean;
+  importResult: ImportResult | null;
+  importError: string | null;
+  catalogName: string;
+  fileName: string;
+  mappings: ColumnMapping[];
   onStart: () => void;
 }
 
-function Step5Execute({ isRunning, progress, isDone, onStart }: Step5Props) {
+function Step5Execute({ isRunning, progress, importResult, importError, catalogName, fileName, mappings, onStart }: Step5Props) {
+  const mappedCount = mappings.filter((m) => m.status === 'mapped').length;
+
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
-      {isDone ? (
+      {importResult ? (
         /* Success state */
         <div className="text-center py-12">
           <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(74,222,128,0.1)', border: '2px solid rgba(74,222,128,0.3)' }}>
             <span className="material-symbols-outlined text-4xl" style={{ color: '#4ade80' }}>check</span>
           </div>
           <h2 className="text-2xl font-black mb-2" style={{ color: '#e5e2e1' }}>Import Complete!</h2>
-          <p className="text-sm mb-8" style={{ color: '#8d90a0' }}>Your products have been imported successfully.</p>
+          <p className="text-sm mb-8" style={{ color: '#8d90a0' }}>Your products have been processed.</p>
           <div className="grid grid-cols-3 gap-4 mb-8">
             {[
-              { label: 'Created', value: '1,210', color: '#4ade80' },
-              { label: 'Updated', value: '15', color: '#b0c6ff' },
-              { label: 'Skipped', value: '15', color: '#8d90a0' },
+              { label: 'Created', value: importResult.created, color: '#4ade80' },
+              { label: 'Updated', value: importResult.updated, color: '#b0c6ff' },
+              { label: 'Skipped', value: importResult.skipped, color: '#8d90a0' },
             ].map(({ label, value, color }) => (
               <div key={label} className="p-4 rounded-xl text-center" style={{ background: '#1c1b1b', border: '1px solid rgba(66,70,84,0.1)' }}>
-                <p className="text-2xl font-black mb-1" style={{ color }}>{value}</p>
+                <p className="text-2xl font-black mb-1" style={{ color }}>{value.toLocaleString()}</p>
                 <p className="text-xs" style={{ color: '#8d90a0' }}>{label}</p>
               </div>
             ))}
           </div>
+          {importResult.errorCount > 0 && (
+            <p className="text-xs mb-6" style={{ color: '#ffb4ab' }}>
+              {importResult.errorCount} row{importResult.errorCount !== 1 ? 's' : ''} had errors and were skipped.
+            </p>
+          )}
           <div className="flex gap-3 justify-center">
             <Link href="/pim" className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold" style={{ background: '#353534', color: '#e5e2e1' }}>
               <span className="material-symbols-outlined text-lg">inventory_2</span>
               View Catalog
             </Link>
-            <button className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold" style={{ background: 'linear-gradient(135deg, #b0c6ff, #0058cc)', color: '#002d6f' }}>
-              <span className="material-symbols-outlined text-lg">download</span>
-              Download Report
-            </button>
           </div>
+        </div>
+      ) : importError ? (
+        /* Error state */
+        <div className="text-center py-12">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'rgba(255,180,171,0.1)', border: '2px solid rgba(255,180,171,0.3)' }}>
+            <span className="material-symbols-outlined text-4xl" style={{ color: '#ffb4ab' }}>error</span>
+          </div>
+          <h2 className="text-2xl font-black mb-2" style={{ color: '#e5e2e1' }}>Import Failed</h2>
+          <p className="text-sm mb-4" style={{ color: '#ffb4ab' }}>{importError}</p>
+          <button
+            onClick={onStart}
+            className="px-6 py-2.5 rounded-lg text-sm font-bold"
+            style={{ background: '#353534', color: '#e5e2e1' }}
+          >
+            Retry
+          </button>
         </div>
       ) : isRunning ? (
         /* Progress state */
@@ -762,7 +648,6 @@ function Step5Execute({ isRunning, progress, isDone, onStart }: Step5Props) {
             </svg>
           </div>
           <h2 className="text-xl font-black mb-2" style={{ color: '#e5e2e1' }}>Importing Products…</h2>
-          <p className="text-sm mb-2" style={{ color: '#8d90a0' }}>Processing {Math.round(progress * 12.4)} of 1,240 records</p>
           <p className="text-2xl font-black" style={{ color: '#b0c6ff' }}>{progress}%</p>
           <div className="w-full h-2 rounded-full mt-4 overflow-hidden" style={{ background: '#353534' }}>
             <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #b0c6ff, #0058cc)' }} />
@@ -775,12 +660,9 @@ function Step5Execute({ isRunning, progress, isDone, onStart }: Step5Props) {
             <h3 className="font-bold mb-4" style={{ color: '#e5e2e1' }}>Import Summary</h3>
             <div className="space-y-3">
               {[
-                { label: 'Target Catalog', value: 'Summer 2026 Main Collection' },
-                { label: 'File', value: 'products_summer2026.csv' },
-                { label: 'Total Records', value: '1,240' },
-                { label: 'Fields Mapped', value: `${INITIAL_MAPPINGS.filter((m) => m.status === 'mapped').length}/${INITIAL_MAPPINGS.length}` },
-                { label: 'Validation Issues', value: '15 rows (will be skipped)' },
-                { label: 'Duplicates', value: 'Update existing (by SKU)' },
+                { label: 'Target Catalog', value: catalogName || '—' },
+                { label: 'File', value: fileName || '—' },
+                { label: 'Fields Mapped', value: `${mappedCount} / ${mappings.length}` },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between text-sm">
                   <span style={{ color: '#8d90a0' }}>{label}</span>
@@ -794,7 +676,7 @@ function Step5Execute({ isRunning, progress, isDone, onStart }: Step5Props) {
             <span className="material-symbols-outlined text-sm flex-shrink-0 mt-0.5" style={{ color: '#b0c6ff' }}>info</span>
             <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
               This import will create or update products in the selected catalog. Products with duplicate SKUs will be updated.
-              15 rows with validation errors will be skipped and logged in the import report.
+              Rows with validation errors will be skipped and logged.
             </p>
           </div>
 
@@ -804,7 +686,7 @@ function Step5Execute({ isRunning, progress, isDone, onStart }: Step5Props) {
             style={{ background: 'linear-gradient(135deg, #b0c6ff, #0058cc)', color: '#002d6f', boxShadow: '0 8px 20px rgba(176,198,255,0.15)' }}
           >
             <span className="material-symbols-outlined text-lg">play_arrow</span>
-            Start Import — 1,240 Records
+            Start Import
           </button>
         </>
       )}
@@ -819,15 +701,36 @@ function Step5Execute({ isRunning, progress, isDone, onStart }: Step5Props) {
 export default function PimImportWizardPage() {
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [file, setFile] = useState<UploadedFile | null>(null);
+  const [rawFile, setRawFile] = useState<File | null>(null);
   const [catalogId, setCatalogId] = useState('');
   const [format, setFormat] = useState<FileFormat>('csv');
   const [delimiter, setDelimiter] = useState<Delimiter>(',');
   const [hasHeader, setHasHeader] = useState(true);
   const [encoding, setEncoding] = useState('UTF-8');
-  const [mappings, setMappings] = useState<ColumnMapping[]>(INITIAL_MAPPINGS);
+  const [mappings, setMappings] = useState<ColumnMapping[]>([]);
+  const [inferring, setInferring] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isDone, setIsDone] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
+  const [catalogsLoading, setCatalogsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/catalogs?size=100`)
+      .then((r) => r.json())
+      .then((data) => setCatalogs(data.items ?? []))
+      .catch(() => setCatalogs([]))
+      .finally(() => setCatalogsLoading(false));
+  }, []);
+
+  const selectedCatalog = catalogs.find((c) => c.id === catalogId);
+
+  const handleFileSelected = (meta: UploadedFile, raw: File) => {
+    setFile(meta.name ? meta : null);
+    setRawFile(meta.name ? raw : null);
+    setMappings([]);
+  };
 
   const handleFormatChange = (key: string, value: unknown) => {
     if (key === 'format') setFormat(value as FileFormat);
@@ -846,26 +749,93 @@ export default function PimImportWizardPage() {
     );
   };
 
-  const handleStartImport = () => {
+  const inferSchema = async () => {
+    if (!rawFile) return;
+    setInferring(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', rawFile);
+      const sourceType = format === 'excel' ? 'EXCEL' : format.toUpperCase();
+      const res = await fetch(`${API_BASE}/imports/infer-schema?sourceType=${sourceType}`, {
+        method: 'POST',
+        body: fd,
+      });
+      if (!res.ok) throw new Error('Schema inference failed');
+      const schema: Record<string, unknown> = await res.json();
+      const properties = (schema.properties as Record<string, { examples?: string[] }>) ?? {};
+      const inferred: ColumnMapping[] = Object.entries(properties).map(([col, meta]) => ({
+        sourceColumn: col,
+        sampleValue: meta.examples?.[0] ?? '',
+        destination: '',
+        status: 'unmapped',
+      }));
+      setMappings(inferred);
+    } catch {
+      setMappings([]);
+    } finally {
+      setInferring(false);
+    }
+  };
+
+  const handleStartImport = async () => {
+    if (!rawFile || !catalogId) return;
     setIsRunning(true);
-    let p = 0;
-    const interval = setInterval(() => {
-      p += Math.random() * 8 + 2;
-      if (p >= 100) {
-        p = 100;
-        clearInterval(interval);
-        setProgress(100);
-        setTimeout(() => setIsDone(true), 500);
-      } else {
-        setProgress(Math.round(p));
+    setProgress(10);
+    setImportError(null);
+
+    // Find which field maps to SKU and name
+    const skuMapping = mappings.find((m) => m.destination === 'Unique Identifier (SKU)');
+    const nameMapping = mappings.find((m) => m.destination === 'Display Title (Localized)');
+
+    try {
+      const fd = new FormData();
+      fd.append('file', rawFile);
+      setProgress(30);
+
+      const params = new URLSearchParams({
+        catalogId,
+        sourceType: format === 'excel' ? 'EXCEL' : format.toUpperCase(),
+        userId: 'admin',
+        ...(skuMapping ? { skuField: skuMapping.sourceColumn } : {}),
+        ...(nameMapping ? { nameField: nameMapping.sourceColumn } : {}),
+      });
+
+      setProgress(50);
+      const res = await fetch(`${API_BASE}/imports?${params.toString()}`, {
+        method: 'POST',
+        body: fd,
+      });
+      setProgress(90);
+
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err || 'Import failed');
       }
-    }, 200);
+
+      const result: ImportResult = await res.json();
+      setProgress(100);
+      setTimeout(() => setImportResult(result), 300);
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Import failed');
+      setIsRunning(false);
+      setProgress(0);
+    }
+  };
+
+  const handleNext = async () => {
+    if (currentStep === 2) {
+      // Transition to mapping: call infer-schema first
+      setCurrentStep(3);
+      await inferSchema();
+    } else {
+      setCurrentStep((s) => Math.min(5, s + 1) as WizardStep);
+    }
   };
 
   const canProceed = () => {
     if (currentStep === 1) return !!file?.name && !!catalogId;
     if (currentStep === 2) return true;
-    if (currentStep === 3) return mappings.filter((m) => m.status === 'unmapped').length === 0;
+    if (currentStep === 3) return mappings.length > 0 && mappings.filter((m) => m.status === 'unmapped').length === 0;
     return true;
   };
 
@@ -941,11 +911,8 @@ export default function PimImportWizardPage() {
                       {step}
                     </span>
                   )}
-                  <span
-                    className="text-[10px] uppercase tracking-widest font-black"
-                    style={{ color: isCurrent ? '#b0c6ff' : isCompleted ? 'rgba(229,226,225,0.5)' : '#8d90a0' }}
-                  >
-                    0{step} {STEP_LABELS[step]}
+                  <span className="text-xs font-bold" style={{ color: isCurrent ? '#e5e2e1' : '#8d90a0' }}>
+                    {STEP_LABELS[step]}
                   </span>
                 </div>
               </div>
@@ -954,13 +921,15 @@ export default function PimImportWizardPage() {
         </div>
 
         {/* ── Step Content ── */}
-        <div className="mb-8">
+        <div className="mb-10">
           {currentStep === 1 && (
             <Step1Upload
+              onFileSelected={handleFileSelected}
+              onCatalogSelected={setCatalogId}
               file={file}
               catalogId={catalogId}
-              onFileSelected={(f) => setFile(f.name ? f : null)}
-              onCatalogSelected={setCatalogId}
+              catalogs={catalogs}
+              catalogsLoading={catalogsLoading}
             />
           )}
           {currentStep === 2 && (
@@ -969,104 +938,72 @@ export default function PimImportWizardPage() {
               delimiter={delimiter}
               hasHeader={hasHeader}
               encoding={encoding}
+              fileName={file?.name ?? ''}
               onChange={handleFormatChange}
             />
           )}
           {currentStep === 3 && (
-            <Step3Mapping mappings={mappings} onMappingChange={handleMappingChange} />
+            <Step3Mapping
+              mappings={mappings}
+              inferring={inferring}
+              onMappingChange={handleMappingChange}
+            />
           )}
           {currentStep === 4 && <Step4Preview />}
           {currentStep === 5 && (
             <Step5Execute
               isRunning={isRunning}
               progress={progress}
-              isDone={isDone}
+              importResult={importResult}
+              importError={importError}
+              catalogName={selectedCatalog?.name ?? catalogId}
+              fileName={file?.name ?? ''}
+              mappings={mappings}
               onStart={handleStartImport}
             />
           )}
         </div>
 
-        {/* ── Bottom Action Bar ── */}
-        {currentStep < 5 || (!isRunning && !isDone) ? (
-          <div
-            className="flex items-center justify-between p-6 rounded-xl sticky bottom-4"
-            style={{ background: '#2a2a2a', border: '1px solid rgba(66,70,84,0.2)', backdropFilter: 'blur(12px)' }}
-          >
-            {/* Left: status */}
-            <div className="flex items-center gap-6">
-              {currentStep === 3 && (
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(176,198,255,0.2)' }}>
-                    <span className="material-symbols-outlined text-base" style={{ color: '#b0c6ff', fontVariationSettings: "'FILL' 1" }}>done_all</span>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase font-black tracking-wider leading-none mb-1" style={{ color: '#8d90a0' }}>Status</p>
-                    <p className="text-sm font-bold" style={{ color: '#e5e2e1' }}>{mappedCount}/{mappings.length} Fields Mapped</p>
-                  </div>
-                </div>
-              )}
-              {currentStep !== 3 && (
-                <p className="text-sm" style={{ color: '#8d90a0' }}>
-                  {currentStep === 1 && (file?.name ? `Ready: ${file.name}` : 'Select a file to continue')}
-                  {currentStep === 2 && 'Format detected — 1,240 rows, 8 columns'}
-                  {currentStep === 4 && '1,225 records ready to import, 15 will be skipped'}
-                </p>
-              )}
-            </div>
+        {/* ── Navigation ── */}
+        {!importResult && !isRunning && (
+          <div className="flex justify-between items-center">
+            <button
+              onClick={() => setCurrentStep((s) => Math.max(1, s - 1) as WizardStep)}
+              disabled={currentStep === 1}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all"
+              style={currentStep === 1
+                ? { background: '#353534', color: '#8d90a0', opacity: 0.5, cursor: 'not-allowed' }
+                : { background: '#353534', color: '#e5e2e1' }}
+            >
+              <span className="material-symbols-outlined text-lg">arrow_back</span>
+              Back
+            </button>
 
-            {/* Right: navigation */}
-            <div className="flex gap-3">
-              {currentStep > 1 && (
-                <button
-                  onClick={() => setCurrentStep((s) => Math.max(1, s - 1) as WizardStep)}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-black transition-all border-2 active:scale-95"
-                  style={{ color: '#e5e2e1', borderColor: 'rgba(66,70,84,0.2)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#353534')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <span className="material-symbols-outlined text-lg">arrow_back</span>
-                  BACK
-                </button>
-              )}
-              {currentStep < 5 && (
-                <button
-                  disabled={!canProceed()}
-                  onClick={() => setCurrentStep((s) => Math.min(5, s + 1) as WizardStep)}
-                  className="flex items-center gap-2 px-10 py-3 rounded-xl text-sm font-black transition-all active:scale-95 group disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ background: canProceed() ? '#fff' : '#353534', color: '#131313', boxShadow: canProceed() ? '0 8px 20px rgba(255,255,255,0.15)' : 'none' }}
-                >
-                  {currentStep === 4 ? 'REVIEW & EXECUTE' : 'CONTINUE TO ' + STEP_LABELS[(currentStep + 1) as WizardStep].toUpperCase()}
-                  <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                </button>
-              )}
-            </div>
+            {/* Mapping progress */}
+            {currentStep === 3 && mappings.length > 0 && (
+              <span className="text-xs font-bold" style={{ color: '#8d90a0' }}>
+                {mappedCount} / {mappings.length} fields mapped
+              </span>
+            )}
+
+            {currentStep < 5 && (
+              <button
+                onClick={handleNext}
+                disabled={!canProceed() || inferring}
+                className="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-black transition-all active:scale-95"
+                style={
+                  !canProceed() || inferring
+                    ? { background: '#353534', color: '#8d90a0', cursor: 'not-allowed' }
+                    : { background: 'linear-gradient(135deg, #b0c6ff, #0058cc)', color: '#002d6f', boxShadow: '0 4px 12px rgba(176,198,255,0.2)' }
+                }
+              >
+                {inferring ? 'Detecting columns…' : 'Next Step'}
+                {!inferring && <span className="material-symbols-outlined text-lg">arrow_forward</span>}
+              </button>
+            )}
           </div>
-        ) : null}
-      </div>
-
-      {/* ── Right contextual rail ── */}
-      <div
-        className="fixed right-6 top-1/2 -translate-y-1/2 xl:flex flex-col gap-3 p-1.5 rounded-full hidden"
-        style={{ background: 'rgba(14,14,14,0.8)', border: '1px solid rgba(66,70,84,0.2)', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
-      >
-        {[
-          { icon: 'history', title: 'View Import History' },
-          { icon: 'download', title: 'Download Template' },
-          { icon: 'help', title: 'Help Center' },
-        ].map(({ icon, title }) => (
-          <button
-            key={icon}
-            title={title}
-            className="w-10 h-10 flex items-center justify-center rounded-full transition-all"
-            style={{ color: '#8d90a0' }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = '#b0c6ff'; e.currentTarget.style.background = 'rgba(176,198,255,0.1)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = '#8d90a0'; e.currentTarget.style.background = 'transparent'; }}
-          >
-            <span className="material-symbols-outlined text-lg">{icon}</span>
-          </button>
-        ))}
+        )}
       </div>
     </div>
   );
 }
-
