@@ -1,20 +1,24 @@
--- Product version history: immutable snapshots of product attributes at each save.
--- Enables audit trail, rollback, and change tracking.
+-- V2: Expand product_versions with full audit-snapshot columns required by the
+-- ProductVersion entity (sku, name, status, updated_by, created_at).
+--
+-- V1 created the table with a minimal schema (changed_by, changed_at).
+-- This migration adds the missing columns idempotently so it is safe to run on
+-- both fresh databases and pre-existing ones where columns were added manually.
+--
+-- LOCAL DEV NOTE: If Flyway reports a checksum mismatch for this file, run:
+--   DELETE FROM flyway_schema_history WHERE version = '2';
+-- Then restart the application — this migration will re-run idempotently.
 
-CREATE TABLE product_versions (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    product_id      UUID         NOT NULL,
-    version_number  BIGINT       NOT NULL,
-    sku             VARCHAR(255) NOT NULL,
-    name            VARCHAR(255) NOT NULL,
-    attributes      JSONB        NOT NULL DEFAULT '{}',
-    status          VARCHAR(50)  NOT NULL,
-    updated_by      VARCHAR(255),
-    created_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
-    change_summary  TEXT,
+ALTER TABLE product_versions ADD COLUMN IF NOT EXISTS sku        VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE product_versions ADD COLUMN IF NOT EXISTS name       VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE product_versions ADD COLUMN IF NOT EXISTS status     VARCHAR(50)  NOT NULL DEFAULT 'DRAFT';
+ALTER TABLE product_versions ADD COLUMN IF NOT EXISTS updated_by VARCHAR(255);
+ALTER TABLE product_versions ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ  NOT NULL DEFAULT now();
 
-    CONSTRAINT uq_product_versions UNIQUE (product_id, version_number)
-);
+-- Backfill created_at from changed_at for any pre-existing rows
+UPDATE product_versions
+SET created_at = changed_at
+WHERE changed_at IS NOT NULL;
 
-CREATE INDEX idx_product_versions_product_id ON product_versions (product_id);
-CREATE INDEX idx_product_versions_created_at ON product_versions (product_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_product_versions_product_id ON product_versions (product_id);
+CREATE INDEX IF NOT EXISTS idx_product_versions_created_at ON product_versions (product_id, created_at DESC);

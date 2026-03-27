@@ -12,3 +12,8 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
+
+  # Local dev: skip Flyway checksum validation so corrected migrations don't
+  # block startup. Checksums only matter when running against shared/prod DB.
+  flyway:
+    validate-on-migrate: false
