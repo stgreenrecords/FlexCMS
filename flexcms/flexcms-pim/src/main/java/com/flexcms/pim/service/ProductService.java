@@ -68,6 +68,14 @@ public class ProductService {
     }
 
     @Transactional(value = "pimTransactionManager", readOnly = true)
+    public Page<Product> listByCatalog(UUID catalogId, ProductStatus status, Pageable pageable) {
+        if (status == null) {
+            return productRepo.findByCatalogId(catalogId, pageable);
+        }
+        return productRepo.findByCatalogIdAndStatus(catalogId, status, pageable);
+    }
+
+    @Transactional(value = "pimTransactionManager", readOnly = true)
     public Page<Product> search(String query, Pageable pageable) {
         return productRepo.searchGlobal(query, pageable);
     }

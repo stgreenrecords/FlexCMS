@@ -7,15 +7,24 @@ import com.flexcms.core.repository.AssetRepository;
 import com.flexcms.core.service.ComponentRegistry;
 import com.flexcms.core.service.ContentDeliveryService;
 import com.flexcms.core.service.ContentNodeService;
+import com.flexcms.pim.model.Catalog;
+import com.flexcms.pim.model.Product;
+import com.flexcms.pim.model.ProductStatus;
+import com.flexcms.pim.service.CatalogService;
+import com.flexcms.pim.service.ProductSearchService;
+import com.flexcms.pim.service.ProductService;
 import com.flexcms.plugin.model.RenderContext;
 import com.flexcms.search.service.SearchIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.UUID;
 
 /**
  * GraphQL query resolvers for the FlexCMS headless API.
@@ -41,6 +50,15 @@ public class ContentQueryResolver {
 
     @Autowired
     private AssetRepository assetRepository;
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private CatalogService catalogService;
+
+    @Autowired
+    private ProductSearchService productSearchService;
 
     // -------------------------------------------------------------------------
     // page(path, site, locale): Page
@@ -169,6 +187,98 @@ public class ContentQueryResolver {
     }
 
     // -------------------------------------------------------------------------
+    // product(sku: String!): Product
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns a single PIM product by SKU with all resolved attributes
+     * (carryforward inheritance applied). Returns {@code null} if not found.
+     */
+    @QueryMapping
+    public Map<String, Object> product(@Argument String sku) {
+        return productService.getResolvedProduct(sku).orElse(null);
+    }
+
+    // -------------------------------------------------------------------------
+    // products(catalogId, status, limit, offset): ProductConnection!
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns a paginated list of products for a catalog with optional status filter.
+     */
+    @QueryMapping
+    @Transactional(value = "pimTransactionManager", readOnly = true)
+    public Map<String, Object> products(@Argument String catalogId,
+                                        @Argument String status,
+                                        @Argument Integer limit,
+                                        @Argument Integer offset) {
+        int pageSize = limit != null ? limit : 20;
+        int pageNum  = (offset != null && pageSize > 0) ? offset / pageSize : 0;
+
+        ProductStatus ps = status != null ? ProductStatus.valueOf(status.toUpperCase()) : null;
+        Page<Product> page = productService.listByCatalog(UUID.fromString(catalogId), ps,
+                PageRequest.of(pageNum, pageSize));
+
+        List<Map<String, Object>> items = page.getContent().stream()
+                .map(this::productToMap)
+                .toList();
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("totalCount", (int) page.getTotalElements());
+        result.put("items", items);
+        result.put("hasNextPage", page.hasNext());
+        return result;
+    }
+
+    // -------------------------------------------------------------------------
+    // catalogs: [Catalog!]!
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns all PIM catalogs.
+     */
+    @QueryMapping
+    public List<Map<String, Object>> catalogs() {
+        return catalogService.listAll().stream()
+                .map(this::catalogToMap)
+                .toList();
+    }
+
+    // -------------------------------------------------------------------------
+    // searchProducts(query, catalogId, status, limit): ProductSearchResult!
+    // -------------------------------------------------------------------------
+
+    /**
+     * Full-text product search via Elasticsearch.
+     */
+    @QueryMapping
+    public Map<String, Object> searchProducts(@Argument String query,
+                                              @Argument String catalogId,
+                                              @Argument String status,
+                                              @Argument Integer limit) {
+        int pageSize = limit != null ? limit : 20;
+        ProductSearchService.ProductSearchResult result =
+                productSearchService.search(query, catalogId, status, PageRequest.of(0, pageSize));
+
+        List<Map<String, Object>> items = result.items().stream()
+                .map(hit -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("sku",       hit.sku());
+                    m.put("name",      hit.name());
+                    m.put("catalogId", hit.catalogId());
+                    m.put("status",    hit.status());
+                    m.put("score",     hit.score());
+                    return m;
+                })
+                .toList();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("totalCount", result.totalCount());
+        response.put("items", items);
+        return response;
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -212,5 +322,38 @@ public class ContentQueryResolver {
         map.put("locale", node.getLocale());
         map.put("siteId", node.getSiteId());
         return map;
+    }
+
+    /**
+     * Map a PIM {@link Product} entity to the GraphQL {@code Product} type fields.
+     * Must be called within an active PIM transaction to allow lazy-loaded catalog access.
+     */
+    private Map<String, Object> productToMap(Product product) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id",        product.getId().toString());
+        m.put("sku",       product.getSku());
+        m.put("name",      product.getName());
+        m.put("status",    product.getStatus().name());
+        m.put("catalogId", product.getCatalog().getId().toString());
+        m.put("attributes", product.getAttributes());
+        m.put("version",   product.getVersion());
+        m.put("createdAt", product.getCreatedAt() != null ? product.getCreatedAt().toString() : null);
+        m.put("updatedAt", product.getUpdatedAt() != null ? product.getUpdatedAt().toString() : null);
+        m.put("updatedBy", product.getUpdatedBy());
+        return m;
+    }
+
+    /**
+     * Map a PIM {@link Catalog} entity to the GraphQL {@code Catalog} type fields.
+     */
+    private Map<String, Object> catalogToMap(Catalog catalog) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id",          catalog.getId().toString());
+        m.put("name",        catalog.getName());
+        m.put("year",        catalog.getYear());
+        m.put("season",      catalog.getSeason());
+        m.put("description", catalog.getDescription());
+        m.put("status",      catalog.getStatus().name());
+        return m;
     }
 }

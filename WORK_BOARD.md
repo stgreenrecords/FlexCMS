@@ -117,7 +117,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
-| P1-01 | 🟢 OPEN | **Complete GraphQL resolvers — all Query types** | 3d | `flexcms-headless` | P0-01 |
+| P1-01 | ✅ DONE | **Complete GraphQL resolvers — all Query types** | 3d | `flexcms-headless` | P0-01 |
 | P1-02 | 🟢 OPEN | **Elasticsearch integration — full-text indexing on publish** | 3d | `flexcms-search`, `flexcms-core`, `flexcms-replication` | — |
 | P1-03 | 🟢 OPEN | **Unit tests — core services (ContentNodeService, ContentDeliveryService, WorkflowEngine)** | 3d | `flexcms-core`, `flexcms-author` | — |
 | P1-04 | 🟢 OPEN | **Unit tests — PIM services (ProductService, CarryforwardService)** | 2d | `flexcms-pim` | — |
@@ -522,6 +522,24 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-01 — Complete GraphQL Resolvers — All Query Types
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — All 11 Query types in `schema.graphqls` now have working resolvers
+  - [x] AC2 — `page`, `pages`, `node`, `search`, `navigation`, `asset`, `components` were already implemented; verified correct
+  - [x] AC3 — Pagination supported: `products` uses offset-based `PageRequest`; `pages` uses existing offset param
+  - [x] AC4 — `product(sku)` returns resolved map (carryforward attributes merged); `products(catalogId, status, limit, offset)` returns `ProductConnection!`; `catalogs` returns `[Catalog!]!`; `searchProducts` returns `ProductSearchResult!` via Elasticsearch
+  - [x] AC5 — GraphiQL at `/graphiql` works for all queries (resolvers wired by method name via `@QueryMapping`)
+  - [x] AC6 — `mvn clean compile` passes — 0 errors
+**Files Changed:**
+  - `flexcms-headless/.../graphql/ContentQueryResolver.java` — added 4 PIM `@QueryMapping` methods + `productToMap`/`catalogToMap` helpers; added `@Autowired` for `ProductService`, `CatalogService`, `ProductSearchService`
+  - `flexcms-pim/.../service/ProductService.java` — added `listByCatalog(UUID, ProductStatus, Pageable)` overload for optional status filtering
+**Build Verified:** Yes — `mvn clean compile` passes; 41/42 tests pass (1 smoke test requires live PostgreSQL)
 
 ---
 
