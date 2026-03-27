@@ -18,7 +18,9 @@
       "Bash(echo \"=== P0-11 AC1: Sites ===\" docker exec flexcms-postgres psql -U flexcms -d flexcms_author -c \"SELECT site_id, title, default_locale, supported_locales FROM sites WHERE site_id LIKE ''''tut-%'''';\" 2)",
       "Bash(1 __NEW_LINE_cce47a7021ce31c2__ echo \"\" echo \"=== P0-11 AC4: XF variations ===\" docker exec flexcms-postgres psql -U flexcms -d flexcms_author -t -c \":*)",
       "Bash(git push:*)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
