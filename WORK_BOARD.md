@@ -100,7 +100,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
-| P0-01 | 🟢 OPEN | **Global error handling — `@ControllerAdvice` + RFC 7807 Problem Details** | 1d | `flexcms-core`, `flexcms-author`, `flexcms-headless`, `flexcms-app` | — |
+| P0-01 | ✅ DONE | **Global error handling — `@ControllerAdvice` + RFC 7807 Problem Details** | 1d | `flexcms-core`, `flexcms-author`, `flexcms-headless`, `flexcms-app` | — |
 | P0-02 | 🟢 OPEN | **Input validation — `@Valid` DTOs + request constraints** | 1d | `flexcms-author`, `flexcms-headless`, `flexcms-pim` | — |
 | P0-03 | 🟢 OPEN | **Fix `PageApiController.getChildren()` — DI instead of `new ContentNodeService()`** | 1h | `flexcms-headless` | — |
 | P0-04 | 🟢 OPEN | **Fix N+1 in `ContentNode.getChildren()` / `loadChildrenRecursive()`** | 4h | `flexcms-core` | — |
@@ -525,7 +525,26 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 ---
 
-*No entries yet. First task completion will be recorded here.*
+### P0-01 — Global error handling — `@ControllerAdvice` + RFC 7807 Problem Details
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `@RestControllerAdvice` class `GlobalExceptionHandler` exists in `flexcms-app`, catches all exceptions including catch-all `Exception.class`
+  - [x] AC2 — 404 (`NotFoundException`), 400 (`MethodArgumentNotValidException`, `ConstraintViolationException`), 409 (`ConflictException`), 422 (`ValidationException`), 500 (catch-all) all return Spring `ProblemDetail` (RFC 7807)
+  - [x] AC3 — Catch-all handler logs `ex.getMessage()` only; stack trace never included in response body
+  - [x] AC4 — Exception hierarchy: `FlexCmsException` (base) → `NotFoundException`, `ContentNotFoundException`, `ValidationException`, `ConflictException`, `ForbiddenException`
+  - [x] AC5 — `cd flexcms && mvn clean compile` passes with 0 errors
+**Files Changed:**
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/FlexCmsException.java` — existed (abstract base with status + errorCode)
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/NotFoundException.java` — existed
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/ValidationException.java` — existed (with FieldError record)
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/ConflictException.java` — existed
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/ForbiddenException.java` — existed
+  - `flexcms-core/src/main/java/com/flexcms/core/exception/ContentNotFoundException.java` — **NEW**: domain-specific specialization of NotFoundException for content-tree lookups
+  - `flexcms-app/src/main/java/com/flexcms/app/config/GlobalExceptionHandler.java` — existed (complete RFC 7807 implementation with correlationId, MDC trace, field-level errors)
+**Build Verified:** Yes — `cd flexcms && mvn clean compile` passed
+**Notes:** Task was largely pre-implemented. Only `ContentNotFoundException` was missing per AC4 and context packet `output_files`. Added as a semantic specialization of `NotFoundException` — callers in content tree lookups should prefer `ContentNotFoundException.forPath(path)` for more descriptive errors.
 
 ---
 
