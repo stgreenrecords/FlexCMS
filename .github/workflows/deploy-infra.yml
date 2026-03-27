@@ -27,7 +27,6 @@ jobs:
   deploy:
     name: Deploy CFN — ${{ inputs.environment }} (${{ inputs.action }})
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
 
     steps:
       - name: Checkout
