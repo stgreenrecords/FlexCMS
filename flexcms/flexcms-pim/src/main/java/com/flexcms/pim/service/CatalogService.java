@@ -5,6 +5,8 @@ import com.flexcms.pim.model.ProductSchema;
 import com.flexcms.pim.repository.CatalogRepository;
 import com.flexcms.pim.repository.ProductSchemaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +41,18 @@ public class CatalogService {
     }
 
     @Transactional(value = "pimTransactionManager", readOnly = true)
+    public Page<Catalog> listByYear(int year, Pageable pageable) {
+        return catalogRepo.findByYearPaginated(year, pageable);
+    }
+
+    @Transactional(value = "pimTransactionManager", readOnly = true)
     public List<Catalog> listAll() {
         return catalogRepo.findAll();
+    }
+
+    @Transactional(value = "pimTransactionManager", readOnly = true)
+    public Page<Catalog> listAll(Pageable pageable) {
+        return catalogRepo.findAllPaginated(pageable);
     }
 
     @Transactional("pimTransactionManager")

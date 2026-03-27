@@ -7,10 +7,12 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,12 +30,22 @@ public class CatalogApiController {
     private CatalogService catalogService;
 
     @GetMapping
-    public ResponseEntity<List<Catalog>> listAll(
-            @RequestParam(required = false) Integer year) {
-        List<Catalog> result = year != null
-                ? catalogService.listByYear(year)
-                : catalogService.listAll();
-        return ResponseEntity.ok(result);
+    public ResponseEntity<Map<String, Object>> listAll(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        int clampedSize = Math.min(size, 100);
+        PageRequest pageable = PageRequest.of(page, clampedSize);
+        Page<Catalog> result = year != null
+                ? catalogService.listByYear(year, pageable)
+                : catalogService.listAll(pageable);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("items", result.getContent());
+        response.put("totalCount", result.getTotalElements());
+        response.put("page", result.getNumber());
+        response.put("size", result.getSize());
+        response.put("hasNextPage", result.hasNext());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

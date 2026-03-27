@@ -6,10 +6,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,8 +29,12 @@ public class SchemaApiController {
     private SchemaService schemaService;
 
     @GetMapping
-    public ResponseEntity<List<ProductSchema>> listActive() {
-        return ResponseEntity.ok(schemaService.listActive());
+    public ResponseEntity<Map<String, Object>> listActive(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        int clampedSize = Math.min(size, 100);
+        Page<ProductSchema> result = schemaService.listActive(PageRequest.of(page, clampedSize));
+        return ResponseEntity.ok(toPageResponse(result));
     }
 
     @GetMapping("/{id}")
@@ -39,8 +45,13 @@ public class SchemaApiController {
     }
 
     @GetMapping("/by-name/{name}")
-    public ResponseEntity<List<ProductSchema>> listByName(@PathVariable String name) {
-        return ResponseEntity.ok(schemaService.listByName(name));
+    public ResponseEntity<Map<String, Object>> listByName(
+            @PathVariable String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        int clampedSize = Math.min(size, 100);
+        Page<ProductSchema> result = schemaService.listByName(name, PageRequest.of(page, clampedSize));
+        return ResponseEntity.ok(toPageResponse(result));
     }
 
     @PostMapping
@@ -81,6 +92,16 @@ public class SchemaApiController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         schemaService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private Map<String, Object> toPageResponse(Page<ProductSchema> result) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("items", result.getContent());
+        response.put("totalCount", result.getTotalElements());
+        response.put("page", result.getNumber());
+        response.put("size", result.getSize());
+        response.put("hasNextPage", result.hasNext());
+        return response;
     }
 
     public record CreateSchemaRequest(

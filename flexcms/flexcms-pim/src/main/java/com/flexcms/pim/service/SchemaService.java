@@ -3,6 +3,8 @@ package com.flexcms.pim.service;
 import com.flexcms.pim.model.ProductSchema;
 import com.flexcms.pim.repository.ProductSchemaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +41,18 @@ public class SchemaService {
     }
 
     @Transactional(value = "pimTransactionManager", readOnly = true)
+    public Page<ProductSchema> listByName(String name, Pageable pageable) {
+        return schemaRepo.findByName(name, pageable);
+    }
+
+    @Transactional(value = "pimTransactionManager", readOnly = true)
     public List<ProductSchema> listActive() {
         return schemaRepo.findByActiveTrue();
+    }
+
+    @Transactional(value = "pimTransactionManager", readOnly = true)
+    public Page<ProductSchema> listActive(Pageable pageable) {
+        return schemaRepo.findByActiveTrue(pageable);
     }
 
     /**

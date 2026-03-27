@@ -104,7 +104,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P0-02 | ✅ DONE | **Input validation — `@Valid` DTOs + request constraints** | 1d | `flexcms-author`, `flexcms-headless`, `flexcms-pim` | — |
 | P0-03 | ✅ DONE | **Fix `PageApiController.getChildren()` — DI instead of `new ContentNodeService()`** | 1h | `flexcms-headless` | — |
 | P0-04 | ✅ DONE | **Fix N+1 in `ContentNode.getChildren()` / `loadChildrenRecursive()`** | 4h | `flexcms-core` | — |
-| P0-05 | 🟢 OPEN | **Add pagination to all list endpoints** | 1d | `flexcms-headless`, `flexcms-author`, `flexcms-pim` | — |
+| P0-05 | ✅ DONE | **Add pagination to all list endpoints** | 1d | `flexcms-headless`, `flexcms-author`, `flexcms-pim` | — |
 | P0-06 | 🟢 OPEN | **Remove all mock/dummy data from frontend markup** | 4h | `apps/admin` | — |
 | P0-07 | ✅ DONE | **Ensure SQL seed data uses only valid `NodeStatus` enum values** | 2h | `flexcms-app` (migrations) | — |
 | P0-08 | ✅ DONE | **Database constraint: CHECK on `content_nodes.status`** | 1h | `flexcms-app` (Flyway migration) | P0-07 |
@@ -522,6 +522,27 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P0-05 — Add Pagination to All List Endpoints
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — All previously-unbounded list endpoints now accept `page` and `size` query params: `GET /api/pim/v1/catalogs`, `GET /api/pim/v1/schemas`, `GET /api/pim/v1/schemas/by-name/{name}`
+  - [x] AC2 — Default page size is 20; max is clamped to 100 in all controllers
+  - [x] AC3 — Response envelope: `{ items, totalCount, page, size, hasNextPage }` (consistent with author/asset endpoints)
+  - [x] AC4 — `cd flexcms && mvn clean compile` passes
+**Files Changed:**
+  - `flexcms-pim/repository/CatalogRepository.java` — added paginated `findAllPaginated` + `findByYearPaginated` with JOIN FETCH and count queries
+  - `flexcms-pim/repository/ProductSchemaRepository.java` — added `findByActiveTrue(Pageable)` and `findByName(String, Pageable)`
+  - `flexcms-pim/service/CatalogService.java` — added `listAll(Pageable)` and `listByYear(int, Pageable)`
+  - `flexcms-pim/service/SchemaService.java` — added `listActive(Pageable)` and `listByName(String, Pageable)`
+  - `flexcms-pim/controller/CatalogApiController.java` — `listAll` paginated, returns Map envelope
+  - `flexcms-pim/controller/SchemaApiController.java` — `listActive` and `listByName` paginated, returns Map envelope
+**Build Verified:** Yes — `mvn clean compile` passed
+**Notes:** Headless and author endpoints were already fully paginated. Only PIM catalog/schema list endpoints needed this work.
 
 ---
 
