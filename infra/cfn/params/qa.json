@@ -3,7 +3,7 @@
   {"ParameterKey": "DBInstanceClass",            "ParameterValue": "db.t3.micro"},
   {"ParameterKey": "DBAllocatedStorage",         "ParameterValue": "20"},
   {"ParameterKey": "CacheNodeType",              "ParameterValue": "cache.t3.micro"},
-  {"ParameterKey": "BrokerInstanceType",         "ParameterValue": "mq.m5.large"},
+  {"ParameterKey": "BrokerInstanceType",         "ParameterValue": "mq.t3.micro"},
   {"ParameterKey": "AuthorDesiredCount",         "ParameterValue": "1"},
   {"ParameterKey": "PublishDesiredCount",        "ParameterValue": "2"},
   {"ParameterKey": "PublishMaxCount",            "ParameterValue": "6"},
