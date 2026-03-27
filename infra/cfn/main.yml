@@ -42,8 +42,42 @@ Parameters:
   TemplateBucketUrl:
     Type: String
     Description: S3 URL prefix for nested CFN templates
+  # Frontend image URIs (ECR). Leave empty to skip deploying that service.
+  AdminImageUri:
+    Type: String
+    Default: ''
+    Description: ECR image URI for the Admin UI (Next.js). Empty = skip Admin service.
+  SiteImageUri:
+    Type: String
+    Default: ''
+    Description: ECR image URI for the Site-nextjs. Empty = skip Site service.
+  AdminDesiredCount:
+    Type: Number
+    Default: 1
+  SiteDesiredCount:
+    Type: Number
+    Default: 1
+  # Domain / TLS (all optional — leave empty for HTTP-only deployment)
+  DomainName:
+    Type: String
+    Default: ''
+    Description: Base domain e.g. qa.flexcmsdemo.store. Empty = no custom domain.
+  CertificateArn:
+    Type: String
+    Default: ''
+    Description: ACM certificate ARN (eu-central-1) for ALBs. Empty = HTTP only.
+  CloudFrontCertificateArn:
+    Type: String
+    Default: ''
+    Description: ACM certificate ARN (us-east-1) for CloudFront. Empty = no custom domain on CF.
+
 Conditions:
   IsProd: !Equals [!Ref EnvironmentName, prod]
+  HasCertificate: !Not [!Equals [!Ref CertificateArn, '']]
+  HasCloudFrontCert: !Not [!Equals [!Ref CloudFrontCertificateArn, '']]
+  HasDomain: !Not [!Equals [!Ref DomainName, '']]
+  HasAdminImage: !Not [!Equals [!Ref AdminImageUri, '']]
+  HasSiteImage: !Not [!Equals [!Ref SiteImageUri, '']]
 
 Resources:
   NetworkStack:
@@ -198,11 +232,13 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: !Sub fcms-${EnvironmentName}-auth
-      Scheme: internal
+      # QA: internet-facing so Admin UI browser calls can reach the Author API.
+      # Prod: internal — Admin UI runs in VPC and connects via private DNS.
+      Scheme: !If [IsProd, internal, internet-facing]
       Type: application
       Subnets:
-        - !GetAtt NetworkStack.Outputs.PrivateSubnetA
-        - !GetAtt NetworkStack.Outputs.PrivateSubnetB
+        - !If [IsProd, !GetAtt NetworkStack.Outputs.PrivateSubnetA, !GetAtt NetworkStack.Outputs.PublicSubnetA]
+        - !If [IsProd, !GetAtt NetworkStack.Outputs.PrivateSubnetB, !GetAtt NetworkStack.Outputs.PublicSubnetB]
       SecurityGroups:
         - !GetAtt NetworkStack.Outputs.AlbSecurityGroup
 
@@ -259,10 +295,13 @@ Resources:
             - {Name: SPRING_DATASOURCE_PASSWORD, Value: !Ref DBMasterPassword}
             - {Name: SPRING_DATA_REDIS_HOST, Value: !GetAtt CacheStack.Outputs.RedisEndpoint}
             - {Name: SPRING_DATA_REDIS_PORT, Value: '6379'}
+            - {Name: SPRING_RABBITMQ_HOST, Value: !GetAtt MessagingStack.Outputs.BrokerHostname}
             - {Name: SPRING_RABBITMQ_PORT, Value: '5671'}
             - {Name: SPRING_RABBITMQ_USERNAME, Value: flexcms}
             - {Name: SPRING_RABBITMQ_PASSWORD, Value: !Ref BrokerPassword}
             - {Name: SPRING_RABBITMQ_SSL_ENABLED, Value: 'true'}
+            - Name: SPRING_ELASTICSEARCH_URIS
+              Value: !Sub http://elasticsearch.flexcms-${EnvironmentName}.local:9200
             - {Name: FLEXCMS_DAM_S3_BUCKET, Value: !GetAtt StorageStack.Outputs.AssetsBucketName}
             - {Name: FLEXCMS_DAM_S3_REGION, Value: !Ref 'AWS::Region'}
             # PIM database (separate DB on same RDS instance)
@@ -326,10 +365,13 @@ Resources:
             - {Name: SPRING_DATASOURCE_PASSWORD, Value: !Ref DBMasterPassword}
             - {Name: SPRING_DATA_REDIS_HOST, Value: !GetAtt CacheStack.Outputs.RedisEndpoint}
             - {Name: SPRING_DATA_REDIS_PORT, Value: '6379'}
+            - {Name: SPRING_RABBITMQ_HOST, Value: !GetAtt MessagingStack.Outputs.BrokerHostname}
             - {Name: SPRING_RABBITMQ_PORT, Value: '5671'}
             - {Name: SPRING_RABBITMQ_USERNAME, Value: flexcms}
             - {Name: SPRING_RABBITMQ_PASSWORD, Value: !Ref BrokerPassword}
             - {Name: SPRING_RABBITMQ_SSL_ENABLED, Value: 'true'}
+            - Name: SPRING_ELASTICSEARCH_URIS
+              Value: !Sub http://elasticsearch.flexcms-${EnvironmentName}.local:9200
             - {Name: FLEXCMS_DAM_S3_BUCKET, Value: !GetAtt StorageStack.Outputs.AssetsBucketName}
             - {Name: FLEXCMS_DAM_S3_REGION, Value: !Ref 'AWS::Region'}
             # PIM database (separate DB on same RDS instance, read-only for publish)
@@ -409,6 +451,349 @@ Resources:
         ScaleOutCooldown: 60
 
   # ===========================================================================
+  # HTTPS Listeners — Author ALB + Publish ALB (requires CertificateArn param)
+  # ===========================================================================
+
+  AuthorHttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HasCertificate
+    Properties:
+      LoadBalancerArn: !Ref AuthorALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AuthorTargetGroup
+
+  PublishHttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HasCertificate
+    Properties:
+      LoadBalancerArn: !Ref PublishALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref PublishTargetGroup
+
+  # ===========================================================================
+  # Service Discovery — Cloud Map private DNS namespace for ECS-to-ECS routing
+  # ===========================================================================
+
+  ServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: !Sub flexcms-${EnvironmentName}.local
+      Vpc: !GetAtt NetworkStack.Outputs.VpcId
+
+  ElasticsearchDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Name: elasticsearch
+      NamespaceId: !GetAtt ServiceDiscoveryNamespace.Id
+      DnsConfig:
+        DnsRecords:
+          - Type: A
+            TTL: 10
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+
+  # ===========================================================================
+  # Elasticsearch — ephemeral single-node (QA). Prod: use Amazon OpenSearch.
+  # Spring connects via http://elasticsearch.flexcms-<env>.local:9200
+  # ===========================================================================
+
+  ElasticsearchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/flexcms-${EnvironmentName}-elasticsearch
+      RetentionInDays: 7
+
+  ElasticsearchTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub flexcms-${EnvironmentName}-elasticsearch
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '1024'
+      Memory: '2048'
+      ExecutionRoleArn: !GetAtt EcsExecutionRole.Arn
+      TaskRoleArn: !GetAtt EcsTaskRole.Arn
+      ContainerDefinitions:
+        - Name: elasticsearch
+          Image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+          Essential: true
+          PortMappings: [{ContainerPort: 9200}]
+          Environment:
+            - {Name: discovery.type, Value: single-node}
+            - {Name: ES_JAVA_OPTS, Value: '-Xms512m -Xmx512m'}
+            - {Name: xpack.security.enabled, Value: 'false'}
+            - {Name: xpack.security.http.ssl.enabled, Value: 'false'}
+            - {Name: cluster.name, Value: !Sub flexcms-${EnvironmentName}}
+          Ulimits:
+            - Name: nofile
+              SoftLimit: 65536
+              HardLimit: 65536
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ElasticsearchLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: elasticsearch
+
+  ElasticsearchService:
+    Type: AWS::ECS::Service
+    DependsOn: ServiceDiscoveryNamespace
+    Properties:
+      ServiceName: !Sub flexcms-${EnvironmentName}-elasticsearch
+      Cluster: !Ref EcsCluster
+      TaskDefinition: !Ref ElasticsearchTaskDef
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetA
+          SecurityGroups:
+            - !GetAtt NetworkStack.Outputs.EcsSecurityGroup
+      ServiceRegistries:
+        - RegistryArn: !GetAtt ElasticsearchDiscoveryService.Arn
+
+  # ===========================================================================
+  # Admin UI — Next.js, internet-facing ALB, private ECS subnet
+  # ===========================================================================
+
+  AdminLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/flexcms-${EnvironmentName}-admin
+      RetentionInDays: !If [IsProd, 90, 14]
+
+  AdminALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-admin
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+        - !GetAtt NetworkStack.Outputs.PublicSubnetA
+        - !GetAtt NetworkStack.Outputs.PublicSubnetB
+      SecurityGroups:
+        - !GetAtt NetworkStack.Outputs.AlbSecurityGroup
+
+  AdminTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-admin-tg
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !GetAtt NetworkStack.Outputs.VpcId
+      TargetType: ip
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+
+  AdminListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref AdminALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AdminTargetGroup
+
+  AdminHttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HasCertificate
+    Properties:
+      LoadBalancerArn: !Ref AdminALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref AdminTargetGroup
+
+  AdminTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Condition: HasAdminImage
+    Properties:
+      Family: !Sub flexcms-${EnvironmentName}-admin
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '512'
+      Memory: '1024'
+      ExecutionRoleArn: !GetAtt EcsExecutionRole.Arn
+      TaskRoleArn: !GetAtt EcsTaskRole.Arn
+      ContainerDefinitions:
+        - Name: flexcms-admin
+          Image: !Ref AdminImageUri
+          Essential: true
+          PortMappings: [{ContainerPort: 3000}]
+          Environment:
+            # NEXT_PUBLIC_FLEXCMS_API is baked into the Next.js bundle at image build time.
+            # This env var is passed as a runtime hint and for documentation purposes.
+            - Name: NEXT_PUBLIC_FLEXCMS_API
+              Value: !If
+                - HasDomain
+                - !Sub https://api.${DomainName}
+                - !Sub http://${AuthorALB.DNSName}
+            - {Name: NEXT_PUBLIC_FLEXCMS_SITE_URL, Value: !If [HasDomain, !Sub 'https://site.${DomainName}', !Sub 'http://${SiteALB.DNSName}']}
+            - {Name: NODE_ENV, Value: production}
+            - {Name: NEXT_TELEMETRY_DISABLED, Value: '1'}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AdminLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: admin
+
+  AdminService:
+    Type: AWS::ECS::Service
+    Condition: HasAdminImage
+    DependsOn: AdminListener
+    Properties:
+      ServiceName: !Sub flexcms-${EnvironmentName}-admin
+      Cluster: !Ref EcsCluster
+      TaskDefinition: !Ref AdminTaskDef
+      DesiredCount: !Ref AdminDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetA
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetB
+          SecurityGroups:
+            - !GetAtt NetworkStack.Outputs.EcsSecurityGroup
+      LoadBalancers:
+        - ContainerName: flexcms-admin
+          ContainerPort: 3000
+          TargetGroupArn: !Ref AdminTargetGroup
+
+  # ===========================================================================
+  # Site-nextjs — Next.js SSR reference site, internet-facing ALB
+  # ===========================================================================
+
+  SiteLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/flexcms-${EnvironmentName}-site
+      RetentionInDays: !If [IsProd, 90, 14]
+
+  SiteALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-site
+      Scheme: internet-facing
+      Type: application
+      Subnets:
+        - !GetAtt NetworkStack.Outputs.PublicSubnetA
+        - !GetAtt NetworkStack.Outputs.PublicSubnetB
+      SecurityGroups:
+        - !GetAtt NetworkStack.Outputs.AlbSecurityGroup
+
+  SiteTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub fcms-${EnvironmentName}-site-tg
+      Port: 3001
+      Protocol: HTTP
+      VpcId: !GetAtt NetworkStack.Outputs.VpcId
+      TargetType: ip
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+
+  SiteListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref SiteALB
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref SiteTargetGroup
+
+  SiteHttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HasCertificate
+    Properties:
+      LoadBalancerArn: !Ref SiteALB
+      Port: 443
+      Protocol: HTTPS
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref SiteTargetGroup
+
+  SiteTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Condition: HasSiteImage
+    Properties:
+      Family: !Sub flexcms-${EnvironmentName}-site
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      Cpu: '512'
+      Memory: '1024'
+      ExecutionRoleArn: !GetAtt EcsExecutionRole.Arn
+      TaskRoleArn: !GetAtt EcsTaskRole.Arn
+      ContainerDefinitions:
+        - Name: flexcms-site
+          Image: !Ref SiteImageUri
+          Essential: true
+          PortMappings: [{ContainerPort: 3001}]
+          Environment:
+            # Server-side only — can be set at runtime for standalone Next.js
+            - Name: FLEXCMS_API_URL
+              Value: !Sub http://${AuthorALB.DNSName}
+            - {Name: FLEXCMS_DEFAULT_SITE, Value: corporate}
+            - {Name: FLEXCMS_DEFAULT_LOCALE, Value: en}
+            - {Name: PORT, Value: '3001'}
+            - {Name: NODE_ENV, Value: production}
+            - {Name: NEXT_TELEMETRY_DISABLED, Value: '1'}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref SiteLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: site
+
+  SiteService:
+    Type: AWS::ECS::Service
+    Condition: HasSiteImage
+    DependsOn: SiteListener
+    Properties:
+      ServiceName: !Sub flexcms-${EnvironmentName}-site
+      Cluster: !Ref EcsCluster
+      TaskDefinition: !Ref SiteTaskDef
+      DesiredCount: !Ref SiteDesiredCount
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetA
+            - !GetAtt NetworkStack.Outputs.PrivateSubnetB
+          SecurityGroups:
+            - !GetAtt NetworkStack.Outputs.EcsSecurityGroup
+      LoadBalancers:
+        - ContainerName: flexcms-site
+          ContainerPort: 3001
+          TargetGroupArn: !Ref SiteTargetGroup
+
+  # ===========================================================================
   # CDN Hybrid Routing — CloudFront Distribution
   # ===========================================================================
   # Origin Group:
@@ -461,6 +846,16 @@ Resources:
         HttpVersion: http2
         IPV6Enabled: true
         PriceClass: !If [IsProd, PriceClass_All, PriceClass_100]
+        Aliases: !If
+          - HasCloudFrontCert
+          - [!Ref DomainName]
+          - !Ref AWS::NoValue
+        ViewerCertificate: !If
+          - HasCloudFrontCert
+          - AcmCertificateArn: !Ref CloudFrontCertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true
 
         Origins:
           # Primary: S3 static site bucket (pre-built HTML)
@@ -530,12 +925,20 @@ Outputs:
     Value: !GetAtt PublishALB.DNSName
   AuthorALBDns:
     Value: !GetAtt AuthorALB.DNSName
+  AdminALBDns:
+    Value: !GetAtt AdminALB.DNSName
+  SiteALBDns:
+    Value: !GetAtt SiteALB.DNSName
   ClusterName:
     Value: !Ref EcsCluster
   RDSEndpoint:
     Value: !GetAtt DatabaseStack.Outputs.DBEndpoint
   RedisEndpoint:
     Value: !GetAtt CacheStack.Outputs.RedisEndpoint
+  BrokerEndpoint:
+    Value: !GetAtt MessagingStack.Outputs.BrokerEndpoint
+  ElasticsearchEndpoint:
+    Value: !Sub http://elasticsearch.flexcms-${EnvironmentName}.local:9200
   CloudFrontDistributionId:
     Value: !Ref FlexCMSDistribution
   CloudFrontDomain:

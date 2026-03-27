@@ -210,6 +210,16 @@ Resources:
       ToPort: 8081
       SourceSecurityGroupId: !Ref EcsSecurityGroup
 
+  # Allow ECS tasks to reach Elasticsearch (port 9200) running in ECS
+  EcsElasticIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EcsSecurityGroup
+      IpProtocol: tcp
+      FromPort: 9200
+      ToPort: 9200
+      SourceSecurityGroupId: !Ref EcsSecurityGroup
+
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:

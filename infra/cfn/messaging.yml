@@ -59,6 +59,17 @@ Outputs:
     Value: !Select [0, !GetAtt RabbitMQBroker.AmqpEndpoints]
     Export:
       Name: !Sub ${AWS::StackName}-BrokerEndpoint
+  # Hostname extracted from amqps://hostname:5671
+  BrokerHostname:
+    Value: !Select
+      - 0
+      - !Split
+        - ':'
+        - !Select
+          - 1
+          - !Split ['/', !Select [0, !GetAtt RabbitMQBroker.AmqpEndpoints]]
+    Export:
+      Name: !Sub ${AWS::StackName}-BrokerHostname
   BrokerId:
     Value: !Ref RabbitMQBroker
 

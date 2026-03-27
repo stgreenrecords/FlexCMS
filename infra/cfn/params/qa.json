@@ -1,11 +1,17 @@
 [
-  {"ParameterKey": "EnvironmentName",    "ParameterValue": "qa"},
-  {"ParameterKey": "DBInstanceClass",    "ParameterValue": "db.t3.medium"},
-  {"ParameterKey": "DBAllocatedStorage", "ParameterValue": "50"},
-  {"ParameterKey": "CacheNodeType",      "ParameterValue": "cache.t3.micro"},
-  {"ParameterKey": "BrokerInstanceType", "ParameterValue": "mq.m5.large"},
-  {"ParameterKey": "AuthorDesiredCount", "ParameterValue": "1"},
-  {"ParameterKey": "PublishDesiredCount","ParameterValue": "2"},
-  {"ParameterKey": "PublishMaxCount",    "ParameterValue": "6"}
+  {"ParameterKey": "EnvironmentName",            "ParameterValue": "qa"},
+  {"ParameterKey": "DBInstanceClass",            "ParameterValue": "db.t3.medium"},
+  {"ParameterKey": "DBAllocatedStorage",         "ParameterValue": "50"},
+  {"ParameterKey": "CacheNodeType",              "ParameterValue": "cache.t3.micro"},
+  {"ParameterKey": "BrokerInstanceType",         "ParameterValue": "mq.m5.large"},
+  {"ParameterKey": "AuthorDesiredCount",         "ParameterValue": "1"},
+  {"ParameterKey": "PublishDesiredCount",        "ParameterValue": "2"},
+  {"ParameterKey": "PublishMaxCount",            "ParameterValue": "6"},
+  {"ParameterKey": "AdminDesiredCount",          "ParameterValue": "1"},
+  {"ParameterKey": "SiteDesiredCount",           "ParameterValue": "1"},
+  {"ParameterKey": "DomainName",                 "ParameterValue": "qa.flexcmsdemo.store"},
+  {"ParameterKey": "AdminImageUri",              "ParameterValue": ""},
+  {"ParameterKey": "SiteImageUri",               "ParameterValue": ""},
+  {"ParameterKey": "CertificateArn",             "ParameterValue": ""},
+  {"ParameterKey": "CloudFrontCertificateArn",   "ParameterValue": ""}
 ]
-

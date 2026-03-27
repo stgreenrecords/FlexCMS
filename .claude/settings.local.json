@@ -23,7 +23,14 @@
       "Bash(git commit:*)",
       "Bash(wc -l /c/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/admin/src/app/\\\\\\(admin\\\\\\)/dam/page.tsx)",
       "Bash(wc -l /c/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/admin/src/app/\\\\\\(admin\\\\\\)/sites/page.tsx)",
-      "Bash(wc -l \"c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/admin/src/app/\\(admin\\)/pim/[id]/[productId]/page.tsx\")"
+      "Bash(wc -l \"c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/admin/src/app/\\(admin\\)/pim/[id]/[productId]/page.tsx\")",
+      "Bash(aws sts:*)",
+      "Bash(aws configure:*)",
+      "Bash(aws cloudformation:*)",
+      "Bash(aws ecr:*)",
+      "Bash(aws ecs:*)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\(''c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/site-nextjs/package.json''\\)\\); print\\(json.dumps\\({k:d.get\\(k\\) for k in [''name'',''scripts'']}, indent=2\\)\\)\")",
+      "Bash(node -e \"const d=require\\(''c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/site-nextjs/package.json''\\); console.log\\(d.name, JSON.stringify\\(d.scripts\\)\\)\")"
     ]
   }
 }

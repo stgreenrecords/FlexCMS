@@ -44,14 +44,16 @@ $LogDir      = Join-Path $RootDir ".dev-logs"
 
 # ─── Service alias map (pim/dam/cms → author since they're in the same JAR) ──
 $AliasMap = @{
-    "pim"     = "author"
-    "dam"     = "author"
-    "cms"     = "author"
-    "frontend"= "admin"
-    "ui"      = "admin"
+    "pim"        = "author"
+    "dam"        = "author"
+    "cms"        = "author"
+    "frontend"   = "admin"
+    "ui"         = "admin"
+    "site-react" = "site"
+    "site-nextjs"= "site"
 }
 
-$ValidServices = @("infra", "author", "publish", "admin")
+$ValidServices = @("infra", "author", "publish", "admin", "site")
 
 function Resolve-Services([string[]]$raw) {
     if ($raw.Count -eq 0 -or ($raw.Count -eq 1 -and $raw[0] -eq "all")) {
@@ -62,7 +64,7 @@ function Resolve-Services([string[]]$raw) {
         $mapped = if ($AliasMap.ContainsKey($s)) { $AliasMap[$s] } else { $s }
         if ($mapped -notin $ValidServices) {
             Write-Host "  Unknown service: '$s'" -ForegroundColor Red
-            Write-Host "  Valid: all, infra, author, publish, admin, pim, dam, cms, ui" -ForegroundColor DarkGray
+            Write-Host "  Valid: all, infra, author, publish, admin, site, pim, dam, cms, ui" -ForegroundColor DarkGray
             exit 1
         }
         if ($mapped -notin $resolved) { $resolved += $mapped }
@@ -154,7 +156,7 @@ function Stop-AllServices {
 
     # Wait for log file locks to release (up to 3 s)
     Ensure-LogDir
-    foreach ($name in @("author", "publish", "admin")) {
+    foreach ($name in @("author", "publish", "admin", "site")) {
         $logFile = Join-Path $LogDir "$name.log"
         if (-not (Test-Path $logFile)) { continue }
         for ($i = 0; $i -lt 10; $i++) {
@@ -231,6 +233,15 @@ function Start-Admin {
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
 }
 
+function Start-Site {
+    Write-Banner "Sample Site  (Next.js)  :3001"
+    $siteDir = Join-Path (Join-Path $FrontendDir "apps") "site-nextjs"
+    Launch-InWindow "FlexCMS Site :3001" $FrontendDir `
+        "pnpm install --silent 2>&1 | Out-Null; Set-Location '$siteDir'; pnpm dev" `
+        "site"
+    Write-Host "    Launched in new window" -ForegroundColor DarkGray
+}
+
 # ─── Commands ─────────────────────────────────────────────────────────────────
 
 switch ($Command) {
@@ -301,6 +312,9 @@ switch ($Command) {
         # 5) Admin UI (always starts — no backend dependency)
         if ("admin" -in $services) { Start-Admin }
 
+        # 6) Sample Site (always starts — no backend dependency)
+        if ("site" -in $services) { Start-Site }
+
         # Summary
         Write-Host ""
         Write-Host "    SERVICE                    URL" -ForegroundColor White
@@ -321,6 +335,7 @@ switch ($Command) {
             if ("publish" -in $services) { Write-Host "    Publish (read-only)        SKIPPED  (compile error)" -ForegroundColor Red }
         }
         if ("admin"   -in $services) { Write-Svc "Admin UI"             "localhost:3000" ".dev-logs/admin.log" }
+        if ("site"    -in $services) { Write-Svc "Sample Site"           "localhost:3001" ".dev-logs/site.log" }
         Write-Host ""
         Write-Host "    flex status      check health" -ForegroundColor DarkGray
         Write-Host "    flex stop local  stop everything" -ForegroundColor DarkGray
@@ -376,7 +391,8 @@ switch ($Command) {
             @{ Name = "pgAdmin 4      :5050"; Url = "http://localhost:5050" },
             @{ Name = "Author API     :8080"; Url = "http://localhost:8080/actuator/health" },
             @{ Name = "Publish API    :8081"; Url = "http://localhost:8081/actuator/health" },
-            @{ Name = "Admin UI       :3000"; Url = "http://localhost:3000" }
+            @{ Name = "Admin UI       :3000"; Url = "http://localhost:3000" },
+            @{ Name = "Sample Site    :3001"; Url = "http://localhost:3001" }
         )
         foreach ($c in $checks) {
             $ok = $false
@@ -433,11 +449,12 @@ switch ($Command) {
     flex reset                         Wipe all data & volumes
 
   SERVICES (pick any combination)
-    all        Everything (infra + author + publish + admin)
+    all        Everything (infra + author + publish + admin + site)
     infra      PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch
     author     Author backend -- CMS + DAM + PIM (read-write)  :8080
     publish    Publish backend -- CMS + DAM (read-only)         :8081
     admin      Admin UI -- Next.js                              :3000
+    site       Sample Site -- Next.js reference site            :3001
 
   ALIASES (map to the service that contains them)
     pim        -> author   (PIM is part of the Author instance)
@@ -445,6 +462,8 @@ switch ($Command) {
     cms        -> author
     ui         -> admin
     frontend   -> admin
+    site-nextjs -> site
+    site-react  -> site
 
   EXAMPLES
     flex start local all                 Start everything

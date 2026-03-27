@@ -85,6 +85,8 @@ resolve_alias() {
   case "$1" in
     pim|dam|cms) echo "author" ;;
     frontend|ui) echo "admin" ;;
+    site-nextjs|site-react|react) echo "site" ;;
+    site-nuxt|site-vue|vue)       echo "site-nuxt" ;;
     *)           echo "$1" ;;
   esac
 }
@@ -92,7 +94,7 @@ resolve_alias() {
 resolve_services() {
   # If no args or "all", return everything
   if [ $# -eq 0 ] || { [ $# -eq 1 ] && [ "$1" = "all" ]; }; then
-    echo "infra author publish admin"
+    echo "infra author publish admin site"
     return
   fi
   local result="infra"  # always include infra
@@ -105,10 +107,10 @@ resolve_services() {
       local mapped
       mapped="$(resolve_alias "$s")"
       case "$mapped" in
-        infra|author|publish|admin) ;;
+        infra|author|publish|admin|site) ;;
         *)
           echo -e "  ${C_RED}Unknown service: '$s'${C_RESET}" >&2
-          echo -e "  ${C_DIM}Valid: all, infra, author, publish, admin, pim, dam, cms, ui${C_RESET}" >&2
+          echo -e "  ${C_DIM}Valid: all, infra, author, publish, admin, site, pim, dam, cms, ui${C_RESET}" >&2
           exit 1
           ;;
       esac
@@ -188,6 +190,23 @@ start_admin() {
   echo -e "    ${C_DIM}PID $pid  |  Log: $log_file${C_RESET}"
 }
 
+start_site() {
+  ensure_log_dir
+  local log_file="$LOG_DIR/site.log"
+  local site_dir="$FRONTEND_DIR/apps/site-nextjs"
+
+  banner "Sample Site  (Next.js)  :3001"
+  (
+    cd "$FRONTEND_DIR"
+    pnpm install --silent >/dev/null 2>&1 || true
+    cd "$site_dir"
+    pnpm dev > "$log_file" 2>&1
+  ) &
+  local pid=$!
+  save_pid "site" "$pid"
+  echo -e "    ${C_DIM}PID $pid  |  Log: $log_file${C_RESET}"
+}
+
 # ── Commands ─────────────────────────────────────────────────────────────────
 
 cmd_start() {
@@ -258,6 +277,11 @@ cmd_start() {
     start_admin
   fi
 
+  # 6) Sample Site (always starts — no backend dependency)
+  if has_service "site" "$services"; then
+    start_site
+  fi
+
   # Summary
   echo ""
   echo -e "    ${C_WHITE}SERVICE                    URL${C_RESET}"
@@ -278,6 +302,7 @@ cmd_start() {
     has_service "publish" "$services" && echo -e "    ${C_RED}Publish (read-only)        SKIPPED  (compile error)${C_RESET}"
   fi
   has_service "admin"   "$services" && write_svc "Admin UI"             "localhost:3000" ".dev-logs/admin.log"
+  has_service "site"    "$services" && write_svc "Sample Site"           "localhost:3001" ".dev-logs/site.log"
   echo ""
   echo -e "    ${C_DIM}flex status      check health${C_RESET}"
   echo -e "    ${C_DIM}flex stop local  stop everything${C_RESET}"
@@ -353,6 +378,7 @@ cmd_status() {
   check_http   "Author API     :8080" "http://localhost:8080/actuator/health"
   check_http   "Publish API    :8081" "http://localhost:8081/actuator/health"
   check_http   "Admin UI       :3000" "http://localhost:3000"
+  check_http   "Sample Site    :3001" "http://localhost:3001"
   echo ""
 }
 
@@ -393,11 +419,12 @@ cmd_help() {
     flex reset                         Wipe all data & volumes
 
   SERVICES (pick any combination)
-    all        Everything (infra + author + publish + admin)
+    all        Everything (infra + author + publish + admin + site)
     infra      PostgreSQL, Redis, RabbitMQ, MinIO, Elasticsearch
     author     Author backend -- CMS + DAM + PIM (read-write)  :8080
     publish    Publish backend -- CMS + DAM (read-only)         :8081
     admin      Admin UI -- Next.js                              :3000
+    site       Sample Site -- Next.js reference site            :3001
 
   ALIASES (map to the service that contains them)
     pim        -> author   (PIM is part of the Author instance)
