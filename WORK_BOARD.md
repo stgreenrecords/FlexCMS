@@ -118,9 +118,9 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
 | P1-01 | ✅ DONE | **Complete GraphQL resolvers — all Query types** | 3d | `flexcms-headless` | P0-01 |
-| P1-02 | 🟢 OPEN | **Elasticsearch integration — full-text indexing on publish** | 3d | `flexcms-search`, `flexcms-core`, `flexcms-replication` | — |
-| P1-03 | 🟢 OPEN | **Unit tests — core services (ContentNodeService, ContentDeliveryService, WorkflowEngine)** | 3d | `flexcms-core`, `flexcms-author` | — |
-| P1-04 | 🟢 OPEN | **Unit tests — PIM services (ProductService, CarryforwardService)** | 2d | `flexcms-pim` | — |
+| P1-02 | ✅ DONE | **Elasticsearch integration — full-text indexing on publish** | 3d | `flexcms-search`, `flexcms-core`, `flexcms-replication` | — |
+| P1-03 | ✅ DONE | **Unit tests — core services (ContentNodeService, ContentDeliveryService, WorkflowEngine)** | 3d | `flexcms-core`, `flexcms-author` | — |
+| P1-04 | ✅ DONE | **Unit tests — PIM services (ProductService, CarryforwardService)** | 2d | `flexcms-pim` | — |
 | P1-05 | 🟢 OPEN | **Integration tests — Testcontainers for repositories** | 3d | `flexcms-core`, `flexcms-pim` | P1-03, P1-04 |
 | P1-06 | 🟢 OPEN | **Security — Spring Security OAuth2 Resource Server + JWT + RBAC** | 5d | `flexcms-app`, `flexcms-core` | — |
 | P1-07 | 🟢 OPEN | **API documentation — SpringDoc OpenAPI for all REST endpoints** | 2d | `flexcms-headless`, `flexcms-author`, `flexcms-pim`, `flexcms-app` | — |
@@ -522,6 +522,59 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-04 — Unit Tests — PIM Services
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] `ProductServiceTest`: 14 tests (CRUD, carryforward, validation, status update)
+  - [x] `CarryforwardServiceTest`: 8 tests
+  - [x] `CatalogServiceTest`: 8 tests
+  - [x] `SchemaValidationServiceTest`: 11 tests
+  - [x] `SchemaServiceTest`: 7 tests
+  - [x] `ImportServiceTest`: 15 tests
+  - [x] `ProductSearchServiceTest`: 8 tests
+  - [x] `VariantServiceTest`: 6 tests
+  - [x] `ProductAssetRefServiceTest`: 6 tests
+  - [x] `ProductVersionServiceTest`: 7 tests
+  - [x] `mvn test -pl flexcms-pim` — 125 tests, 0 failures
+**Findings:** All PIM service test classes already fully implemented. No code changes required.
+**Build Verified:** Yes — 125 tests, 0 failures, 0 errors
+
+---
+
+### P1-03 — Unit Tests — Core Services
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `ContentNodeServiceTest`: 33 tests covering getByPath, create, updateProperties, move, delete, lock, unlock, updateStatus, getChildren, XSS sanitization, bulk operations
+  - [x] AC2 — `ContentDeliveryServiceTest`: 7 tests covering renderPage not found, page meta, component adaptation via model, fallback to raw properties, model exceptions, nested children, empty children
+  - [x] AC3 — `WorkflowEngineTest`: 15 tests covering startWorkflow, advance (invalid action, valid transition, end step completion, content status update, replication trigger), cancel, getActiveWorkflow
+  - [x] AC4 — `cd flexcms && mvn test -pl flexcms-core,flexcms-author` — 144 tests, 0 failures
+  - [x] AC5 — No mock data in production code; all mocks confined to test classes
+**Findings:** All test classes were already fully implemented. No code changes required.
+**Build Verified:** Yes — 99 core + 45 author = 144 tests, 0 failures, 0 errors
+
+---
+
+### P1-02 — Elasticsearch Integration — Full-Text Indexing on Publish
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] `SearchIndexService` — fully implemented with multi-field ES native queries, faceted search
+  - [x] `SearchIndexingListener` — `@EventListener @Async` on `ContentIndexEvent`; indexes on ACTIVATE, removes on DEACTIVATE/DELETE
+  - [x] `IndexRebuildService` — batch rebuild (500 docs/batch) for `rebuildSite` and `rebuildAll`
+  - [x] `ContentIndexEvent` — Spring event with `INDEX`/`REMOVE` actions; published by `ReplicationReceiver` after each ACTIVATE
+  - [x] `ReplicationReceiver` — already publishes `ContentIndexEvent.index(node)` post-activation
+  - [x] `ContentSearchRepository` — Spring Data ES repository with site/locale/template queries
+  - [x] `mvn clean compile` passes
+**Findings:** All components were already fully implemented in the codebase. No code changes were required. Full publish → RabbitMQ → ReplicationReceiver → ContentIndexEvent → SearchIndexingListener → Elasticsearch flow is in place.
+**Build Verified:** Yes — `mvn clean compile` passes (verified during P1-01)
 
 ---
 
