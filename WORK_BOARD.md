@@ -137,7 +137,7 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
-| P2-01 | 🟢 OPEN | **Admin UI — Page editor with auto-generated forms from component schema** | 5d | `apps/admin`, `packages/ui` | P1-09 |
+| P2-01 | ✅ DONE | **Admin UI — Page editor with auto-generated forms from component schema** | 5d | `apps/admin`, `packages/ui` | P1-09 |
 | P2-02 | 🟢 OPEN | **Admin UI — Workflow inbox (submit/approve/reject)** | 3d | `apps/admin`, `packages/ui` | P1-09 |
 | P2-03 | 🟢 OPEN | **Admin UI — PIM product grid + editor** | 4d | `apps/admin`, `packages/ui` | P0-06 |
 | P2-04 | 🟢 OPEN | **Content preview — iframe-based preview in admin** | 3d | `apps/admin`, `apps/site-nextjs` | P2-01 |
@@ -522,6 +522,25 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P2-01 — Admin UI — Page Editor with Auto-Generated Forms
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — Component registry fetched from `/api/content/v1/component-registry` on editor mount; palette populated from real `ComponentDefinition` objects grouped by `group` field
+  - [x] AC2 — Page data loaded from `/api/author/content/page?path=...` when `?path=` search param is provided; children mapped to canvas components
+  - [x] AC3 — `schemaToFields(dataSchema)` converts JSON Schema `properties` to `PropField[]`: string→text, boolean→toggle, number→number, enum→select, description/content/body→textarea
+  - [x] AC4 — Property panel renders schema-driven `PropertyField` components (text, toggle, select, number, textarea); includes field label from schema `title`, required markers, description hints
+  - [x] AC5 — Save wires to `PUT /api/author/content/node/properties` for all API-loaded components
+  - [x] AC6 — Publish wires to `POST /api/author/content/node/status?status=PUBLISHED`
+  - [x] AC7 — Loading/error states; footer shows live registry component count; viewport toggle (Desktop/Tablet/Mobile)
+  - [x] AC8 — `pnpm build` passes with 0 errors
+**Files Changed:**
+  - `frontend/apps/admin/src/app/editor/page.tsx` — full rewrite with real API integration and schema-driven forms
+**Build Verified:** Yes — `pnpm build` ✅ 0 errors
 
 ---
 

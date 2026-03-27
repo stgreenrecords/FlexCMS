@@ -20,7 +20,9 @@
       "Bash(git push:*)",
       "Bash(gh run:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(wc -l /c/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/admin/src/app/\\\\\\(admin\\\\\\)/dam/page.tsx)",
+      "Bash(wc -l /c/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/admin/src/app/\\\\\\(admin\\\\\\)/sites/page.tsx)"
     ]
   }
 }
