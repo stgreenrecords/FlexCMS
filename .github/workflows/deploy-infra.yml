@@ -41,21 +41,34 @@ jobs:
 
       - name: Clear ROLLBACK_COMPLETE stack (if any)
         run: |
+          ACCT=$(aws sts get-caller-identity --query Account --output text)
+          ENV="${{ inputs.environment }}"
+          STACK="flexcms-${ENV}"
+
           STATUS=$(aws cloudformation describe-stacks \
-            --stack-name "flexcms-${{ inputs.environment }}" \
+            --stack-name "$STACK" \
             --query "Stacks[0].StackStatus" --output text \
             --region ${{ env.AWS_REGION }} 2>/dev/null || echo "DOES_NOT_EXIST")
           echo "Current stack status: $STATUS"
+
           if [ "$STATUS" = "ROLLBACK_COMPLETE" ]; then
             echo "Stack is in ROLLBACK_COMPLETE — deleting before redeploy..."
-            aws cloudformation delete-stack \
-              --stack-name "flexcms-${{ inputs.environment }}" \
-              --region ${{ env.AWS_REGION }}
-            aws cloudformation wait stack-delete-complete \
-              --stack-name "flexcms-${{ inputs.environment }}" \
-              --region ${{ env.AWS_REGION }}
-            echo "Stack deleted. Proceeding with fresh create."
+            aws cloudformation delete-stack --stack-name "$STACK" --region ${{ env.AWS_REGION }}
+            aws cloudformation wait stack-delete-complete --stack-name "$STACK" --region ${{ env.AWS_REGION }}
+            echo "Stack deleted."
           fi
+
+          # Delete retained S3 buckets that block a fresh create after rollback.
+          # AssetsBucket has DeletionPolicy:Retain so CFN never deletes it;
+          # after a failed first deploy these buckets are empty and safe to remove.
+          for BUCKET in \
+            "flexcms-${ENV}-assets-${ACCT}" \
+            "flexcms-${ENV}-static-${ACCT}"; do
+            if aws s3api head-bucket --bucket "$BUCKET" --region ${{ env.AWS_REGION }} 2>/dev/null; then
+              echo "Removing retained bucket $BUCKET ..."
+              aws s3 rb "s3://${BUCKET}" --force --region ${{ env.AWS_REGION }} || true
+            fi
+          done
 
       - name: Deploy CloudFormation stacks
         env:
