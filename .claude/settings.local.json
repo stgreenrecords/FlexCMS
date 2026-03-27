@@ -16,7 +16,8 @@
       "Read(//c/Users/Viach/IdeaProjects/FlexCMS/**)",
       "Bash(1 __NEW_LINE_f9de696b4eb18911__ echo \"\" echo \"=== P0-11 AC8: Headless page API ===\" curl -s \"http://localhost:8080/api/content/v1/pages/tut-gb/en/home\")",
       "Bash(echo \"=== P0-11 AC1: Sites ===\" docker exec flexcms-postgres psql -U flexcms -d flexcms_author -c \"SELECT site_id, title, default_locale, supported_locales FROM sites WHERE site_id LIKE ''''tut-%'''';\" 2)",
-      "Bash(1 __NEW_LINE_cce47a7021ce31c2__ echo \"\" echo \"=== P0-11 AC4: XF variations ===\" docker exec flexcms-postgres psql -U flexcms -d flexcms_author -t -c \":*)"
+      "Bash(1 __NEW_LINE_cce47a7021ce31c2__ echo \"\" echo \"=== P0-11 AC4: XF variations ===\" docker exec flexcms-postgres psql -U flexcms -d flexcms_author -t -c \":*)",
+      "Bash(git push:*)"
     ]
   }
 }

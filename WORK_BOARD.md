@@ -101,14 +101,14 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
 | P0-01 | ✅ DONE | **Global error handling — `@ControllerAdvice` + RFC 7807 Problem Details** | 1d | `flexcms-core`, `flexcms-author`, `flexcms-headless`, `flexcms-app` | — |
-| P0-02 | 🟢 OPEN | **Input validation — `@Valid` DTOs + request constraints** | 1d | `flexcms-author`, `flexcms-headless`, `flexcms-pim` | — |
-| P0-03 | 🟢 OPEN | **Fix `PageApiController.getChildren()` — DI instead of `new ContentNodeService()`** | 1h | `flexcms-headless` | — |
-| P0-04 | 🟢 OPEN | **Fix N+1 in `ContentNode.getChildren()` / `loadChildrenRecursive()`** | 4h | `flexcms-core` | — |
+| P0-02 | ✅ DONE | **Input validation — `@Valid` DTOs + request constraints** | 1d | `flexcms-author`, `flexcms-headless`, `flexcms-pim` | — |
+| P0-03 | ✅ DONE | **Fix `PageApiController.getChildren()` — DI instead of `new ContentNodeService()`** | 1h | `flexcms-headless` | — |
+| P0-04 | ✅ DONE | **Fix N+1 in `ContentNode.getChildren()` / `loadChildrenRecursive()`** | 4h | `flexcms-core` | — |
 | P0-05 | 🟢 OPEN | **Add pagination to all list endpoints** | 1d | `flexcms-headless`, `flexcms-author`, `flexcms-pim` | — |
 | P0-06 | 🟢 OPEN | **Remove all mock/dummy data from frontend markup** | 4h | `apps/admin` | — |
-| P0-07 | 🟢 OPEN | **Ensure SQL seed data uses only valid `NodeStatus` enum values** | 2h | `flexcms-app` (migrations) | — |
-| P0-08 | 🟢 OPEN | **Database constraint: CHECK on `content_nodes.status`** | 1h | `flexcms-app` (Flyway migration) | P0-07 |
-| P0-09 | 🟢 OPEN | **Fix headless module test failure (Mockito stubbing mismatch)** | 2h | `flexcms-headless` | — |
+| P0-07 | ✅ DONE | **Ensure SQL seed data uses only valid `NodeStatus` enum values** | 2h | `flexcms-app` (migrations) | — |
+| P0-08 | ✅ DONE | **Database constraint: CHECK on `content_nodes.status`** | 1h | `flexcms-app` (Flyway migration) | P0-07 |
+| P0-09 | ✅ DONE | **Fix headless module test failure (Mockito stubbing mismatch)** | 2h | `flexcms-headless` | — |
 | P0-10 | ✅ DONE | **Register 18 TUT component definitions (V14 migration)** | 4h | `flexcms-app` (Flyway migration) | — |
 | P0-11 | ✅ DONE | **Seed TUT sample website — DAM assets + PIM products + sites + XFs + 85 pages** | 3d | `flexcms-app`, `flexcms-pim`, `flexcms-dam`, `scripts` | P0-10 |
 | P0-12 | 🟢 OPEN | **Implement 18 TUT frontend component renderers in site-nextjs** | 2d | `apps/site-nextjs` | P0-10 |
@@ -522,6 +522,86 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P0-09 — Fix Headless Module Test Failure (Mockito Stubbing Mismatch)
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `cd flexcms && mvn test -pl flexcms-headless` passes: 50 tests, 0 failures, 0 errors
+  - [x] AC2 — No tests skipped or marked lenient to hide failures
+  - [x] AC3 — `mvn clean compile` passes
+**Files Changed:**
+  - `flexcms-headless/src/test/java/com/flexcms/headless/graphql/ContentQueryResolverTest.java` — Fixed `node_convertsUrlPathToContentPath`: test was stubbing `"content.corp.en.about"` but `node()` resolver correctly uses `"corp.en.about"` (no `content.` prefix). Updated stub and verify to match actual behavior.
+**Build Verified:** Yes — all 50 tests pass
+**Root Cause:** The `node()` GraphQL resolver intentionally omits the `content.` prefix (CLAUDE.md: "GraphQL node() resolver uses path directly (no content. prefix added)"). The test was wrong, not the production code. Renamed test method to `node_convertsUrlPathToDotPath` for clarity.
+
+---
+
+### P0-08 — Database Constraint: CHECK on `content_nodes.status`
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `V13__node_status_constraint.sql` adds `CHECK (status IN ('DRAFT', 'IN_REVIEW', 'APPROVED', 'PUBLISHED', 'ARCHIVED'))` on `content_nodes`
+  - [x] AC2 — `mvn clean compile` passes
+**Files Changed:** `flexcms-app/src/main/resources/db/migration/V13__node_status_constraint.sql` — pre-implemented
+**Build Verified:** Yes
+
+---
+
+### P0-07 — Ensure SQL Seed Data Uses Valid NodeStatus Values
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — Grep across all migration files: no `'LIVE'` value in any content_nodes insert. All seeds use valid values (DRAFT, PUBLISHED, etc.) or no direct content_nodes inserts at all.
+**Files Changed:** None — seed data was already valid.
+**Build Verified:** Yes — confirmed via grep
+
+---
+
+### P0-04 — Fix N+1 in `loadChildrenRecursive()`
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `loadChildrenRecursive()` uses a single `findDescendants(path)` bulk query then wires tree in-memory. No recursive DB calls.
+  - [x] AC2 — `findDescendants` is a single native SQL query: `SELECT * FROM content_nodes WHERE path::text LIKE :pathPrefix || '.%'`
+  - [x] AC3 — `mvn clean compile` passes
+**Files Changed:** `flexcms-core/src/main/java/com/flexcms/core/service/ContentNodeService.java` — pre-implemented (single-query + in-memory wire-up pattern)
+**Build Verified:** Yes
+
+---
+
+### P0-03 — Fix `PageApiController.getChildren()` DI Bug
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `PageApiController` uses `@Autowired private ContentNodeService nodeService` (DI), not `new ContentNodeService()`. Verified via grep: no `new ContentNodeService()` exists anywhere in codebase.
+  - [x] AC2 — `getChildren()` delegates to `nodeService.getChildren(contentPath)` correctly
+  - [x] AC3 — `mvn clean compile` passes
+**Files Changed:** None — bug was already fixed in a prior session. CLAUDE.md "Known Technical Debt" entry is now resolved.
+**Build Verified:** Yes — `cd flexcms && mvn clean compile` passed
+**Notes:** Bug was pre-fixed; `PageApiController.java` line 28 already has the comment "FIX BUG-01: injected via DI, not new()". CLAUDE.md Known Technical Debt section should be updated to remove this item.
+
+---
+
+### P0-02 — Input Validation (`@Valid` DTOs + request constraints)
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — All `@PostMapping`/`@PutMapping` in `AuthorContentController`, `ProductApiController` use `@Valid @RequestBody`; `PageApiController` is GET-only so no DTOs needed
+  - [x] AC2 — Request records have `@NotBlank` (String fields) and `@NotNull` (UUID, Map, enum fields) constraints; `@Size`/`@Pattern` not needed for current fields
+  - [x] AC3 — `GlobalExceptionHandler` handles `MethodArgumentNotValidException` → 400 with RFC 7807 `fieldErrors` array; handles `ConstraintViolationException` → 400 with field-level details
+  - [x] AC4 — `mvn clean compile` passes
+**Files Changed:** None — validation was already fully implemented in prior sessions.
+**Build Verified:** Yes — `cd flexcms && mvn clean compile` passed
+**Notes:** DTOs implemented as inner records within controllers (standard Spring Boot pattern). Context packet's `output_files` listed separate DTO classes — the inner-record approach satisfies all ACs equally well without unnecessary file proliferation.
 
 ---
 

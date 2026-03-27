@@ -153,12 +153,14 @@ class ContentQueryResolverTest {
     }
 
     @Test
-    void node_convertsUrlPathToContentPath() {
-        when(nodeService.getByPath("content.corp.en.about")).thenReturn(Optional.empty());
+    void node_convertsUrlPathToDotPath() {
+        // node() does NOT prepend "content." — it uses the path as-is (dot-separated).
+        // See CLAUDE.md: "GraphQL node() resolver uses path directly (no content. prefix added)."
+        when(nodeService.getByPath("corp.en.about")).thenReturn(Optional.empty());
 
         resolver.node("/corp/en/about");
 
-        verify(nodeService).getByPath("content.corp.en.about");
+        verify(nodeService).getByPath("corp.en.about");
     }
 
     // -------------------------------------------------------------------------
