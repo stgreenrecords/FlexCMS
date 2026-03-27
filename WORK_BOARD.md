@@ -126,8 +126,8 @@ When an agent starts a task, it MUST lock every module listed in the task's "Mod
 | P1-07 | ✅ DONE | **API documentation — SpringDoc OpenAPI for all REST endpoints** | 2d | `flexcms-headless`, `flexcms-author`, `flexcms-pim`, `flexcms-app` | — |
 | P1-08 | ✅ DONE | **Observability — Micrometer + Prometheus metrics + structured logging** | 3d | `flexcms-app`, `flexcms-core`, `flexcms-replication` | — |
 | P1-09 | ✅ DONE | **Admin UI — Content tree browser** | 5d | `apps/admin`, `packages/ui` | P0-06 |
-| P1-10 | 🟢 OPEN | **Admin UI — DAM browser with upload** | 4d | `apps/admin`, `packages/ui` | P0-06 |
-| P1-11 | 🟢 OPEN | **Admin UI — Site management page (real data, no mocks)** | 2d | `apps/admin` | P0-06 |
+| P1-10 | ✅ DONE | **Admin UI — DAM browser with upload** | 4d | `apps/admin`, `packages/ui` | P0-06 |
+| P1-11 | ✅ DONE | **Admin UI — Site management page (real data, no mocks)** | 2d | `apps/admin` | P0-06 |
 | P1-12 | 🟢 OPEN | **PIM ↔ CMS integration — product enrichment in ComponentModels** | 3d | `flexcms-pim`, `flexcms-core`, `flexcms-plugin-api` | — |
 | P1-13 | 🟢 OPEN | **PIM ↔ DAM integration — product asset linking** | 2d | `flexcms-pim`, `flexcms-dam` | — |
 | P1-14 | ✅ DONE | **Automated data seeding script — re-runnable setup for TUT sample website** | 2d | `scripts`, `flexcms-app` | P0-11 |
@@ -522,6 +522,46 @@ Each task below lists the files to read and acceptance criteria to verify.
 
 > Agents add entries here when completing or pausing tasks.
 > Use the templates below. Most recent entries go at the TOP.
+
+---
+
+### P1-11 — Admin UI — Site Management Page (Real Data)
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — `sites/page.tsx` fetches real data from `/api/admin/sites` (SiteAdminController) — no mock data
+  - [x] AC2 — Grid view: site cards with color-coded status badge (Published/Maintenance/Draft/Offline), site URL, last-published date, page count, locale tags
+  - [x] AC3 — List view: table with columns Site Name, Status, URL, Last Published, Pages + row action menu
+  - [x] AC4 — Search filter by name or URL (client-side)
+  - [x] AC5 — Grid/List view toggle; Sort toggle (Alphabetical / Page Count)
+  - [x] AC6 — Multi-select with select-all checkbox; bulk action support
+  - [x] AC7 — Per-row action menu: Visit, Manage Pages, Publish All, Edit Settings, Duplicate, Archive, Delete
+  - [x] AC8 — Loading skeleton (4 card skeletons in grid, 4 row skeletons in list); empty state
+  - [x] AC9 — "Create New Site" CTA button
+  - [x] AC10 — `pnpm build` passes — 18/18 pages, 0 errors
+**Findings:** All components were already fully implemented. No code changes required.
+**Build Verified:** Yes — `pnpm build` passes; 18 routes, 0 errors
+
+---
+
+### P1-10 — Admin UI — DAM Browser with Upload
+**Status:** ✅ DONE
+**Date:** 2026-03-27
+**Agent:** Claude Sonnet 4.6
+**AC Verification:**
+  - [x] AC1 — DAM page fetches real data from `/api/author/assets?size=200` — no mock data
+  - [x] AC2 — Grid view with image thumbnails (real `img` tag from `/api/author/assets/{id}/content`), icon placeholders for non-image types
+  - [x] AC3 — List view via DataTable columns: Name (thumbnail), Type, Info (size + dimensions), Uploaded, Status badge, Actions menu
+  - [x] AC4 — Folder tree sidebar: All Assets, Images, Videos, Documents, Archives (counts derived from loaded data), Archive, Trash
+  - [x] AC5 — Search: filters by name client-side
+  - [x] AC6 — Upload dialog: `FileUpload` component with drag-and-drop, multi-file, 100MB limit; calls `POST /api/author/assets` with FormData
+  - [x] AC7 — Multi-select: select all/individual; bulk Download / Move / Delete actions in toolbar
+  - [x] AC8 — Loading skeleton (10 grid cells) while fetching; empty state with Upload CTA when no assets
+  - [x] AC9 — Asset action menu: View Details (→ /dam/[id]), Download, Move, Copy URL, Delete
+  - [x] AC10 — `pnpm build` passes — 18/18 pages, 0 errors
+**Findings:** All components were already fully implemented. No code changes required.
+**Build Verified:** Yes — `pnpm build` passes; 18 routes, 0 errors
 
 ---
 
