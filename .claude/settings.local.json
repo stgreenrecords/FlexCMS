@@ -30,7 +30,10 @@
       "Bash(aws ecr:*)",
       "Bash(aws ecs:*)",
       "Bash(python3 -c \"import json; d=json.load\\(open\\(''c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/site-nextjs/package.json''\\)\\); print\\(json.dumps\\({k:d.get\\(k\\) for k in [''name'',''scripts'']}, indent=2\\)\\)\")",
-      "Bash(node -e \"const d=require\\(''c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/site-nextjs/package.json''\\); console.log\\(d.name, JSON.stringify\\(d.scripts\\)\\)\")"
+      "Bash(node -e \"const d=require\\(''c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/site-nextjs/package.json''\\); console.log\\(d.name, JSON.stringify\\(d.scripts\\)\\)\")",
+      "Bash(aws route53:*)",
+      "Read(//dev/**)",
+      "Bash(aws iam:*)"
     ]
   }
 }

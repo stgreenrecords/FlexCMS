@@ -1,4 +1,4 @@
-﻿AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: '2010-09-09'
 Description: FlexCMS Root orchestrator - deploys all nested stacks.
 Parameters:
   EnvironmentName:
@@ -535,7 +535,8 @@ Resources:
             - {Name: ES_JAVA_OPTS, Value: '-Xms512m -Xmx512m'}
             - {Name: xpack.security.enabled, Value: 'false'}
             - {Name: xpack.security.http.ssl.enabled, Value: 'false'}
-            - {Name: cluster.name, Value: !Sub flexcms-${EnvironmentName}}
+            - Name: cluster.name
+              Value: !Sub flexcms-${EnvironmentName}
           Ulimits:
             - Name: nofile
               SoftLimit: 65536
@@ -648,7 +649,11 @@ Resources:
                 - HasDomain
                 - !Sub https://api.${DomainName}
                 - !Sub http://${AuthorALB.DNSName}
-            - {Name: NEXT_PUBLIC_FLEXCMS_SITE_URL, Value: !If [HasDomain, !Sub 'https://site.${DomainName}', !Sub 'http://${SiteALB.DNSName}']}
+            - Name: NEXT_PUBLIC_FLEXCMS_SITE_URL
+              Value: !If
+                - HasDomain
+                - !Sub https://site.${DomainName}
+                - !Sub http://${SiteALB.DNSName}
             - {Name: NODE_ENV, Value: production}
             - {Name: NEXT_TELEMETRY_DISABLED, Value: '1'}
           LogConfiguration:
