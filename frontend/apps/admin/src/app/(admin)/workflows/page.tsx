@@ -350,8 +350,20 @@ interface DetailPanelProps {
 }
 
 function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
-  const [comment, setComment] = React.useState('');
+  // Uncontrolled textarea: we read the DOM value at submit time via ref.
+  // This avoids React's controlled-component reset and React 18 batching timing issues.
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const isPending = task.status === 'pending';
+
+  /** Returns the current comment text from the DOM element, or undefined if blank. */
+  function getCurrentComment(): string | undefined {
+    // Primary: read from forwarded ref. Fallback: query any visible textarea in the panel.
+    return textareaRef.current?.value
+      || (typeof document !== 'undefined'
+        ? (document.querySelector('textarea') as HTMLTextAreaElement | null)?.value
+        : undefined)
+      || undefined;
+  }
 
   return (
     <aside
@@ -454,9 +466,9 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
       >
         {isPending && (
           <Textarea
+            ref={textareaRef}
             placeholder="Optional comment…"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            defaultValue=""
             className="border-0 text-[0.8125rem] resize-none min-h-[48px] focus:ring-0 rounded-lg w-full"
             style={{
               backgroundColor: 'var(--color-surface-container)',
@@ -475,7 +487,7 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
                 color: 'var(--color-error)',
                 border: '1px solid rgba(var(--color-error-rgb, 255 180 171) / 0.2)',
               }}
-              onClick={() => onReject(task.id, comment || undefined)}
+              onClick={() => onReject(task.id, getCurrentComment())}
             >
               Reject Task
             </button>
@@ -486,7 +498,7 @@ function DetailPanel({ task, onClose, onApprove, onReject }: DetailPanelProps) {
                 color: 'var(--color-on-primary)',
                 boxShadow: '0 10px 15px -3px rgba(176,198,255,0.2)',
               }}
-              onClick={() => onApprove(task.id, comment || undefined)}
+              onClick={() => onApprove(task.id, getCurrentComment())}
             >
               Approve Workflow
             </button>

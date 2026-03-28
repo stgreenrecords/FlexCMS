@@ -1,0 +1,68 @@
+{
+  "items": [
+    {
+      "id": "asset-001",
+      "name": "hero-banner.jpg",
+      "mimeType": "image/jpeg",
+      "fileSize": 2516582,
+      "width": 2400,
+      "height": 1200,
+      "status": "ACTIVE",
+      "createdAt": "2026-03-28T10:00:00Z",
+      "updatedAt": "2026-03-28T10:00:00Z"
+    },
+    {
+      "id": "asset-002",
+      "name": "product-launch.mp4",
+      "mimeType": "video/mp4",
+      "fileSize": 52428800,
+      "width": 1920,
+      "height": 1080,
+      "status": "ACTIVE",
+      "createdAt": "2026-03-27T14:30:00Z",
+      "updatedAt": "2026-03-27T14:30:00Z"
+    },
+    {
+      "id": "asset-003",
+      "name": "press-release-q1.pdf",
+      "mimeType": "application/pdf",
+      "fileSize": 1048576,
+      "status": "ACTIVE",
+      "createdAt": "2026-03-26T09:00:00Z",
+      "updatedAt": "2026-03-26T09:00:00Z"
+    },
+    {
+      "id": "asset-004",
+      "name": "brand-assets.zip",
+      "mimeType": "application/zip",
+      "fileSize": 20971520,
+      "status": "ACTIVE",
+      "createdAt": "2026-03-25T10:00:00Z",
+      "updatedAt": "2026-03-25T10:00:00Z"
+    },
+    {
+      "id": "asset-005",
+      "name": "model-specs.xlsx",
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "fileSize": 262144,
+      "status": "ACTIVE",
+      "createdAt": "2026-03-24T11:00:00Z",
+      "updatedAt": "2026-03-24T11:00:00Z"
+    },
+    {
+      "id": "asset-006",
+      "name": "showroom-interior.jpg",
+      "mimeType": "image/jpeg",
+      "fileSize": 3145728,
+      "width": 3000,
+      "height": 2000,
+      "status": "ACTIVE",
+      "createdAt": "2026-03-23T13:00:00Z",
+      "updatedAt": "2026-03-23T13:00:00Z"
+    }
+  ],
+  "total": 6,
+  "page": 0,
+  "size": 20
+}
+

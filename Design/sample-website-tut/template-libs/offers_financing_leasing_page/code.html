@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#082768",
+              "surface-variant": "#0a2257",
+              "on-surface-variant": "#96a9e6",
+              "inverse-surface": "#faf8ff",
+              "surface-tint": "#c6c6c7",
+              "surface-container-high": "#0b1d48",
+              "surface": "#070d1f",
+              "on-tertiary-container": "#495468",
+              "primary-container": "#454747",
+              "on-secondary-container": "#b0c0da",
+              "secondary-dim": "#8f9fb7",
+              "error-container": "#7f2927",
+              "on-error-container": "#ff9993",
+              "secondary": "#8f9fb7",
+              "secondary-fixed-dim": "#c5d6f0",
+              "surface-container-lowest": "#000000",
+              "tertiary": "#f0f3ff",
+              "on-tertiary-fixed-variant": "#535e72",
+              "tertiary-container": "#dae6fe",
+              "on-primary-fixed": "#3e4040",
+              "inverse-primary": "#5e5f60",
+              "on-error": "#490106",
+              "primary-fixed": "#e2e2e2",
+              "tertiary-fixed": "#dae6fe",
+              "tertiary-dim": "#ccd7ef",
+              "error-dim": "#bb5551",
+              "on-primary-container": "#d0d0d0",
+              "error": "#ee7d77",
+              "secondary-container": "#2d3c51",
+              "primary-dim": "#b8b9b9",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "inverse-on-surface": "#4f5469",
+              "primary": "#c6c6c7",
+              "on-primary": "#3f4041",
+              "primary-fixed-dim": "#d4d4d4",
+              "surface-dim": "#070d1f",
+              "on-background": "#dfe4ff",
+              "on-secondary-fixed": "#314055",
+              "background": "#070d1f",
+              "on-tertiary-fixed": "#374155",
+              "outline-variant": "#32457c",
+              "tertiary-fixed-dim": "#ccd7ef",
+              "surface-container-highest": "#0a2257",
+              "surface-container": "#0a1839",
+              "on-surface": "#dfe4ff",
+              "surface-container-low": "#09122b",
+              "on-tertiary": "#515c70",
+              "outline": "#6073ad",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "on-secondary": "#102134",
+              "secondary-fixed": "#d3e4fe"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #070d1f;
+            color: #dfe4ff;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 rounded-none bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Sedans</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">SUVs</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Electric</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Build</a>
+</div>
+<div class="flex items-center space-x-8">
+<button class="font-sans tracking-widest text-[10px] uppercase text-slate-100 border border-slate-100/20 px-6 py-2 hover:bg-slate-100 hover:text-slate-950 transition-all duration-500">Find a Dealer</button>
+<button class="font-sans tracking-widest text-[10px] uppercase text-slate-400 hover:text-slate-100 transition-colors duration-300">Sign In</button>
+</div>
+</nav>
+<main class="pt-32">
+<!-- Page Header -->
+<header class="px-12 py-20 md:py-32 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+<div class="lg:col-span-8">
+<span class="font-label text-xs uppercase tracking-[0.3em] text-primary mb-6 block">Financial Mastery</span>
+<h1 class="font-headline italic text-5xl md:text-7xl lg:text-8xl text-on-surface leading-tight">
+                    Acquire Performance <br/> through Precision.
+                </h1>
+</div>
+<div class="lg:col-span-4 border-l border-outline-variant/20 pl-8 pb-4">
+<p class="font-body text-on-surface-variant text-lg leading-relaxed max-w-xs">
+                    Our bespoke financing structures are engineered with the same meticulous attention to detail as our vehicles. Pure clarity, zero compromise.
+                </p>
+</div>
+</header>
+<!-- Pricing Table / Plan Selection -->
+<section class="px-12 py-20 bg-surface-container-low">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-outline-variant/10">
+<!-- Select Plan -->
+<div class="p-12 border-r border-outline-variant/10 flex flex-col justify-between min-h-[500px] hover:bg-surface-container transition-colors duration-500">
+<div>
+<h3 class="font-label uppercase tracking-widest text-xs text-on-surface-variant mb-4">Tier I</h3>
+<h2 class="font-headline text-4xl italic text-on-surface mb-8">Select</h2>
+<ul class="space-y-6">
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Flexible Term Limits
+                            </li>
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Standard Appreciation Protection
+                            </li>
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                24/7 Concierge Support
+                            </li>
+</ul>
+</div>
+<div class="mt-12">
+<div class="flex items-baseline gap-2 mb-6">
+<span class="font-headline text-3xl italic">3.49%</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Starting APR</span>
+</div>
+<button class="w-full py-4 bg-transparent border border-outline-variant/30 text-on-surface font-label uppercase text-[10px] tracking-widest hover:bg-primary hover:text-on-primary transition-all duration-300">Select Plan</button>
+</div>
+</div>
+<!-- Pure Plan -->
+<div class="p-12 border-r border-outline-variant/10 flex flex-col justify-between min-h-[500px] bg-surface-container-high relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4">
+<span class="font-label text-[8px] uppercase tracking-[0.2em] bg-primary text-on-primary px-3 py-1">Most Preferred</span>
+</div>
+<div>
+<h3 class="font-label uppercase tracking-widest text-xs text-primary mb-4">Tier II</h3>
+<h2 class="font-headline text-4xl italic text-on-surface mb-8">Pure</h2>
+<ul class="space-y-6">
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Guaranteed Buy-Back Values
+                            </li>
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Zero Down-Payment Options
+                            </li>
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Comprehensive Maintenance
+                            </li>
+</ul>
+</div>
+<div class="mt-12">
+<div class="flex items-baseline gap-2 mb-6">
+<span class="font-headline text-3xl italic">2.99%</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Starting APR</span>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary font-label uppercase text-[10px] tracking-widest hover:bg-primary-fixed transition-all duration-300">Select Plan</button>
+</div>
+</div>
+<!-- Performance Plan -->
+<div class="p-12 flex flex-col justify-between min-h-[500px] hover:bg-surface-container transition-colors duration-500">
+<div>
+<h3 class="font-label uppercase tracking-widest text-xs text-on-surface-variant mb-4">Tier III</h3>
+<h2 class="font-headline text-4xl italic text-on-surface mb-8">Performance</h2>
+<ul class="space-y-6">
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Customized Lease-End Cycles
+                            </li>
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Full Track-Day Insurance
+                            </li>
+<li class="flex items-center gap-4 text-sm font-body tracking-wide">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check">check</span>
+                                Asset Management Advisory
+                            </li>
+</ul>
+</div>
+<div class="mt-12">
+<div class="flex items-baseline gap-2 mb-6">
+<span class="font-headline text-3xl italic">1.99%</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Starting APR</span>
+</div>
+<button class="w-full py-4 bg-transparent border border-outline-variant/30 text-on-surface font-label uppercase text-[10px] tracking-widest hover:bg-primary hover:text-on-primary transition-all duration-300">Select Plan</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Loan Offer Card / Hero Spec -->
+<section class="px-12 py-32 flex flex-col md:flex-row gap-20 items-center overflow-hidden">
+<div class="w-full md:w-1/2">
+<div class="relative group">
+<div class="aspect-[4/5] bg-surface-container-highest overflow-hidden">
+<img alt="Luxury car interior" class="w-full h-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" data-alt="Close-up of luxury car steering wheel and carbon fiber dashboard with soft moody studio lighting and sharp details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqjZE3dqwk3masCd2fhFw6O_BD1xWF0VEukzQ8UUAURslNw57oDSmyeVweuRATNi7H0iYT0mnlbPeAHTDyVHkHf2lo84mK1HAagSQy_ahrgkZtQL5-t70LEI6DKXBowAJY0ci1YmKUoy9EnhlnXEDza2JZO8o82wu73N5wgs2c7cv3vnDuCRmYLNgEOZwycuqqIlcbFtNZypgtp0Tx2At4Yf-lXiV97KSh4keWrj2RooC-UlaD5DhE42jv23dqnqI6qJn15j2sNrOz"/>
+</div>
+<div class="absolute -bottom-10 -right-10 bg-surface-container p-12 border border-outline-variant/10 hidden lg:block">
+<div class="flex flex-col gap-8">
+<div>
+<div class="font-headline text-4xl italic text-on-surface">36 <span class="text-lg font-label uppercase tracking-widest text-on-surface-variant not-italic">Months</span></div>
+<div class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Optimum Term</div>
+</div>
+<div>
+<div class="font-headline text-4xl italic text-on-surface">0.00% <span class="text-lg font-label uppercase tracking-widest text-on-surface-variant not-italic">Down</span></div>
+<div class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Qualified Buyers</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full md:w-1/2 space-y-12">
+<h2 class="font-headline italic text-5xl leading-tight">Structured for the <br/> Long Range.</h2>
+<p class="font-body text-on-surface-variant text-lg leading-relaxed max-w-lg">
+                    Traditional financing looks at where you are. We look at where you're going. Our Performance Leasing programs allow you to transition between models with seamless equity transfers and zero friction.
+                </p>
+<div class="grid grid-cols-2 gap-12 border-t border-outline-variant/10 pt-12">
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary block mb-2">Acquisition Fee</span>
+<span class="font-headline text-2xl italic">$995</span>
+</div>
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest text-primary block mb-2">Disposition Fee</span>
+<span class="font-headline text-2xl italic">Waived</span>
+</div>
+</div>
+<button class="px-12 py-5 bg-primary text-on-primary font-label uppercase text-[10px] tracking-widest hover:bg-primary-fixed transition-all duration-500">Inquire for Quote</button>
+</div>
+</section>
+<!-- Rate Table -->
+<section class="px-12 py-20 bg-surface">
+<div class="mb-12">
+<h2 class="font-headline italic text-4xl mb-4">Current Indices</h2>
+<p class="font-label text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Daily Market Update — Q4 2024</p>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/20">
+<th class="text-left font-label text-[10px] uppercase tracking-widest text-on-surface-variant py-6">Product Range</th>
+<th class="text-left font-label text-[10px] uppercase tracking-widest text-on-surface-variant py-6">Term (Months)</th>
+<th class="text-left font-label text-[10px] uppercase tracking-widest text-on-surface-variant py-6">Lease Factor</th>
+<th class="text-left font-label text-[10px] uppercase tracking-widest text-on-surface-variant py-6">Residual Value</th>
+<th class="text-left font-label text-[10px] uppercase tracking-widest text-on-surface-variant py-6">APR Tier I</th>
+</tr>
+</thead>
+<tbody class="font-body text-sm divide-y divide-outline-variant/5">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-8 font-headline text-xl italic group-hover:pl-4 transition-all">S-Series Performance</td>
+<td class="py-8 text-on-surface-variant tracking-widest">36 / 48</td>
+<td class="py-8 text-on-surface-variant tracking-widest">0.00124</td>
+<td class="py-8 text-on-surface-variant tracking-widest">62%</td>
+<td class="py-8 font-bold text-primary">2.9%</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-8 font-headline text-xl italic group-hover:pl-4 transition-all">V-Series Electric</td>
+<td class="py-8 text-on-surface-variant tracking-widest">24 / 36</td>
+<td class="py-8 text-on-surface-variant tracking-widest">0.00098</td>
+<td class="py-8 text-on-surface-variant tracking-widest">68%</td>
+<td class="py-8 font-bold text-primary">1.9%</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-8 font-headline text-xl italic group-hover:pl-4 transition-all">X-Series Utility</td>
+<td class="py-8 text-on-surface-variant tracking-widest">48 / 60</td>
+<td class="py-8 text-on-surface-variant tracking-widest">0.00142</td>
+<td class="py-8 text-on-surface-variant tracking-widest">58%</td>
+<td class="py-8 font-bold text-primary">3.4%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="px-12 py-32 grid grid-cols-1 lg:grid-cols-12 gap-20">
+<div class="lg:col-span-4">
+<h2 class="font-headline italic text-5xl mb-8">Financial <br/> Clarity.</h2>
+<p class="font-body text-on-surface-variant leading-relaxed">Commonly requested information regarding our asset acquisition programs.</p>
+<div class="mt-12">
+<a class="group inline-flex items-center gap-4 font-label text-[10px] uppercase tracking-widest text-primary" href="#">
+                        Download Full Guide
+                        <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+<div class="lg:col-span-8 space-y-12">
+<div class="space-y-4">
+<h4 class="font-headline text-2xl italic">Can I terminate my lease early?</h4>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed max-w-2xl">
+                        Our Performance and Pure tiers include the 'Agile Exit' clause, allowing for early termination or vehicle swap after 12 months with minimal adjustment fees, provided equity thresholds are met.
+                    </p>
+</div>
+<div class="space-y-4">
+<h4 class="font-headline text-2xl italic">Is there a mileage limitation?</h4>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed max-w-2xl">
+                        Standard programs offer 7,500, 10,000, and 12,000 mile annual limits. However, we offer bespoke high-mileage contracts tailored for transcontinental drivers.
+                    </p>
+</div>
+<div class="space-y-4">
+<h4 class="font-headline text-2xl italic">How does tax treatment work for Electric models?</h4>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed max-w-2xl">
+                        All federal and state incentives are factored into the gross capitalized cost reduction, ensuring that the tax benefits are immediately realized in your monthly payment structure.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="px-12 py-32 bg-surface-container-high text-center">
+<div class="max-w-3xl mx-auto space-y-10">
+<h2 class="font-headline italic text-5xl md:text-7xl">Your Portfolio, <br/> Elevated.</h2>
+<p class="font-body text-on-surface-variant text-lg tracking-wide uppercase font-light">Connect with a luxury asset specialist today.</p>
+<div class="pt-8">
+<button class="px-16 py-6 bg-primary text-on-primary font-label uppercase text-[12px] tracking-[0.3em] hover:bg-primary-fixed transition-all duration-500 scale-100 hover:scale-105">Inquire for Quote</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 dark:bg-slate-950 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full border-t border-slate-800/30">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-6">TUT</div>
+<p class="font-sans text-[10px] uppercase tracking-widest text-slate-500">© 2024 TUT USA. ALL RIGHTS RESERVED.</p>
+</div>
+<div class="space-y-4">
+<h5 class="font-serif italic text-slate-200">Vehicles</h5>
+<ul class="space-y-2">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Sedans</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">SUVs</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Electric</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="font-serif italic text-slate-200">Owners</h5>
+<ul class="space-y-2">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">My Account</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Service Plans</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Roadside</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="font-serif italic text-slate-200">Company</h5>
+<ul class="space-y-2">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">About</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Careers</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Newsroom</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="font-serif italic text-slate-200">Legal</h5>
+<ul class="space-y-2">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Privacy</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">Cookies</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-200 hover:text-slate-100 transition-transform duration-300 hover:translate-x-1 block" href="#">USA/English</a></li>
+</ul>
+</div>
+</footer>
+</body></html>

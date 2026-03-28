@@ -45,14 +45,15 @@ export default defineConfig({
     },
   ],
 
-  /* Start admin dev server automatically in local dev */
-  webServer: process.env.CI
-    ? undefined
-    : {
-        command: 'cd ../admin && pnpm dev',
-        url: 'http://localhost:3000',
-        reuseExistingServer: true,
-        timeout: 120_000,
-      },
+  /* Start admin server automatically.
+   * Uses the production build (next start) for deterministic static file serving.
+   * Pre-requisite: `cd frontend && pnpm build` must have been run first.
+   * In CI the server is started by the workflow before `playwright test` runs. */
+  webServer: {
+    command: 'cd ../admin && pnpm start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+  },
 });
 

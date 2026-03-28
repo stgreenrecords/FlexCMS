@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#082768",
+              "surface-variant": "#0a2257",
+              "on-surface-variant": "#96a9e6",
+              "inverse-surface": "#faf8ff",
+              "surface-tint": "#c6c6c7",
+              "surface-container-high": "#0b1d48",
+              "surface": "#070d1f",
+              "on-tertiary-container": "#495468",
+              "primary-container": "#454747",
+              "on-secondary-container": "#b0c0da",
+              "secondary-dim": "#8f9fb7",
+              "error-container": "#7f2927",
+              "on-error-container": "#ff9993",
+              "secondary": "#8f9fb7",
+              "secondary-fixed-dim": "#c5d6f0",
+              "surface-container-lowest": "#000000",
+              "tertiary": "#f0f3ff",
+              "on-tertiary-fixed-variant": "#535e72",
+              "tertiary-container": "#dae6fe",
+              "on-primary-fixed": "#3e4040",
+              "inverse-primary": "#5e5f60",
+              "on-error": "#490106",
+              "primary-fixed": "#e2e2e2",
+              "tertiary-fixed": "#dae6fe",
+              "tertiary-dim": "#ccd7ef",
+              "error-dim": "#bb5551",
+              "on-primary-container": "#d0d0d0",
+              "error": "#ee7d77",
+              "secondary-container": "#2d3c51",
+              "primary-dim": "#b8b9b9",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "inverse-on-surface": "#4f5469",
+              "primary": "#c6c6c7",
+              "on-primary": "#3f4041",
+              "primary-fixed-dim": "#d4d4d4",
+              "surface-dim": "#070d1f",
+              "on-background": "#dfe4ff",
+              "on-secondary-fixed": "#314055",
+              "background": "#070d1f",
+              "on-tertiary-fixed": "#374155",
+              "outline-variant": "#32457c",
+              "tertiary-fixed-dim": "#ccd7ef",
+              "surface-container-highest": "#0a2257",
+              "surface-container": "#0a1839",
+              "on-surface": "#dfe4ff",
+              "surface-container-low": "#09122b",
+              "on-tertiary": "#515c70",
+              "outline": "#6073ad",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "on-secondary": "#102134",
+              "secondary-fixed": "#d3e4fe"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex items-center gap-12">
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-sm Manrope uppercase" href="#">Sedans</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-sm Manrope uppercase" href="#">SUVs</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-sm Manrope uppercase" href="#">Electric</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-sm Manrope uppercase" href="#">Build</a>
+</div>
+<div class="flex items-center gap-8">
+<button class="text-slate-400 hover:text-slate-100 transition-all duration-500 font-sans tracking-widest text-xs uppercase font-bold">Sign In</button>
+<button class="bg-primary text-on-primary px-6 py-2 font-sans tracking-widest text-xs uppercase font-bold hover:bg-primary-fixed transition-colors">Find a Dealer</button>
+</div>
+</nav>
+<main class="pt-32 pb-24">
+<!-- Breadcrumb & Header Section -->
+<section class="px-12 mb-16 max-w-7xl mx-auto">
+<nav class="flex items-center gap-4 mb-8 text-on-surface-variant font-label text-[10px] tracking-[0.2em] uppercase">
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Ownership How-To</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-primary">Winter Optimization</span>
+</nav>
+<div class="grid lg:grid-cols-2 gap-16 items-end">
+<div>
+<h1 class="font-headline italic text-6xl md:text-8xl text-tertiary mb-6 leading-none">Maximizing Range in Winter</h1>
+<p class="text-on-surface-variant text-lg max-w-xl font-light leading-relaxed">
+                        Cold temperatures can impact battery efficiency. Follow our engineered protocols to maintain peak performance and preserve range during the winter months.
+                    </p>
+</div>
+<div class="flex flex-col gap-4 border-l border-outline-variant/20 pl-8">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="ac_unit">ac_unit</span>
+<span class="font-label uppercase tracking-widest text-xs">Efficiency Priority: High</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="schedule">schedule</span>
+<span class="font-label uppercase tracking-widest text-xs">Completion Time: 10 Mins</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Hero Cinematic Imagery -->
+<section class="mb-24 px-12">
+<div class="h-[614px] w-full relative overflow-hidden group">
+<img alt="Vehicle in winter" class="w-full h-full object-cover filter brightness-75 scale-105 group-hover:scale-100 transition-transform duration-1000" data-alt="Sleek silver electric sedan parked on a snow-covered mountain road during a dramatic twilight blue hour with frost on the headlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7UwSE7pNtb62AzAFtyuAHlY5QKlVPsExzSt6-58jnc1yeW_5yDVfrZj8gFfHgAguJaJGCLyYO3lMogZhLXRVdpBE5Xfw6KpPq-_gYw74fnLM8f5naWbiDmif1aSouBBVPD3N1cmUqg2WN8cbCDu5-jQlvuz8sAemKAcdUui4-UlKuAoFAD9zCcm1zw6hfIkxs3wDgb1hxLyWlrcf28HaHYshKyd-fcZ46qrG00ven5HEu6l620Bu2JaDSsTxgyoN0HTNBKEa3nVqp"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+</div>
+</section>
+<!-- Task-Based Steps (Numbered) -->
+<section class="px-12 max-w-7xl mx-auto mb-32">
+<h2 class="font-label uppercase tracking-[0.3em] text-xs text-outline mb-16">Operational Protocol</h2>
+<div class="grid gap-24">
+<!-- Step 1 -->
+<div class="grid lg:grid-cols-12 gap-12 group">
+<div class="lg:col-span-1">
+<span class="font-headline italic text-5xl text-primary-dim opacity-50 group-hover:opacity-100 transition-opacity">01</span>
+</div>
+<div class="lg:col-span-6">
+<h3 class="font-headline text-3xl text-tertiary mb-4">Pre-Conditioning the Battery</h3>
+<p class="text-on-surface-variant leading-relaxed font-light mb-8">
+                            Before your departure, use the TUT app to start pre-conditioning while the vehicle is still plugged in. This draws energy from the grid rather than your battery to warm the cells to optimal operating temperature.
+                        </p>
+<div class="p-6 bg-surface-container-low border-l-2 border-primary">
+<p class="text-xs font-label uppercase tracking-widest text-primary mb-2">Technical Insight</p>
+<p class="text-sm italic text-on-surface">Chemical reactions within the battery slow down in cold weather; pre-heating restores ions' mobility for full power delivery.</p>
+</div>
+</div>
+<div class="lg:col-span-5 h-64 bg-surface-container-highest overflow-hidden">
+<img alt="Smartphone app interface" class="w-full h-full object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-700" data-alt="Close-up of a high-end smartphone screen showing a sophisticated automotive climate control interface with metallic blue accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9fwpxtm7r4JAAMTJUCdtNzmjCkkhLenwhfJAwfigj7PJj3M11VckInF_h3BesVIlXKOMeONIGQhpWArlsfyla6oS8lOWs-mYT15IQOqs2xAfur-vapjIuxqCoQ4OgNFWEmwAvhbIsQ7A0LrCVPKvjdsFcxPrdzWYy34PRYFvXVKgX5D_WBxabSWPnJtM7awp68FMUQa_VSkSBMvTPBMUjOUjD1MwTQd8MZILqKbAYHaVj7auJsRHtMHxCbXZw1xvGAveiANiUafHZ"/>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="grid lg:grid-cols-12 gap-12 group">
+<div class="lg:col-span-1">
+<span class="font-headline italic text-5xl text-primary-dim opacity-50 group-hover:opacity-100 transition-opacity">02</span>
+</div>
+<div class="lg:col-span-6">
+<h3 class="font-headline text-3xl text-tertiary mb-4">Utilize Targeted Heating</h3>
+<p class="text-on-surface-variant leading-relaxed font-light mb-8">
+                            Heating the entire cabin via the HVAC system is energy-intensive. Prioritize heated seats and the steering wheel, which transfer heat directly to the occupants with significantly lower power consumption.
+                        </p>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container">
+<span class="material-symbols-outlined block mb-2 text-primary" data-icon="chair">chair</span>
+<span class="text-[10px] font-label uppercase tracking-tighter">Seat Heating</span>
+</div>
+<div class="p-4 bg-surface-container">
+<span class="material-symbols-outlined block mb-2 text-primary" data-icon="settings_input_component">settings_input_component</span>
+<span class="text-[10px] font-label uppercase tracking-tighter">Wheel Heating</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 h-64 bg-surface-container-highest overflow-hidden">
+<img alt="Interior luxury seats" class="w-full h-full object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-700" data-alt="Detailed texture of perforated charcoal leather car seats with ambient blue lighting highlighting the stitching precision" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJpmM2qEVZUqlIe_cfSuneztgLV-5Z0ur88dR9ZApy7VklCgLQeACgmVN2Q-FoOtXT0QPNTbf9fJKRpUcbeuSta6Fg-On4pOX3Hsgll9QtKtw1UX4yzPtEtkiF80Ud4vvA8ur9W_zzB1IFnbJB9zKXdTVpva7cIvMzK-hZ1rMiq3zQ1Qwa8q2qLUHGJpWk23eiFrwD3qlBp9vwuKWG5EJNRBO0cFLATyro2xZb52jXZ8eewfqwth3wzGxHLWto5cqMHrxCtSRbEGDy"/>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="grid lg:grid-cols-12 gap-12 group">
+<div class="lg:col-span-1">
+<span class="font-headline italic text-5xl text-primary-dim opacity-50 group-hover:opacity-100 transition-opacity">03</span>
+</div>
+<div class="lg:col-span-6">
+<h3 class="font-headline text-3xl text-tertiary mb-4">Navigating to Superchargers</h3>
+<p class="text-on-surface-variant leading-relaxed font-light">
+                            When planning a long journey, always use the in-vehicle navigation to select your charging stop. The vehicle will automatically begin "pre-conditioning for fast charging" as you approach, ensuring the battery is at the exact temperature required for maximum intake speed.
+                        </p>
+</div>
+<div class="lg:col-span-5 h-64 bg-surface-container-highest overflow-hidden">
+<img alt="Charging station" class="w-full h-full object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-700" data-alt="Minimalist electric vehicle charging station in a clean architectural setting with dramatic cold shadows and sleek aluminum finishes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxlGvnuTQ0Inzl19VVkwUzjxXv7Rw5zFG6bL-sEGSsKpe3tu9W1b_R9E1CvDrx4wY9tYLgq0kpgatYPQShXrv0D22iHcqyoXffsyCcj_oYLoyXu_g5etbnLDVeajTRFkVkcqOukASWsNQSI4uK1JMdfK1IlfuT0Kx96tPP0QbzP295qPVFB8ahfNYgkaHCEdBcSPSOg4yi8-OXw_KWeagugnEQZ3SEh4CAVUyyCsWRnEI4MzJi1Ww3GDNhOIAPmt6Cv9UZobcrV8o-"/>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ Section (Asymmetric Bento) -->
+<section class="px-12 mb-32">
+<div class="max-w-7xl mx-auto">
+<h2 class="font-label uppercase tracking-[0.3em] text-xs text-outline mb-16">Frequently Asked</h2>
+<div class="grid md:grid-cols-3 gap-1">
+<div class="p-12 bg-surface-container-low border border-outline-variant/10">
+<h4 class="font-headline text-2xl text-tertiary mb-4">Why does my range estimate change?</h4>
+<p class="text-sm text-on-surface-variant font-light leading-loose">The algorithm accounts for ambient temperature and historical driving data to give you a "real-world" projection, often appearing lower in winter to ensure accuracy.</p>
+</div>
+<div class="p-12 bg-surface-container-low border border-outline-variant/10 md:mt-12">
+<h4 class="font-headline text-2xl text-tertiary mb-4">Is regenerative braking affected?</h4>
+<p class="text-sm text-on-surface-variant font-light leading-loose">Yes. A cold battery cannot accept high energy bursts. Regen may be limited until the battery warms up. Look for the 'Limited Regen' icon on your display.</p>
+</div>
+<div class="p-12 bg-surface-container-low border border-outline-variant/10">
+<h4 class="font-headline text-2xl text-tertiary mb-4">What is the optimal tire pressure?</h4>
+<p class="text-sm text-on-surface-variant font-light leading-loose">Pressure drops in cold air. Check your tires monthly during winter to maintain the recommended PSI for minimal rolling resistance and maximum range.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Related Content (Horizontal Scroll) -->
+<section class="pl-12 mb-32">
+<div class="flex justify-between items-end mb-12 pr-12">
+<h2 class="font-label uppercase tracking-[0.3em] text-xs text-outline">Related Guides</h2>
+<div class="flex gap-4">
+<button class="w-12 h-12 flex items-center justify-center border border-outline-variant/30 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center border border-outline-variant/30 hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="flex gap-8 overflow-x-auto no-scrollbar pb-8">
+<!-- Related Card 1 -->
+<div class="min-w-[400px] bg-surface-container border border-outline-variant/10 hover:border-primary/40 transition-all duration-500">
+<div class="h-64 overflow-hidden">
+<img alt="Tire swap" class="w-full h-full object-cover" data-alt="Extreme close-up of high-performance winter tire treads on a clean studio floor with cold blue rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6woywrVi6E1kcVmWOx0Q7dd_fVZPpvfjj1DhnKkWeXvBSiKEHRaQNVnYdMvPSU9zMVU3n_MJwYKb46WxECp6UykQkdBqVwxMl7K4sBpTa2qdKjU4Gm4t4ROEN5Fl2bv4iqm-NJ7GAJWjUIKbm0sQVNyXs_OfXukZZS7QGGaauWWOZFLp1VJJpqCdsZ2kHulouUDFrWZPfEEhBhDBSqoKqPlMaR4f_vLabLVFon54WBO0JNiyLJXzqQXozMUJBE-eFCw1uR7UMG2VO"/>
+</div>
+<div class="p-8">
+<span class="text-[10px] font-label uppercase tracking-widest text-outline mb-4 block">Safety</span>
+<h5 class="font-headline text-2xl text-tertiary mb-4">Selecting Winter Performance Tires</h5>
+<a class="inline-flex items-center gap-2 text-xs font-label uppercase tracking-widest text-primary group" href="#">
+                            Read Guide <span class="material-symbols-outlined text-sm group-hover:translate-x-2 transition-transform" data-icon="north_east">north_east</span>
+</a>
+</div>
+</div>
+<!-- Related Card 2 -->
+<div class="min-w-[400px] bg-surface-container border border-outline-variant/10 hover:border-primary/40 transition-all duration-500">
+<div class="h-64 overflow-hidden">
+<img alt="Snow storm" class="w-full h-full object-cover" data-alt="Abstract view of falling snow illuminated by vehicle headlights in a dark forest at night" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN7eJDMdYEEUtI0q6Bo-oAenc7gUwi9FWdUUVFK4CzXimifJ3AXt8TnQ3CsTtBrc453Q8QJucb2o86eUdNEWLwn2UfE5Xibdd3LeoTkR8evwrIN2c6czBSGPi-mK_4axU5wu38A_AYBL23XmkxLFt4HouUgC_JKF72FdKuoUvxJCBCenG2rPyH3abkjIA-4uhrcQfljvQNLzYG2SpzSLq0YK1F5O-2flEItm_15UYivJAPnDpA74oGczUqTbEelqmEmX2F-gl7vwpK"/>
+</div>
+<div class="p-8">
+<span class="text-[10px] font-label uppercase tracking-widest text-outline mb-4 block">Maintenance</span>
+<h5 class="font-headline text-2xl text-tertiary mb-4">Snow Mode Calibration</h5>
+<a class="inline-flex items-center gap-2 text-xs font-label uppercase tracking-widest text-primary group" href="#">
+                            Read Guide <span class="material-symbols-outlined text-sm group-hover:translate-x-2 transition-transform" data-icon="north_east">north_east</span>
+</a>
+</div>
+</div>
+<!-- Related Card 3 -->
+<div class="min-w-[400px] bg-surface-container border border-outline-variant/10 hover:border-primary/40 transition-all duration-500">
+<div class="h-64 overflow-hidden">
+<img alt="EV Plug" class="w-full h-full object-cover" data-alt="Close-up of a high-tech EV charging plug frosted with ice crystals against a dark blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXqVge1GyPidnXjlKtY0z7WpPM6Tjdor6yVYe80uhLqsTyezt5HcjAvD3oqy8mhuVNPDtw7N1StpmcJcyHFKoCJ8fzWhVN2Xw7cb8FrBRHksmVMtyBA2lcY8seFxnDmi4tQtmNZnyicNHN8NqW5hJymndTEOGQmvKSQ6RdAhC8yiEaK8oq7YN7SP53AUE36Qc_e09sC3DQ0kEbWIGhNfW-MIlVEA2tJn8JD4vz3nqqo9FkHQJnX0XKyR4_0zGMjUiwjktgvJ3QOrg_"/>
+</div>
+<div class="p-8">
+<span class="text-[10px] font-label uppercase tracking-widest text-outline mb-4 block">Charging</span>
+<h5 class="font-headline text-2xl text-tertiary mb-4">Home Charging in Sub-Zero</h5>
+<a class="inline-flex items-center gap-2 text-xs font-label uppercase tracking-widest text-primary group" href="#">
+                            Read Guide <span class="material-symbols-outlined text-sm group-hover:translate-x-2 transition-transform" data-icon="north_east">north_east</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 text-slate-400 font-sans uppercase tracking-widest text-[10px] Manrope border-t border-slate-800/30">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-8">TUT</div>
+<p class="normal-case text-slate-500 max-w-xs mb-8 tracking-normal font-light">The pinnacle of electric engineering and sustainable luxury. Crafted for those who demand precision.</p>
+</div>
+<div class="flex flex-col gap-4">
+<h6 class="text-slate-200 mb-2">Vehicles</h6>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Sedans</a>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">SUVs</a>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Electric</a>
+</div>
+<div class="flex flex-col gap-4">
+<h6 class="text-slate-200 mb-2">Owners</h6>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Support</a>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Charging</a>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Safety</a>
+</div>
+<div class="flex flex-col gap-4">
+<h6 class="text-slate-200 mb-2">Legal</h6>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Privacy</a>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Legal</a>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">Cookies</a>
+</div>
+<div class="flex flex-col gap-4">
+<h6 class="text-slate-200 mb-2">Region</h6>
+<a class="hover:text-slate-100 transition-colors duration-200 hover:translate-x-1 transition-transform" href="#">USA/English</a>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-slate-900 flex justify-between items-center text-slate-500">
+<span>© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<span class="material-symbols-outlined text-lg" data-icon="language">language</span>
+<span class="material-symbols-outlined text-lg" data-icon="policy">policy</span>
+</div>
+</div>
+</footer>
+</body></html>

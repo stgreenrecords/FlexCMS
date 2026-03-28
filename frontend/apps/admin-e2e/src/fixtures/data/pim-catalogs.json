@@ -1,0 +1,19 @@
+[
+  {
+    "id": "tut-vehicles",
+    "name": "TUT Vehicles",
+    "description": "Main vehicle catalog for all TUT Motors models",
+    "productCount": 12,
+    "status": "ACTIVE",
+    "createdAt": "2026-01-01T00:00:00Z"
+  },
+  {
+    "id": "tut-accessories",
+    "name": "TUT Accessories",
+    "description": "Genuine TUT accessories and parts",
+    "productCount": 48,
+    "status": "ACTIVE",
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+]
+

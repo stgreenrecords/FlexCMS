@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Newsreader:ital,opsz,wght@1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#082768",
+              "surface-variant": "#0a2257",
+              "on-surface-variant": "#96a9e6",
+              "inverse-surface": "#faf8ff",
+              "surface-tint": "#c6c6c7",
+              "surface-container-high": "#0b1d48",
+              "surface": "#070d1f",
+              "on-tertiary-container": "#495468",
+              "primary-container": "#454747",
+              "on-secondary-container": "#b0c0da",
+              "secondary-dim": "#8f9fb7",
+              "error-container": "#7f2927",
+              "on-error-container": "#ff9993",
+              "secondary": "#8f9fb7",
+              "secondary-fixed-dim": "#c5d6f0",
+              "surface-container-lowest": "#000000",
+              "tertiary": "#f0f3ff",
+              "on-tertiary-fixed-variant": "#535e72",
+              "tertiary-container": "#dae6fe",
+              "on-primary-fixed": "#3e4040",
+              "inverse-primary": "#5e5f60",
+              "on-error": "#490106",
+              "primary-fixed": "#e2e2e2",
+              "tertiary-fixed": "#dae6fe",
+              "tertiary-dim": "#ccd7ef",
+              "error-dim": "#bb5551",
+              "on-primary-container": "#d0d0d0",
+              "error": "#ee7d77",
+              "secondary-container": "#2d3c51",
+              "primary-dim": "#b8b9b9",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "inverse-on-surface": "#4f5469",
+              "primary": "#c6c6c7",
+              "on-primary": "#3f4041",
+              "primary-fixed-dim": "#d4d4d4",
+              "surface-dim": "#070d1f",
+              "on-background": "#dfe4ff",
+              "on-secondary-fixed": "#314055",
+              "background": "#070d1f",
+              "on-tertiary-fixed": "#374155",
+              "outline-variant": "#32457c",
+              "tertiary-fixed-dim": "#ccd7ef",
+              "surface-container-highest": "#0a2257",
+              "surface-container": "#0a1839",
+              "on-surface": "#dfe4ff",
+              "surface-container-low": "#09122b",
+              "on-tertiary": "#515c70",
+              "outline": "#6073ad",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "on-secondary": "#102134",
+              "secondary-fixed": "#d3e4fe"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(50, 69, 124, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex gap-10">
+<a class="font-sans tracking-widest text-sm text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Sedans</a>
+<a class="font-sans tracking-widest text-sm text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">SUVs</a>
+<a class="font-sans tracking-widest text-sm text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Electric</a>
+<a class="font-sans tracking-widest text-sm text-slate-100 font-bold border-b border-slate-100 pb-1" href="#">Build</a>
+</div>
+<div class="flex items-center gap-8">
+<button class="font-sans tracking-widest text-[10px] uppercase text-slate-400 hover:text-slate-100 transition-all duration-500">Find a Dealer</button>
+<button class="bg-primary text-on-primary px-6 py-2 text-[10px] uppercase tracking-widest font-bold hover:bg-primary-fixed transition-colors">Sign In</button>
+</div>
+</nav>
+<main class="pt-32 min-h-screen">
+<!-- Page Header -->
+<header class="px-12 mb-20">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-8">
+<div class="max-w-2xl">
+<span class="font-label uppercase tracking-[0.3em] text-[10px] text-secondary-dim mb-4 block">The Lifestyle Atelier</span>
+<h1 class="font-headline italic text-6xl md:text-8xl text-on-surface tracking-tight leading-none">Curated <br/>Precision</h1>
+</div>
+<p class="font-body text-on-surface-variant max-w-sm text-sm leading-relaxed mb-2">
+                    An uncompromising collection of performance enhancements and bespoke lifestyle goods designed for the discerning TUT owner.
+                </p>
+</div>
+</header>
+<!-- Collection Spotlight (Asymmetric Hero Section) -->
+<section class="mb-32">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-0 min-h-[716px]">
+<div class="md:col-span-8 relative overflow-hidden group">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100" data-alt="Close-up of high-performance carbon fiber car component with dramatic lighting and metallic reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWqQqREeXxLkX8zIpfjoXUNdCGkGSrw5kaUQZeqPy6-ZecGmn5NBtxOT8m22xZskOAd0Uf801JABhWyNBrt-gkCQRk5sFW_s0A9UtKbrHnEaftjh8Z5SjE2XEYAJTmqpbNfiX0r-uRwXBdjt-WI6uOSrz0fWFAMq-ZvGFwibphGshkmOOTQV3rjMkgJ7birteLN_8p-grqpQVBXSL9G7uPD2qFwNW35kRtMTGpVqDw4h9j9S5jSwPciiks11UN-ltSAjexAUShI-eS"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60"></div>
+<div class="absolute bottom-12 left-12">
+<h2 class="font-headline italic text-4xl text-tertiary mb-2">Performance Apex</h2>
+<p class="font-label uppercase tracking-widest text-[10px] text-primary">Limited Edition Carbon Series</p>
+</div>
+</div>
+<div class="md:col-span-4 bg-surface-container-low p-16 flex flex-col justify-center">
+<h3 class="font-headline italic text-3xl mb-6">Machined Integrity</h3>
+<p class="font-body text-sm text-on-surface-variant mb-10 leading-loose">
+                        Each piece in our Performance Collection is engineered with aerospace-grade materials, ensuring that form and function achieve a perfect, silent synthesis.
+                    </p>
+<button class="w-fit ghost-border border-opacity-20 px-10 py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-on-surface hover:text-surface transition-all">
+                        Explore Engineering
+                    </button>
+</div>
+</div>
+</section>
+<!-- Filter and Grid Section -->
+<section class="px-12 max-w-none mx-auto mb-32">
+<div class="flex flex-col lg:flex-row gap-16">
+<!-- Filter Panel -->
+<aside class="w-full lg:w-64 flex-shrink-0">
+<div class="sticky top-32">
+<div class="mb-12">
+<h4 class="font-label uppercase tracking-[0.2em] text-xs text-on-surface border-b border-outline-variant/30 pb-4 mb-8">Categories</h4>
+<ul class="space-y-6">
+<li><a class="font-body text-sm text-on-surface hover:text-primary transition-colors block" href="#">All Collections</a></li>
+<li><a class="font-body text-sm text-on-surface-variant hover:text-on-surface transition-colors block" href="#">Interior Appointments</a></li>
+<li><a class="font-body text-sm text-on-surface-variant hover:text-on-surface transition-colors block" href="#">Exterior Aero</a></li>
+<li><a class="font-body text-sm text-on-surface-variant hover:text-on-surface transition-colors block" href="#">Technical Apparel</a></li>
+<li><a class="font-body text-sm text-on-surface-variant hover:text-on-surface transition-colors block" href="#">Bespoke Luggage</a></li>
+</ul>
+</div>
+<div class="mb-12">
+<h4 class="font-label uppercase tracking-[0.2em] text-xs text-on-surface border-b border-outline-variant/30 pb-4 mb-8">Refine</h4>
+<div class="flex flex-col gap-4">
+<label class="flex items-center gap-3 group cursor-pointer">
+<div class="w-4 h-4 border border-outline-variant group-hover:border-primary transition-colors"></div>
+<span class="font-body text-xs text-on-surface-variant group-hover:text-on-surface uppercase tracking-widest">In Stock Only</span>
+</label>
+<label class="flex items-center gap-3 group cursor-pointer">
+<div class="w-4 h-4 border border-outline-variant group-hover:border-primary transition-colors"></div>
+<span class="font-body text-xs text-on-surface-variant group-hover:text-on-surface uppercase tracking-widest">Limited Release</span>
+</label>
+</div>
+</div>
+</div>
+</aside>
+<!-- Product Grid and Sort -->
+<div class="flex-grow">
+<div class="flex justify-between items-center mb-12 border-b border-outline-variant/10 pb-6">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Showing 24 Artifacts</span>
+<div class="flex items-center gap-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Sort By</span>
+<button class="font-body text-xs flex items-center gap-2 hover:text-primary transition-colors">
+                                Newest First
+                                <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-16">
+<!-- Product Card 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Luxury minimalist black leather weekender bag on a dark concrete background with sharp shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5UEGMU9h83MUG6OSUy_iTALEBfkdUqXp7KTrXPsWidhJBWlb4fjfO5ngcJOnlfvQRppdMb7L7_SLSUAJUtS6D1ZvxJ-qlnvI46zeXggcST4BNxerjKZhudXS4JU6_dRJuR4G9O_6XhVI5xUQqf0ETsW-xnPcXkE-NRi9zwyWftp0u151Kh15EBplpZJ0Inrfh0e3oiuLMPYFEVpOBd0Ez8_v7RxYtPxGYYoSAbMKIiIS05m16GDmtHy4UoL84g_DtEK0agpv9N5N4"/>
+<div class="absolute top-4 left-4 bg-primary text-on-primary px-3 py-1 text-[8px] font-bold uppercase tracking-widest">Limited</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-body text-sm font-medium mb-1 group-hover:text-primary transition-colors uppercase tracking-widest">Atelier Weekender</h5>
+<p class="font-label text-[10px] text-on-surface-variant tracking-widest uppercase">Nappa Leather / Matte Black</p>
+</div>
+<span class="font-headline italic text-lg">$1,850</span>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Ultra-sleek carbon fiber sunglasses with titanium frames, shot in a high-contrast studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8PVa1kxgWZ0PXxHka151axNqd7hkchAd-cqjhA1rg6gr0agYUSOB3nbD9L4ilo4sN3HA-s3ovouDli7-27qkmANW_BDuSJio4DJ9Zoogkfd45Tt2vyt7vOlF1GGCIjvwhH6UkyQs7tDYSDpTn_8JjXvlZexh1DqL8qUYnFgY0Q020TKscSrwjLEqAmDtsRKxWufcoiT9MEUJ97Q2DkA7dQWWkTZmytLCmL-7xizxZ6MMrg5adfI54Y8cL_fXdNC-zh4enJ1RmIhcW"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-body text-sm font-medium mb-1 group-hover:text-primary transition-colors uppercase tracking-widest">Orbital Aviators</h5>
+<p class="font-label text-[10px] text-on-surface-variant tracking-widest uppercase">Titanium / Polarized Carbon</p>
+</div>
+<span class="font-headline italic text-lg">$420</span>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Premium minimalist silver watch with mesh strap on a dark architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFGC_wyAZTAUV4kOG5s_Hr_ZKv1l7t1VZVdPVHm-Jz2hLUiK4SQJKV2oKAS16nXgWIRx17q11FTgjAS-2xCjArEa90IH9TzaVmiWEfPGz-HPMme55C7UiK3cgmnTY80CBxUyjZNsbxqTEhYPatmhJ6kyZXxb49qVu7I3AtA-EdwavvJUdYoDmAGxy0m8GCOo7IgX_SLNuAuQcPP66wdLFOuKi3VqTuAfXqofsRbDSuc-4Pnfdpfp08OGOojB7ALvKHJiH20K1V8PCF"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-body text-sm font-medium mb-1 group-hover:text-primary transition-colors uppercase tracking-widest">Precision Chrono</h5>
+<p class="font-label text-[10px] text-on-surface-variant tracking-widest uppercase">Brushed Steel / Automatic</p>
+</div>
+<span class="font-headline italic text-lg">$2,100</span>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Carbon fiber steering wheel detail with alcantara grips and red stitching" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlgo7ToVDovJjaOUaLksswb6VRV5qlrVq6In3byqbIx2kTDH-m5DEMkKBXXujFI9QHNagyQqIR2bj4RsRE3TdiDZLAGr311uTeoMsT9QoF9DtCj4BdI0O3iqgo2AjG9qB1ZZhg4aDoeVRVbdaAT5Nxe-U7UZjet1yeEORo7KBzmU0NiumcgTEduHshUVxnmmAwctZOXXMwolTttQJNRtd837zOBIeR-fLwdtGsW637bp1CgxnLl1tiVboxasQ6taLobFp8MN3NaV-O"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-body text-sm font-medium mb-1 group-hover:text-primary transition-colors uppercase tracking-widest">GT-R Steering Module</h5>
+<p class="font-label text-[10px] text-on-surface-variant tracking-widest uppercase">Forged Carbon / Alcantara</p>
+</div>
+<span class="font-headline italic text-lg">$3,400</span>
+</div>
+</div>
+<!-- Product Card 5 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Selection of luxury technical apparel in muted grey and black tones folded neatly" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkL_atVF34HFDIi9MzEKGUOxQL5-OsqoaPxCplCucPTuk64kYkmNlasZVOjrAjVJ3Fk5zxPjPDp-MqDFYz1QCnx-U_6EBfdsU6TCKj8lGb8hGnPZysX_54H3M2y6OjfdzYFdCFDv3b8rprzcklJ_3stdQZWW20fxk-hprroDfnqXPqSJ1c_5vCL1TtEfK8Ac1_-16Vdl7G9mOXa3IOxznKMwm2SI7k4NYWutSGCjETmJbV-y5Kl2ioWb91w9ivtXQZXLqlc0wt-ApY"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-body text-sm font-medium mb-1 group-hover:text-primary transition-colors uppercase tracking-widest">Tech Shell Jacket</h5>
+<p class="font-label text-[10px] text-on-surface-variant tracking-widest uppercase">Weatherproof Membrane</p>
+</div>
+<span class="font-headline italic text-lg">$890</span>
+</div>
+</div>
+<!-- Product Card 6 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/5] bg-surface-container-low mb-6 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Macro shot of a high-performance brake caliper in silver with brand logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpD3pMecx4x8v5QBdZ6272DtXHo1ITEVux7Vp3SjSEdXZPd0apYHGWySAaHem9eS6MD1eXru-QULHa56Dex6q9K6lM4xmBM2r-z7An0cEUxcT9sRwYlaiF6roeC0iTcWwVH54hGwicfhkUhatlsdzGRG17JidSebJH3ahejEySsTHq18G3YHRpwSzFp4nV-u2NYkrW64gJAJ7EWGFqGstBq0b_pdVZf9sSpTnhPtn7Nv1CfOJkxS03CkMknxq0buwQM3OiRcgbGgsl"/>
+<div class="absolute top-4 left-4 bg-surface-container-high text-on-surface px-3 py-1 text-[8px] font-bold uppercase tracking-widest">Engineering</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h5 class="font-body text-sm font-medium mb-1 group-hover:text-primary transition-colors uppercase tracking-widest">Ceramic Brake Kit</h5>
+<p class="font-label text-[10px] text-on-surface-variant tracking-widest uppercase">Vented / High-Temp Silver</p>
+</div>
+<span class="font-headline italic text-lg">$12,500</span>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-24 flex justify-center">
+<div class="flex items-center gap-12">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">arrow_back</button>
+<div class="flex gap-8">
+<span class="font-label text-xs border-b-2 border-primary pb-1">01</span>
+<span class="font-label text-xs text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">02</span>
+<span class="font-label text-xs text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">03</span>
+<span class="font-label text-xs text-on-surface-variant">...</span>
+<span class="font-label text-xs text-on-surface-variant hover:text-on-surface cursor-pointer transition-colors">12</span>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">arrow_forward</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter / CTA -->
+<section class="bg-surface-container-low py-32 px-12 overflow-hidden relative">
+<div class="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
+<img class="w-full h-full object-cover" data-alt="Abstract silhouette of a sports car in a dark studio with cinematic rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyV2xxRR98LkBZiQQEUNUj1AyIHLfIldtYM4GD5EdqWWSUR85epwmrOJq0AtM8OJmJxlpDYt7BOphzTsZhS0d92jk4Q_0_6-lLITx9ZOqR_09mJ_nULjqLV37D2BI0F47et4H61h95kthMINwXfG3UFsVFVdL3FZqcOoDPid9Jbo8QDgD-JTx_jWZjr6_7VUynflhGZTPXqlstxQKpmjV2KVz2WOwbLsjmLygMA_wkjNlprnlj0oTc5mN0m5MxZwxBmJStFGxia_Ya"/>
+</div>
+<div class="max-w-7xl mx-auto relative z-10">
+<div class="max-w-xl">
+<h2 class="font-headline italic text-5xl mb-8">Access the Inner Circle</h2>
+<p class="font-body text-on-surface-variant mb-12 leading-relaxed">
+                        Join our exclusive dispatch to receive early access to limited edition collections and performance engineering insights.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-0">
+<input class="bg-transparent border-b border-outline-variant/30 py-4 px-0 w-full font-label text-[10px] tracking-widest focus:outline-none focus:border-primary transition-colors uppercase" placeholder="ENTER YOUR EMAIL" type="email"/>
+<button class="bg-primary text-on-primary px-12 py-4 font-label text-[10px] font-bold tracking-[0.2em] uppercase whitespace-nowrap hover:bg-primary-fixed transition-colors">
+                            Subscribe
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-slate-950 dark:bg-slate-950 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full border-t border-slate-800/30">
+<div class="lg:col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-8">TUT</div>
+<p class="font-sans uppercase tracking-widest text-[10px] text-slate-500 max-w-xs leading-relaxed">
+                Precision engineered for the path ahead. Every component is a testament to our legacy of performance.
+            </p>
+</div>
+<div>
+<h6 class="font-serif italic text-slate-200 mb-6">Vehicles</h6>
+<ul class="space-y-4">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Electric</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">SUVs</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Sedans</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-serif italic text-slate-200 mb-6">Company</h6>
+<ul class="space-y-4">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">History</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Innovation</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Support</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-serif italic text-slate-200 mb-6">Legal</h6>
+<ul class="space-y-4">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Privacy</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Cookies</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">USA/English</a></li>
+</ul>
+</div>
+<div class="col-span-2 lg:col-span-6 mt-12 pt-12 border-t border-slate-800/30 flex flex-col md:flex-row justify-between items-center gap-6">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-500">© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-100 cursor-pointer transition-colors">share</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-100 cursor-pointer transition-colors">location_on</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-100 cursor-pointer transition-colors">language</span>
+</div>
+</div>
+</footer>
+</body></html>

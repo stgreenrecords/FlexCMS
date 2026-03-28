@@ -1,0 +1,87 @@
+{
+  "componentDefinitions": [
+    {
+      "resourceType": "flexcms/hero",
+      "name": "hero",
+      "title": "Hero Banner",
+      "description": "Full-width hero banner with image and call-to-action",
+      "group": "Layout",
+      "isContainer": false,
+      "dataSchema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "title": "Title" },
+          "subtitle": { "type": "string", "title": "Subtitle", "format": "textarea" },
+          "ctaLabel": { "type": "string", "title": "CTA Label" },
+          "ctaUrl": { "type": "string", "title": "CTA URL" },
+          "variant": {
+            "type": "string",
+            "title": "Variant",
+            "enum": ["dark", "light", "transparent"]
+          },
+          "fullHeight": { "type": "boolean", "title": "Full Height" }
+        },
+        "required": ["title"]
+      }
+    },
+    {
+      "resourceType": "flexcms/text-block",
+      "name": "text-block",
+      "title": "Text Block",
+      "description": "Rich text content block",
+      "group": "Content",
+      "isContainer": false,
+      "dataSchema": {
+        "type": "object",
+        "properties": {
+          "body": { "type": "string", "title": "Body", "format": "textarea" },
+          "alignment": {
+            "type": "string",
+            "title": "Alignment",
+            "enum": ["left", "center", "right"]
+          }
+        }
+      }
+    },
+    {
+      "resourceType": "flexcms/image",
+      "name": "image",
+      "title": "Image",
+      "description": "Responsive image component",
+      "group": "Media",
+      "isContainer": false,
+      "dataSchema": {
+        "type": "object",
+        "properties": {
+          "src": { "type": "string", "title": "Image URL" },
+          "alt": { "type": "string", "title": "Alt Text" },
+          "caption": { "type": "string", "title": "Caption" }
+        },
+        "required": ["src", "alt"]
+      }
+    },
+    {
+      "resourceType": "flexcms/container",
+      "name": "container",
+      "title": "Container",
+      "description": "Layout container for grouping components",
+      "group": "Layout",
+      "isContainer": true,
+      "dataSchema": {
+        "type": "object",
+        "properties": {
+          "columns": {
+            "type": "number",
+            "title": "Columns"
+          },
+          "gap": {
+            "type": "string",
+            "title": "Gap",
+            "enum": ["none", "small", "medium", "large"]
+          }
+        }
+      }
+    }
+  ]
+}
+

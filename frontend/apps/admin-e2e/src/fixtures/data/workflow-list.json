@@ -1,0 +1,33 @@
+[
+  {
+    "id": "wf-001",
+    "workflowName": "Publish Review",
+    "contentPath": "content.tut-gb.en.home",
+    "status": "ACTIVE",
+    "startedBy": "editor1",
+    "startedAt": "2026-03-28T08:00:00Z",
+    "lastAction": null,
+    "lastComment": null
+  },
+  {
+    "id": "wf-002",
+    "workflowName": "Content Approval",
+    "contentPath": "content.tut-gb.en.models",
+    "status": "ACTIVE",
+    "startedBy": "editor2",
+    "startedAt": "2026-03-27T14:00:00Z",
+    "lastAction": null,
+    "lastComment": "Please review the specs section"
+  },
+  {
+    "id": "wf-003",
+    "workflowName": "Publish Review",
+    "contentPath": "content.tut-de.de.home",
+    "status": "COMPLETED",
+    "startedBy": "editor3",
+    "startedAt": "2026-03-26T10:00:00Z",
+    "lastAction": "approve",
+    "lastComment": "Approved by senior editor"
+  }
+]
+

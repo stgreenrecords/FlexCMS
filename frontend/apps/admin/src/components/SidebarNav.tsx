@@ -59,6 +59,22 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const TESTID_MAP: Record<string, string> = {
+  '/dashboard':            'sidebar-nav-dashboard',
+  '/content':              'sidebar-nav-content',
+  '/sites':                'sidebar-nav-sites',
+  '/workflows':            'sidebar-nav-workflows',
+  '/components':           'sidebar-nav-components',
+  '/experience-fragments': 'sidebar-nav-fragments',
+  '/preview':              'sidebar-nav-preview',
+  '/dam':                  'sidebar-nav-dam',
+  '/pim':                  'sidebar-nav-pim',
+  '/pim/schema':           'sidebar-nav-pim-schema',
+  '/pim/import':           'sidebar-nav-pim-import',
+  '/translations':         'sidebar-nav-translations',
+  '/settings':             'sidebar-nav-settings',
+};
+
 export function SidebarNav() {
   const pathname = usePathname();
 
@@ -86,7 +102,7 @@ export function SidebarNav() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-4" aria-label="Main navigation">
+      <nav className="flex-1 px-3 space-y-4" aria-label="Main navigation" data-testid="sidebar-nav">
         {NAV_GROUPS.map((group) => (
           <div key={group.label}>
             <p
@@ -102,6 +118,7 @@ export function SidebarNav() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      data-testid={TESTID_MAP[item.href] ?? undefined}
                       className="flex items-center gap-3 px-4 py-2.5 rounded-r-lg transition-all duration-200"
                       style={
                         isActive

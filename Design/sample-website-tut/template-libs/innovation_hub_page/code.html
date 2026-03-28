@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ee7d77",
+              "primary-fixed": "#e2e2e2",
+              "surface-variant": "#0a2257",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "on-tertiary": "#515c70",
+              "on-primary-container": "#d0d0d0",
+              "inverse-surface": "#faf8ff",
+              "surface": "#070d1f",
+              "secondary-fixed-dim": "#c5d6f0",
+              "tertiary-fixed": "#dae6fe",
+              "on-tertiary-container": "#495468",
+              "secondary-fixed": "#d3e4fe",
+              "tertiary-fixed-dim": "#ccd7ef",
+              "inverse-primary": "#5e5f60",
+              "surface-container-high": "#0b1d48",
+              "on-secondary-fixed": "#314055",
+              "surface-bright": "#082768",
+              "on-tertiary-fixed": "#374155",
+              "secondary-container": "#2d3c51",
+              "primary-dim": "#b8b9b9",
+              "surface-dim": "#070d1f",
+              "error-container": "#7f2927",
+              "primary-container": "#454747",
+              "inverse-on-surface": "#4f5469",
+              "background": "#070d1f",
+              "on-tertiary-fixed-variant": "#535e72",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "on-surface-variant": "#96a9e6",
+              "secondary-dim": "#8f9fb7",
+              "on-secondary-container": "#b0c0da",
+              "tertiary": "#f0f3ff",
+              "tertiary-container": "#dae6fe",
+              "on-primary-fixed": "#3e4040",
+              "outline-variant": "#32457c",
+              "primary": "#c6c6c7",
+              "surface-container": "#0a1839",
+              "primary-fixed-dim": "#d4d4d4",
+              "surface-container-lowest": "#000000",
+              "on-background": "#dfe4ff",
+              "on-surface": "#dfe4ff",
+              "surface-tint": "#c6c6c7",
+              "surface-container-low": "#09122b",
+              "outline": "#6073ad",
+              "surface-container-highest": "#0a2257",
+              "on-primary": "#3f4041",
+              "on-error": "#490106",
+              "error-dim": "#bb5551",
+              "tertiary-dim": "#ccd7ef",
+              "secondary": "#8f9fb7",
+              "on-error-container": "#ff9993",
+              "on-secondary": "#102134"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #070d1f; }
+        ::-webkit-scrollbar-thumb { background: #32457c; }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(198, 198, 199, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 rounded-none bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex gap-12 items-center">
+<a class="font-sans tracking-widest Manrope text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Sedans</a>
+<a class="font-sans tracking-widest Manrope text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">SUVs</a>
+<a class="font-sans tracking-widest Manrope text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Electric</a>
+<a class="font-sans tracking-widest Manrope text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Build</a>
+</div>
+<div class="flex gap-8 items-center">
+<button class="font-sans tracking-widest Manrope text-slate-300 dark:text-slate-300 hover:text-slate-100 transition-all duration-500 uppercase text-xs border-b border-transparent hover:border-slate-100 pb-1">Sign In</button>
+<button class="bg-primary text-on-primary px-8 py-3 font-sans tracking-widest text-[10px] uppercase font-bold hover:bg-primary-fixed transition-colors">Find a Dealer</button>
+</div>
+</nav>
+<!-- Video Hero Section -->
+<section class="relative h-screen w-full flex items-end overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent z-10"></div>
+<img class="w-full h-full object-cover grayscale opacity-60" data-alt="Cinematic macro shot of an advanced electric vehicle battery cell with glowing blue circuit paths and brushed aluminum casing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSAG26YKfV8m3Q036e-ljSB3-IAN5cCRbMkY0DwUdlqKhdmUNcxw2WAvFBe_I-_lIzKWrGs8FNzXRb-ph6OwK96T4pqPm0d4vrkNMWCZ6wZKY4Spjtm4taSR81UiHwlg4lZTJoGyK0Msz0PxQEGj72zWomeUyv63010eSMlmEej4z-k7fIjAQINDQ6zghNt_MnHmW1TaOoBWStnJR_zNH6-VbEEFTHAcgWwqJ5sm8IjJICqp7qQZjVgL4mdaQOdXvVhFopWwASaX1B"/>
+</div>
+<div class="relative z-20 px-12 pb-24 w-full grid grid-cols-12">
+<div class="col-span-12 lg:col-span-7">
+<span class="font-label uppercase tracking-[0.3em] text-primary text-xs mb-4 block">Innovation / Powertrain</span>
+<h1 class="font-headline italic text-7xl md:text-9xl text-tertiary leading-[0.9] tracking-tighter mb-8">
+                    The Eon <br/>Architecture
+                </h1>
+<p class="font-body text-xl text-on-surface-variant max-w-xl leading-relaxed">
+                    A revolutionary modular energy system engineered for zero-latency power delivery and sustainable longevity. Witness the future of electrification.
+                </p>
+</div>
+<div class="col-span-12 lg:col-span-5 flex items-end justify-end mt-12 lg:mt-0">
+<button class="group flex items-center gap-6">
+<span class="w-20 h-20 flex items-center justify-center border border-outline-variant/30 group-hover:bg-primary transition-all duration-500">
+<span class="material-symbols-outlined text-tertiary group-hover:text-on-primary" data-icon="play_arrow">play_arrow</span>
+</span>
+<span class="font-label uppercase tracking-widest text-xs text-primary">Watch Technical Deep-Dive</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Category Grid: Bento Layout -->
+<section class="py-32 px-12 bg-surface">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-1">
+<div class="relative aspect-square md:aspect-auto md:h-[600px] bg-surface-container-low p-12 flex flex-col justify-between group overflow-hidden">
+<div class="absolute inset-0 opacity-20 group-hover:scale-105 transition-transform duration-700 pointer-events-none">
+<img class="w-full h-full object-cover grayscale" data-alt="Abstract architectural lines and glass reflections representing modern structural connectivity and high-tech infrastructure" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMNC0oHxalJ-7jEfqe2EJtuw1UlcU_xltzqnfsA4TB1tKjnZw7JrFCXNYC78toa-HJ11UlsrAPub4u5kExIlp9ood03qOwy4KVhdTLmFR8qhoNi_cBAlz9p1f45Dwx_jRnNnCZ6pW3Jk-FRAEPh7xp7uNWhRo4QcZFOxIEcBEcaCOl7fRlmt4CRHW9Yk8aUbYQaob65sDBd_ty0gyzeQhv8s4lYsQGVcYGufMfOkmpTnnMYJFWglKlytwrWxKBWxx1CN79aXMOH--c"/>
+</div>
+<div class="relative z-10">
+<span class="font-label uppercase text-[10px] tracking-widest text-secondary">Phase 01</span>
+<h3 class="font-headline text-4xl mt-4">Connectivity</h3>
+</div>
+<div class="relative z-10">
+<p class="font-body text-sm text-on-surface-variant mb-8 max-w-xs">Neural-link systems integrating every aspect of the driver's digital ecosystem with sub-millisecond precision.</p>
+<a class="font-label uppercase text-[10px] tracking-widest text-primary border-b border-primary/20 pb-1" href="#">Explore Interface</a>
+</div>
+</div>
+<div class="relative aspect-square md:aspect-auto md:h-[600px] bg-surface-container p-12 flex flex-col justify-between group overflow-hidden">
+<div class="absolute inset-0 opacity-20 group-hover:scale-105 transition-transform duration-700 pointer-events-none">
+<img class="w-full h-full object-cover grayscale" data-alt="Microscopic view of carbon fiber weave patterns representing lightweight structural engineering and advanced material safety" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnXz14gyZqthc1Cb1bh67LmJOAYnmR_QJfgA4k8pHoJr1ViGaB1u6vouTdx6-ipk2kYuntReHtARV1zq944N_M_Tfc-AK4dMRYoElkYE4uTvuWmzhBrF4Wp51PSxTCYzw6A6EA7z0P5c-oKCkd5SShdzJCXH_1hUS1zfDb85e4Aq5s3WZ-XxoOCOa5WNeGcloTPZm3DqwMk2Vub_cmT7N-sDEyYpiUa00Lb5gGkMnURxIUEK_2BO7NMYtWOhiXxghFmmtZQsfIlP-r"/>
+</div>
+<div class="relative z-10">
+<span class="font-label uppercase text-[10px] tracking-widest text-secondary">Phase 02</span>
+<h3 class="font-headline text-4xl mt-4">Safety</h3>
+</div>
+<div class="relative z-10">
+<p class="font-body text-sm text-on-surface-variant mb-8 max-w-xs">Proactive defensive matrices using LIDAR-scan technology to predict and negate hazards before they manifest.</p>
+<a class="font-label uppercase text-[10px] tracking-widest text-primary border-b border-primary/20 pb-1" href="#">Defense Systems</a>
+</div>
+</div>
+<div class="relative aspect-square md:aspect-auto md:h-[600px] bg-surface-container-high p-12 flex flex-col justify-between group overflow-hidden">
+<div class="absolute inset-0 opacity-20 group-hover:scale-105 transition-transform duration-700 pointer-events-none">
+<img class="w-full h-full object-cover grayscale" data-alt="Abstract energy flow lines moving through a dark metallic space symbolizing high-speed electrification and power" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdPLBaq3crj_soPNiYUgyxlRUgXZ39_awFcrpQaIk9sL_3yDOm0qeFi5E6DkTqlZInK-XTHkGZ1mXhlKYBTyxMF9Kynoo5xMvOIHmb0XBJg5V2ZS_XTdi7TEIDsSXuKSU8yBdMP8vpBPH06--NeeIDWOihmsgUCm-PO0kdK6Svma1KCKzliKW5FO8dJJ3zG3j6PAp_lFxzm6PM2cyOvrqziw6JPDn1LEmDlGSyrDfaEEsF6rWCwEZUUpJcejEkJzHi2W9R8uD2psoD"/>
+</div>
+<div class="relative z-10">
+<span class="font-label uppercase text-[10px] tracking-widest text-secondary">Phase 03</span>
+<h3 class="font-headline text-4xl mt-4">Electrification</h3>
+</div>
+<div class="relative z-10">
+<p class="font-body text-sm text-on-surface-variant mb-8 max-w-xs">Beyond the battery. A holistic approach to regenerative propulsion and ultra-high voltage charging efficiency.</p>
+<a class="font-label uppercase text-[10px] tracking-widest text-primary border-b border-primary/20 pb-1" href="#">Power Dynamics</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Story Card Previews: Asymmetric Layout -->
+<section class="py-32 px-12 bg-surface-container-low overflow-hidden">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col lg:flex-row gap-24 items-center mb-32">
+<div class="lg:w-1/2">
+<img class="w-full h-[500px] object-cover" data-alt="Industrial robot arm precisely assembling a high-tech vehicle frame in a clean, dark laboratory environment with focused blue light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZ_T00xM-0ctyTzHFZeXEW4abcHrV-g6bxv6ewiSHKAJkFtunYaoiTQkxiHxsexCUOzBtXWLh2BbEvE4JRSWho_74rvTDyFg_HdyH19px9fX36Vl1Qxscv24ZUPl_82bfXdlok4Mi0j9K-gPNMw_LoAkUZAWQ04wJ4ZqPmhN8ha2x84NtENRGRg2ZxPJRVdON-zCWK8cxjX0EXrdr426w_ixKOMpewRb5983oIfrgNyduxINCBINK0T0SmevIIoo63DCDM98XcSqLK"/>
+</div>
+<div class="lg:w-1/2">
+<span class="font-label uppercase text-xs tracking-[0.4em] text-outline mb-6 block">Feature Story</span>
+<h2 class="font-headline text-5xl italic mb-8 leading-tight">The Sculptural Chassis: <br/>Aerodynamics as Art.</h2>
+<p class="font-body text-on-surface-variant mb-12 leading-loose">
+                        How our engineers collaborated with aerospace physicists to create a frame that doesn't just cut through the air—it manipulates it. Every curve is a calculation. Every line is a mandate for performance.
+                    </p>
+<button class="bg-primary text-on-primary px-12 py-4 font-label uppercase text-xs tracking-widest hover:bg-primary-fixed transition-colors">Read Full Article</button>
+</div>
+</div>
+<div class="flex flex-col-reverse lg:flex-row gap-24 items-center">
+<div class="lg:w-1/2">
+<span class="font-label uppercase text-xs tracking-[0.4em] text-outline mb-6 block">Materials Tech</span>
+<h2 class="font-headline text-5xl italic mb-8 leading-tight">Sustainable Luxury: <br/>The Mycelium Interior.</h2>
+<p class="font-body text-on-surface-variant mb-12 leading-loose">
+                        Redefining the cabin through bio-engineered surfaces. Our research hub in Berlin is pioneering the use of lab-grown textiles that surpass leather in durability and silk in texture.
+                    </p>
+<button class="bg-primary text-on-primary px-12 py-4 font-label uppercase text-xs tracking-widest hover:bg-primary-fixed transition-colors">View Technical Specs</button>
+</div>
+<div class="lg:w-1/2">
+<img class="w-full h-[500px] object-cover" data-alt="Macro texture of futuristic bio-textile with intricate organic patterns and a soft metallic sheen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKg9kvuYnw8-Qqzv3LJJmqYRTfPq61OWyAzqiUlTGxVHBBMP18JMgLEIXsP7NIL7rIaGJPRewfRPIbXx24fR7MSp7dyKvMntfEZFe_cQ41MGRi8wEpq6IoAhynbaQPxzCegHqWw-qERJ_A1Yklkp8dv8LWDXh6DescoRXoCprDuFITUG6wj7OhtUl4pq_wwFbe6lmINz-buZmMy8veL3Zhii5rO5ZRD7cQbPFJ7TItizG_nNLTy-GXdn_qcR1fXzfKQmc5Jj4DLctY"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature List: Spec Sheet Style -->
+<section class="py-32 bg-surface">
+<div class="px-12 mb-20">
+<h2 class="font-headline text-6xl tracking-tighter">Performance Indices</h2>
+</div>
+<div class="border-t border-outline-variant/10">
+<div class="grid grid-cols-1 md:grid-cols-4 px-12 divide-y md:divide-y-0 md:divide-x divide-outline-variant/10">
+<div class="py-16 flex flex-col gap-2">
+<span class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Acceleration</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">1.92</span>
+<span class="font-label uppercase text-xs">Seconds</span>
+</div>
+<p class="text-[10px] font-body text-secondary mt-4">0–60 MPH Benchmarked</p>
+</div>
+<div class="py-16 md:px-12 flex flex-col gap-2">
+<span class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Drag Coefficient</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">0.19</span>
+<span class="font-label uppercase text-xs">CD</span>
+</div>
+<p class="text-[10px] font-body text-secondary mt-4">Optimized Airflow Matrix</p>
+</div>
+<div class="py-16 md:px-12 flex flex-col gap-2">
+<span class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Charging Rate</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">350</span>
+<span class="font-label uppercase text-xs">KW/H</span>
+</div>
+<p class="text-[10px] font-body text-secondary mt-4">Hyper-Flux V3 Technology</p>
+</div>
+<div class="py-16 md:px-12 flex flex-col gap-2">
+<span class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Neural Processing</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">2.5</span>
+<span class="font-label uppercase text-xs">Petaflops</span>
+</div>
+<p class="text-[10px] font-body text-secondary mt-4">On-Board AI Computation</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Resource List -->
+<section class="py-32 px-12 bg-surface-container-high relative overflow-hidden">
+<div class="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-surface-bright/20 to-transparent pointer-events-none"></div>
+<div class="max-w-4xl">
+<h2 class="font-headline text-4xl mb-16 italic">Technical Archives</h2>
+<div class="space-y-1">
+<div class="group flex items-center justify-between py-10 border-b border-outline-variant/20 hover:bg-surface-container transition-colors px-4">
+<div>
+<span class="font-label uppercase text-[10px] text-primary tracking-widest mb-2 block">White Paper / 2024</span>
+<h4 class="font-body text-xl tracking-tight">Eon Battery Thermal Management: Cold-Climate Optimization</h4>
+</div>
+<button class="flex items-center gap-4 text-secondary group-hover:text-tertiary transition-colors">
+<span class="font-label uppercase text-[10px] tracking-widest">Download PDF</span>
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+<div class="group flex items-center justify-between py-10 border-b border-outline-variant/20 hover:bg-surface-container transition-colors px-4">
+<div>
+<span class="font-label uppercase text-[10px] text-primary tracking-widest mb-2 block">Engineering Guide / 2024</span>
+<h4 class="font-body text-xl tracking-tight">LIDAR integration and V2X Communication Protocols</h4>
+</div>
+<button class="flex items-center gap-4 text-secondary group-hover:text-tertiary transition-colors">
+<span class="font-label uppercase text-[10px] tracking-widest">Download PDF</span>
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+<div class="group flex items-center justify-between py-10 border-b border-outline-variant/20 hover:bg-surface-container transition-colors px-4">
+<div>
+<span class="font-label uppercase text-[10px] text-primary tracking-widest mb-2 block">Case Study / 2023</span>
+<h4 class="font-body text-xl tracking-tight">Sustainable Sourcing: The TUT Carbon-Neutral Initiative</h4>
+</div>
+<button class="flex items-center gap-4 text-secondary group-hover:text-tertiary transition-colors">
+<span class="font-label uppercase text-[10px] tracking-widest">Download PDF</span>
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-slate-950 dark:bg-slate-950 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full border-t border-slate-800/30">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-6">TUT</div>
+<p class="font-sans text-[10px] tracking-widest uppercase text-slate-500 max-w-xs leading-loose">
+                Engineering excellence through precision and luxury. Defined by performance, refined by design.
+            </p>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-400 mb-4">Vehicles</span>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Sedans</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">SUVs</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Electric</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-400 mb-4">Company</span>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">About</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Sustainability</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Innovation</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-400 mb-4">Support</span>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Owners</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Manuals</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Legal</a>
+</div>
+<div class="col-span-full mt-20 pt-8 border-t border-slate-800/30 flex flex-col md:flex-row justify-between items-center gap-6">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-500">© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Privacy</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors" href="#">Cookies</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-200" href="#">USA/English</a>
+</div>
+</div>
+</footer>
+</body></html>

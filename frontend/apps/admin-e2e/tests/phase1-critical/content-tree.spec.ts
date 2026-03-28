@@ -1,271 +1,229 @@
 /**
  * Content Tree Browser E2E Tests — UI-007 → UI-022
  *
- * Opens the real /content page, verifies table rows appear from API data,
- * clicks into folders, checks breadcrumbs, uses search, verifies status
- * badges, tests action menus, and validates deep-link URLs.
+ * Self-contained: JSON fixtures imported directly, routes set up inline
+ * via test.beforeEach so Playwright's per-file scoping works correctly.
  */
-import { test, expect } from '../../src/fixtures/base.fixture';
+import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import rootChildren from '../../src/fixtures/data/content-children-root.json';
+import tutGbChildren from '../../src/fixtures/data/content-children-tut-gb.json';
+import tutGbEnChildren from '../../src/fixtures/data/content-children-tut-gb-en.json';
 
+// ── API mocks ─────────────────────────────────────────────────────────────
+test.beforeEach(async ({ page }) => {
+  if (process.env['USE_LIVE_API']) return;
+  await page.route('**/api/**', async (route) => {
+    const url = new URL(route.request().url());
+    const { pathname, searchParams } = url;
+
+    if (pathname.includes('/api/author/content/children')) {
+      const path = searchParams.get('path') ?? 'content';
+      const data =
+        path === 'content'            ? rootChildren :
+        path === 'content.tut-gb'     ? tutGbChildren :
+        path === 'content.tut-gb.en'  ? tutGbEnChildren :
+        [];
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
+    }
+    if (pathname.includes('/api/author/content/list')) {
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify({ content: tutGbEnChildren, totalElements: 1005, totalPages: 51, size: 20, number: 0 }),
+      });
+    }
+    if (pathname.includes('/api/author/sites')) {
+      return route.fulfill({
+        status: 200, contentType: 'application/json',
+        body: JSON.stringify([
+          { siteId: 'tut-gb', title: 'TUT Motors UK' },
+          { siteId: 'tut-de', title: 'TUT Motors DE' },
+          { siteId: 'tut-fr', title: 'TUT Motors FR' },
+          { siteId: 'tut-ca', title: 'TUT Motors CA' },
+        ]),
+      });
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+  });
+});
+
+// ── Selector helper ───────────────────────────────────────────────────────
+/** Locate a content table row by its exact node name (avoids URL-path column). */
+function rowByName(page: Page, name: string) {
+  return page.locator('tbody tr', { has: page.locator('span.font-semibold', { hasText: name }) }).first();
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────
 test.describe('Content Tree Page @smoke @regression', () => {
 
-  // ── UI-007: Content tree loads and shows top-level nodes ─────────────
-  test('UI-007: top-level content nodes are displayed from API', async ({ mockPage: page }) => {
-    // Wait for the API call to /api/author/content/children?path=content
+  test('UI-007: top-level content nodes are displayed from API', async ({ page }) => {
     const apiCall = page.waitForResponse(
       (r) => r.url().includes('/api/author/content/children') && r.url().includes('path=content'),
     );
-
     await page.goto('/content');
     await apiCall;
 
-    // Verify the heading loads
-    await expect(page.getByText('Content Tree')).toBeVisible();
-
-    // Verify the 5 top-level nodes from our mock are shown in the table
-    await expect(page.getByText('tut-gb')).toBeVisible();
-    await expect(page.getByText('tut-de')).toBeVisible();
-    await expect(page.getByText('tut-fr')).toBeVisible();
-    await expect(page.getByText('tut-ca')).toBeVisible();
-    await expect(page.getByText('experience-fragments')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Content Tree' })).toBeVisible();
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-de')).toBeVisible();
+    await expect(rowByName(page, 'tut-fr')).toBeVisible();
+    await expect(rowByName(page, 'tut-ca')).toBeVisible();
+    await expect(rowByName(page, 'experience-fragments')).toBeVisible();
   });
 
-  // ── UI-008: Clicking a folder navigates into it ──────────────────────
-  test('UI-008: clicking a folder row loads its children', async ({ mockPage: page }) => {
+  test('UI-008: clicking a folder row loads its children', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Set up a listener for the NEXT API call (when we click into tut-gb)
-    const childApiCall = page.waitForResponse(
-      (r) => r.url().includes('path=content.tut-gb'),
-    );
-
-    // Click the "tut-gb" row to navigate into it
-    await page.getByText('tut-gb').click();
-
-    // Wait for children API call
+    const childApiCall = page.waitForResponse((r) => r.url().includes('path=content.tut-gb'));
+    await rowByName(page, 'tut-gb').click();
     await childApiCall;
 
-    // Now the table should show the children of tut-gb (the "en" locale)
-    await expect(page.getByText('en')).toBeVisible();
+    await expect(rowByName(page, 'en')).toBeVisible();
   });
 
-  // ── UI-009: Breadcrumb trail updates as you navigate deeper ──────────
-  test('UI-009: breadcrumb shows navigation path', async ({ mockPage: page }) => {
+  test('UI-009: breadcrumb shows navigation path', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Initially, breadcrumb shows only "Content"
-    const breadcrumbArea = page.locator('.flex.items-center.gap-1.mb-2');
-    await expect(breadcrumbArea.getByText('Content')).toBeVisible();
+    const breadcrumb = page.locator('.flex.items-center.gap-1.mb-2');
+    await expect(breadcrumb.getByText('Content')).toBeVisible();
 
-    // Click into tut-gb
-    await page.getByText('tut-gb').click();
-    await page.waitForLoadState('networkidle');
+    await rowByName(page, 'tut-gb').click();
+    await expect(rowByName(page, 'en')).toBeVisible();
+    await expect(breadcrumb.getByText('tut-gb')).toBeVisible();
 
-    // Breadcrumb should now show: Content / tut-gb
-    await expect(breadcrumbArea.getByText('Content')).toBeVisible();
-    await expect(breadcrumbArea.getByText('tut-gb')).toBeVisible();
-
-    // Click into "en"
-    await page.getByText('en').click();
-    await page.waitForLoadState('networkidle');
-
-    // Breadcrumb: Content / tut-gb / en
-    await expect(breadcrumbArea.getByText('en')).toBeVisible();
+    await rowByName(page, 'en').click();
+    await expect(rowByName(page, 'home')).toBeVisible();
+    await expect(breadcrumb.getByText('en', { exact: true }).first()).toBeVisible();
   });
 
-  // ── UI-010: Clicking a breadcrumb segment navigates back ─────────────
-  test('UI-010: breadcrumb click navigates back to that level', async ({ mockPage: page }) => {
+  test('UI-010: breadcrumb click navigates back to that level', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Navigate: content → tut-gb → en (3 levels deep)
-    await page.getByText('tut-gb').click();
-    await page.waitForLoadState('networkidle');
-    await page.getByText('en').click();
-    await page.waitForLoadState('networkidle');
+    await rowByName(page, 'tut-gb').click();
+    await expect(rowByName(page, 'en')).toBeVisible();
+    await rowByName(page, 'en').click();
+    await expect(rowByName(page, 'home')).toBeVisible();
 
-    // Now we're 3 levels deep. Click "Content" in breadcrumb to go back to root.
-    const breadcrumbArea = page.locator('.flex.items-center.gap-1.mb-2');
-    await breadcrumbArea.getByText('Content').first().click();
-    await page.waitForLoadState('networkidle');
+    await page.locator('.flex.items-center.gap-1.mb-2').getByText('Content').first().click();
 
-    // Should be back at root level — top-level nodes visible again
-    await expect(page.getByText('tut-gb')).toBeVisible();
-    await expect(page.getByText('tut-de')).toBeVisible();
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-de')).toBeVisible();
   });
 
-  // ── UI-011: Up button navigates to parent folder ─────────────────────
-  test('UI-011: up-one-level button works', async ({ mockPage: page }) => {
+  test('UI-011: up-one-level button works', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Navigate into tut-gb
-    await page.getByText('tut-gb').click();
-    await page.waitForLoadState('networkidle');
+    await rowByName(page, 'tut-gb').click();
+    await expect(rowByName(page, 'en')).toBeVisible();
 
-    // Click the up (↑) button
     await page.getByTitle('Up one level').click();
-    await page.waitForLoadState('networkidle');
 
-    // Back at root — all top-level nodes visible
-    await expect(page.getByText('tut-de')).toBeVisible();
+    await expect(rowByName(page, 'tut-de')).toBeVisible();
   });
 
-  // ── UI-012: Status badges show correct labels ────────────────────────
-  test('UI-012: status badges show Live, Draft, In Review, Archived', async ({ mockPage: page }) => {
+  test('UI-012: status badges show Live, Draft, In Review, Archived', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Navigate into tut-gb → en to see pages with various statuses
-    await page.getByText('tut-gb').click();
-    await page.waitForLoadState('networkidle');
-    await page.getByText('en').click();
-    await page.waitForLoadState('networkidle');
+    await rowByName(page, 'tut-gb').click();
+    await expect(rowByName(page, 'en')).toBeVisible();
+    await rowByName(page, 'en').click();
+    await expect(rowByName(page, 'home')).toBeVisible();
 
-    // Verify status badges exist for different statuses
-    // Our mock has: home=PUBLISHED(Live), innovation=DRAFT, safety=IN_REVIEW, contact=ARCHIVED
+    // home=PUBLISHED(Live), innovation=DRAFT, safety=IN_REVIEW, contact=ARCHIVED
     await expect(page.getByText('Live').first()).toBeVisible();
     await expect(page.getByText('Draft').first()).toBeVisible();
     await expect(page.getByText('In Review').first()).toBeVisible();
     await expect(page.getByText('Archived').first()).toBeVisible();
   });
 
-  // ── UI-013: Search filters table rows by name ────────────────────────
-  test('UI-013: search filters content rows', async ({ mockPage: page }) => {
+  test('UI-013: search filters content rows', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Navigate to tut-gb/en which has 7 pages
-    await page.getByText('tut-gb').click();
-    await page.waitForLoadState('networkidle');
-    await page.getByText('en').click();
-    await page.waitForLoadState('networkidle');
+    await rowByName(page, 'tut-gb').click();
+    await expect(rowByName(page, 'en')).toBeVisible();
+    await rowByName(page, 'en').click();
+    await expect(rowByName(page, 'home')).toBeVisible();
 
-    // Type "model" in the search box
-    const searchInput = page.getByPlaceholder('Filter by name or URL...');
-    await searchInput.fill('model');
+    await page.getByPlaceholder('Filter by name or URL...').fill('model');
 
-    // Only "models" row should be visible
-    await expect(page.getByText('models')).toBeVisible();
-
-    // "home" should NOT be visible (filtered out)
-    await expect(page.getByText('home')).not.toBeVisible();
+    await expect(rowByName(page, 'models')).toBeVisible();
+    await expect(rowByName(page, 'home')).not.toBeVisible();
   });
 
-  // ── UI-014: Empty folder shows empty state message ───────────────────
-  test('UI-014: empty folder shows empty message', async ({ mockPage: page }) => {
+  test('UI-014: empty folder shows empty message', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'experience-fragments')).toBeVisible();
 
-    // Navigate to experience-fragments (returns [] in our mock)
-    await page.getByText('experience-fragments').click();
-    await page.waitForLoadState('networkidle');
+    await rowByName(page, 'experience-fragments').click();
 
-    // Should show empty state message
     await expect(page.getByText('This folder is empty.')).toBeVisible();
   });
 
-  // ── UI-015: Loading skeletons appear while data fetches ──────────────
   test('UI-015: skeleton rows shown during loading', async ({ page }) => {
-    // Set up a slow API response (2 second delay)
+    // Override with a slow response so skeleton is visible before data arrives
     await page.route('**/api/author/content/children*', async (route) => {
       await new Promise((r) => setTimeout(r, 2000));
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([]),
-      });
+      await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
     });
-    await page.route('**/api/**', (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
-    );
 
     await page.goto('/content');
 
-    // During the 2-second delay, skeleton placeholder rows should be visible
-    // The skeleton rows have small colored div placeholders
-    const skeletonRow = page.locator('table tbody tr').first();
-    await expect(skeletonRow).toBeVisible();
+    await expect(page.locator('table tbody tr').first()).toBeVisible();
   });
 
-  // ── UI-016: Action menu opens with correct options ───────────────────
-  test('UI-016: three-dot action menu shows Edit, Preview, Publish', async ({ mockPage: page }) => {
+  test('UI-016: three-dot action menu shows Edit, Preview, Publish', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Navigate to tut-gb/en to see page rows
-    await page.getByText('tut-gb').click();
-    await page.waitForLoadState('networkidle');
-    await page.getByText('en').click();
-    await page.waitForLoadState('networkidle');
+    await rowByName(page, 'tut-gb').click();
+    await expect(rowByName(page, 'en')).toBeVisible();
+    await rowByName(page, 'en').click();
+    await expect(rowByName(page, 'home')).toBeVisible();
 
-    // Find the action menu button (⋮) on the "home" row and click it
-    const homeRow = page.locator('tr', { hasText: 'home' });
-    const actionBtn = homeRow.locator('button').last();
-    await actionBtn.click();
+    const homeRow = rowByName(page, 'home');
+    await homeRow.locator('button').last().click();
 
-    // The dropdown menu should appear with action items
-    // Check for at least Edit and Preview options
-    await expect(page.getByText('Edit')).toBeVisible();
-    await expect(page.getByText('Preview')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Edit', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Preview', exact: true })).toBeVisible();
   });
 
-  // ── UI-019: No mock data — all content comes from real API calls ─────
   test('UI-019: all data is fetched from API, no hardcoded content', async ({ page }) => {
     const apiCalls: string[] = [];
-
-    // Intercept all API calls and record them, then return data
-    await page.route('**/api/**', async (route) => {
-      apiCalls.push(route.request().url());
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([]),
-      });
-    });
+    page.on('request', (req) => { if (req.url().includes('/api/')) apiCalls.push(req.url()); });
 
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
 
-    // Verify that at least one API call was made to fetch content children
-    const childrenCall = apiCalls.find((url) => url.includes('/api/author/content/children'));
-    expect(childrenCall).toBeTruthy();
+    expect(apiCalls.find((u) => u.includes('/api/author/content/children'))).toBeTruthy();
   });
 
-  // ── UI-022: Deep-link URL loads the correct folder ───────────────────
-  test('UI-022: direct URL with path param loads correct children', async ({ mockPage: page }) => {
-    // This test is for when we support deep-link URLs.
-    // Navigate directly to /content — the page always starts at root "content".
-    // If deep-link support exists (e.g., ?path=content.tut-gb.en), test that.
-
+  test('UI-022: direct URL with path param loads correct children', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
-
-    // Verify root children are loaded (proves the page reads the path and fetches)
-    await expect(page.getByText('tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-de')).toBeVisible();
   });
 
-  // ── UI-007b: Row count indicator shows correct number ────────────────
-  test('UI-007b: item count footer shows correct number', async ({ mockPage: page }) => {
+  test('UI-007b: item count footer shows correct number', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'experience-fragments')).toBeVisible();
 
-    // Footer should show "Showing 5 items in Content" (5 top-level nodes)
     await expect(page.getByText(/Showing.*5.*items/)).toBeVisible();
   });
 
-  // ── UI-007c: Checkbox select-all works ───────────────────────────────
-  test('UI-007c: select-all checkbox selects all rows', async ({ mockPage: page }) => {
+  test('UI-007c: select-all checkbox selects all rows', async ({ page }) => {
     await page.goto('/content');
-    await page.waitForLoadState('networkidle');
+    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'experience-fragments')).toBeVisible();
 
-    // Click the header checkbox (select all)
-    const headerCheckbox = page.locator('thead input[type="checkbox"]');
-    await headerCheckbox.click();
+    await page.locator('thead input[type="checkbox"]').click();
 
-    // The "X selected" button should appear showing 5 selected
     await expect(page.getByText('5 selected')).toBeVisible();
   });
 });

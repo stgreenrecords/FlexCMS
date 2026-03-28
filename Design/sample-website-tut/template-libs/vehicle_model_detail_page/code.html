@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,700;1,6..72,400;1,6..72,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error": "#ee7d77",
+                        "primary-fixed": "#e2e2e2",
+                        "surface-variant": "#0a2257",
+                        "on-secondary-fixed-variant": "#4d5d73",
+                        "on-tertiary": "#515c70",
+                        "on-primary-container": "#d0d0d0",
+                        "inverse-surface": "#faf8ff",
+                        "surface": "#070d1f",
+                        "secondary-fixed-dim": "#c5d6f0",
+                        "tertiary-fixed": "#dae6fe",
+                        "on-tertiary-container": "#495468",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-fixed-dim": "#ccd7ef",
+                        "inverse-primary": "#5e5f60",
+                        "surface-container-high": "#0b1d48",
+                        "on-secondary-fixed": "#314055",
+                        "surface-bright": "#082768",
+                        "on-tertiary-fixed": "#374155",
+                        "secondary-container": "#2d3c51",
+                        "primary-dim": "#b8b9b9",
+                        "surface-dim": "#070d1f",
+                        "error-container": "#7f2927",
+                        "primary-container": "#454747",
+                        "inverse-on-surface": "#4f5469",
+                        "background": "#070d1f",
+                        "on-tertiary-fixed-variant": "#535e72",
+                        "on-primary-fixed-variant": "#5a5c5c",
+                        "on-surface-variant": "#96a9e6",
+                        "secondary-dim": "#8f9fb7",
+                        "on-secondary-container": "#b0c0da",
+                        "tertiary": "#f0f3ff",
+                        "tertiary-container": "#dae6fe",
+                        "on-primary-fixed": "#3e4040",
+                        "outline-variant": "#32457c",
+                        "primary": "#c6c6c7",
+                        "surface-container": "#0a1839",
+                        "primary-fixed-dim": "#d4d4d4",
+                        "surface-container-lowest": "#000000",
+                        "on-background": "#dfe4ff",
+                        "on-surface": "#dfe4ff",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-low": "#09122b",
+                        "outline": "#6073ad",
+                        "surface-container-highest": "#0a2257",
+                        "on-primary": "#3f4041",
+                        "on-error": "#490106",
+                        "error-dim": "#bb5551",
+                        "tertiary-dim": "#ccd7ef",
+                        "secondary": "#8f9fb7",
+                        "on-error-container": "#ff9993",
+                        "on-secondary": "#102134"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(7, 13, 31, 0) 60%, rgba(7, 13, 31, 1) 100%);
+        }
+        .metallic-cta {
+            background: linear-gradient(45deg, #c6c6c7 0%, #b8b9b9 100%);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #070d1f; }
+        ::-webkit-scrollbar-thumb { background: #32457c; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 rounded-none bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex gap-10">
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 text-[12px] uppercase" href="#">Sedans</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 text-[12px] uppercase" href="#">SUVs</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 text-[12px] uppercase" href="#">Electric</a>
+<a class="font-sans tracking-widest text-slate-100 font-bold border-b border-slate-100 pb-1 text-[12px] uppercase" href="#">Build</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-all duration-500 text-[10px] uppercase">Sign In</button>
+<button class="bg-primary text-on-primary px-6 py-2 text-[10px] font-sans tracking-widest uppercase hover:bg-primary-fixed transition-colors">Find a Dealer</button>
+</div>
+</nav>
+<main>
+<!-- Product Hero -->
+<section class="relative h-screen w-full flex items-end pb-24 overflow-hidden">
+<img alt="TUT S Flagship Hero" class="absolute inset-0 w-full h-full object-cover z-0" data-alt="Sleek silver luxury electric sedan parked on a minimalist concrete platform at twilight with sharp architectural shadows and metallic reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9HK3H8wzRfDC-aRtAimDuCWXfJzf_1VKupRSrsnD07StwEt_6qOQCwWIvWTDAQN2Kr9zVel4V2TeYkWgp4w2Zo3nY2FAWb81W-NFaDjBOm_We4LB-NeeIvawRYr8EzWPOpMIxoyDoOjS8wDbhfVGLJQYz3uwX5eYAVANoi2MMqgkJv8-Sr9kC4OjR9NPQqU02zWNbjQAaWDJO7BXKVH86FjSTpOFMfDwmtMLn_rx7aKusayEr4Z_BEglSVDWzjrIvuiuh7EnLoDnN"/>
+<div class="absolute inset-0 hero-gradient z-10"></div>
+<div class="relative z-20 px-12 w-full grid grid-cols-12 gap-6 items-end">
+<div class="col-span-12 md:col-span-6">
+<span class="font-label text-on-surface-variant tracking-[0.3em] text-[12px] uppercase mb-4 block">The Pinnacle of Precision</span>
+<h1 class="font-headline italic text-7xl md:text-9xl tracking-tight text-on-surface leading-none">TUT S <span class="text-primary-dim">Flagship</span></h1>
+</div>
+<div class="col-span-12 md:col-span-6 flex flex-col md:items-end gap-8">
+<div class="flex gap-12">
+<div class="flex flex-col">
+<span class="font-headline text-4xl text-primary">2.1s</span>
+<span class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">0-60 MPH</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline text-4xl text-primary">480mi</span>
+<span class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">Range (est.)</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline text-4xl text-primary">1020hp</span>
+<span class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">Peak Power</span>
+</div>
+</div>
+<button class="metallic-cta text-on-primary px-12 py-4 font-label font-bold tracking-[0.2em] uppercase text-sm">Experience the Drive</button>
+</div>
+</div>
+</section>
+<!-- Product Gallery Bento -->
+<section class="py-32 px-12 bg-surface">
+<div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-[800px]">
+<div class="md:col-span-2 md:row-span-2 relative group overflow-hidden">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Interior cockpit of a high-end vehicle featuring panoramic glass roof, brushed aluminum accents, and deep navy leather seats in soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuAmgaxZAO42c6CmJ0yg0GDSSNOf5OOW8Vyojszxp_oDCLRsMKlXW2_SDCrZpA_Aj-qIPHMp-GreFUJXiGAHXegFyRP-m7GX_OlQU7kzla3vn8akFOO6BfguPbXmiT3xcOj_n2W0PPJEEwCA7eEB-OVybKQThkqxtPcjxSURQsfGmPjJoUUI2VVtr1sN-PbTIo0WSUfE9MxIzRWCBaNni-66LjBuaJzdJOVqC9USoP6jvPyqbOTDv4ClZwy05_BRAEF5EW6wTFXsaB"/>
+<div class="absolute bottom-6 left-6 opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="font-label text-[10px] tracking-widest uppercase bg-surface/80 px-4 py-2">The Sanctuary Interior</p>
+</div>
+</div>
+<div class="md:col-span-2 relative group overflow-hidden">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Macro close-up of a precision-engineered car wheel rim with carbon ceramic brakes and detailed texture on the alloy surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXHP9wocO4m6Ny8kzw2rSandgzS3HeVv5HXuxakauFGLjb-TG6T7hnJbNnfJ9Pr3Gh0OVMMvZCoH1QLnP8dINwdVnS_Suj9nwpxyZ0JQYss9RgdFAZloeeEuvlwE2XF4GU6OwR0Y7dc5IOmLiep-PDA6XeYHwuVyl7gsiOEm95IWmxsvTI-QyTCN7IapSMhywjrkffWcDjW_K9e23navDuvm_98swGOrOmvdQBCpc8FyyUXL-vMzBb2X4Ku__gV6qC1Ogm741PTXG-"/>
+<div class="absolute top-6 right-6">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="settings_input_component">settings_input_component</span>
+</div>
+</div>
+<div class="relative group overflow-hidden">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Extreme close-up of LED headlight array with crystalline structures reflecting cool blue light in a dark studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9YmekH1vnsvxbDBS78ebbosd7o5jQ5qXGOj9Jx47dY8zyyQV1QnhkbwYikHj37rXtRGcSclhtSALXE1xHzcFJw2edEARZcACr2t_zMyJ8zzSHhEyQXWK0JDky3kC1pEV3isjIqgs1gtOhXhznhQ8HhljbSPCaxiINHkvQyqsjELnXxAdO2zv4-3gUPQ8O4qlFkYS9egs5Wo-ZO3jMFh1xlEILGKiCmbDIKDHoLpW5D3u8W0bzVh0AzBXv2cGC4znl0OsRpZKsY8Il"/>
+</div>
+<div class="relative group overflow-hidden bg-surface-container-high flex flex-col justify-center p-8">
+<h3 class="font-headline italic text-3xl mb-4">Sculpted by Physics</h3>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Every curve on the TUT S is engineered to channel air with surgical precision, achieving a drag coefficient of 0.19.</p>
+</div>
+</div>
+</section>
+<!-- Feature List -->
+<section class="py-32 bg-surface-container-low border-y border-outline-variant/10">
+<div class="px-12 grid grid-cols-1 md:grid-cols-3 gap-20">
+<div class="flex flex-col gap-6">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="auto_awesome">auto_awesome</span>
+<h4 class="font-headline italic text-4xl">Neural Drive</h4>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed">Our proprietary AI-driven suspension predicts road imperfections 500 meters ahead, adjusting damping in real-time for an effortless glide.</p>
+</div>
+<div class="flex flex-col gap-6">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="bolt">bolt</span>
+<h4 class="font-headline italic text-4xl">Hyper Charge</h4>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed">The 900V architecture enables a 10% to 80% charge in just 14 minutes at any TUT Ultra-High station.</p>
+</div>
+<div class="flex flex-col gap-6">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="verified_user">verified_user</span>
+<h4 class="font-headline italic text-4xl">Shield 360</h4>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed">Redundant LIDAR and ultrasonic sensors create a digital cocoon, ensuring uncompromising safety across all environmental conditions.</p>
+</div>
+</div>
+</section>
+<!-- Product Specs Table -->
+<section class="py-32 px-12 max-w-5xl mx-auto">
+<div class="text-center mb-24">
+<h2 class="font-headline italic text-6xl mb-4">The Technical Dossier</h2>
+<div class="h-1 w-24 bg-primary mx-auto"></div>
+</div>
+<div class="space-y-0">
+<div class="grid grid-cols-2 py-8 border-b border-outline-variant/20 hover:bg-surface-container transition-colors px-4">
+<span class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant self-center">Performance</span>
+<div class="space-y-4">
+<div class="flex justify-between items-baseline">
+<span class="font-body text-sm font-bold">Top Speed</span>
+<span class="font-body text-sm text-primary">200 mph</span>
+</div>
+<div class="flex justify-between items-baseline">
+<span class="font-body text-sm font-bold">Quarter Mile</span>
+<span class="font-body text-sm text-primary">9.2s</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 py-8 border-b border-outline-variant/20 hover:bg-surface-container transition-colors px-4">
+<span class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant self-center">Battery &amp; Charging</span>
+<div class="space-y-4">
+<div class="flex justify-between items-baseline">
+<span class="font-body text-sm font-bold">Capacity</span>
+<span class="font-body text-sm text-primary">115 kWh</span>
+</div>
+<div class="flex justify-between items-baseline">
+<span class="font-body text-sm font-bold">Charging Rate</span>
+<span class="font-body text-sm text-primary">350 kW DC</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 py-8 border-b border-outline-variant/20 hover:bg-surface-container transition-colors px-4">
+<span class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant self-center">Dimensions</span>
+<div class="space-y-4">
+<div class="flex justify-between items-baseline">
+<span class="font-body text-sm font-bold">Wheelbase</span>
+<span class="font-body text-sm text-primary">122.4 in</span>
+</div>
+<div class="flex justify-between items-baseline">
+<span class="font-body text-sm font-bold">Cargo Volume</span>
+<span class="font-body text-sm text-primary">28 cu ft</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Quote Request Form -->
+<section class="py-32 px-12 bg-surface-container-low">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-24">
+<div>
+<h3 class="font-headline italic text-5xl mb-8">Secure Your Position</h3>
+<p class="font-body text-on-surface-variant text-lg mb-12 leading-relaxed">The TUT S Flagship is produced in limited annual quantities to maintain the highest standards of hand-finished assembly. Begin your consultation today.</p>
+<div class="p-8 border border-outline-variant/20 bg-surface">
+<div class="flex items-start gap-6">
+<span class="material-symbols-outlined text-primary" data-icon="support_agent">support_agent</span>
+<div>
+<h5 class="font-label text-[10px] tracking-widest uppercase mb-1">Personal Concierge</h5>
+<p class="font-body text-xs text-on-surface-variant">Every Flagship owner is assigned a dedicated concierge for the lifetime of the vehicle.</p>
+</div>
+</div>
+</div>
+</div>
+<form class="space-y-8">
+<div class="grid grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">First Name</label>
+<input class="w-full bg-transparent border-b border-outline-variant/40 focus:border-primary transition-all py-2 outline-none" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">Last Name</label>
+<input class="w-full bg-transparent border-b border-outline-variant/40 focus:border-primary transition-all py-2 outline-none" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">Email Address</label>
+<input class="w-full bg-transparent border-b border-outline-variant/40 focus:border-primary transition-all py-2 outline-none" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="font-label text-[10px] tracking-widest uppercase text-on-surface-variant">Preferred Configuration</label>
+<select class="w-full bg-surface border-b border-outline-variant/40 focus:border-primary transition-all py-2 outline-none">
+<option>Standard Range</option>
+<option>Performance Edition</option>
+<option>The Atelier Edition (Bespoke)</option>
+</select>
+</div>
+<button class="w-full metallic-cta text-on-primary py-5 font-label font-bold tracking-[0.2em] uppercase text-sm mt-8" type="submit">Submit Request</button>
+</form>
+</div>
+</section>
+<!-- Dealer Locator / Map -->
+<section class="h-[500px] w-full relative flex items-center justify-center">
+<img alt="TUT Experience Center" class="absolute inset-0 w-full h-full object-cover brightness-50" data-alt="Modern minimalist automotive showroom with polished dark floors, huge glass windows, and a silver luxury sedan under dramatic spotlights" data-location="New York City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5YKrWb4EGM2omeUEMPaH-GRMEQDPP-vknqGY-imTFcfHohsJdgsFs44GuP5oCcQaoglvnpX88m_FNBWLupEaOA-Znhk03yZ3ZCMLnomEQEh4y3vT4lksUn_CLSf8m0L5UbTxOu3Y07vNa7FfL6iVdk253mBdtBBEmLyW02SAK9w4ETs999nEFGjnrBDtjSAwARDcTmkCcS87INcxrtCJ_lZB5bcYQzLdPXal-02HZgykkzu6dAFNkPaGGSqY-wxeGN-2WW6i2ge8P"/>
+<div class="relative z-10 glass-nav p-12 text-center max-w-2xl">
+<span class="material-symbols-outlined text-primary text-4xl mb-4" data-icon="location_on">location_on</span>
+<h3 class="font-headline italic text-4xl mb-6">Experience it in Person</h3>
+<p class="font-body text-sm mb-8 text-on-surface-variant">Visit one of our 12 North American Experience Centers to feel the materials and drive the future.</p>
+<div class="flex gap-4 justify-center">
+<input class="bg-surface border border-outline-variant/40 px-6 py-2 text-sm font-label tracking-widest outline-none focus:border-primary" placeholder="Enter Zip Code" type="text"/>
+<button class="bg-primary text-on-primary px-8 py-2 font-label text-[10px] tracking-widest uppercase">Locate</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 dark:bg-slate-950 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full border-t border-slate-800/30">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-6">TUT</div>
+<p class="font-sans text-[10px] tracking-widest text-slate-500 uppercase leading-loose">The Precision Atelier.<br/>Engineering luxury for the next era of mobility.</p>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="font-sans uppercase tracking-widest text-[10px] text-slate-300 font-bold mb-2">Vehicles</h5>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 translate-x-1 transition-transform duration-300" href="#">TUT S</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">TUT X</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">TUT 3</a>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="font-sans uppercase tracking-widest text-[10px] text-slate-300 font-bold mb-2">Company</h5>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Our Story</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Careers</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Newsroom</a>
+</div>
+<div class="flex flex-col gap-4">
+<h5 class="font-sans uppercase tracking-widest text-[10px] text-slate-300 font-bold mb-2">Support</h5>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Owners</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Service</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200" href="#">Contact</a>
+</div>
+<div class="col-span-full border-t border-slate-800/20 pt-12 flex justify-between items-center">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-500">© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100" href="#">Privacy</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100" href="#">Legal</a>
+<a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100" href="#">USA/English</a>
+</div>
+</div>
+</footer>
+</body></html>

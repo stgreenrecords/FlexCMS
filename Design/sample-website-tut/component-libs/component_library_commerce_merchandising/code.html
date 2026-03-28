@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TUT USA | Commerce &amp; Merchandising Component Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-container": "#dae6fe",
+              "secondary-container": "#2d3c51",
+              "primary-container": "#454747",
+              "surface-bright": "#082768",
+              "secondary-fixed": "#d3e4fe",
+              "tertiary-fixed": "#dae6fe",
+              "surface-container-high": "#0b1d48",
+              "surface-variant": "#0a2257",
+              "on-tertiary-container": "#495468",
+              "on-primary-fixed": "#3e4040",
+              "inverse-surface": "#faf8ff",
+              "error-container": "#7f2927",
+              "background": "#070d1f",
+              "on-secondary-container": "#b0c0da",
+              "outline": "#6073ad",
+              "outline-variant": "#32457c",
+              "on-tertiary": "#515c70",
+              "inverse-primary": "#5e5f60",
+              "on-surface": "#dfe4ff",
+              "surface-container-lowest": "#000000",
+              "secondary": "#8f9fb7",
+              "on-secondary": "#102134",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "surface-dim": "#070d1f",
+              "on-primary-container": "#d0d0d0",
+              "primary": "#c6c6c7",
+              "primary-dim": "#b8b9b9",
+              "on-tertiary-fixed": "#374155",
+              "on-background": "#dfe4ff",
+              "on-secondary-fixed": "#314055",
+              "tertiary-dim": "#ccd7ef",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "on-error": "#490106",
+              "on-primary": "#3f4041",
+              "secondary-fixed-dim": "#c5d6f0",
+              "inverse-on-surface": "#4f5469",
+              "on-error-container": "#ff9993",
+              "error-dim": "#bb5551",
+              "primary-fixed-dim": "#d4d4d4",
+              "on-surface-variant": "#96a9e6",
+              "error": "#ee7d77",
+              "surface-container": "#0a1839",
+              "surface-tint": "#c6c6c7",
+              "surface-container-low": "#09122b",
+              "surface": "#070d1f",
+              "on-tertiary-fixed-variant": "#535e72",
+              "primary-fixed": "#e2e2e2",
+              "tertiary": "#f0f3ff",
+              "surface-container-highest": "#0a2257",
+              "secondary-dim": "#8f9fb7",
+              "tertiary-fixed-dim": "#ccd7ef"
+            },
+            fontFamily: {
+              "headline": ["Newsreader", "serif"],
+              "body": ["Manrope", "sans-serif"],
+              "label": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .glass-panel {
+        background: rgba(10, 34, 87, 0.6);
+        backdrop-filter: blur(20px);
+      }
+      .ghost-border {
+        border: 1px solid rgba(50, 69, 124, 0.15);
+      }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex items-center space-x-12 font-sans tracking-widest text-[11px] uppercase">
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Sedans</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">SUVs</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Electric</a>
+<a class="text-slate-100 font-bold border-b border-slate-100 pb-1" href="#">Build</a>
+</div>
+<div class="flex items-center space-x-8">
+<button class="font-sans tracking-widest text-[10px] uppercase text-slate-400 hover:text-slate-100 transition-all duration-500">Sign In</button>
+<button class="bg-primary text-on-primary px-8 py-3 font-sans tracking-widest text-[10px] uppercase hover:bg-primary-fixed transition-all duration-300">Find a Dealer</button>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-12 max-w-[1600px] mx-auto">
+<!-- Header Section -->
+<header class="mb-24">
+<h1 class="font-headline italic text-6xl md:text-8xl mb-6 text-tertiary">The Precision Catalog</h1>
+<p class="font-body text-on-surface-variant max-w-2xl leading-relaxed">A visual exploration of the TUT USA Commerce ecosystem. From technical spec sheets to bespoke configurators, every interaction is machined for high-performance retail.</p>
+</header>
+<!-- Bento Grid: Featured Components -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-24">
+<!-- Main Product Detail Card (Large) -->
+<div class="md:col-span-8 bg-surface-container-low ghost-border overflow-hidden">
+<div class="grid md:grid-cols-2 h-full">
+<div class="relative bg-surface-container-highest aspect-square md:aspect-auto overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 transition-all duration-700" data-alt="Close-up side profile of a dark metallic luxury sedan featuring sharp aerodynamic lines and chrome highlights in a minimalist studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4p4Uqsg91-xmy_7IFMnwjVwSaQ9ErQeDwfeb3V7E6V6C7s4Rix57VlUMFXnti8g0mH6GiHwi19sZUjAITV2lqutg1nnfJjMJ15PZb0vxye3ZatBY9bYh__Ez2GnB750YlFd2nVFlWYTNg-AcYfMlsYR4jD_N2Km_dOvMxcw_fq_R9FHHTVTVpfn6fsS4scrgUrX2G9Qzi092FRyE9v5LXM1c1KbiXIsYGkzlDoxpgH-zdgb79PZZYpEC8ojKcZEyHqq6-jvlyWqPJ"/>
+<div class="absolute top-6 left-6 space-y-2">
+<span class="bg-primary text-on-primary px-4 py-1 text-[10px] tracking-widest uppercase font-bold">New Release</span>
+</div>
+<div class="absolute bottom-6 left-6 flex space-x-2">
+<div class="w-2 h-2 bg-primary"></div>
+<div class="w-2 h-2 bg-outline-variant"></div>
+<div class="w-2 h-2 bg-outline-variant"></div>
+</div>
+</div>
+<div class="p-12 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-8">
+<h2 class="font-headline text-4xl italic text-tertiary">Model Zenith</h2>
+<button class="text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="favorite" data-weight="fill">favorite</span>
+</button>
+</div>
+<div class="flex items-center space-x-2 mb-8">
+<div class="flex text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star_half">star_half</span>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">(128 Reviews)</span>
+</div>
+<p class="text-on-surface-variant font-body mb-8 leading-relaxed">Engineering excellence meets ethereal comfort. The Zenith is our commitment to the future of grand touring.</p>
+<div class="space-y-6 mb-12">
+<div class="flex items-center justify-between">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Selected Variant</span>
+<span class="font-body text-sm">Performance Edition</span>
+</div>
+<div class="flex space-x-3">
+<button class="w-8 h-8 bg-slate-200 border-2 border-primary"></button>
+<button class="w-8 h-8 bg-slate-900 border-2 border-transparent hover:border-outline"></button>
+<button class="w-8 h-8 bg-blue-900 border-2 border-transparent hover:border-outline"></button>
+</div>
+</div>
+</div>
+<div class="flex items-end justify-between">
+<div class="flex flex-col">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Starting at</span>
+<span class="font-headline text-3xl italic">$142,500</span>
+</div>
+<button class="bg-primary text-on-primary px-10 py-4 font-sans tracking-widest text-[10px] uppercase hover:bg-primary-fixed transition-all duration-300">Reserve Now</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Mini Cart / Summary (Tall) -->
+<div class="md:col-span-4 glass-panel ghost-border p-10 flex flex-col">
+<div class="flex justify-between items-center mb-10">
+<h3 class="font-label text-[11px] uppercase tracking-[0.2em] font-bold">Your Configuration</h3>
+<span class="font-body text-sm text-on-surface-variant">03 Items</span>
+</div>
+<div class="flex-grow space-y-8 overflow-y-auto no-scrollbar pr-2 mb-10">
+<!-- Cart Item -->
+<div class="flex gap-4">
+<div class="w-20 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover grayscale" data-alt="Minimalist top view of a luxury car interior console with carbon fiber finish and leather stitching" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6kuyYfFIOA6-8ogUSZBwXyskP8zeT6TJsgXyEenGCSwbpNLEq2y__EU_VQ4HFX8jHiaxzEZgmzo12loBiw5NYgbeQFNYx3tei03Ip4k05EyWL3a0n5quyfdXTSTlQaWAxGAd2IMtJSfSp6OSDsmR7wJMNdxoEhUDNuPhcL_BWlg5U_WpNyp9op-0QZz-g5ecdSwdleQyghO41_d5Z3IT3M75XQdAFeNiG0TB-vv_kJi4bmJNwruge_KL9a3bgTExYwYX6Hs-UP9FZ"/>
+</div>
+<div class="flex-grow flex flex-col justify-between py-1">
+<div class="flex justify-between">
+<span class="font-body text-sm">Titanium Trim</span>
+<span class="font-body text-sm">$4,200</span>
+</div>
+<button class="text-[10px] uppercase tracking-widest text-on-surface-variant self-start hover:text-error transition-colors">Remove</button>
+</div>
+</div>
+<!-- Cart Item -->
+<div class="flex gap-4">
+<div class="w-20 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover grayscale" data-alt="Macro photo of a bespoke aluminum wheel rim with precise machining marks and deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7zn1R-SWE8SRVWKDvUMeWH9Z-tsvSqtk3cNOOspU41uZ-gpLMoe_iBEoVX9dAO6qjsFbbhJPg5Wm6fl0Rym9lWx4zog2aKnCb98cPjkcqgAzXdP19B9iVNJB1-KCVOx-0ElBiCIjL_S8M9ehqMCrb55hYuqSZ99xOFfbHXI5liSm87zcNeXcLr82j6KixjTM-SrezNOeUDAiCx3zBWjeEmEKdsjyHM5CD_mrUCELGjTqnxVx3nLfROFVC9UvOVeNF_hl8mqa4itIe"/>
+</div>
+<div class="flex-grow flex flex-col justify-between py-1">
+<div class="flex justify-between">
+<span class="font-body text-sm">21" Forge Wheels</span>
+<span class="font-body text-sm">$8,500</span>
+</div>
+<button class="text-[10px] uppercase tracking-widest text-on-surface-variant self-start hover:text-error transition-colors">Remove</button>
+</div>
+</div>
+</div>
+<div class="border-t border-outline-variant/30 pt-8 space-y-4">
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-label text-[10px] uppercase tracking-widest">Subtotal</span>
+<span class="font-body text-sm">$155,200</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-label text-[10px] uppercase tracking-widest">Est. Taxes</span>
+<span class="font-body text-sm">$12,416</span>
+</div>
+<div class="flex justify-between items-end pt-4">
+<span class="font-label text-[10px] uppercase tracking-[0.2em] font-bold">Total</span>
+<span class="font-headline text-3xl italic">$167,616</span>
+</div>
+<div class="pt-8 space-y-3">
+<button class="w-full bg-primary text-on-primary py-4 font-sans tracking-widest text-[10px] uppercase hover:bg-primary-fixed transition-all duration-300">Proceed to Checkout</button>
+<div class="flex items-center space-x-2 bg-surface-container-low p-3 ghost-border">
+<input class="bg-transparent border-none focus:ring-0 text-[10px] uppercase tracking-widest flex-grow font-sans" placeholder="COUPON CODE" type="text"/>
+<button class="text-[10px] uppercase tracking-widest text-primary font-bold">Apply</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Spec Sheets Section -->
+<section class="mb-24">
+<div class="flex items-center justify-between mb-12">
+<h3 class="font-label text-xs uppercase tracking-[0.3em] text-on-surface-variant border-l-2 border-primary pl-6">Technical Architecture</h3>
+<button class="text-[10px] uppercase tracking-widest flex items-center group">
+                    View Full Specs <span class="material-symbols-outlined ml-2 text-xs group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-outline-variant/20">
+<div class="bg-surface p-12 hover:bg-surface-container-low transition-colors group">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-4 block">0 — 60 MPH</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">2.4</span>
+<span class="font-label text-xs uppercase text-primary">SEC</span>
+</div>
+</div>
+<div class="bg-surface p-12 hover:bg-surface-container-low transition-colors group">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-4 block">Total Power</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">1,020</span>
+<span class="font-label text-xs uppercase text-primary">HP</span>
+</div>
+</div>
+<div class="bg-surface p-12 hover:bg-surface-container-low transition-colors group">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-4 block">Peak Torque</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">980</span>
+<span class="font-label text-xs uppercase text-primary">LB-FT</span>
+</div>
+</div>
+<div class="bg-surface p-12 hover:bg-surface-container-low transition-colors group">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-4 block">Est. Range</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-6xl italic">420</span>
+<span class="font-label text-xs uppercase text-primary">MI</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Grid & Merchandise -->
+<section class="mb-24">
+<h3 class="font-headline text-5xl italic text-tertiary mb-12">Lifestyle Collection</h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+<!-- Merchandise Card 1 -->
+<div class="group cursor-pointer">
+<div class="relative bg-surface-container-low aspect-[3/4] overflow-hidden mb-6">
+<img class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700" data-alt="Folded dark navy luxury cashmere scarf on a rustic wood surface with soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1VDSZ8ZsJqyJ3zEZPoY8q33pPzxB7NI4a2uE-h7MPTSuB5Yk64b5syCTuJOfd6Nvi_wdK4vIp9ef1XkUQfGRMWObOd47GQhuzwKC8xhsxuUPlncNx4PX8MvqdGkHLJLoz7bLAEaKxnnP3dakN7jhaipzniawIqeV66ZBo5BYx43KkcXEwGfBphITF-ZJ8dr84yD5FhqpXp_gTs2R6AUt03LYeVwkvB0jR0jnTWGpgjaPZEL10sgG_pH-BaNqWGLCiEZftrjAMPII2"/>
+<button class="absolute bottom-6 right-6 w-12 h-12 bg-primary text-on-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-500">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant block mb-1">Accessories</span>
+<h4 class="font-body text-sm font-bold uppercase tracking-widest">Heritage Scarf</h4>
+</div>
+<span class="font-body text-sm">$320</span>
+</div>
+</div>
+<!-- Merchandise Card 2 -->
+<div class="group cursor-pointer">
+<div class="relative bg-surface-container-low aspect-[3/4] overflow-hidden mb-6">
+<img class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700" data-alt="High-end white modern minimalist watch with stainless steel finish on a dark marble slab" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKSG2aaqLia18AU3OGFK6etVKSrIOYokHrJeRL-f64k8zDd-IKvb83NhI95U7SnuUVt_3ukAj4qheIdIyLy_z1tp_UBIwp9480mwh9O0Mjm9NUNVtoTI8nwYev1XTHnLrp2miM_2uZi2cEKpLitgUQRe1hIlF7e1F-9kHWtxrpcjMvFWIUFPNPDlcw5lI6muIaCgb4BWWeCpJVu27swAjZ7DkvNurbDr5Rzotdp-spXg7bYmCW-uQc58V1MO3V1u0MGKmE1jkdjYMd"/>
+<div class="absolute top-4 left-4">
+<span class="bg-error-container text-on-error-container px-3 py-1 text-[9px] uppercase tracking-widest font-bold">Preorder</span>
+</div>
+<button class="absolute bottom-6 right-6 w-12 h-12 bg-primary text-on-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-500">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant block mb-1">Timepieces</span>
+<h4 class="font-body text-sm font-bold uppercase tracking-widest">Precision Chrono</h4>
+</div>
+<span class="font-body text-sm">$2,450</span>
+</div>
+</div>
+<!-- Merchandise Card 3 -->
+<div class="group cursor-pointer">
+<div class="relative bg-surface-container-low aspect-[3/4] overflow-hidden mb-6">
+<img class="w-full h-full object-cover grayscale group-hover:scale-105 transition-transform duration-700" data-alt="Premium black leather weekend duffel bag with silver hardware placed in a bright empty hangar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAekCSAm_Vp7o6O7P1GdXvp6Cz3C44bfpsxK3gu_69JnTDIcIozG2MYHgI-4XK81KNolxhQM0ko_t54ZY7BrEFqaCl7XcDnZcRUms90_3lHMPBoKY0ubQnpmmICGJp3DThCcwRty8fDZBL_I1rsaK44CmA7hqtcoZ1TP3bPnvYzjhNDCJDhLS0EO6B_l59TVFtNkdsND4c3I0vBhBJMPaazb4mGxTFpJmkOU46S0OUEkLczJsgbqyS7hUxJb9DUosA5zGZlYdP8nHFg"/>
+<button class="absolute bottom-6 right-6 w-12 h-12 bg-primary text-on-primary flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity translate-y-4 group-hover:translate-y-0 duration-500">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant block mb-1">Travel</span>
+<h4 class="font-body text-sm font-bold uppercase tracking-widest">Grand Tour Duffel</h4>
+</div>
+<span class="font-body text-sm">$890</span>
+</div>
+</div>
+<!-- Upsell/Cross Sell Card -->
+<div class="bg-surface-container-high p-10 flex flex-col justify-between ghost-border">
+<div>
+<span class="material-symbols-outlined text-primary mb-6" data-icon="auto_awesome">auto_awesome</span>
+<h4 class="font-headline text-2xl italic mb-4">Complete the Look</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed font-body">Owners of the Zenith series often choose our Bespoke Cleaning Kit for long-term protection.</p>
+</div>
+<div class="mt-8">
+<div class="flex items-center space-x-4 mb-6">
+<div class="w-12 h-12 bg-surface">
+<img class="w-full h-full object-cover grayscale" data-alt="Small luxury detailing spray bottle with chrome nozzle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5G5QO-K2bFBg4lOONIZhgUPilORcpJ5YrFdxILW1dUiLLKueKaIQDFzQHWf3RVYGGzmoeAah9nDJEXuwcP5XQ-3h_KkUFXnaw3l_htpDeqWDa36riPXLeCXQP4Hs33nohG3zBXLHclIAORbc1tDxzqoiCpsdOFj5P2lqKZDv7NNbSf9OnYgn4dVsQMPXbfcysXzhvqa8wsVhsFjCcl0xZtUu06gpaeXav15EcreJhWAIOGrG9VnSVau5xI6c7pXZYWkU2JOorE9Ha"/>
+</div>
+<div>
+<span class="font-body text-[11px] font-bold block">Detailing Kit</span>
+<span class="font-body text-[11px] text-primary">$120</span>
+</div>
+</div>
+<button class="w-full border border-outline-variant/30 py-3 text-[10px] uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">Add Recommended</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Configurator / Comparison Tool Preview -->
+<section class="mb-24 grid md:grid-cols-2 gap-12">
+<!-- Configurator Tool -->
+<div class="bg-surface-container-low p-12 ghost-border">
+<h3 class="font-label text-xs uppercase tracking-[0.3em] mb-12">Interior Configurator</h3>
+<div class="space-y-10">
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant block mb-4">Upholstery</span>
+<div class="grid grid-cols-3 gap-4">
+<button class="bg-surface-container border-2 border-primary p-4 text-left">
+<span class="block w-6 h-6 bg-slate-100 mb-3"></span>
+<span class="font-body text-[10px] font-bold block">Alabaster Leather</span>
+</button>
+<button class="bg-surface-container border border-outline-variant/30 p-4 text-left hover:border-outline transition-colors">
+<span class="block w-6 h-6 bg-slate-800 mb-3"></span>
+<span class="font-body text-[10px] font-bold block">Midnight Hide</span>
+</button>
+<button class="bg-surface-container border border-outline-variant/30 p-4 text-left hover:border-outline transition-colors">
+<span class="block w-6 h-6 bg-orange-900 mb-3"></span>
+<span class="font-body text-[10px] font-bold block">Sienna Tan</span>
+</button>
+</div>
+</div>
+<div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant block mb-4">Inlays</span>
+<div class="flex space-x-4">
+<div class="flex items-center space-x-2 cursor-pointer">
+<div class="w-4 h-4 rounded-full border border-primary flex items-center justify-center">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+</div>
+<span class="font-body text-[10px] uppercase tracking-widest">Matte Carbon</span>
+</div>
+<div class="flex items-center space-x-2 cursor-pointer">
+<div class="w-4 h-4 rounded-full border border-outline-variant"></div>
+<span class="font-body text-[10px] uppercase tracking-widest text-on-surface-variant">Polished Walnut</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Comparison Tool -->
+<div class="flex flex-col">
+<h3 class="font-label text-xs uppercase tracking-[0.3em] mb-12">Model Comparison</h3>
+<div class="flex-grow space-y-px bg-outline-variant/20">
+<div class="grid grid-cols-3 bg-surface py-6 px-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Feature</span>
+<span class="font-body text-[11px] font-bold uppercase text-center">Zenith</span>
+<span class="font-body text-[11px] font-bold uppercase text-center">Apex</span>
+</div>
+<div class="grid grid-cols-3 bg-surface py-6 px-4">
+<span class="font-body text-[11px]">Drive System</span>
+<span class="font-body text-[11px] text-center">Dual Motor AWD</span>
+<span class="font-body text-[11px] text-center">Tri Motor AWD</span>
+</div>
+<div class="grid grid-cols-3 bg-surface py-6 px-4">
+<span class="font-body text-[11px]">Suspension</span>
+<span class="font-body text-[11px] text-center">Adaptive Air</span>
+<span class="font-body text-[11px] text-center">Track-Tuned</span>
+</div>
+<div class="grid grid-cols-3 bg-surface py-6 px-4">
+<span class="font-body text-[11px]">Interior Tech</span>
+<span class="font-body text-[11px] text-center">15" OLED</span>
+<span class="font-body text-[11px] text-center">Wraparound 32"</span>
+</div>
+</div>
+<button class="mt-8 border border-outline-variant/30 py-4 font-sans tracking-widest text-[10px] uppercase hover:bg-primary hover:text-on-primary transition-all">Download Full Comparison</button>
+</div>
+</section>
+<!-- Review Section -->
+<section class="mb-24">
+<div class="grid md:grid-cols-12 gap-16">
+<div class="md:col-span-4">
+<h3 class="font-headline text-4xl italic mb-8">Client Experience</h3>
+<div class="space-y-8">
+<div>
+<span class="font-headline text-7xl italic text-primary">4.8</span>
+<div class="flex text-primary mb-2">
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined" data-icon="star" data-weight="fill">star</span>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Based on 1,420 Reviews</span>
+</div>
+<div class="space-y-4">
+<button class="w-full border border-outline-variant/30 py-4 text-[10px] uppercase tracking-widest hover:border-primary transition-all">Write a Review</button>
+</div>
+</div>
+</div>
+<div class="md:col-span-8 space-y-12">
+<!-- Review Item -->
+<div class="border-b border-outline-variant/20 pb-12">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h5 class="font-body font-bold text-sm uppercase tracking-widest mb-2">Absolute Performance redefined</h5>
+<div class="flex text-primary text-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+</div>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">March 24, 2024</span>
+</div>
+<p class="font-body text-sm leading-relaxed text-on-surface-variant italic mb-6">"Transitioning from traditional ICE luxury to the Zenith was seamless. The instant torque is breathtaking, but the refinement of the cabin at high speeds is what truly impresses."</p>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold">— Julian V. (Verified Owner)</span>
+</div>
+<!-- Review Item -->
+<div class="border-b border-outline-variant/20 pb-12 opacity-60">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h5 class="font-body font-bold text-sm uppercase tracking-widest mb-2">Minimalist Masterpiece</h5>
+<div class="flex text-primary text-xs">
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="star_outline">star_outline</span>
+</div>
+</div>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">February 12, 2024</span>
+</div>
+<p class="font-body text-sm leading-relaxed text-on-surface-variant italic mb-6">"The software interface is the best in the market. Clean, fast, and stays out of the way of the driving experience."</p>
+<span class="font-label text-[10px] uppercase tracking-widest font-bold">— Marcus Thorne</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Checkout Progress Indicator (Floating/Footer Style) -->
+<div class="fixed bottom-12 left-1/2 -translate-x-1/2 glass-panel ghost-border px-12 py-6 z-40 hidden md:flex items-center space-x-12">
+<div class="flex items-center space-x-3">
+<span class="w-6 h-6 flex items-center justify-center bg-primary text-on-primary text-[10px] font-bold">01</span>
+<span class="font-label text-[10px] uppercase tracking-widest">Model</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center space-x-3">
+<span class="w-6 h-6 flex items-center justify-center bg-outline-variant text-on-surface text-[10px] font-bold">02</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Spec</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center space-x-3">
+<span class="w-6 h-6 flex items-center justify-center bg-outline-variant text-on-surface text-[10px] font-bold">03</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Confirm</span>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 dark:bg-slate-950 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full full-width rounded-none border-t border-slate-800/30">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-8">TUT USA</div>
+<p class="text-slate-500 font-body text-xs leading-relaxed max-w-xs uppercase tracking-widest">Defined by precision. Driven by the future of luxury engineering.</p>
+</div>
+<div>
+<h6 class="font-label uppercase tracking-widest text-[10px] text-slate-400 mb-6">Vehicles</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-100 transition-colors duration-200" href="#">Sedans</a></li>
+<li><a class="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-100 transition-colors duration-200" href="#">SUVs</a></li>
+<li><a class="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-100 transition-colors duration-200" href="#">Electric</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-label uppercase tracking-widest text-[10px] text-slate-400 mb-6">Support</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-100 transition-colors duration-200" href="#">Owners</a></li>
+<li><a class="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-100 transition-colors duration-200" href="#">Contact</a></li>
+<li><a class="text-slate-500 text-[10px] uppercase tracking-widest hover:text-slate-100 transition-colors duration-200" href="#">Support</a></li>
+</ul>
+</div>
+<div class="col-span-2">
+<h6 class="font-label uppercase tracking-widest text-[10px] text-slate-400 mb-6">Newsletter</h6>
+<div class="flex border-b border-slate-800 pb-2">
+<input class="bg-transparent border-none focus:ring-0 text-[10px] uppercase tracking-widest flex-grow text-slate-200" placeholder="ENTER EMAIL" type="email"/>
+<button class="material-symbols-outlined text-slate-500 hover:text-slate-100" data-icon="arrow_forward">arrow_forward</button>
+</div>
+<div class="mt-12 text-slate-500 text-[10px] uppercase tracking-widest">
+                © 2024 TUT USA. ALL RIGHTS RESERVED.
+            </div>
+</div>
+</footer>
+</body></html>

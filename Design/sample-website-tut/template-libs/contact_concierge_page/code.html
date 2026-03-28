@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ee7d77",
+              "primary-fixed": "#e2e2e2",
+              "surface-variant": "#0a2257",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "on-tertiary": "#515c70",
+              "on-primary-container": "#d0d0d0",
+              "inverse-surface": "#faf8ff",
+              "surface": "#070d1f",
+              "secondary-fixed-dim": "#c5d6f0",
+              "tertiary-fixed": "#dae6fe",
+              "on-tertiary-container": "#495468",
+              "secondary-fixed": "#d3e4fe",
+              "tertiary-fixed-dim": "#ccd7ef",
+              "inverse-primary": "#5e5f60",
+              "surface-container-high": "#0b1d48",
+              "on-secondary-fixed": "#314055",
+              "surface-bright": "#082768",
+              "on-tertiary-fixed": "#374155",
+              "secondary-container": "#2d3c51",
+              "primary-dim": "#b8b9b9",
+              "surface-dim": "#070d1f",
+              "error-container": "#7f2927",
+              "primary-container": "#454747",
+              "inverse-on-surface": "#4f5469",
+              "background": "#070d1f",
+              "on-tertiary-fixed-variant": "#535e72",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "on-surface-variant": "#96a9e6",
+              "secondary-dim": "#8f9fb7",
+              "on-secondary-container": "#b0c0da",
+              "tertiary": "#f0f3ff",
+              "tertiary-container": "#dae6fe",
+              "on-primary-fixed": "#3e4040",
+              "outline-variant": "#32457c",
+              "primary": "#c6c6c7",
+              "surface-container": "#0a1839",
+              "primary-fixed-dim": "#d4d4d4",
+              "surface-container-lowest": "#000000",
+              "on-background": "#dfe4ff",
+              "on-surface": "#dfe4ff",
+              "surface-tint": "#c6c6c7",
+              "surface-container-low": "#09122b",
+              "outline": "#6073ad",
+              "surface-container-highest": "#0a2257",
+              "on-primary": "#3f4041",
+              "on-error": "#490106",
+              "error-dim": "#bb5551",
+              "tertiary-dim": "#ccd7ef",
+              "secondary": "#8f9fb7",
+              "on-error-container": "#ff9993",
+              "on-secondary": "#102134"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #070d1f; }
+        ::-webkit-scrollbar-thumb { background: #32457c; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-x-hidden">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 rounded-none bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex items-center gap-12">
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs Manrope" href="#">Sedans</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs Manrope" href="#">SUVs</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs Manrope" href="#">Electric</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs Manrope" href="#">Build</a>
+<a class="text-slate-100 font-bold border-b border-slate-100 pb-1 font-sans tracking-widest text-xs Manrope" href="#">Support</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-slate-300 hover:text-slate-100 transition-all duration-500 font-sans tracking-widest text-xs Manrope">Sign In</button>
+<button class="bg-primary text-on-primary px-6 py-2 text-xs font-bold tracking-widest uppercase hover:bg-primary-fixed transition-colors">Find a Dealer</button>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Support Hero -->
+<section class="relative min-h-[716px] flex items-center px-12 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-40" data-alt="Close up of a luxury car interior with fine leather stitching and brushed metal details in atmospheric dim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFK-ODphE3Y8veVdsnEnEi9nenYYSFk_w7W8gbNdC4TrorTHD6XIn7p52dXjKD4KKQmG1FjgtgFuaAswpBCDBrmnpi7k1Em5lgJoVaz18I0LUhw-aiYqCJx9Llee-zd2gwTDotPgQasc9UfcaXtfaJK02CdzBkQHb3auAKweAdiSMoZtxFEb5ruZX6IJUX3xHI9LijLEpsLMzUwxDgqXriUvmfK4Jvz6L5fIhcS-clKBUBRLbVZDXSPGpTvM2hOJmj-DBWBchH5zm7"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-4xl">
+<span class="inline-block mb-6 text-primary tracking-[0.3em] font-bold text-xs uppercase">Concierge Services</span>
+<h1 class="text-6xl md:text-8xl font-headline italic mb-8 leading-tight">Precision Support for <br/>Uncompromising Standards.</h1>
+<p class="text-lg text-on-surface-variant max-w-xl leading-relaxed font-light">
+                    Whether you are an owner seeking technical refinement or a prospective guest exploring our atelier, our concierge team is dedicated to providing an experience as meticulously engineered as our vehicles.
+                </p>
+</div>
+</section>
+<!-- Contact Cards / Concierge Info -->
+<section class="px-12 py-24 bg-surface-container-low">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-outline-variant/10">
+<!-- Sales -->
+<div class="p-12 hover:bg-surface-container-high transition-colors duration-500 group">
+<span class="material-symbols-outlined text-primary mb-8" data-icon="auto_awesome">auto_awesome</span>
+<h3 class="text-2xl font-headline mb-4">Acquisition Concierge</h3>
+<p class="text-on-surface-variant text-sm mb-12 leading-relaxed">Dedicated assistance for vehicle configuration, bespoke commissions, and private showroom viewings.</p>
+<div class="space-y-4">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-primary/60 mb-1">Direct Line</span>
+<span class="text-lg font-headline">1.800.TUT.LUXE</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-primary/60 mb-1">Email</span>
+<span class="text-lg font-headline">bespoke@tut-usa.com</span>
+</div>
+</div>
+</div>
+<!-- Support -->
+<div class="p-12 bg-surface-container transition-colors duration-500 group">
+<span class="material-symbols-outlined text-primary mb-8" data-icon="engineering">engineering</span>
+<h3 class="text-2xl font-headline mb-4">Technical Stewardship</h3>
+<p class="text-on-surface-variant text-sm mb-12 leading-relaxed">Expert guidance for vehicle maintenance, OTA updates, and performance optimization for current owners.</p>
+<div class="space-y-4">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-primary/60 mb-1">Support Center</span>
+<span class="text-lg font-headline">1.888.TUT.TECH</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-primary/60 mb-1">Direct Email</span>
+<span class="text-lg font-headline">stewardship@tut-usa.com</span>
+</div>
+</div>
+</div>
+<!-- Global -->
+<div class="p-12 hover:bg-surface-container-high transition-colors duration-500 group">
+<span class="material-symbols-outlined text-primary mb-8" data-icon="public">public</span>
+<h3 class="text-2xl font-headline mb-4">Global Relations</h3>
+<p class="text-on-surface-variant text-sm mb-12 leading-relaxed">Inquiries regarding corporate partnerships, fleet acquisitions, and international press relations.</p>
+<div class="space-y-4">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-primary/60 mb-1">Corporate</span>
+<span class="text-lg font-headline">+1 212 555 0198</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-primary/60 mb-1">HQ</span>
+<span class="text-lg font-headline">press@tut-usa.com</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Forms Section -->
+<section class="px-12 py-32 grid grid-cols-1 lg:grid-cols-2 gap-24 items-start">
+<div class="space-y-12">
+<div>
+<h2 class="text-4xl font-headline mb-4">Inquiry Initiation</h2>
+<p class="text-on-surface-variant max-w-md">Complete the following brief to initiate a conversation with our specialists. Your inquiry will be prioritized based on urgency.</p>
+</div>
+<form class="space-y-10">
+<div class="grid grid-cols-2 gap-8">
+<div class="border-b border-outline-variant/30 focus-within:border-primary transition-colors">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">First Name</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface placeholder-on-surface/20" placeholder="Alexander" type="text"/>
+</div>
+<div class="border-b border-outline-variant/30 focus-within:border-primary transition-colors">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Last Name</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface placeholder-on-surface/20" placeholder="Sterling" type="text"/>
+</div>
+</div>
+<div class="border-b border-outline-variant/30 focus-within:border-primary transition-colors">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Electronic Mail</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface placeholder-on-surface/20" placeholder="a.sterling@private.com" type="email"/>
+</div>
+<div class="border-b border-outline-variant/30 focus-within:border-primary transition-colors">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Inquiry Type</label>
+<select class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface appearance-none">
+<option class="bg-surface">New Vehicle Configuration</option>
+<option class="bg-surface">Service &amp; Maintenance</option>
+<option class="bg-surface">Software Assistance</option>
+<option class="bg-surface">Other Professional Inquiry</option>
+</select>
+</div>
+<div class="border-b border-outline-variant/30 focus-within:border-primary transition-colors">
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Message</label>
+<textarea class="w-full bg-transparent border-none p-0 focus:ring-0 text-on-surface placeholder-on-surface/20 resize-none" placeholder="How may our atelier assist you?" rows="4"></textarea>
+</div>
+<button class="w-full py-5 bg-primary text-on-primary text-xs font-bold tracking-widest uppercase hover:bg-primary-fixed transition-all flex justify-center items-center gap-3">
+                        Transmit Inquiry
+                        <span class="material-symbols-outlined" data-icon="arrow_right_alt">arrow_right_alt</span>
+</button>
+</form>
+</div>
+<div class="relative group">
+<img class="w-full aspect-[4/5] object-cover" data-alt="Modern minimalist architectural detail of a glass building reflecting a clear sky with sharp lines and dark steel frames" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM16S0EWXjsLDSlXN_h5UB4XxvT39yTa4b0ovYH9SQskSIlTnoFI4PdLCeYEecnfrUQQdv078BJ0kjFAU0iT_ZSjTTeTRfLecBTsoAPznWN2UL-V5Q1n-PIOtwWBAPnSLrbrDFTO0LmnaRhzjdXofJVGj4bl_7IDQxXpPPOf7Y6C4Mt5zJC8gUiOF8yen3TDzgcuv2bdZiUxNsOu3hUN5OQZM9Qyl5IaZprrX1RO50fNysWnlRF_RhSuDFapUTAhD9iJnJxylxRCQI"/>
+<div class="absolute inset-0 border border-primary/20 -translate-x-6 translate-y-6 -z-10 transition-transform group-hover:translate-x-0 group-hover:translate-y-0 duration-700"></div>
+<div class="absolute bottom-12 -left-12 glass-panel p-10 max-w-xs">
+<h4 class="font-headline text-xl mb-4 italic">Commitment to Privacy</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed tracking-wide">Your data is handled with the highest level of security and discretion. We do not share owner details with third-party marketers.</p>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="px-12 py-32 bg-surface-container-low/50">
+<div class="max-w-4xl mx-auto">
+<h2 class="text-4xl font-headline mb-16 text-center">Frequently Resolved Inquiries</h2>
+<div class="space-y-4">
+<!-- FAQ 1 -->
+<div class="group border-b border-outline-variant/10 py-8">
+<div class="flex justify-between items-center cursor-pointer">
+<h4 class="text-lg font-headline group-hover:text-primary transition-colors">How do I schedule a bespoke vehicle consultation?</h4>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary" data-icon="add">add</span>
+</div>
+</div>
+<!-- FAQ 2 -->
+<div class="group border-b border-outline-variant/10 py-8">
+<div class="flex justify-between items-center cursor-pointer">
+<h4 class="text-lg font-headline group-hover:text-primary transition-colors">What is the expected lead time for custom builds?</h4>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary" data-icon="add">add</span>
+</div>
+</div>
+<!-- FAQ 3 -->
+<div class="group border-b border-outline-variant/10 py-8">
+<div class="flex justify-between items-center cursor-pointer">
+<h4 class="text-lg font-headline group-hover:text-primary transition-colors">Where can I access technical documentation for my model?</h4>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary" data-icon="add">add</span>
+</div>
+</div>
+<!-- FAQ 4 -->
+<div class="group border-b border-outline-variant/10 py-8">
+<div class="flex justify-between items-center cursor-pointer">
+<h4 class="text-lg font-headline group-hover:text-primary transition-colors">Can I update my software preferences remotely?</h4>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary" data-icon="add">add</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Dealer Locator / Map Placeholder -->
+<section class="px-12 py-32 flex flex-col md:flex-row gap-12 bg-surface">
+<div class="md:w-1/3">
+<span class="text-primary tracking-[0.2em] font-bold text-[10px] uppercase mb-4 block">Regional Presence</span>
+<h2 class="text-4xl font-headline mb-8">Authorized Ateliers</h2>
+<p class="text-on-surface-variant mb-12 text-sm leading-relaxed">Locate your nearest authorized TUT USA service center and showroom. Our partners adhere to the strict quality standards of the Precision Atelier.</p>
+<div class="relative border-b border-outline-variant/30 focus-within:border-primary transition-colors">
+<input class="w-full bg-transparent border-none p-0 py-4 focus:ring-0 text-on-surface placeholder-on-surface/20 text-sm" placeholder="Enter ZIP or City" type="text"/>
+<span class="absolute right-0 top-1/2 -translate-y-1/2 material-symbols-outlined text-primary" data-icon="location_searching">location_searching</span>
+</div>
+<div class="mt-12 space-y-6">
+<div class="p-6 bg-surface-container-low border-l-2 border-primary">
+<h5 class="font-bold text-xs uppercase tracking-tighter mb-2">TUT flagship - New York</h5>
+<p class="text-[10px] text-on-surface-variant mb-4 uppercase">715 5th Ave, New York, NY 10022</p>
+<a class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline" href="#">View Directions</a>
+</div>
+<div class="p-6 bg-surface-container-low border-l-2 border-transparent hover:border-outline-variant transition-colors">
+<h5 class="font-bold text-xs uppercase tracking-tighter mb-2">TUT atelier - Los Angeles</h5>
+<p class="text-[10px] text-on-surface-variant mb-4 uppercase">9200 Wilshire Blvd, Beverly Hills, CA 90212</p>
+<a class="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline" href="#">View Directions</a>
+</div>
+</div>
+</div>
+<div class="md:w-2/3 h-[600px] bg-surface-container-highest relative">
+<img class="w-full h-full object-cover grayscale opacity-60" data-alt="Monochrome dark satellite map view of an urban metropolitan area with glowing grid lines indicating city streets" data-location="New York" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACiPOBh8NxPcLeri8ts01v85Y9AwtkftgoKzkMJ3NQMuCMH7OzOju4L1WgD4hskWJmROW4S-F8aV3OT_dG6Rkwqe_EQQp5gb8LKvNrvtrVZARYFmAW92taAlW4s3AQ2bs-3r6rgOCqK4qQywp81t0lFN5znjdfK5eE3SfJ-kg2Avxsgsf9kJVnIrgGDkLCjJtNGCtTRz948FjxgRfgDkxK6QyJSGv1fDrTeMsakSX1X0zIQrxKPRv9hOeKIg_XZk4EFXSlpSlFIWxJ"/>
+<div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="w-12 h-12 border-2 border-primary flex items-center justify-center animate-pulse">
+<div class="w-2 h-2 bg-primary"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 dark:bg-slate-950 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full border-t border-slate-800/30">
+<div class="col-span-2 lg:col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-8 uppercase">TUT</div>
+<p class="text-slate-500 font-sans tracking-widest text-[10px] uppercase leading-loose">
+                Engineering excellence through the lens of timeless luxury. <br/>Design. Precision. Performance.
+            </p>
+</div>
+<div>
+<h6 class="text-slate-200 font-sans uppercase tracking-widest text-[10px] font-bold mb-6">Vehicles</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Model S1</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Model XV</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Electra One</a></li>
+</ul>
+</div>
+<div>
+<h6 class="text-slate-200 font-sans uppercase tracking-widest text-[10px] font-bold mb-6">Company</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">About Us</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Careers</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Contact</a></li>
+</ul>
+</div>
+<div>
+<h6 class="text-slate-200 font-sans uppercase tracking-widest text-[10px] font-bold mb-6">Legal</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Privacy</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Legal</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Cookies</a></li>
+</ul>
+</div>
+<div class="col-span-full pt-20 flex flex-col md:flex-row justify-between items-center border-t border-slate-900">
+<p class="text-slate-500 font-sans uppercase tracking-widest text-[10px]">© 2024 TUT USA. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-8 mt-4 md:mt-0">
+<span class="text-slate-500 font-sans uppercase tracking-widest text-[10px]">USA / English</span>
+</div>
+</div>
+</footer>
+</body></html>

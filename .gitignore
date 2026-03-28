@@ -72,5 +72,10 @@ logs/
 
 # Optional: TypeScript cache
 *.tsbuildinfo
+
+# Playwright test artifacts (generated on each run — never commit)
+**/playwright-report/
+**/test-results/
+**/.playwright-browsers/
 /aws.config
 /AEM-Website-Example/

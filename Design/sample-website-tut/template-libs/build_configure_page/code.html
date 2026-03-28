@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Build Your TUT | The Precision Atelier</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ee7d77",
+              "primary-fixed": "#e2e2e2",
+              "surface-variant": "#0a2257",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "on-tertiary": "#515c70",
+              "on-primary-container": "#d0d0d0",
+              "inverse-surface": "#faf8ff",
+              "surface": "#070d1f",
+              "secondary-fixed-dim": "#c5d6f0",
+              "tertiary-fixed": "#dae6fe",
+              "on-tertiary-container": "#495468",
+              "secondary-fixed": "#d3e4fe",
+              "tertiary-fixed-dim": "#ccd7ef",
+              "inverse-primary": "#5e5f60",
+              "surface-container-high": "#0b1d48",
+              "on-secondary-fixed": "#314055",
+              "surface-bright": "#082768",
+              "on-tertiary-fixed": "#374155",
+              "secondary-container": "#2d3c51",
+              "primary-dim": "#b8b9b9",
+              "surface-dim": "#070d1f",
+              "error-container": "#7f2927",
+              "primary-container": "#454747",
+              "inverse-on-surface": "#4f5469",
+              "background": "#070d1f",
+              "on-tertiary-fixed-variant": "#535e72",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "on-surface-variant": "#96a9e6",
+              "secondary-dim": "#8f9fb7",
+              "on-secondary-container": "#b0c0da",
+              "tertiary": "#f0f3ff",
+              "tertiary-container": "#dae6fe",
+              "on-primary-fixed": "#3e4040",
+              "outline-variant": "#32457c",
+              "primary": "#c6c6c7",
+              "surface-container": "#0a1839",
+              "primary-fixed-dim": "#d4d4d4",
+              "surface-container-lowest": "#000000",
+              "on-background": "#dfe4ff",
+              "on-surface": "#dfe4ff",
+              "surface-tint": "#c6c6c7",
+              "surface-container-low": "#09122b",
+              "outline": "#6073ad",
+              "surface-container-highest": "#0a2257",
+              "on-primary": "#3f4041",
+              "on-error": "#490106",
+              "error-dim": "#bb5551",
+              "tertiary-dim": "#ccd7ef",
+              "secondary": "#8f9fb7",
+              "on-error-container": "#ff9993",
+              "on-secondary": "#102134"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        background-color: #070d1f;
+        color: #dfe4ff;
+      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .glass-effect {
+        background: rgba(10, 34, 87, 0.6);
+        backdrop-filter: blur(20px);
+      }
+      .ghost-border {
+        border: 1px solid rgba(50, 69, 124, 0.15);
+      }
+    </style>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 rounded-none bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Sedans</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">SUVs</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Electric</a>
+<a class="font-sans tracking-widest text-slate-100 font-bold border-b border-slate-100 pb-1" href="#">Build</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 text-sm uppercase">Sign In</button>
+<button class="bg-primary text-on-primary px-6 py-2 text-sm font-sans tracking-widest uppercase font-bold hover:bg-primary-fixed transition-all duration-500">Find a Dealer</button>
+</div>
+</nav>
+<main class="pt-24 min-h-screen">
+<!-- Configurator Shell -->
+<div class="flex flex-col lg:flex-row min-h-[calc(100vh-6rem)]">
+<!-- Left Side: Visualizer (Cinematic Framing) -->
+<section class="lg:w-2/3 relative overflow-hidden bg-surface-container-low flex items-center justify-center min-h-[512px] lg:min-h-0">
+<div class="absolute inset-0 z-0">
+<img alt="Vehicle Visualizer" class="w-full h-full object-cover opacity-80 mix-blend-lighten" data-alt="Side profile of a luxury silver sedan in a minimalist concrete architectural space with dramatic overhead lighting and deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdWlX5XS70GXkJRVoJP7AxPue8zBv9JrMBipJQiFbW52N3xpTZ_ZYDJ7av-z7ymbT3Y3yyeoAo8pIvLxUERPABEDYtIuZLoHSbXIn_CQnZQtv6luObrgxfLGA8E-DiKjPj-3R6q0xUimFz_tMS6iFSLz45XnRGwMh-NSftuC76izBSrPEteamL_6YyrVYlTYvuf-YH493sw3NYfUqeIlNCUd8-C1E3r4VlQ6Myw8XVWBbmT5L0pq9cXRA9ujUU25DgJkDCDhGy236o"/>
+</div>
+<!-- Floating Spec Summary Overlay -->
+<div class="absolute bottom-12 left-12 z-10 flex gap-12 glass-effect p-8 ghost-border">
+<div class="flex flex-col">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-1">Acceleration</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline italic text-4xl text-primary">3.2</span>
+<span class="font-sans font-bold text-xs uppercase tracking-tighter text-on-surface">s 0-60</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-1">Peak Power</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline italic text-4xl text-primary">640</span>
+<span class="font-sans font-bold text-xs uppercase tracking-tighter text-on-surface">hp</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-1">Est. Range</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline italic text-4xl text-primary">385</span>
+<span class="font-sans font-bold text-xs uppercase tracking-tighter text-on-surface">mi</span>
+</div>
+</div>
+</div>
+<!-- Color Swatches (Floating) -->
+<div class="absolute right-12 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-10">
+<button class="w-8 h-8 bg-slate-200 border-2 border-primary ring-2 ring-offset-4 ring-offset-surface ring-primary"></button>
+<button class="w-8 h-8 bg-slate-900 border border-outline-variant hover:border-primary transition-colors"></button>
+<button class="w-8 h-8 bg-indigo-950 border border-outline-variant hover:border-primary transition-colors"></button>
+<button class="w-8 h-8 bg-stone-500 border border-outline-variant hover:border-primary transition-colors"></button>
+</div>
+</section>
+<!-- Right Side: Configuration Controls (The Atelier Interface) -->
+<aside class="lg:w-1/3 bg-surface border-l border-outline-variant/10 flex flex-col h-full overflow-y-auto no-scrollbar">
+<!-- Progress Header -->
+<div class="px-10 py-8 border-b border-outline-variant/10 sticky top-0 bg-surface z-20">
+<h1 class="font-headline italic text-3xl mb-2">Configure Your Sedan</h1>
+<div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+<span class="text-[10px] font-bold tracking-widest text-primary border-b border-primary pb-1 shrink-0">01 TRIM</span>
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant shrink-0">02 EXTERIOR</span>
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant shrink-0">03 INTERIOR</span>
+<span class="text-[10px] font-bold tracking-widest text-on-surface-variant shrink-0">04 OPTIONS</span>
+</div>
+</div>
+<div class="px-10 py-10 space-y-12">
+<!-- Trim Selection -->
+<section>
+<h2 class="font-sans font-bold text-xs tracking-widest uppercase text-on-surface-variant mb-6">Select Product Variant</h2>
+<div class="space-y-4">
+<!-- Active Trim -->
+<div class="p-6 bg-surface-container-high ghost-border cursor-pointer transition-all">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-xl italic">TUT S Performance</h3>
+<span class="font-sans font-bold text-xs tracking-tighter">$128,500</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-4">Dual-motor AWD, carbon fiber aero package, and track-ready suspension calibration.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-sm">check_circle</span>
+<span class="text-[10px] font-bold tracking-widest uppercase">Selected Configuration</span>
+</div>
+</div>
+<!-- Inactive Trim -->
+<div class="p-6 bg-surface hover:bg-surface-container-low ghost-border cursor-pointer transition-all group">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline text-xl italic text-on-surface-variant group-hover:text-on-surface transition-colors">TUT S Pure</h3>
+<span class="font-sans font-bold text-xs tracking-tighter text-on-surface-variant group-hover:text-on-surface">$104,200</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">The essential expression of performance and minimalist luxury.</p>
+</div>
+</div>
+</section>
+<!-- Exterior Options -->
+<section>
+<h2 class="font-sans font-bold text-xs tracking-widest uppercase text-on-surface-variant mb-6">Exterior Finish &amp; Wheels</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<div class="aspect-square bg-surface-container-low ghost-border p-2">
+<img alt="21-inch Precision Forged Wheels" class="w-full h-full object-cover" data-alt="Close up of a brushed aluminum car wheel with complex multi-spoke design and carbon ceramic brake calipers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsUX039cJoXapt8PKomkltXD11WhlR4h4n0g4qIeORdUIs-DylmAyZ9OMJR-witYO6yyWefONMI44rLXzEMkaXFVZKhMUKUpfPDyt19Jz1hH-xEzLR0n3NPQ-HdmTlXSrSGPEWIXyfu8nVhM6M0DCanBSD8lZxRTkdhhPmoXOoCCDgNBSR-9NdRYY4_XsqvRyC6VjLCHFIAsEvlFRISkPfpy49r81qEH0TGxkl4ikFKti4d76WVudt8g9cfDZp5cZPZ4-0Mhg7zOlY"/>
+</div>
+<span class="text-[10px] font-bold tracking-widest uppercase block text-center">21" Forged Alloy</span>
+</div>
+<div class="space-y-2">
+<div class="aspect-square bg-surface-container-low ghost-border p-2 opacity-50 hover:opacity-100 transition-opacity cursor-pointer">
+<img alt="Nightfall Matte Paint" class="w-full h-full object-cover" data-alt="Macro detail of black matte automotive paint surface with subtle metallic flakes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBValtcXySdT4hDv1ucLFCbTlXyt7hiA_2EDANJuvwcKYJiARQrF7EYzrALdBDCRgCBrxMPw5uFHxgNFsaRE85Y11Cfwa2mSytyBFhPnQavULUQCJkg7k9XTBm0Wn559ZtDoVzRtMxPmp0Q_gRH_y7iUXC8zsl_19rqpWq9NxSL_sFfgW1DWPuxcPnpvu7CklT9cg-JOUvkc3iN3nH9_qaLAjW22bLUs70N7NohP0Cjl4I8Vk_2IvgYnRNqGDnOgCBWjzlURCj0TE1j"/>
+</div>
+<span class="text-[10px] font-bold tracking-widest uppercase block text-center text-on-surface-variant">Nightfall Matte</span>
+</div>
+</div>
+</section>
+<!-- Interior Selections -->
+<section>
+<h2 class="font-sans font-bold text-xs tracking-widest uppercase text-on-surface-variant mb-6">Interior Atelier</h2>
+<div class="p-6 bg-surface-container-low ghost-border">
+<div class="flex gap-6 items-center">
+<div class="w-16 h-16 bg-slate-100 shrink-0">
+<img alt="Alpine White Leather" class="w-full h-full object-cover" data-alt="Close up texture of perforated white luxury leather with diamond stitching pattern" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBK1UuchyDI2pjLrm1k2ni4UWqMI4XV89ZOFsexYSfEFspgW8OuZ-wLyDDyl-12F4xRs3zy-DLinVx4NRQwNXKToYeH6XCL19r0qvpeKoPfla4PMLRWYus_FRqCaIPnrjt6Y05Hwz9z1e_coEsh7ma2Dc_0YGwSFE6ZU_UPS8qVYrcNiCzPEo5RbWVpbLJ2ISx-Qp9FcVKbSr_cODOm0vID94bx2aDdbbnWSaUZzqqrBxOf6lP78Gr56mNHulDrJ_xMwPsx2VG4Mm5x"/>
+</div>
+<div>
+<h4 class="font-sans font-bold text-sm">Alpine White Leather</h4>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Nappa Grade • Included</p>
+</div>
+<button class="ml-auto text-[10px] font-bold tracking-widest text-primary border-b border-primary uppercase">Change</button>
+</div>
+</div>
+</section>
+<!-- Dynamic Pricing -->
+<section class="pt-8 border-t border-outline-variant/20">
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant uppercase tracking-widest">Base Price</span>
+<span>$128,500</span>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant uppercase tracking-widest">Selected Options</span>
+<span>$4,250</span>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant uppercase tracking-widest">Destination Fee</span>
+<span>$1,450</span>
+</div>
+<div class="flex justify-between items-baseline pt-4">
+<span class="font-headline italic text-2xl">Total Build</span>
+<span class="font-sans font-extrabold text-2xl tracking-tighter text-primary">$134,200</span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<button class="w-full bg-primary text-on-primary py-5 text-sm font-sans tracking-[0.2em] uppercase font-extrabold hover:bg-primary-fixed transition-all duration-500 shadow-xl">
+                                Confirm Your Build
+                            </button>
+<button class="w-full bg-transparent border border-outline-variant/30 text-on-surface py-5 text-sm font-sans tracking-[0.2em] uppercase font-bold hover:bg-surface-container transition-all">
+                                Save To Profile
+                            </button>
+</div>
+</section>
+</div>
+</aside>
+</div>
+<!-- Footer -->
+<footer class="bg-slate-950 dark:bg-slate-950 full-width rounded-none border-t border-slate-800/30 tonal-shift-low">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full">
+<div class="col-span-2 lg:col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-6">TUT</div>
+<p class="font-sans text-xs tracking-widest text-slate-400 uppercase leading-relaxed max-w-xs">
+                        Hand-built precision for the discerning few. Engineering the future of high-performance motion.
+                    </p>
+</div>
+<div>
+<h5 class="font-serif italic text-lg text-slate-200 mb-6">Vehicles</h5>
+<ul class="space-y-4">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Sedans</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">SUVs</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Electric</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif italic text-lg text-slate-200 mb-6">Company</h5>
+<ul class="space-y-4">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">About Us</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Careers</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">News</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif italic text-lg text-slate-200 mb-6">Support</h5>
+<ul class="space-y-4">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Service</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Owners</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Contact</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif italic text-lg text-slate-200 mb-6">Legal</h5>
+<ul class="space-y-4">
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Privacy</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-500 hover:text-slate-100 transition-colors duration-200 block" href="#">Cookies</a></li>
+<li><a class="font-sans uppercase tracking-widest text-[10px] text-slate-200 hover:text-slate-100 transition-colors duration-200 block" href="#">USA/English</a></li>
+</ul>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-slate-800/10 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-500">© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-200 cursor-pointer text-sm">share</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-200 cursor-pointer text-sm">language</span>
+</div>
+</div>
+</footer>
+</main>
+</body></html>

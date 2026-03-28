@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TUT USA | Component Library: Account &amp; Transactional</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#dae6fe",
+                        "secondary-container": "#2d3c51",
+                        "primary-container": "#454747",
+                        "surface-bright": "#082768",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-fixed": "#dae6fe",
+                        "surface-container-high": "#0b1d48",
+                        "surface-variant": "#0a2257",
+                        "on-tertiary-container": "#495468",
+                        "on-primary-fixed": "#3e4040",
+                        "inverse-surface": "#faf8ff",
+                        "error-container": "#7f2927",
+                        "background": "#070d1f",
+                        "on-secondary-container": "#b0c0da",
+                        "outline": "#6073ad",
+                        "outline-variant": "#32457c",
+                        "on-tertiary": "#515c70",
+                        "inverse-primary": "#5e5f60",
+                        "on-surface": "#dfe4ff",
+                        "surface-container-lowest": "#000000",
+                        "secondary": "#8f9fb7",
+                        "on-secondary": "#102134",
+                        "on-primary-fixed-variant": "#5a5c5c",
+                        "surface-dim": "#070d1f",
+                        "on-primary-container": "#d0d0d0",
+                        "primary": "#c6c6c7",
+                        "primary-dim": "#b8b9b9",
+                        "on-tertiary-fixed": "#374155",
+                        "on-background": "#dfe4ff",
+                        "on-secondary-fixed": "#314055",
+                        "tertiary-dim": "#ccd7ef",
+                        "on-secondary-fixed-variant": "#4d5d73",
+                        "on-error": "#490106",
+                        "on-primary": "#3f4041",
+                        "secondary-fixed-dim": "#c5d6f0",
+                        "inverse-on-surface": "#4f5469",
+                        "on-error-container": "#ff9993",
+                        "error-dim": "#bb5551",
+                        "primary-fixed-dim": "#d4d4d4",
+                        "on-surface-variant": "#96a9e6",
+                        "error": "#ee7d77",
+                        "surface-container": "#0a1839",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-low": "#09122b",
+                        "surface": "#070d1f",
+                        "on-tertiary-fixed-variant": "#535e72",
+                        "primary-fixed": "#e2e2e2",
+                        "tertiary": "#f0f3ff",
+                        "surface-container-highest": "#0a2257",
+                        "secondary-dim": "#8f9fb7",
+                        "tertiary-fixed-dim": "#ccd7ef"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #070d1f; }
+        ::-webkit-scrollbar-thumb { background: #32457c; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 text-slate-300 dark:text-slate-300 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex space-x-10 items-center">
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 uppercase text-xs" href="#">Sedans</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 uppercase text-xs" href="#">SUVs</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 uppercase text-xs" href="#">Electric</a>
+<a class="font-sans tracking-widest text-slate-400 hover:text-slate-100 transition-colors duration-300 uppercase text-xs" href="#">Build</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="font-sans tracking-widest text-xs uppercase text-slate-100 border-b border-slate-100 pb-1">Find a Dealer</button>
+<div class="flex items-center space-x-2 cursor-pointer group">
+<span class="material-symbols-outlined text-xl text-slate-400 group-hover:text-slate-100">account_circle</span>
+<span class="font-sans tracking-widest text-xs uppercase text-slate-400 group-hover:text-slate-100 transition-colors duration-300">Sign In</span>
+</div>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto space-y-32">
+<!-- Hero Section: Intentional Asymmetry -->
+<header class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+<div class="lg:col-span-7">
+<span class="font-label uppercase tracking-widest text-on-surface-variant text-xs mb-4 block">Precision Atelier / System 280-303</span>
+<h1 class="font-headline italic text-6xl md:text-8xl text-primary leading-tight">Identity &amp; <br/>Exchange</h1>
+</div>
+<div class="lg:col-span-5 pb-4">
+<p class="font-body text-secondary leading-relaxed max-w-sm">
+                    A suite of high-fidelity transactional components designed for the TUT automotive ecosystem. Built for trust, machined for precision.
+                </p>
+</div>
+</header>
+<!-- Section 1: Authentication & Identity -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+<!-- Login/Registration Module -->
+<div class="bg-surface-container-low p-12 space-y-10 relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 -mr-16 -mt-16 rotate-45"></div>
+<div>
+<h3 class="font-headline text-3xl mb-2 text-on-surface">Access Portal</h3>
+<p class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Credentials Required</p>
+</div>
+<form class="space-y-8">
+<div class="space-y-1">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">User Identifier</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant py-3 focus:ring-0 focus:border-primary transition-all text-on-surface placeholder:text-outline-variant/50" placeholder="client@atelier.tut" type="email"/>
+</div>
+<div class="space-y-1">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Security Cipher</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant py-3 focus:ring-0 focus:border-primary transition-all text-on-surface" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex items-center justify-between pt-4">
+<a class="font-label text-[10px] uppercase tracking-widest text-secondary hover:text-primary transition-colors" href="#">Reset Access</a>
+<button class="bg-primary text-on-primary px-10 py-4 font-label uppercase tracking-widest text-xs hover:bg-primary-fixed transition-all">Authenticate</button>
+</div>
+</form>
+<div class="pt-8 border-t border-outline-variant/20 space-y-4">
+<p class="text-center font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Direct Federation</p>
+<button class="w-full border border-outline-variant/30 py-4 flex items-center justify-center space-x-3 group hover:border-outline-variant transition-all">
+<span class="material-symbols-outlined text-lg">fingerprint</span>
+<span class="font-label text-[10px] uppercase tracking-widest">Connect via SSO</span>
+</button>
+</div>
+</div>
+<!-- Profile Summary & Editor -->
+<div class="space-y-12">
+<div class="flex items-center space-x-8">
+<div class="w-32 h-32 bg-surface-container-high relative">
+<img alt="Profile" class="w-full h-full object-cover grayscale brightness-75 contrast-125" data-alt="high-contrast black and white portrait of a man in a dark suit against a minimalist architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAraza2AY0u33F3DybgyspUM3oxJIwDZdU3OHn7TSrXPCyApYWmrarQG1FA7tN9mTDkIjMBur4PGnHwW1PmKzJqCxQUh10qvbc2mOujXcvlukAVfd90zCCmj_AyMZssfAwLFxyzQrEcK0HHoxzhWxT5jqXRRB2t70XsQtpo41F1U9e8vXLSvWY8Lwrp_ezF6KxRshMtJ1uSxqNyHl0kRNVLHwx5XgVIm0FGhmi_ZxFymmSIIedsrSUPmUtywkdHh4ZOBS9WIeGbqeS4"/>
+<div class="absolute inset-0 border border-primary/20"></div>
+</div>
+<div class="space-y-2">
+<h2 class="font-headline text-4xl text-on-surface">Julian Thorne</h2>
+<div class="flex space-x-4">
+<span class="font-label text-[10px] uppercase tracking-widest px-3 py-1 bg-surface-variant text-on-surface-variant">Tier: Platinum</span>
+<span class="font-label text-[10px] uppercase tracking-widest px-3 py-1 bg-surface-variant text-on-surface-variant">Member since 2021</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<div class="space-y-2">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Primary Residence</span>
+<p class="font-body text-sm text-on-surface leading-relaxed">
+                            1200 Industrial Way<br/>Unit 402, Precision District<br/>New York, NY 10012
+                        </p>
+</div>
+<div class="space-y-2">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Contact Protocol</span>
+<p class="font-body text-sm text-on-surface leading-relaxed">
+                            j.thorne@atelier.tut<br/>+1 (555) 092-1182
+                        </p>
+</div>
+</div>
+<div class="flex space-x-4">
+<button class="flex-1 border border-outline-variant/30 py-4 font-label uppercase tracking-widest text-[10px] hover:border-primary transition-all">Edit Profile</button>
+<button class="flex-1 border border-outline-variant/30 py-4 font-label uppercase tracking-widest text-[10px] hover:border-primary transition-all">Partner Portal</button>
+</div>
+</div>
+</section>
+<!-- Section 2: Financials & Transactions -->
+<section class="space-y-16">
+<div class="flex items-center justify-between border-b border-outline-variant/10 pb-6">
+<h2 class="font-headline text-4xl text-on-surface">Ledger &amp; Logistics</h2>
+<div class="flex space-x-6">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant flex items-center">
+<span class="w-2 h-2 bg-primary mr-2"></span> Active Subscription
+                    </span>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Payment Method Card -->
+<div class="bg-surface-container-high p-8 flex flex-col justify-between h-64 border-l-4 border-primary">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-4xl text-primary" data-weight="fill">credit_card</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Primary</span>
+</div>
+<div class="space-y-4">
+<p class="font-label text-xl tracking-[0.2em] text-on-surface">•••• •••• •••• 8821</p>
+<div class="flex justify-between">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Valid Thru 09/27</span>
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">J. Thorne</span>
+</div>
+</div>
+</div>
+<!-- Order Summary Glass Module -->
+<div class="glass-panel p-8 space-y-6 flex flex-col justify-between">
+<div>
+<h4 class="font-label text-[10px] uppercase tracking-widest text-on-surface mb-4">Current Order: #TUT-9921</h4>
+<div class="space-y-3">
+<div class="flex justify-between font-body text-xs">
+<span class="text-secondary">Performance Package B</span>
+<span class="text-on-surface">$4,200.00</span>
+</div>
+<div class="flex justify-between font-body text-xs">
+<span class="text-secondary">Atelier Delivery</span>
+<span class="text-on-surface">$850.00</span>
+</div>
+<div class="flex justify-between font-body text-xs pt-3 border-t border-outline-variant/20">
+<span class="text-on-surface font-bold uppercase tracking-widest">Total Liability</span>
+<span class="text-primary font-bold">$5,050.00</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 font-label text-[10px] uppercase tracking-widest hover:bg-primary-fixed transition-all">Settlement Required</button>
+</div>
+<!-- Billing History / Invoices -->
+<div class="bg-surface-container-low p-8 space-y-6">
+<h4 class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Recent Ledger</h4>
+<div class="space-y-4">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="space-y-1">
+<p class="font-body text-xs text-on-surface">Invoice #8821-A</p>
+<p class="font-label text-[9px] uppercase tracking-widest text-on-surface-variant">Oct 12, 2023</p>
+</div>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">download</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="space-y-1">
+<p class="font-body text-xs text-on-surface">Invoice #8819-B</p>
+<p class="font-label text-[9px] uppercase tracking-widest text-on-surface-variant">Sep 12, 2023</p>
+</div>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">download</span>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="space-y-1">
+<p class="font-body text-xs text-on-surface">Invoice #8792-C</p>
+<p class="font-label text-[9px] uppercase tracking-widest text-on-surface-variant">Aug 12, 2023</p>
+</div>
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors">download</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Loyalty & Portal Shortcuts -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Loyalty Summary (Asymmetric Grid) -->
+<div class="lg:col-span-8 bg-surface-container-low p-12 grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="md:col-span-1 space-y-4 border-r border-outline-variant/10">
+<h3 class="font-headline text-3xl text-on-surface">Rewards</h3>
+<p class="font-body text-sm text-secondary leading-relaxed">Your accumulated Atelier Credits for exclusive events and upgrades.</p>
+</div>
+<div class="md:col-span-2 grid grid-cols-2 gap-8">
+<div class="space-y-1">
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Current Balance</p>
+<p class="font-headline text-5xl text-primary">12,450</p>
+<p class="font-label text-[9px] uppercase tracking-widest text-secondary pt-2">Credits</p>
+</div>
+<div class="space-y-1">
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Status Elevation</p>
+<p class="font-headline text-5xl text-on-surface">Gold</p>
+<p class="font-label text-[9px] uppercase tracking-widest text-secondary pt-2">Next: Obsidian</p>
+</div>
+</div>
+<div class="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-outline-variant/10">
+<div class="p-6 bg-surface-container-high space-y-4 group cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary">event_seat</span>
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface">VIP Race Entry</p>
+<p class="font-body text-[10px] text-secondary">5,000 Credits</p>
+</div>
+<div class="p-6 bg-surface-container-high space-y-4 group cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary">speed</span>
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface">Software Unlock</p>
+<p class="font-body text-[10px] text-secondary">2,500 Credits</p>
+</div>
+<div class="p-6 bg-surface-container-high space-y-4 group cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface">Express Service</p>
+<p class="font-body text-[10px] text-secondary">1,200 Credits</p>
+</div>
+</div>
+</div>
+<!-- Dashboard Widgets / Portal Shortcuts -->
+<div class="lg:col-span-4 space-y-8">
+<div class="bg-surface-container-high p-8 space-y-8">
+<h4 class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Operational Status</h4>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<span class="font-body text-xs text-on-surface">Vehicle Telemetry</span>
+<span class="font-label text-[9px] uppercase tracking-widest px-2 py-0.5 bg-primary/10 text-primary border border-primary/20">Nominal</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body text-xs text-on-surface">Firmware v4.2</span>
+<span class="font-label text-[9px] uppercase tracking-widest px-2 py-0.5 bg-primary/10 text-primary border border-primary/20">Optimized</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body text-xs text-on-surface">Security Protocol</span>
+<span class="font-label text-[9px] uppercase tracking-widest px-2 py-0.5 bg-error-container/20 text-error border border-error-container/40">Action Reqd</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<a class="p-6 bg-surface-container-low border border-outline-variant/10 hover:border-primary/50 transition-all group" href="#">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-4 block">build</span>
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface">Service</p>
+</a>
+<a class="p-6 bg-surface-container-low border border-outline-variant/10 hover:border-primary/50 transition-all group" href="#">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-4 block">map</span>
+<p class="font-label text-[10px] uppercase tracking-widest text-on-surface">Stations</p>
+</a>
+</div>
+</div>
+</section>
+<!-- Section 4: Complex Form (Billing/Shipping) -->
+<section class="max-w-4xl">
+<h2 class="font-headline text-4xl mb-12 text-on-surface">Logistic Protocols</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+<div class="space-y-8">
+<h3 class="font-label text-[10px] uppercase tracking-widest text-primary border-b border-primary/20 pb-2">01 Shipping Details</h3>
+<div class="grid grid-cols-2 gap-6">
+<div class="col-span-2 space-y-1">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Full Name</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant py-2 focus:ring-0 focus:border-primary text-on-surface text-sm" type="text" value="Julian Thorne"/>
+</div>
+<div class="col-span-2 space-y-1">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Street Address</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant py-2 focus:ring-0 focus:border-primary text-on-surface text-sm" placeholder="1200 Industrial Way" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Postal Code</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant py-2 focus:ring-0 focus:border-primary text-on-surface text-sm" placeholder="10012" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">City</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant py-2 focus:ring-0 focus:border-primary text-on-surface text-sm" placeholder="New York" type="text"/>
+</div>
+</div>
+</div>
+<div class="space-y-8">
+<h3 class="font-label text-[10px] uppercase tracking-widest text-primary border-b border-primary/20 pb-2">02 Billing Address</h3>
+<div class="flex items-center space-x-3 p-4 bg-surface-container-low border border-outline-variant/10">
+<input checked="" class="rounded-none bg-transparent border-outline-variant text-primary focus:ring-0" id="same_address" type="checkbox"/>
+<label class="font-body text-xs text-secondary" for="same_address">Same as shipping details</label>
+</div>
+<div class="opacity-40 pointer-events-none">
+<p class="font-body text-xs italic text-secondary">Billing information currently synchronized with residential protocols.</p>
+</div>
+</div>
+</div>
+<div class="mt-16 flex justify-end">
+<button class="bg-primary text-on-primary px-16 py-5 font-label uppercase tracking-widest text-xs hover:bg-primary-fixed transition-all flex items-center space-x-4">
+<span>Synchronize Profile</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-slate-950 dark:bg-slate-950 text-slate-400 dark:text-slate-500 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full border-t border-slate-800/30">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-6">TUT</div>
+<p class="font-sans text-[10px] uppercase tracking-widest max-w-xs leading-relaxed">
+                Automotive engineering redefined through the lens of pure precision. Experience the atelier.
+            </p>
+</div>
+<div>
+<h5 class="font-serif text-slate-200 mb-6">Vehicles</h5>
+<ul class="space-y-3 font-sans uppercase tracking-widest text-[10px]">
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Sedans</li>
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">SUVs</li>
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Electric</li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif text-slate-200 mb-6">Company</h5>
+<ul class="space-y-3 font-sans uppercase tracking-widest text-[10px]">
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Design</li>
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Sustainability</li>
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Careers</li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif text-slate-200 mb-6">Support</h5>
+<ul class="space-y-3 font-sans uppercase tracking-widest text-[10px]">
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Contact</li>
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Locations</li>
+<li class="hover:text-slate-100 transition-colors duration-200 cursor-pointer">Recall</li>
+</ul>
+</div>
+<div class="col-span-full pt-12 mt-12 border-t border-slate-800/20 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="font-sans uppercase tracking-widest text-[10px]">© 2024 TUT USA. ALL RIGHTS RESERVED.</p>
+<div class="flex space-x-8 font-sans uppercase tracking-widest text-[10px]">
+<span class="hover:text-slate-100 cursor-pointer">Privacy</span>
+<span class="hover:text-slate-100 cursor-pointer">Legal</span>
+<span class="hover:text-slate-100 cursor-pointer">USA/English</span>
+</div>
+</div>
+</footer>
+</body></html>

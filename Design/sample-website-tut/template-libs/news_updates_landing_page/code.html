@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TUT USA | Editorial &amp; Updates</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ee7d77",
+              "primary-fixed": "#e2e2e2",
+              "surface-variant": "#0a2257",
+              "on-secondary-fixed-variant": "#4d5d73",
+              "on-tertiary": "#515c70",
+              "on-primary-container": "#d0d0d0",
+              "inverse-surface": "#faf8ff",
+              "surface": "#070d1f",
+              "secondary-fixed-dim": "#c5d6f0",
+              "tertiary-fixed": "#dae6fe",
+              "on-tertiary-container": "#495468",
+              "secondary-fixed": "#d3e4fe",
+              "tertiary-fixed-dim": "#ccd7ef",
+              "inverse-primary": "#5e5f60",
+              "surface-container-high": "#0b1d48",
+              "on-secondary-fixed": "#314055",
+              "surface-bright": "#082768",
+              "on-tertiary-fixed": "#374155",
+              "secondary-container": "#2d3c51",
+              "primary-dim": "#b8b9b9",
+              "surface-dim": "#070d1f",
+              "error-container": "#7f2927",
+              "primary-container": "#454747",
+              "inverse-on-surface": "#4f5469",
+              "background": "#070d1f",
+              "on-tertiary-fixed-variant": "#535e72",
+              "on-primary-fixed-variant": "#5a5c5c",
+              "on-surface-variant": "#96a9e6",
+              "secondary-dim": "#8f9fb7",
+              "on-secondary-container": "#b0c0da",
+              "tertiary": "#f0f3ff",
+              "tertiary-container": "#dae6fe",
+              "on-primary-fixed": "#3e4040",
+              "outline-variant": "#32457c",
+              "primary": "#c6c6c7",
+              "surface-container": "#0a1839",
+              "primary-fixed-dim": "#d4d4d4",
+              "surface-container-lowest": "#000000",
+              "on-background": "#dfe4ff",
+              "on-surface": "#dfe4ff",
+              "surface-tint": "#c6c6c7",
+              "surface-container-low": "#09122b",
+              "outline": "#6073ad",
+              "surface-container-highest": "#0a2257",
+              "on-primary": "#3f4041",
+              "on-error": "#490106",
+              "error-dim": "#bb5551",
+              "tertiary-dim": "#ccd7ef",
+              "secondary": "#8f9fb7",
+              "on-error-container": "#ff9993",
+              "on-secondary": "#102134"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #070d1f; }
+        ::-webkit-scrollbar-thumb { background: #32457c; }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 rounded-none bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</span>
+<div class="hidden md:flex gap-8">
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase Manrope" href="#">Sedans</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase Manrope" href="#">SUVs</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase Manrope" href="#">Electric</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase Manrope" href="#">Build</a>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center border-b border-outline-variant/30 pb-1">
+<span class="material-symbols-outlined text-sm mr-2 text-slate-400">search</span>
+<input class="bg-transparent border-none text-[10px] tracking-widest focus:ring-0 placeholder:text-slate-600 text-slate-100 uppercase font-sans" placeholder="SEARCH UPDATES" type="text"/>
+</div>
+<button class="text-slate-300 dark:text-slate-300 font-sans tracking-widest text-xs uppercase Manrope hover:text-slate-100 transition-all duration-500">Sign In</button>
+<button class="bg-primary text-on-primary px-6 py-2 font-sans tracking-widest text-xs uppercase Manrope hover:bg-primary-fixed transition-all duration-300">Find a Dealer</button>
+</div>
+</nav>
+<main class="pt-32 pb-20">
+<!-- Hero Section: Editorial Header -->
+<section class="px-12 mb-20">
+<div class="grid grid-cols-12 gap-8 items-end">
+<div class="col-span-12 lg:col-span-8">
+<span class="label-sm uppercase tracking-[0.3em] text-on-surface-variant font-bold mb-4 block">THE NEWSROOM</span>
+<h1 class="text-7xl md:text-8xl font-headline italic tracking-tight leading-none mb-8">Precision <br/>Intelligence.</h1>
+</div>
+<div class="col-span-12 lg:col-span-4 pb-4">
+<p class="text-on-surface-variant font-body text-lg max-w-sm leading-relaxed mb-6">
+                        Explore the frontier of automotive engineering and design philosophy. From the atelier to the open road.
+                    </p>
+<div class="flex flex-wrap gap-3">
+<button class="px-4 py-1.5 bg-surface-container-high text-[10px] tracking-widest uppercase border border-outline-variant/20 hover:border-primary transition-all">All Stories</button>
+<button class="px-4 py-1.5 bg-transparent text-[10px] tracking-widest uppercase border border-outline-variant/20 hover:border-primary transition-all">Engineering</button>
+<button class="px-4 py-1.5 bg-transparent text-[10px] tracking-widest uppercase border border-outline-variant/20 hover:border-primary transition-all">Design</button>
+<button class="px-4 py-1.5 bg-transparent text-[10px] tracking-widest uppercase border border-outline-variant/20 hover:border-primary transition-all">Sustainability</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Featured High-Impact Story -->
+<section class="px-12 mb-32">
+<div class="relative group cursor-pointer overflow-hidden aspect-[21/9] flex items-end">
+<img alt="Featured Story" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Close-up of a high-performance luxury sports car's aerodynamic carbon fiber wing reflecting industrial sunset light with moody blue tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRg4Z7VgGDrw78_W_CWGkxJJJEF_KvGhYGXJAWUFyPlECApNtZ8aiX2mQMoWYiLRjX_OllCZ0RTivCmIe3OALNiaRN9ybvdlOoUOlQsimjk3iM9QYYNkR07lxmgMOUD8R6wav0pPfWEbIfvNj0adPOwuD-MqCeXWTHdGdiUHKhFtyOz9ipO-O48MuEvJsGQXQy83NT-f0Tw2IqIHwY3on8grAW2Sxkjn2s_Sd1zQcRYOIogPs_GQwqNd1PLaorPkLQCzj1xs4R7NYk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent opacity-80"></div>
+<div class="relative p-12 w-full max-w-4xl">
+<div class="flex items-center gap-4 mb-6">
+<span class="bg-primary text-on-primary text-[10px] px-3 py-1 font-bold tracking-widest uppercase">Feature</span>
+<span class="text-[10px] tracking-widest uppercase text-on-surface-variant">November 14, 2024</span>
+</div>
+<h2 class="text-5xl font-headline italic text-tertiary mb-6 leading-tight">The Architecture of Speed: How the 2025 TUT Aero Redefines Downforce.</h2>
+<a class="inline-flex items-center gap-2 group/link" href="#">
+<span class="text-xs tracking-[0.2em] font-bold uppercase border-b border-primary pb-1">Read the full story</span>
+<span class="material-symbols-outlined text-sm transform transition-transform group-hover/link:translate-x-2">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Latest News Bento Grid -->
+<section class="px-12 mb-32">
+<div class="flex justify-between items-end mb-12 border-b border-outline-variant/10 pb-6">
+<h3 class="text-3xl font-headline italic">Latest Updates</h3>
+<div class="flex gap-4">
+<button class="w-10 h-10 border border-outline-variant/20 flex items-center justify-center hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 border border-outline-variant/20 flex items-center justify-center hover:bg-surface-container-low transition-colors text-primary">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Story Card 1 -->
+<article class="bg-surface-container-low group">
+<div class="aspect-[4/3] overflow-hidden mb-6">
+<img alt="Production Update" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Interior of a futuristic car production plant with robotic arms and precise blue lighting on metallic components" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOaQd0AYubIb05JzYrt4jBgIzw1nGe9EUNhoxtCNMO9FcNgdp8iX6whsx_j-CJg72rfYOqU0gUpt5a-DXQbmkQKpWTOfWl6BZdXNbzZ_jL4-jOu0NI19Jcrkl_4JfQ7pmeTUuU1N3JDpUsBEJqNsd9A9kJqx0gyO95PD37W7ggv-zNLUrTHOinXbvPL_DIPiAlPYbU9FYtyPXmtVWewzE46WKpvVePB_Olrj1YsSWmSrQX_-KujWNGd2iYxS1b8jdfVylJg7klkCoy"/>
+</div>
+<div class="px-8 pb-10">
+<span class="text-[9px] tracking-[0.2em] font-bold uppercase text-on-surface-variant mb-3 block">Engineering</span>
+<h4 class="text-2xl font-headline italic mb-4 leading-tight">The Carbon-Neutral Assembly: A New Benchmark for TUT USA.</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-6 font-body">Our South Carolina facility achieves zero-emission certification through innovative solar integration and thermal recycling.</p>
+<span class="text-[10px] tracking-widest uppercase font-bold text-primary group-hover:underline underline-offset-4 cursor-pointer">Explore</span>
+</div>
+</article>
+<!-- Story Card 2 -->
+<article class="bg-surface-container-low group">
+<div class="aspect-[4/3] overflow-hidden mb-6">
+<img alt="Design Detail" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="A premium leather car interior detail showing intricate stitching and machined aluminum knobs in a dark luxury cabin" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQL0PlSlNFPyOW5HEtU4GS-HbAHJH4qWOBMsQy9RCgaJMWuoz3iMx7Qs9vsrd84Xho9KMzajcH4b57gsI--CZY833pRD0baBMEoz9UvTJfmUzHZHzJ27bvEfCPcCdlfHkKoQ6C1g32edUELs-ars0GrhlbeMVzyvXOuCkznZiC1pfeygK3L3P2v8RAtDXO7YuGKSvVvdUti36HhnKSZnuGg356zQqcN0S20e6VTraYV4ZqrIabDxbmPNKErE4O6YY6AypNCHYFvS00"/>
+</div>
+<div class="px-8 pb-10">
+<span class="text-[9px] tracking-[0.2em] font-bold uppercase text-on-surface-variant mb-3 block">Design Philosophy</span>
+<h4 class="text-2xl font-headline italic mb-4 leading-tight">Tactile Luxury: The Return of Analogue Controls in the Digital Age.</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-6 font-body">Why TUT designers are opting for physical switches machined from solid billet aluminum over touchscreen interfaces.</p>
+<span class="text-[10px] tracking-widest uppercase font-bold text-primary group-hover:underline underline-offset-4 cursor-pointer">Explore</span>
+</div>
+</article>
+<!-- Story Card 3 -->
+<article class="bg-surface-container-low group">
+<div class="aspect-[4/3] overflow-hidden mb-6">
+<img alt="Future Concept" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Front view of a white electric luxury SUV in a minimalist concrete gallery with harsh artistic shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK0u93WzjRxYtJObJVWt4yH74-eI8ertQQ09UtuCQ-z2O6gBszqM5i5P-AHOL5QZZ0d6VKkjL1Uo8FCUlAlCxaXO9fobP9JygS-ewoKGeCyKyV62tgSKwHViksHJgY5Q7TGge4xBR2N37Bk-KpzV1vgVoNPw56Sj7vkWVVXUSSi24zqSahN-A5RGUeqI_sjjjMF3OE0gbzBa2uBxNBKO0y3ds9HZclWni9uNXbNogOcwqCUQfQNO3MWM6MzHYbb--196g105cbV__n"/>
+</div>
+<div class="px-8 pb-10">
+<span class="text-[9px] tracking-[0.2em] font-bold uppercase text-on-surface-variant mb-3 block">Innovation</span>
+<h4 class="text-2xl font-headline italic mb-4 leading-tight">Solid State: The 1,000-Mile Battery Prototype Enters Testing.</h4>
+<p class="text-sm text-on-surface-variant line-clamp-2 mb-6 font-body">Collaborative research with MIT reveals first glimpse of high-density storage that could change grand touring forever.</p>
+<span class="text-[10px] tracking-widest uppercase font-bold text-primary group-hover:underline underline-offset-4 cursor-pointer">Explore</span>
+</div>
+</article>
+</div>
+</section>
+<!-- Newsletter Signup Section -->
+<section class="px-12 mb-32">
+<div class="bg-surface-container-high p-20 grid grid-cols-1 md:grid-cols-2 items-center gap-16 border-l-4 border-primary">
+<div>
+<h3 class="text-5xl font-headline italic mb-6">The Atelier Digest.</h3>
+<p class="text-on-surface-variant text-lg max-w-md font-body">Exclusive engineering insights, limited edition previews, and invitations to private TUT events delivered monthly.</p>
+</div>
+<div class="flex flex-col gap-4">
+<div class="relative border-b-2 border-outline-variant/30 py-4 group focus-within:border-primary transition-all">
+<label class="text-[10px] tracking-[0.3em] uppercase text-on-surface-variant block mb-2 font-bold">Your Email Address</label>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-xl font-headline italic placeholder:text-surface-variant" placeholder="JOIN@PRECISION.TUT" type="email"/>
+</div>
+<button class="bg-primary text-on-primary py-4 px-10 text-xs tracking-[0.3em] font-bold uppercase self-start hover:bg-primary-fixed transition-colors">Subscribe Now</button>
+<p class="text-[9px] text-on-tertiary-fixed-variant uppercase tracking-widest mt-2">By subscribing, you agree to our privacy policy and terms of service.</p>
+</div>
+</div>
+</section>
+<!-- Blog/Article Archive -->
+<section class="px-12 mb-20">
+<h3 class="text-[10px] tracking-[0.4em] uppercase font-bold text-on-surface-variant mb-12 border-b border-outline-variant/10 pb-4">Deep Archive</h3>
+<div class="space-y-0">
+<!-- Article Item 1 -->
+<div class="group border-b border-outline-variant/10 py-10 grid grid-cols-12 gap-8 items-center hover:bg-surface-container-low transition-all px-4 -mx-4">
+<div class="col-span-2 text-on-surface-variant text-[10px] tracking-widest font-bold uppercase">Oct 2024</div>
+<div class="col-span-7">
+<h4 class="text-3xl font-headline italic group-hover:text-primary transition-colors cursor-pointer">The Sound of Silence: Acoustic Engineering in the 2024 Sedan Lineup.</h4>
+</div>
+<div class="col-span-3 text-right">
+<span class="text-[10px] tracking-widest uppercase border border-outline-variant/40 px-3 py-1 text-on-surface-variant">Engineering</span>
+</div>
+</div>
+<!-- Article Item 2 -->
+<div class="group border-b border-outline-variant/10 py-10 grid grid-cols-12 gap-8 items-center hover:bg-surface-container-low transition-all px-4 -mx-4">
+<div class="col-span-2 text-on-surface-variant text-[10px] tracking-widest font-bold uppercase">Sep 2024</div>
+<div class="col-span-7">
+<h4 class="text-3xl font-headline italic group-hover:text-primary transition-colors cursor-pointer">Heritage Meets High-Tech: The Restomod Collection Reveals.</h4>
+</div>
+<div class="col-span-3 text-right">
+<span class="text-[10px] tracking-widest uppercase border border-outline-variant/40 px-3 py-1 text-on-surface-variant">Design</span>
+</div>
+</div>
+<!-- Article Item 3 -->
+<div class="group border-b border-outline-variant/10 py-10 grid grid-cols-12 gap-8 items-center hover:bg-surface-container-low transition-all px-4 -mx-4">
+<div class="col-span-2 text-on-surface-variant text-[10px] tracking-widest font-bold uppercase">Aug 2024</div>
+<div class="col-span-7">
+<h4 class="text-3xl font-headline italic group-hover:text-primary transition-colors cursor-pointer">TUT Racing: Reflections on the 24 Hours of Nürburgring.</h4>
+</div>
+<div class="col-span-3 text-right">
+<span class="text-[10px] tracking-widest uppercase border border-outline-variant/40 px-3 py-1 text-on-surface-variant">Performance</span>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-20 flex justify-center items-center gap-12">
+<button class="text-on-surface-variant text-[10px] tracking-[0.3em] font-bold uppercase opacity-50 cursor-not-allowed">Previous</button>
+<div class="flex gap-8">
+<span class="text-primary text-xs font-bold border-b-2 border-primary pb-1">01</span>
+<span class="text-on-surface-variant text-xs hover:text-on-surface cursor-pointer">02</span>
+<span class="text-on-surface-variant text-xs hover:text-on-surface cursor-pointer">03</span>
+<span class="text-on-surface-variant text-xs hover:text-on-surface cursor-pointer">04</span>
+</div>
+<button class="text-on-surface text-[10px] tracking-[0.3em] font-bold uppercase hover:text-primary transition-colors">Next</button>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-slate-950 dark:bg-slate-950 border-t border-slate-800/30">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full">
+<div class="col-span-2">
+<span class="text-3xl font-serif tracking-tighter text-slate-200 block mb-6">TUT</span>
+<p class="text-slate-500 font-sans text-xs tracking-widest uppercase Manrope leading-relaxed">Defining the next century of automotive excellence through precision, art, and engineering.</p>
+</div>
+<div>
+<h5 class="font-serif italic text-slate-200 mb-6 Newsreader">Vehicles</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Sedans</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">SUVs</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Electric</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Future</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif italic text-slate-200 mb-6 Newsreader">Company</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">About</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Careers</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Sustainability</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Newsroom</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif italic text-slate-200 mb-6 Newsreader">Support</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Contact</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Service</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Recall Info</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">FAQ</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-serif italic text-slate-200 mb-6 Newsreader">Legal</h5>
+<ul class="space-y-4">
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Privacy</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Terms</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Cookies</a></li>
+<li><a class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope hover:text-slate-100 transition-colors duration-200 block" href="#">Accessibility</a></li>
+</ul>
+</div>
+</div>
+<div class="px-12 py-10 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6">
+<span class="text-slate-500 text-[10px] font-sans uppercase tracking-widest Manrope">© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<span class="text-slate-200 text-[10px] font-sans uppercase tracking-widest Manrope cursor-pointer hover:text-primary transition-colors">USA / English</span>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-500 text-sm hover:text-slate-200 cursor-pointer">public</span>
+<span class="material-symbols-outlined text-slate-500 text-sm hover:text-slate-200 cursor-pointer">share</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TUT | Component Library: Forms &amp; Consent</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#dae6fe",
+                        "secondary-container": "#2d3c51",
+                        "primary-container": "#454747",
+                        "surface-bright": "#082768",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-fixed": "#dae6fe",
+                        "surface-container-high": "#0b1d48",
+                        "surface-variant": "#0a2257",
+                        "on-tertiary-container": "#495468",
+                        "on-primary-fixed": "#3e4040",
+                        "inverse-surface": "#faf8ff",
+                        "error-container": "#7f2927",
+                        "background": "#070d1f",
+                        "on-secondary-container": "#b0c0da",
+                        "outline": "#6073ad",
+                        "outline-variant": "#32457c",
+                        "on-tertiary": "#515c70",
+                        "inverse-primary": "#5e5f60",
+                        "on-surface": "#dfe4ff",
+                        "surface-container-lowest": "#000000",
+                        "secondary": "#8f9fb7",
+                        "on-secondary": "#102134",
+                        "on-primary-fixed-variant": "#5a5c5c",
+                        "surface-dim": "#070d1f",
+                        "on-primary-container": "#d0d0d0",
+                        "primary": "#c6c6c7",
+                        "primary-dim": "#b8b9b9",
+                        "on-tertiary-fixed": "#374155",
+                        "on-background": "#dfe4ff",
+                        "on-secondary-fixed": "#314055",
+                        "tertiary-dim": "#ccd7ef",
+                        "on-secondary-fixed-variant": "#4d5d73",
+                        "on-error": "#490106",
+                        "on-primary": "#3f4041",
+                        "secondary-fixed-dim": "#c5d6f0",
+                        "inverse-on-surface": "#4f5469",
+                        "on-error-container": "#ff9993",
+                        "error-dim": "#bb5551",
+                        "primary-fixed-dim": "#d4d4d4",
+                        "on-surface-variant": "#96a9e6",
+                        "error": "#ee7d77",
+                        "surface-container": "#0a1839",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-low": "#09122b",
+                        "surface": "#070d1f",
+                        "on-tertiary-fixed-variant": "#535e72",
+                        "primary-fixed": "#e2e2e2",
+                        "tertiary": "#f0f3ff",
+                        "surface-container-highest": "#0a2257",
+                        "secondary-dim": "#8f9fb7",
+                        "tertiary-fixed-dim": "#ccd7ef"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader", "serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #070d1f;
+            color: #dfe4ff;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #070d1f; }
+        ::-webkit-scrollbar-thumb { background: #32457c; }
+        input, select, textarea {
+            background: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(50, 69, 124, 0.4) !important;
+            border-radius: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            border-bottom: 2px solid #c6c6c7 !important;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Anchor -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl flex justify-between items-center px-12 py-6">
+<div class="text-2xl font-headline italic tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex gap-10 items-center">
+<a class="font-label tracking-widest text-[11px] uppercase text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Sedans</a>
+<a class="font-label tracking-widest text-[11px] uppercase text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">SUVs</a>
+<a class="font-label tracking-widest text-[11px] uppercase text-slate-400 hover:text-slate-100 transition-colors duration-300" href="#">Electric</a>
+<a class="font-label tracking-widest text-[11px] uppercase text-slate-100 font-bold border-b border-slate-100 pb-1" href="#">Build</a>
+</div>
+<div class="flex gap-6 items-center">
+<button class="font-label tracking-widest text-[10px] uppercase text-slate-100 border border-outline-variant/30 px-6 py-2 hover:bg-on-surface/5 transition-all">Find a Dealer</button>
+<span class="material-symbols-outlined text-slate-300 cursor-pointer">account_circle</span>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-6 md:px-12 lg:px-24">
+<!-- Hero Section -->
+<header class="mb-24 max-w-4xl">
+<h1 class="font-headline text-5xl md:text-7xl italic leading-tight mb-8">
+                Precision <span class="text-primary-dim">Interface</span><br/>Systems
+            </h1>
+<p class="font-body text-on-surface-variant text-lg tracking-wide leading-relaxed">
+                A technical compendium of forms, data capture modules, and consent frameworks designed for the automotive elite. Every interaction is machined for clarity, security, and uncompromising luxury.
+            </p>
+</header>
+<!-- Bento Grid: Forms & Data -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-10 mb-32">
+<!-- VIN Lookup / Technical Verification -->
+<div class="md:col-span-7 bg-surface-container-low p-10 flex flex-col justify-between">
+<div>
+<span class="font-label uppercase text-[10px] tracking-[0.3em] text-primary mb-6 block">Vehicle Diagnostics</span>
+<h2 class="font-headline text-3xl italic mb-8">VIN Configuration Search</h2>
+<div class="relative mb-12">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant mb-2 block">Vehicle Identification Number</label>
+<input class="w-full text-xl font-body py-4 uppercase tracking-widest" placeholder="WBA1234567890..." type="text"/>
+<div class="absolute right-0 bottom-4">
+<button class="bg-primary text-on-primary px-8 py-3 font-label uppercase text-[11px] tracking-widest hover:bg-primary-fixed transition-colors">Verify Spec</button>
+</div>
+</div>
+</div>
+<div class="flex gap-12 border-t border-outline-variant/10 pt-10">
+<div>
+<div class="font-headline text-2xl italic">0.14<span class="font-label text-xs tracking-tighter ml-1">SEC</span></div>
+<div class="font-label uppercase text-[9px] tracking-widest text-on-surface-variant">Lookup Latency</div>
+</div>
+<div>
+<div class="font-headline text-2xl italic">TLS 1.3</div>
+<div class="font-label uppercase text-[9px] tracking-widest text-on-surface-variant">Encryption Level</div>
+</div>
+</div>
+</div>
+<!-- Lead Generation / CTA Card -->
+<div class="md:col-span-5 bg-surface-container-high p-10 relative overflow-hidden">
+<div class="relative z-10 h-full flex flex-col">
+<span class="font-label uppercase text-[10px] tracking-[0.3em] text-primary mb-6 block">Direct Inquiry</span>
+<h2 class="font-headline text-3xl italic mb-10 leading-snug">Reserve Your Private Allocation</h2>
+<form class="space-y-8 flex-grow">
+<div>
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant block mb-1">Legal Name</label>
+<input class="w-full py-2" type="text"/>
+</div>
+<div>
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant block mb-1">Digital Identity</label>
+<input class="w-full py-2" placeholder="client@exclusive.com" type="email"/>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-on-primary py-5 font-label uppercase text-[12px] tracking-[0.2em] font-bold">Initiate Engagement</button>
+</div>
+</form>
+</div>
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<img alt="Dramatic silhouette of a luxury vehicle in a dark studio with thin sharp highlights" class="w-full h-full object-cover grayscale" data-alt="Dramatic silhouette of a luxury vehicle in a dark studio with thin sharp highlights and architectural shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLaXZTMqYS15BdmVhUA0fIFdTg4lhah3k1p6Ii2yhcxToG1yYMFau2JLFSAtqvb6Njg7Y9EdeUga5G9YJpIqL-eQlVOSlGom9YvkE-Rb_cKudhd7n3eP8U49xGWKW2U_h-ojJdgbaue9MZBER9A7G9FEXXbhbV6xI8HkMgBcxAkPcQHZrX-5TF5yOqEcoQRfyfczN1Yw_Lf7FuTWYMJPwU16gFyK0E8xAJnoyk5Dd8F0NBGbRbKeP4R5BJjq6C_uURImKX6WveoMME"/>
+</div>
+</div>
+<!-- Quiz / Preference Module -->
+<div class="md:col-span-4 bg-surface-container-low p-10">
+<span class="font-label uppercase text-[10px] tracking-[0.3em] text-primary mb-6 block">Curation Quiz</span>
+<h3 class="font-headline text-2xl mb-8">Identify Your Performance Profile</h3>
+<div class="space-y-6">
+<p class="font-body text-sm text-on-surface-variant leading-relaxed mb-8">Select the environment that best matches your typical driving circuit.</p>
+<div class="space-y-3">
+<label class="group flex items-center justify-between p-4 border border-outline-variant/20 cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="font-label text-[11px] uppercase tracking-widest">Alpine Passages</span>
+<input class="hidden" name="perf" type="radio"/>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">arrow_forward</span>
+</label>
+<label class="group flex items-center justify-between p-4 border border-outline-variant/20 cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="font-label text-[11px] uppercase tracking-widest">Urban Grid</span>
+<input class="hidden" name="perf" type="radio"/>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">arrow_forward</span>
+</label>
+<label class="group flex items-center justify-between p-4 border border-outline-variant/20 cursor-pointer hover:bg-surface-variant transition-colors">
+<span class="font-label text-[11px] uppercase tracking-widest">Grand Touring</span>
+<input class="hidden" name="perf" type="radio"/>
+<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100">arrow_forward</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Ownership Calculator -->
+<div class="md:col-span-8 bg-surface-container p-10 flex flex-col md:flex-row gap-12">
+<div class="md:w-1/2">
+<span class="font-label uppercase text-[10px] tracking-[0.3em] text-primary mb-6 block">Financial Projection</span>
+<h3 class="font-headline text-2xl mb-8 leading-snug">Asset Acquisition Calculator</h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between mb-4">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Allocation Term</label>
+<span class="font-label text-[10px] text-primary">48 MONTHS</span>
+</div>
+<input class="w-full accent-primary h-1 bg-outline-variant/30 appearance-none cursor-pointer" type="range"/>
+</div>
+<div>
+<div class="flex justify-between mb-4">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Initial Equity</label>
+<span class="font-label text-[10px] text-primary">$25,000</span>
+</div>
+<input class="w-full accent-primary h-1 bg-outline-variant/30 appearance-none cursor-pointer" type="range"/>
+</div>
+</div>
+</div>
+<div class="md:w-1/2 bg-surface-container-highest p-8 flex flex-col justify-center items-center text-center">
+<div class="font-label uppercase text-[9px] tracking-[0.3em] text-on-surface-variant mb-2">Estimated Monthly Commitment</div>
+<div class="font-headline text-6xl italic mb-4">$2,440</div>
+<p class="font-body text-[10px] text-on-surface-variant uppercase tracking-widest">Excludes local taxes and dealer surcharges.</p>
+</div>
+</div>
+</div>
+<!-- Section: Input Architecture -->
+<section class="mb-32">
+<div class="flex flex-col md:flex-row gap-20">
+<div class="md:w-1/3">
+<h2 class="font-headline text-4xl italic mb-6">Input Architecture</h2>
+<p class="font-body text-on-surface-variant tracking-wide">Standardized components for complex data entry, following the No-Line rule and Tonal Layering principles.</p>
+</div>
+<div class="md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
+<div class="space-y-2">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Default Text Field</label>
+<input class="w-full py-2" placeholder="Enter alphanumeric string" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Active State</label>
+<input class="w-full py-2 !border-primary" type="text" value="Direct Injection System"/>
+</div>
+<div class="space-y-2">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Selection Matrix</label>
+<select class="w-full py-2 appearance-none">
+<option>Performance Matte Silver</option>
+<option>Gloss Obsidian Black</option>
+<option>Arctic White</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant">Error Condition</label>
+<input class="w-full py-2 !border-error-container text-error" type="email" value="invalid-email-format"/>
+<span class="font-label text-[9px] text-error uppercase tracking-widest mt-1 block">Authentication Failed: Check format</span>
+</div>
+<div class="md:col-span-2">
+<label class="font-label uppercase text-[10px] tracking-widest text-on-surface-variant block mb-4">Transmission of Files</label>
+<div class="border border-dashed border-outline-variant/40 p-12 text-center group hover:border-primary transition-all">
+<span class="material-symbols-outlined text-4xl mb-4 text-on-surface-variant group-hover:text-primary transition-colors">cloud_upload</span>
+<p class="font-label text-[11px] uppercase tracking-[0.2em]">Drag telemetry data or <span class="text-primary underline cursor-pointer">Browse Storage</span></p>
+<p class="text-[9px] text-on-surface-variant mt-2 uppercase">Max payload: 50MB (.csv, .log, .pdf)</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Consent & Legal -->
+<section class="mb-32">
+<div class="bg-surface-container-low p-12 md:p-20 relative border-l-4 border-primary">
+<div class="max-w-3xl">
+<span class="font-label uppercase text-[10px] tracking-[0.3em] text-primary mb-6 block">Legal Governance</span>
+<h2 class="font-headline text-4xl italic mb-10">Consent &amp; Privacy Management</h2>
+<div class="space-y-12">
+<div class="flex gap-8 items-start">
+<div class="flex-shrink-0 pt-1">
+<input class="w-5 h-5 bg-transparent border-outline-variant text-primary focus:ring-0" type="checkbox"/>
+</div>
+<div>
+<h4 class="font-label text-[12px] uppercase tracking-widest font-bold mb-2">Technical Telemetry Consent</h4>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">
+                                    I permit TUT USA to collect anonymized engine telemetry and driving dynamics to improve safety protocols and future powertrain development.
+                                </p>
+</div>
+</div>
+<div class="flex gap-8 items-start">
+<div class="flex-shrink-0 pt-1">
+<input checked="" class="w-5 h-5 bg-transparent border-outline-variant text-primary focus:ring-0" type="checkbox"/>
+</div>
+<div>
+<h4 class="font-label text-[12px] uppercase tracking-widest font-bold mb-2">Privacy &amp; GDPR Compliance</h4>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">
+                                    I acknowledge the <a class="text-primary underline" href="#">Privacy Policy</a> and understand my rights regarding data rectification, portability, and the right to be forgotten.
+                                </p>
+</div>
+</div>
+</div>
+<div class="mt-16 flex flex-wrap gap-8">
+<button class="bg-primary text-on-primary px-10 py-4 font-label uppercase text-[11px] tracking-widest font-bold">Commit Settings</button>
+<button class="border border-outline-variant/30 text-on-surface px-10 py-4 font-label uppercase text-[11px] tracking-widest">Withdraw All Consent</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Feedback & Polls -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<div class="bg-surface-container-high p-12">
+<h3 class="font-headline text-2xl italic mb-8">Service Feedback</h3>
+<div class="space-y-8">
+<div class="flex justify-between">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Support Quality</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-primary" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-primary" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-primary" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-primary" data-weight="fill">star</span>
+<span class="material-symbols-outlined text-outline-variant">star</span>
+</div>
+</div>
+<textarea class="w-full resize-none" placeholder="Detailed encounter notes..." rows="4"></textarea>
+<button class="w-full bg-primary text-on-primary py-4 font-label uppercase text-[11px] tracking-widest">Submit Critique</button>
+</div>
+</div>
+<div class="bg-surface-container-low p-12">
+<h3 class="font-headline text-2xl italic mb-8">Global Preference Poll</h3>
+<p class="font-body text-sm text-on-surface-variant mb-10">Which propulsion architecture represents the future of the Atelier?</p>
+<div class="space-y-6">
+<div class="relative">
+<div class="flex justify-between font-label text-[11px] uppercase tracking-widest mb-2 relative z-10 px-4 pt-3">
+<span>Hydrogen Fuel Cell</span>
+<span>12%</span>
+</div>
+<div class="absolute inset-0 bg-outline-variant/10 h-12 w-full"></div>
+<div class="absolute inset-0 bg-primary/20 h-12 w-[12%] border-r border-primary"></div>
+</div>
+<div class="relative">
+<div class="flex justify-between font-label text-[11px] uppercase tracking-widest mb-2 relative z-10 px-4 pt-3">
+<span>Solid State Battery</span>
+<span>64%</span>
+</div>
+<div class="absolute inset-0 bg-outline-variant/10 h-12 w-full"></div>
+<div class="absolute inset-0 bg-primary/20 h-12 w-[64%] border-r border-primary"></div>
+</div>
+<div class="relative">
+<div class="flex justify-between font-label text-[11px] uppercase tracking-widest mb-2 relative z-10 px-4 pt-3">
+<span>Synthetic E-Fuels</span>
+<span>24%</span>
+</div>
+<div class="absolute inset-0 bg-outline-variant/10 h-12 w-full"></div>
+<div class="absolute inset-0 bg-primary/20 h-12 w-[24%] border-r border-primary"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-950 border-t border-slate-800/30 px-12 py-20">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 w-full mb-16">
+<div class="col-span-2">
+<div class="text-3xl font-headline tracking-tighter text-slate-200 mb-8 uppercase">TUT USA</div>
+<p class="font-body text-xs text-slate-500 max-w-xs leading-relaxed">
+                    Defining the intersection of performance engineering and digital refinement. Designed in Germany. Engineered for the world.
+                </p>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-slate-200 mb-4">Vehicles</span>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">TUT S-Series</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">TUT X-Line</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Electric Concept</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-slate-200 mb-4">Company</span>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Heritage</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Innovation</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Careers</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-slate-200 mb-4">Legal</span>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Privacy</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Cookies</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">USA/English</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="font-label text-[10px] uppercase tracking-widest text-slate-200 mb-4">Support</span>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Contact</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Recall Search</a>
+<a class="font-label text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-100 transition-colors" href="#">Owner Login</a>
+</div>
+</div>
+<div class="border-t border-slate-800/20 pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="font-label text-[9px] uppercase tracking-[0.2em] text-slate-500">© 2024 TUT USA. ALL RIGHTS RESERVED.</div>
+<div class="flex gap-8">
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-100 cursor-pointer">public</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-100 cursor-pointer">verified_user</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-slate-100 cursor-pointer">shield</span>
+</div>
+</div>
+</footer>
+<!-- Cookie Banner / Consent Overlay -->
+<div class="fixed bottom-0 left-0 w-full z-[100] p-6 pointer-events-none">
+<div class="bg-surface-container-high/90 backdrop-blur-2xl p-8 max-w-2xl mx-auto border-t-2 border-primary pointer-events-auto shadow-2xl">
+<div class="flex flex-col md:flex-row gap-8 items-start">
+<div class="flex-grow">
+<h5 class="font-label text-[11px] uppercase tracking-widest font-bold mb-3 text-slate-100">Intelligent Experience Personalization</h5>
+<p class="font-body text-[11px] text-slate-400 leading-relaxed uppercase tracking-wider">
+                        We use technical cookies to optimize site navigation and analyze engagement. By continuing, you accept our algorithmic preference tracking.
+                    </p>
+</div>
+<div class="flex gap-4 flex-shrink-0 w-full md:w-auto">
+<button class="flex-1 md:flex-none border border-outline-variant/30 px-6 py-3 font-label text-[10px] uppercase tracking-widest text-slate-300 hover:bg-white/5 transition-all">Customize</button>
+<button class="flex-1 md:flex-none bg-primary text-on-primary px-6 py-3 font-label text-[10px] uppercase tracking-widest font-bold">Accept All</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TUT | Preserving Excellence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#082768",
+                        "surface-variant": "#0a2257",
+                        "on-surface-variant": "#96a9e6",
+                        "inverse-surface": "#faf8ff",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-high": "#0b1d48",
+                        "surface": "#070d1f",
+                        "on-tertiary-container": "#495468",
+                        "primary-container": "#454747",
+                        "on-secondary-container": "#b0c0da",
+                        "secondary-dim": "#8f9fb7",
+                        "error-container": "#7f2927",
+                        "on-error-container": "#ff9993",
+                        "secondary": "#8f9fb7",
+                        "secondary-fixed-dim": "#c5d6f0",
+                        "surface-container-lowest": "#000000",
+                        "tertiary": "#f0f3ff",
+                        "on-tertiary-fixed-variant": "#535e72",
+                        "tertiary-container": "#dae6fe",
+                        "on-primary-fixed": "#3e4040",
+                        "inverse-primary": "#5e5f60",
+                        "on-error": "#490106",
+                        "primary-fixed": "#e2e2e2",
+                        "tertiary-fixed": "#dae6fe",
+                        "tertiary-dim": "#ccd7ef",
+                        "error-dim": "#bb5551",
+                        "on-primary-container": "#d0d0d0",
+                        "error": "#ee7d77",
+                        "secondary-container": "#2d3c51",
+                        "primary-dim": "#b8b9b9",
+                        "on-secondary-fixed-variant": "#4d5d73",
+                        "inverse-on-surface": "#4f5469",
+                        "primary": "#c6c6c7",
+                        "on-primary": "#3f4041",
+                        "primary-fixed-dim": "#d4d4d4",
+                        "surface-dim": "#070d1f",
+                        "on-background": "#dfe4ff",
+                        "on-secondary-fixed": "#314055",
+                        "background": "#070d1f",
+                        "on-tertiary-fixed": "#374155",
+                        "outline-variant": "#32457c",
+                        "tertiary-fixed-dim": "#ccd7ef",
+                        "surface-container-highest": "#0a2257",
+                        "surface-container": "#0a1839",
+                        "on-surface": "#dfe4ff",
+                        "surface-container-low": "#09122b",
+                        "on-tertiary": "#515c70",
+                        "outline": "#6073ad",
+                        "on-primary-fixed-variant": "#5a5c5c",
+                        "on-secondary": "#102134",
+                        "secondary-fixed": "#d3e4fe"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(50, 69, 124, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-[11px] Manrope uppercase" href="#">Sedans</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-[11px] Manrope uppercase" href="#">SUVs</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-[11px] Manrope uppercase" href="#">Electric</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-[11px] Manrope uppercase" href="#">Build</a>
+</div>
+<div class="flex items-center space-x-8">
+<button class="text-slate-400 hover:text-slate-100 transition-all duration-500 font-sans tracking-widest text-[11px] uppercase">Sign In</button>
+<button class="bg-primary text-on-primary px-6 py-2.5 font-sans tracking-widest text-[11px] uppercase transition-transform active:scale-[0.99]">Find a Dealer</button>
+</div>
+</nav>
+<main class="pt-32">
+<!-- Hero Section: Preserving Excellence -->
+<section class="px-12 mb-32 relative">
+<div class="grid grid-cols-12 gap-8 items-end">
+<div class="col-span-12 lg:col-span-5">
+<span class="font-label uppercase tracking-[0.3em] text-primary text-[10px] mb-4 block">Ownership Care</span>
+<h1 class="font-headline italic text-7xl md:text-8xl lg:text-9xl leading-[0.9] text-tertiary mb-8">Preserving Excellence</h1>
+<p class="font-body text-secondary-dim max-w-md leading-relaxed">Your TUT is a masterpiece of precision engineering. Our specialized maintenance ecosystem ensures it remains in peak performance through every mile and every year.</p>
+</div>
+<div class="col-span-12 lg:col-span-7 aspect-[21/9] overflow-hidden grayscale contrast-125">
+<img alt="High-end automotive workshop" class="w-full h-full object-cover" data-alt="Close-up of a high-performance vehicle engine bay with dramatic cinematic lighting and metallic textures in a clean clinical workshop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-TZJ5vt-S5nhiFPHrjjp2mbE47OyNTOWOaIk584RBQfbwCitUmcViTpHdPYVUJ3DZTCWD4Ee-mhsgWIWU68yBVBYm08JMvxEnG57I7omctUfpehZJ3P67lD05SWAKRtSdllRPlU9YaLTfg1iF92uugh_4ensSgcbO6Duxa_8mE3L0TGr6WLhuewBJ5ct0SdcFhlT_jozn-WRrUoAEXN_PFsgjpeONCI4T6AcSG6gbyFfvWHdYVk25rDhWlFRsZP1vLrs1o9rQFeq8"/>
+</div>
+</div>
+</section>
+<!-- Feature List: Bento Grid Style -->
+<section class="px-12 mb-40">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Concierge Service -->
+<div class="bg-surface-container-low p-12 ghost-border flex flex-col justify-between aspect-square md:aspect-auto min-h-[400px]">
+<div>
+<span class="material-symbols-outlined text-primary text-4xl mb-8" data-icon="room_service">room_service</span>
+<h3 class="font-headline text-3xl text-tertiary mb-4">Concierge Service</h3>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed">White-glove vehicle retrieval and delivery. We manage the logistics so your schedule remains undisturbed.</p>
+</div>
+<div class="mt-8 border-t border-outline-variant/20 pt-6">
+<span class="font-label text-[10px] tracking-widest uppercase text-primary">Priority Access</span>
+</div>
+</div>
+<!-- Software Updates -->
+<div class="bg-surface-container-high p-12 ghost-border flex flex-col justify-between min-h-[400px]">
+<div>
+<span class="material-symbols-outlined text-primary text-4xl mb-8" data-icon="terminal">terminal</span>
+<h3 class="font-headline text-3xl text-tertiary mb-4">Over-the-Air Updates</h3>
+<p class="font-body text-on-surface-variant text-sm leading-relaxed">Continuous evolution of performance. Our engineering team optimizes your vehicle's systems remotely via secure satellite uplink.</p>
+</div>
+<div class="flex items-end gap-4">
+<div>
+<span class="font-headline text-4xl text-primary">v4.2</span>
+<span class="block font-label text-[10px] tracking-widest uppercase text-secondary">Latest Build</span>
+</div>
+</div>
+</div>
+<!-- Technical Specs / Data -->
+<div class="bg-surface-container-low p-12 ghost-border flex flex-col justify-between min-h-[400px]">
+<div class="space-y-12">
+<div>
+<span class="font-headline text-5xl text-tertiary">0.02<span class="text-xl text-secondary">mm</span></span>
+<span class="block font-label text-[10px] tracking-widest uppercase mt-2">Alignment Tolerance</span>
+</div>
+<div>
+<span class="font-headline text-5xl text-tertiary">100%</span>
+<span class="block font-label text-[10px] tracking-widest uppercase mt-2">OEM Component Integrity</span>
+</div>
+<div>
+<span class="font-headline text-5xl text-tertiary">24/7</span>
+<span class="block font-label text-[10px] tracking-widest uppercase mt-2">Telemetry Monitoring</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Appointment Scheduler Widget & Service Center Card -->
+<section class="px-12 mb-40">
+<div class="grid grid-cols-12 gap-12 items-start">
+<div class="col-span-12 lg:col-span-4 sticky top-32">
+<h2 class="font-headline text-5xl italic text-tertiary mb-8">Schedule Maintenance</h2>
+<div class="bg-surface-container-high p-8 ghost-border">
+<div class="mb-8">
+<label class="font-label text-[10px] uppercase text-on-surface-variant mb-2 block">Vehicle Identification</label>
+<select class="w-full bg-transparent border-b border-outline-variant py-3 text-tertiary focus:border-primary outline-none appearance-none font-body">
+<option>TUT S-Class Touring (VIN: ...8829)</option>
+<option>TUT X-Series Electric (VIN: ...1104)</option>
+</select>
+</div>
+<div class="mb-8">
+<label class="font-label text-[10px] uppercase text-on-surface-variant mb-2 block">Select Service Tier</label>
+<div class="space-y-4 mt-4">
+<button class="w-full text-left p-4 ghost-border flex justify-between items-center group hover:bg-surface-variant transition-colors">
+<span class="font-body text-sm">Annual Inspection</span>
+<span class="material-symbols-outlined text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full text-left p-4 ghost-border flex justify-between items-center group hover:bg-surface-variant transition-colors border-primary/50 bg-surface-container-highest">
+<span class="font-body text-sm">Precision Tuning Package</span>
+<span class="material-symbols-outlined text-xs text-primary" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 font-label uppercase tracking-widest text-xs transition-colors hover:bg-primary-fixed">Confirm Booking</button>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-8 space-y-12">
+<!-- Service Center Map/Card -->
+<div class="relative group overflow-hidden h-[500px]">
+<img alt="Modern luxury car dealership interior" class="w-full h-full object-cover grayscale brightness-75 group-hover:scale-105 transition-transform duration-[2000ms]" data-alt="Interior of a ultra-modern minimalist automotive service center with white glossy floors and dark architectural details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8zfJdKtmIBJPrvk91AXkfhHLDjuX1WON1IA6XAG-5rOyRpxz3B20eeUo_dIoVwdppcuKwZTGMze6ldF1mJVDllUIW8dkBKsx7GohgG0nnVS4OV2i7z-omSBV-9ItZOrf_tF5gO4jgvQFooWv58kD6idONPiByqLttXBI0oCWFiyaUgWfZmSPg7dHg8OeHyEoTB5FBtzPnKJXFMwJS74e5uw2l68WkJ7pq6drfpzimKHu_LRSJ5srTyClQbsYFXsnDnkpuOzRI8Y-5"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-12 w-full flex justify-between items-end">
+<div>
+<span class="font-label text-[10px] tracking-widest uppercase text-primary mb-2 block">Nearest Atelier</span>
+<h3 class="font-headline text-4xl text-tertiary">Manhattan South Center</h3>
+<p class="font-body text-secondary text-sm mt-2">12th Ave, New York, NY 10014</p>
+</div>
+<div class="bg-surface-container-high/80 backdrop-blur-md p-6 ghost-border">
+<span class="font-label text-[10px] uppercase text-primary block mb-2">Operational Status</span>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+<span class="font-body text-sm text-tertiary">Service Ready</span>
+</div>
+</div>
+</div>
+</div>
+<!-- FAQ Section -->
+<div class="pt-12 border-t border-outline-variant/10">
+<h4 class="font-label text-[10px] tracking-[0.4em] uppercase text-on-surface-variant mb-12">Frequently Asked Questions</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div>
+<h5 class="font-headline text-xl text-tertiary mb-3">Service intervals for Electric models?</h5>
+<p class="font-body text-sm text-on-secondary-container leading-relaxed">Unlike internal combustion counterparts, TUT EVs require full inspection every 24 months, with telemetry monitoring handling minor adjustments in between.</p>
+</div>
+<div>
+<h5 class="font-headline text-xl text-tertiary mb-3">Warranty coverage on components?</h5>
+<p class="font-body text-sm text-on-secondary-container leading-relaxed">All precision components are covered under a 6-year inclusive excellence guarantee, including brake systems and adaptive suspension elements.</p>
+</div>
+<div>
+<h5 class="font-headline text-xl text-tertiary mb-3">Is concierge service available globally?</h5>
+<p class="font-body text-sm text-on-secondary-container leading-relaxed">Concierge retrieval is available within a 150-mile radius of any authorized TUT Atelier. Specialized transport can be arranged beyond this zone.</p>
+</div>
+<div>
+<h5 class="font-headline text-xl text-tertiary mb-3">Software version rollback?</h5>
+<p class="font-body text-sm text-on-secondary-container leading-relaxed">In the event of a specific preference for legacy driving dynamics, our technicians can manually re-flash previous firmware iterations during an on-site visit.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Aesthetic Detail Section -->
+<section class="mb-40 h-[614px] relative flex items-center justify-center overflow-hidden">
+<img alt="Abstract car headlight macro" class="absolute inset-0 w-full h-full object-cover opacity-30" data-alt="Macro artistic shot of a luxury car headlight assembly with intricate internal lenses and cool blue light reflections" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBSg0yDxVNEjMhq0SPcq33DhC5WFNWqrMlWOVScApOKTXtviHhO1KBqgHYmu_v2957mt7jAl-Hv3N94-E9XwnQP148eFQxyVO9V7PGX6KvzZxNcVWa4tbs2AFhWHZ78x2PlpaGUtOj2WWTWsNCuu4uIj8cdcGGcGttSV96TELSuejji72nVR4OD6PPhkyutKwjkKsBt0crohvN_os6LlP4K2HGrkwS2qkyARZBRETucV0tQ1oaF1RNh3pbiiT3O-KzjKSGgEvBcVo8"/>
+<div class="relative z-10 text-center px-12">
+<h2 class="font-headline italic text-6xl md:text-8xl text-primary-fixed-dim leading-none">Engineering <br/>for Eternity.</h2>
+<div class="mt-12 flex justify-center">
+<div class="w-px h-24 bg-gradient-to-b from-primary to-transparent"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-slate-950 dark:bg-slate-950 border-t border-slate-800/30 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-6">TUT</div>
+<p class="font-sans text-[10px] uppercase tracking-widest text-slate-500 leading-loose max-w-xs">Crafting high-performance benchmarks for the modern era. Precision in every movement.</p>
+</div>
+<div>
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-200 block mb-6 Manrope">Vehicles</span>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Models</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Configurator</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Inventory</a></li>
+</ul>
+</div>
+<div>
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-200 block mb-6 Manrope">Owners</span>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">My TUT</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Service</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Accessories</a></li>
+</ul>
+</div>
+<div>
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-200 block mb-6 Manrope">Company</span>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">About</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Press</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Careers</a></li>
+</ul>
+</div>
+<div class="col-span-full pt-12 mt-12 border-t border-slate-800/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="font-sans uppercase tracking-widest text-[10px] text-slate-500 Manrope">© 2024 TUT USA. ALL RIGHTS RESERVED.</div>
+<div class="flex gap-8">
+<a class="text-slate-500 hover:text-slate-100 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Privacy</a>
+<a class="text-slate-500 hover:text-slate-100 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">Legal</a>
+<a class="text-slate-500 hover:text-slate-100 font-sans uppercase tracking-widest text-[10px] Manrope" href="#">USA/English</a>
+</div>
+</div>
+</footer>
+</body></html>

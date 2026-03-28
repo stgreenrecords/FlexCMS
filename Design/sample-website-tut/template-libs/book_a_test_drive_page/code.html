@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-bright": "#082768",
+                        "surface-variant": "#0a2257",
+                        "on-surface-variant": "#96a9e6",
+                        "inverse-surface": "#faf8ff",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-high": "#0b1d48",
+                        "surface": "#070d1f",
+                        "on-tertiary-container": "#495468",
+                        "primary-container": "#454747",
+                        "on-secondary-container": "#b0c0da",
+                        "secondary-dim": "#8f9fb7",
+                        "error-container": "#7f2927",
+                        "on-error-container": "#ff9993",
+                        "secondary": "#8f9fb7",
+                        "secondary-fixed-dim": "#c5d6f0",
+                        "surface-container-lowest": "#000000",
+                        "tertiary": "#f0f3ff",
+                        "on-tertiary-fixed-variant": "#535e72",
+                        "tertiary-container": "#dae6fe",
+                        "on-primary-fixed": "#3e4040",
+                        "inverse-primary": "#5e5f60",
+                        "on-error": "#490106",
+                        "primary-fixed": "#e2e2e2",
+                        "tertiary-fixed": "#dae6fe",
+                        "tertiary-dim": "#ccd7ef",
+                        "error-dim": "#bb5551",
+                        "on-primary-container": "#d0d0d0",
+                        "error": "#ee7d77",
+                        "secondary-container": "#2d3c51",
+                        "primary-dim": "#b8b9b9",
+                        "on-secondary-fixed-variant": "#4d5d73",
+                        "inverse-on-surface": "#4f5469",
+                        "primary": "#c6c6c7",
+                        "on-primary": "#3f4041",
+                        "primary-fixed-dim": "#d4d4d4",
+                        "surface-dim": "#070d1f",
+                        "on-background": "#dfe4ff",
+                        "on-secondary-fixed": "#314055",
+                        "background": "#070d1f",
+                        "on-tertiary-fixed": "#374155",
+                        "outline-variant": "#32457c",
+                        "tertiary-fixed-dim": "#ccd7ef",
+                        "surface-container-highest": "#0a2257",
+                        "surface-container": "#0a1839",
+                        "on-surface": "#dfe4ff",
+                        "surface-container-low": "#09122b",
+                        "on-tertiary": "#515c70",
+                        "outline": "#6073ad",
+                        "on-primary-fixed-variant": "#5a5c5c",
+                        "on-secondary": "#102134",
+                        "secondary-fixed": "#d3e4fe"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        input:focus {
+            outline: none;
+            border-bottom: 2px solid #c6c6c7 !important;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- TopNavBar - JSON Execution -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl dark:bg-slate-950/60 flex justify-between items-center px-12 py-6 w-full max-w-none">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase font-headline italic">TUT</div>
+<div class="hidden md:flex items-center space-x-10">
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase" href="#">Sedans</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase" href="#">SUVs</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase" href="#">Electric</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase" href="#">Build</a>
+</div>
+<div class="flex items-center space-x-8">
+<button class="text-slate-400 hover:text-slate-100 transition-all duration-500 font-sans tracking-widest text-xs uppercase">Sign In</button>
+<button class="bg-primary text-on-primary px-6 py-2 text-[10px] font-bold tracking-widest uppercase hover:bg-primary-fixed transition-all duration-300">Find a Dealer</button>
+</div>
+</nav>
+<main class="pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Page Header: Cinematic Framing -->
+<header class="mb-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
+<div>
+<span class="font-label text-primary tracking-[0.3em] text-[10px] uppercase block mb-4">Precision Performance</span>
+<h1 class="font-headline text-5xl md:text-7xl italic leading-tight text-on-surface">Experience the <br/>Art of Driving.</h1>
+</div>
+<div class="md:pb-2">
+<p class="font-body text-secondary-dim max-w-md leading-relaxed">
+                    Select your vehicle and preferred location to schedule a private commissioning and performance trial. Every detail, machined to perfection.
+                </p>
+</div>
+</header>
+<!-- Main Conversion Journey: Asymmetric Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+<!-- Left Column: Vehicle & Dealer (8/12) -->
+<div class="lg:col-span-7 space-y-24">
+<!-- Vehicle Selection -->
+<section>
+<div class="flex justify-between items-center mb-10 border-b border-outline-variant/15 pb-4">
+<h2 class="font-label text-sm tracking-widest uppercase">01 Select Vehicle</h2>
+<span class="text-primary-dim font-headline italic">The Collection</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/10">
+<!-- Vehicle Card 1 -->
+<div class="bg-surface p-8 group cursor-pointer border border-outline-variant/10 hover:bg-surface-container-low transition-colors duration-500">
+<div class="aspect-[16/9] mb-8 overflow-hidden">
+<img alt="TUT Alpine S" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Sleek silver luxury sedan with sharp edges and metallic finish, dramatic studio lighting with deep shadows and chrome highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpeEOzdGOM2SrGxBjHBpwSVVcam6try92jj9oiDOjMAeDDjGHAUFnrY8e7RQ9kBF_UEEHbKBJXtINSslfzDavc_V3WCQ0LOiiA-qvqknuf_1L5sNID1Y90V6ozuwsG2gJa5PECmI5g8WILGbN1IFko6QC2MIH1NlO74kqkMAh-SIe8mOqnkKYAzdTlCBZAxREERNfFTIe3ATSQ4FIwKg7etnQPNNnMfPrwt8oSYNT3tSdfQTWV7Sn26lVO58zuu9xUJdZU92w4pivL"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline text-2xl italic mb-1">Alpine S</h3>
+<p class="font-label text-[10px] tracking-widest text-secondary-dim uppercase">High-Performance Sedan</p>
+</div>
+<div class="text-right">
+<span class="font-headline text-xl">3.2</span>
+<span class="font-label text-[10px] block text-secondary-dim uppercase">0-60 MPH</span>
+</div>
+</div>
+</div>
+<!-- Vehicle Card 2 -->
+<div class="bg-surface p-8 group cursor-pointer border border-outline-variant/10 hover:bg-surface-container-low transition-colors duration-500">
+<div class="aspect-[16/9] mb-8 overflow-hidden">
+<img alt="TUT Summit X" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Modern dark blue luxury SUV parked in an architectural concrete space, soft daylight highlighting the sharp geometric design" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCltT8SoF7tVISb5dqLl_lIxbjdsj-zwVDrbGMIud2q69P_jMKpReg6u6DPUf4Hx5kpoRxOjy-MhAgvGLEtbIV3jueMSE_tBIiD5V4fGTIOpdScVK-atr-uHbqKImEwe4OSWU3WqlwKT6bBuFzlCW7C0XqA09nehTEpiEuo-v7P8sO4ds6aiH7qiOkHg5Xbx19mFMPJxCH3RVvTeC-pJwA4jAb0xtfURD8BX5yfJfIZnxZyLWD3wpp75Qzm7fKvbxLvBCMoGvV-vz0V"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline text-2xl italic mb-1">Summit X</h3>
+<p class="font-label text-[10px] tracking-widest text-secondary-dim uppercase">All-Terrain Performance</p>
+</div>
+<div class="text-right">
+<span class="font-headline text-xl">450</span>
+<span class="font-label text-[10px] block text-secondary-dim uppercase">MILE RANGE</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Dealer Locator -->
+<section>
+<div class="flex justify-between items-center mb-10 border-b border-outline-variant/15 pb-4">
+<h2 class="font-label text-sm tracking-widest uppercase">02 Showroom</h2>
+<span class="text-primary-dim font-headline italic">Find Proximity</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<div class="relative group">
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-4 font-label text-xs tracking-widest focus:ring-0 placeholder:text-secondary-dim/50 uppercase" placeholder="ENTER ZIP CODE" type="text"/>
+<span class="material-symbols-outlined absolute right-0 top-4 text-secondary-dim text-lg">near_me</span>
+</div>
+<div class="space-y-px bg-outline-variant/10">
+<div class="bg-surface-container-low p-6 flex justify-between items-center group cursor-pointer hover:bg-surface-container transition-colors">
+<div>
+<p class="font-label text-xs tracking-widest uppercase mb-1">TUT Atelier Manhattan</p>
+<p class="text-[10px] text-secondary-dim uppercase">11th Avenue, New York, NY</p>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">check</span>
+</div>
+<div class="bg-surface p-6 flex justify-between items-center group cursor-pointer hover:bg-surface-container-low transition-colors">
+<div>
+<p class="font-label text-xs tracking-widest uppercase mb-1">TUT Greenwich Studio</p>
+<p class="text-[10px] text-secondary-dim uppercase">Mason St, Greenwich, CT</p>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">check</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low min-h-[300px] relative">
+<img alt="Location Map" class="w-full h-full object-cover opacity-50 grayscale" data-alt="Abstract dark topographical map of a city grid with glowing primary metallic highlights and technical data overlays" data-location="New York" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN_iVUdB9oUeoGnFRcAmVtCHI0sdGGAwHGx_bGvsF18CACmrLBOxqrMJPWYbVnY1qzaEmA2N9NAZPg6oD7LALqhEL3xWr7yDXqlgWgL7KJz5dVsIeTAiq_UprKoq5ta2rsQAWfijJWgKKRObMfryCrrVB4Dem0BN5viGwyI_1-DtU-j0s25apJbSCvDj18PGuvjKMfUgMuarJ3gVbgZrho7ddOJx63fHNf7vCrCWAlt6NIeiS-VDVjE1mDxpq2Tz-xMvyDFnvDm9FW"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-3 h-3 bg-primary rounded-full animate-pulse shadow-[0_0_20px_rgba(198,198,199,0.8)]"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Form & Schedule (4/12) - Sticky/Glass -->
+<div class="lg:col-span-5">
+<div class="lg:sticky lg:top-32 glass-panel p-10 border border-outline-variant/10">
+<div class="mb-10">
+<h2 class="font-label text-sm tracking-widest uppercase mb-2">03 Finalize Request</h2>
+<p class="text-secondary-dim text-xs leading-relaxed">A concierge will contact you within 24 hours to confirm your private session.</p>
+</div>
+<form class="space-y-10">
+<!-- Appointment Scheduler -->
+<div>
+<p class="font-label text-[10px] tracking-widest uppercase text-secondary-dim mb-4">Preferred Date</p>
+<div class="grid grid-cols-4 gap-2">
+<button class="border border-outline-variant/30 py-3 font-label text-[10px] tracking-widest uppercase hover:border-primary transition-colors" type="button">Oct 24</button>
+<button class="border border-primary py-3 font-label text-[10px] tracking-widest uppercase bg-primary text-on-primary" type="button">Oct 25</button>
+<button class="border border-outline-variant/30 py-3 font-label text-[10px] tracking-widest uppercase hover:border-primary transition-colors" type="button">Oct 26</button>
+<button class="border border-outline-variant/30 py-3 font-label text-[10px] tracking-widest uppercase hover:border-primary transition-colors" type="button">Oct 27</button>
+</div>
+</div>
+<!-- Personal Info -->
+<div class="space-y-8">
+<div class="relative group">
+<label class="font-label text-[10px] tracking-widest uppercase text-secondary-dim block">Full Name</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-2 font-body text-on-surface focus:ring-0" type="text"/>
+</div>
+<div class="relative group">
+<label class="font-label text-[10px] tracking-widest uppercase text-secondary-dim block">Email Address</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-2 font-body text-on-surface focus:ring-0" type="email"/>
+</div>
+<div class="relative group">
+<label class="font-label text-[10px] tracking-widest uppercase text-secondary-dim block">Phone Number</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-2 font-body text-on-surface focus:ring-0" type="tel"/>
+</div>
+</div>
+<div class="pt-6">
+<button class="w-full bg-primary text-on-primary py-5 font-label text-xs tracking-[0.2em] uppercase font-bold hover:bg-primary-fixed transition-all duration-300 relative group overflow-hidden">
+<span class="relative z-10">Request Commissioning</span>
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+</button>
+<p class="mt-4 text-[9px] text-center text-secondary-dim/60 uppercase tracking-widest">
+                                By submitting, you agree to our privacy policy and precision standards.
+                            </p>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- Spec Highlights Section -->
+<section class="mt-40 grid grid-cols-2 md:grid-cols-4 gap-12 border-t border-outline-variant/15 pt-20">
+<div>
+<span class="font-headline text-5xl italic text-on-surface">360</span>
+<span class="font-label text-[10px] block text-secondary-dim tracking-widest uppercase mt-2">Atelier Support</span>
+</div>
+<div>
+<span class="font-headline text-5xl italic text-on-surface">1/100</span>
+<span class="font-label text-[10px] block text-secondary-dim tracking-widest uppercase mt-2">Precision Built</span>
+</div>
+<div>
+<span class="font-headline text-5xl italic text-on-surface">4.0</span>
+<span class="font-label text-[10px] block text-secondary-dim tracking-widest uppercase mt-2">Year Warranty</span>
+</div>
+<div>
+<span class="font-headline text-5xl italic text-on-surface">0</span>
+<span class="font-label text-[10px] block text-secondary-dim tracking-widest uppercase mt-2">Emissions Goal</span>
+</div>
+</section>
+</main>
+<!-- Footer - JSON Execution -->
+<footer class="bg-slate-950 border-t border-slate-800/30">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 px-12 py-20 w-full">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 font-headline italic mb-6">TUT</div>
+<p class="text-slate-500 font-sans text-xs tracking-widest leading-relaxed uppercase">Engineering the future of high-performance luxury mobility since 2024.</p>
+</div>
+<div class="flex flex-col space-y-4">
+<span class="font-headline text-slate-200 mb-2">Vehicles</span>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Alpine</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Summit</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Electric</a>
+</div>
+<div class="flex flex-col space-y-4">
+<span class="font-headline text-slate-200 mb-2">Company</span>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">About</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Careers</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Press</a>
+</div>
+<div class="flex flex-col space-y-4">
+<span class="font-headline text-slate-200 mb-2">Support</span>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Contact</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Dealers</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Safety</a>
+</div>
+<div class="flex flex-col space-y-4">
+<span class="font-headline text-slate-200 mb-2">Legal</span>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Privacy</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Cookies</a>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Terms</a>
+</div>
+</div>
+<div class="px-12 py-8 border-t border-slate-800/20 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="text-slate-500 font-sans uppercase tracking-widest text-[10px]">© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex space-x-6">
+<span class="text-slate-200 font-sans uppercase tracking-widest text-[10px]">USA/English</span>
+</div>
+</div>
+</footer>
+</body></html>

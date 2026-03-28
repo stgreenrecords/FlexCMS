@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TUT USA | Community &amp; Engagement Library</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#dae6fe",
+                        "secondary-container": "#2d3c51",
+                        "primary-container": "#454747",
+                        "surface-bright": "#082768",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-fixed": "#dae6fe",
+                        "surface-container-high": "#0b1d48",
+                        "surface-variant": "#0a2257",
+                        "on-tertiary-container": "#495468",
+                        "on-primary-fixed": "#3e4040",
+                        "inverse-surface": "#faf8ff",
+                        "error-container": "#7f2927",
+                        "background": "#070d1f",
+                        "on-secondary-container": "#b0c0da",
+                        "outline": "#6073ad",
+                        "outline-variant": "#32457c",
+                        "on-tertiary": "#515c70",
+                        "inverse-primary": "#5e5f60",
+                        "on-surface": "#dfe4ff",
+                        "surface-container-lowest": "#000000",
+                        "secondary": "#8f9fb7",
+                        "on-secondary": "#102134",
+                        "on-primary-fixed-variant": "#5a5c5c",
+                        "surface-dim": "#070d1f",
+                        "on-primary-container": "#d0d0d0",
+                        "primary": "#c6c6c7",
+                        "primary-dim": "#b8b9b9",
+                        "on-tertiary-fixed": "#374155",
+                        "on-background": "#dfe4ff",
+                        "on-secondary-fixed": "#314055",
+                        "tertiary-dim": "#ccd7ef",
+                        "on-secondary-fixed-variant": "#4d5d73",
+                        "on-error": "#490106",
+                        "on-primary": "#3f4041",
+                        "secondary-fixed-dim": "#c5d6f0",
+                        "inverse-on-surface": "#4f5469",
+                        "on-error-container": "#ff9993",
+                        "error-dim": "#bb5551",
+                        "primary-fixed-dim": "#d4d4d4",
+                        "on-surface-variant": "#96a9e6",
+                        "error": "#ee7d77",
+                        "surface-container": "#0a1839",
+                        "surface-tint": "#c6c6c7",
+                        "surface-container-low": "#09122b",
+                        "surface": "#070d1f",
+                        "on-tertiary-fixed-variant": "#535e72",
+                        "primary-fixed": "#e2e2e2",
+                        "tertiary": "#f0f3ff",
+                        "surface-container-highest": "#0a2257",
+                        "secondary-dim": "#8f9fb7",
+                        "tertiary-fixed-dim": "#ccd7ef"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(10, 34, 87, 0.6);
+            backdrop-filter: blur(20px);
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(223, 228, 255, 0.3);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #070d1f; }
+        ::-webkit-scrollbar-thumb { background: #32457c; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl flex justify-between items-center px-12 py-6">
+<div class="text-2xl font-serif tracking-[0.2em] text-slate-100 uppercase">TUT</div>
+<div class="hidden md:flex space-x-12 items-center">
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase" href="#">Sedans</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase" href="#">SUVs</a>
+<a class="text-slate-400 hover:text-slate-100 transition-colors duration-300 font-sans tracking-widest text-xs uppercase" href="#">Electric</a>
+<a class="text-slate-100 font-bold border-b border-slate-100 pb-1 font-sans tracking-widest text-xs uppercase" href="#">Build</a>
+</div>
+<div class="flex items-center space-x-8">
+<button class="text-slate-300 hover:text-slate-100 transition-all duration-500 font-sans tracking-widest text-xs uppercase">Find a Dealer</button>
+<button class="bg-primary text-on-primary px-6 py-2 font-sans tracking-widest text-xs uppercase font-bold hover:bg-primary-fixed transition-colors">Sign In</button>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-6 md:px-12 lg:px-24 max-w-[1600px] mx-auto">
+<!-- Hero Section -->
+<header class="mb-32">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div class="max-w-3xl">
+<span class="font-label uppercase tracking-[0.3em] text-outline text-xs mb-4 block">System 328-358: Engagement</span>
+<h1 class="font-headline italic text-6xl md:text-8xl leading-tight mb-8">The Social Architecture.</h1>
+<p class="font-body text-secondary text-lg max-w-xl leading-relaxed">
+                        A definitive library for human-centric digital interfaces. Designed for high-performance social proof, authority building, and seamless community integration.
+                    </p>
+</div>
+<div class="pb-4">
+<div class="flex gap-4">
+<div class="w-12 h-[1px] bg-primary mt-4"></div>
+<span class="font-label uppercase tracking-widest text-[10px] text-on-surface-variant">Precision Engineering <br/> Edition 2024</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Bento Grid: Identity & Team -->
+<section class="mb-32">
+<h2 class="font-label uppercase tracking-[0.4em] text-sm mb-12 flex items-center gap-4">
+<span class="w-2 h-2 bg-primary"></span> 01. Team &amp; Authorship
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-px bg-outline-variant/20">
+<!-- Large Team Member Card -->
+<div class="md:col-span-8 bg-surface-container-low p-12 group">
+<div class="flex flex-col md:flex-row gap-12">
+<div class="w-full md:w-1/2 aspect-[4/5] bg-surface-container-highest relative overflow-hidden">
+<img alt="" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100" data-alt="professional portrait of a chief design engineer in a minimal dark studio setting with soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8hHFiHbJeJoTsdKMUfbixW7T_LIyZMxV5cwSOMelkFlllDktDtrzfJRsqvYWnBA68hYV2zJkOJdRn13CZR2VX6NSSh0M_T-78Vu98nMPBwQGHkBCm90ta1VpgDUzklyCc9ZMFrEKmfh-CgKn6Sv1TtziqCi2ZyGhmMv6f-hmq_meWQgHVRh7uauUP2V6OKCqQY9wBHc2MbnsRcStjzkWmGO33kbiAdVTIvPVmwZIi7DAqVkAjMIuVlh9WZVcPJe7a_-JHajxycDnF"/>
+</div>
+<div class="w-full md:w-1/2 flex flex-col justify-between">
+<div>
+<h3 class="font-headline text-4xl italic mb-2">Julian Vane</h3>
+<p class="font-label uppercase tracking-widest text-primary text-xs mb-8">Chief Aerodynamicist</p>
+<p class="text-secondary leading-relaxed mb-8">Pioneering the next decade of drag-reduction through computational fluid dynamics and sculptural intent.</p>
+</div>
+<div class="flex gap-6">
+<a class="text-on-surface hover:text-primary transition-colors font-label uppercase tracking-widest text-[10px]" href="#">LinkedIn</a>
+<a class="text-on-surface hover:text-primary transition-colors font-label uppercase tracking-widest text-[10px]" href="#">Research</a>
+<a class="text-on-surface hover:text-primary transition-colors font-label uppercase tracking-widest text-[10px]" href="#">Contact</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Small Author Cards -->
+<div class="md:col-span-4 grid grid-rows-2 gap-px">
+<div class="bg-surface-container-low p-8 flex items-center gap-6">
+<div class="w-20 h-20 shrink-0 bg-surface-container-highest">
+<img alt="" class="w-full h-full object-cover grayscale" data-alt="headshot of a female technology director with a focused expression in a corporate office environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6aWN3codHLukO-CInznw_27VRhiPIkZVXDEy4T_CBARWPLbg_m2UB9otDMNG4OdM6_SfeFsBpcHTFHqumLJ5RB5t56TiGQeCqq0M4i1D8c571mM6BNNqKQiXAHlDp4uDaK1tCL-LLuJirkbDAIMQfOxajcGLBsufUzx6UjpEXdXdA8gHKM_bfrJk4wuN-KMX-bUfJOX_a3Uf_ityXmEFky99-s-g6ETUNQw8Jg--NmfMeqEz-J9TFn9Koi7N57bVXxYc3uwBY_SMM"/>
+</div>
+<div>
+<h4 class="font-headline italic text-xl">Elena Rossi</h4>
+<p class="font-label uppercase tracking-widest text-[10px] text-on-surface-variant">UX Director</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-8 flex items-center gap-6">
+<div class="w-20 h-20 shrink-0 bg-surface-container-highest">
+<img alt="" class="w-full h-full object-cover grayscale" data-alt="headshot of a male lead software engineer in a high-tech lab setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQEJoHnML8SKwPdazbzJvqFvwvBRsaGpJWHUfZ-Xgw0HJqXTO7rkVUJ0Iafo9Pmj_0RF3ZadfZHwDrhdn33_ma8Jfaf_wbLI-a9EAapi22hgWj0YCkeyLXC6YUthDCoEAGIZ0IdGfE7Kh4Lp_WyKNW62G3h1-kL2tajS5_3pWEBNRgZEpfWDGLQALe5CwbKyndqAwAY0vlQ0ZBVgRateAVpGZ0HjawA-L2Tt-iHbaTzzafvQOpx7-8cjL3OMaSauf1rM_EYjpPLUam"/>
+</div>
+<div>
+<h4 class="font-headline italic text-xl">Marcus Chen</h4>
+<p class="font-label uppercase tracking-widest text-[10px] text-on-surface-variant">Lead Systems Architect</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Social Proof: Testimonials & Client Lists -->
+<section class="mb-32">
+<h2 class="font-label uppercase tracking-[0.4em] text-sm mb-12 flex items-center gap-4">
+<span class="w-2 h-2 bg-primary"></span> 02. Validation &amp; Credibility
+            </h2>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+<!-- Testimonial -->
+<div class="lg:col-span-2 space-y-12">
+<div class="border-l border-primary/30 pl-12 py-8">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">format_quote</span>
+<blockquote class="font-headline italic text-4xl md:text-5xl leading-tight mb-8">
+                            "The attention to tactile feedback and digital silence is what sets the TUT ecosystem apart from the noise of modern mobility."
+                        </blockquote>
+<div class="flex items-center gap-4">
+<div class="w-8 h-[1px] bg-outline-variant"></div>
+<cite class="not-italic font-label uppercase tracking-[0.2em] text-xs">Director, Alpine Global</cite>
+</div>
+</div>
+<!-- Client Ticker Style -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-40 grayscale hover:opacity-100 transition-opacity duration-700">
+<div class="h-16 flex items-center justify-center font-headline text-2xl tracking-tighter">VOLTA</div>
+<div class="h-16 flex items-center justify-center font-headline text-2xl tracking-tighter">ZENITH</div>
+<div class="h-16 flex items-center justify-center font-headline text-2xl tracking-tighter">AETHER</div>
+<div class="h-16 flex items-center justify-center font-headline text-2xl tracking-tighter">ORION</div>
+</div>
+</div>
+<!-- Trust Badges & Awards -->
+<div class="bg-surface-container p-10 space-y-12">
+<div>
+<p class="font-label uppercase tracking-widest text-[10px] text-on-surface-variant mb-6">Honors &amp; Distinctions</p>
+<div class="space-y-6">
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-4">
+<div>
+<h5 class="font-headline italic text-lg leading-none">Red Dot: Best of Best</h5>
+<p class="font-label uppercase tracking-widest text-[8px] mt-2">Product Architecture</p>
+</div>
+<span class="font-label text-xs">2024</span>
+</div>
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-4">
+<div>
+<h5 class="font-headline italic text-lg leading-none">iF Gold Award</h5>
+<p class="font-label uppercase tracking-widest text-[8px] mt-2">Digital Ecosystem</p>
+</div>
+<span class="font-label text-xs">2023</span>
+</div>
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-4">
+<div>
+<h5 class="font-headline italic text-lg leading-none">Green Future Index</h5>
+<p class="font-label uppercase tracking-widest text-[8px] mt-2">Materials Innovation</p>
+</div>
+<span class="font-label text-xs">Top 10</span>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap gap-4">
+<div class="px-4 py-2 bg-surface-variant/40 border border-outline-variant/20 font-label text-[10px] uppercase tracking-widest">ISO 9001 Certified</div>
+<div class="px-4 py-2 bg-surface-variant/40 border border-outline-variant/20 font-label text-[10px] uppercase tracking-widest">Carbon Neutral</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Social Feeds & Media -->
+<section class="mb-32">
+<h2 class="font-label uppercase tracking-[0.4em] text-sm mb-12 flex items-center gap-4">
+<span class="w-2 h-2 bg-primary"></span> 03. Social Ecosystem
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Social Follow Cluster -->
+<div class="md:col-span-1 flex flex-col gap-6">
+<div class="bg-surface-container-low p-8 grow flex flex-col justify-between">
+<span class="material-symbols-outlined text-primary text-3xl">share</span>
+<div>
+<h3 class="font-headline italic text-2xl mb-4">Join the Conversation</h3>
+<div class="space-y-4">
+<a class="flex items-center justify-between group py-2" href="#">
+<span class="font-label uppercase tracking-widest text-xs">Instagram</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+<a class="flex items-center justify-between group py-2" href="#">
+<span class="font-label uppercase tracking-widest text-xs">X / Twitter</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+<a class="flex items-center justify-between group py-2" href="#">
+<span class="font-label uppercase tracking-widest text-xs">LinkedIn</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Instagram Feed Mockup -->
+<div class="md:col-span-2 grid grid-cols-2 gap-4">
+<div class="aspect-square bg-surface-container-highest relative group overflow-hidden">
+<img alt="" class="w-full h-full object-cover brightness-75 group-hover:scale-110 group-hover:brightness-100 transition-all duration-1000" data-alt="dramatic night shot of a sleek luxury car's headlights reflecting in rain-slicked asphalt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ04MJx34BY-xf6r4fvtjV-WnTUAsd2Pm9YgalfBeibo28gAdL5mlFnxmx4pEqjZJRsidPQuTNg0Qy9fUM6mtOkjG70xwo2uBQbDzWjUOa_iQu9NMU8k9LVJvxHtzW3WkmRAbdkctgxeJEFVdHcDQBIyxfZbrS4I5GYExfYSW4YzQGl47q8VpKXS1213M7DmUuuqZN5gck7d9eRmVPs8GBjODoC5JDmpnxye-pav9w6bMl8Pf0kBI_-kr1qPYHa46pdaxlUiJLd0VV"/>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="material-symbols-outlined text-white text-xs" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-[10px] font-label text-white">2.4k</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container-highest relative group overflow-hidden">
+<img alt="" class="w-full h-full object-cover brightness-75 group-hover:scale-110 group-hover:brightness-100 transition-all duration-1000" data-alt="abstract close-up of high-performance car carbon fiber weave with metallic highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFL6-4dFxjaRNS8XXPd6vO3RK1T7JA0NLAKNGMCj1jHh-zRjz_oJzisCD0W1dQNHQ5Jm6aRppFoMIrTq8VNw5bDzdDjscqxSBIJEz5gXIBdyETC6bWRKR7asbJGfmQYnCe8ggfxcsLvAEMSyrx4XhKTIiLG3zOJn3RRWAh_MPS11zhrgSIg_gjAUapIXy3RPxOWvxIRAsP79ECgyfUZJFGtUgnheDEdAcn-DQ9v-PeaH8rTvU3UwLTueIPAbdVhe5GSeCycGGkNaaV"/>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="material-symbols-outlined text-white text-xs" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-[10px] font-label text-white">1.8k</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container-highest relative group overflow-hidden">
+<img alt="" class="w-full h-full object-cover brightness-75 group-hover:scale-110 group-hover:brightness-100 transition-all duration-1000" data-alt="cinematic interior view of a luxury car steering wheel and digital dashboard with blue ambient light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXT01q7PR8j453ll_x0fJDSTUML5W14HVCE2PrbSLkEZYqbsm9XJvVs2knzarweElc4lpDArOSDG0xRkpgGdn9_qre9XowO6cHBrRC0OsSRtc-gbwTvq7Q_cXAzhX04wSIi4kFW9hmMwThlb-vfbd_nrC-4NRlC-wO_W04pOSju0sivbnG3NCejt166-ThZ0SL2MzJ6ZV3meK7VaCy8uggpQ8vasorq5UqLUE2_hPnlJHjlmJii2RvMKudy9OcUpUtvM9wRWzyrzdp"/>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="material-symbols-outlined text-white text-xs" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-[10px] font-label text-white">3.1k</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container-highest relative group overflow-hidden">
+<img alt="" class="w-full h-full object-cover brightness-75 group-hover:scale-110 group-hover:brightness-100 transition-all duration-1000" data-alt="blurred motion shot of a silver sports car speeding through a minimalist tunnel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKLHA38it-y8aQ9xTKlpbVARuNGks8ew43E0aEvsEiE1Gm9Hv7BJwMWqXCb9Gh6AUkc_bFUkcOyraeUF0MdU-cO2nCl0e3lKb5i_BY-KDHrh8D2c9b7U65YpTjFI3szVt-tNg80QfyVAIXWahswiPWTuQFPnOcNhDh-dw1CiSILrGfJdtageQcxnLDVGk4VdQiZAIU6VnIpjrgI_9QzeV3gMCE6q6B9SR_GJyS60aRYRHxdqiqyeXXgEq3rF683z3yEeVqt6sbu8Sy"/>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="material-symbols-outlined text-white text-xs" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-[10px] font-label text-white">4.2k</span>
+</div>
+</div>
+</div>
+<!-- Media Contact Card -->
+<div class="md:col-span-1 bg-surface-container-high p-8 flex flex-col justify-between border-l border-primary/20">
+<div>
+<h3 class="font-label uppercase tracking-widest text-xs mb-8">Press Relations</h3>
+<div class="space-y-6">
+<div>
+<p class="text-[10px] text-on-surface-variant font-label uppercase tracking-widest mb-1">Global Lead</p>
+<p class="font-headline italic text-xl">press@tut-usa.com</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant font-label uppercase tracking-widest mb-1">Direct Media Line</p>
+<p class="font-headline italic text-xl">+1 800-TUT-PRESS</p>
+</div>
+</div>
+</div>
+<button class="w-full border border-outline-variant/30 py-4 font-label uppercase tracking-widest text-[10px] hover:bg-primary hover:text-on-primary transition-all">Download Media Kit</button>
+</div>
+</div>
+</section>
+<!-- Community & Discussion -->
+<section class="mb-32">
+<h2 class="font-label uppercase tracking-[0.4em] text-sm mb-12 flex items-center gap-4">
+<span class="w-2 h-2 bg-primary"></span> 04. Forum &amp; Discussion
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-px bg-outline-variant/20">
+<!-- Thread Preview -->
+<div class="md:col-span-7 bg-surface p-10">
+<div class="flex items-center justify-between mb-12">
+<h3 class="font-headline italic text-3xl">Active Discussions</h3>
+<a class="font-label uppercase tracking-widest text-[10px] text-primary" href="#">View All Threads</a>
+</div>
+<div class="space-y-10">
+<div class="group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-body font-bold text-lg group-hover:text-primary transition-colors">Future of V-series Suspension: Magnetorheological vs Air?</h4>
+<span class="text-xs text-on-surface-variant font-label">12m ago</span>
+</div>
+<p class="text-secondary text-sm mb-4 line-clamp-1">The debate between the responsiveness of magnetic damping and the absolute comfort of air suspension continues in our latest technical dive...</p>
+<div class="flex gap-6 items-center">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-highest border border-background"></div>
+<div class="w-6 h-6 rounded-full bg-primary border border-background"></div>
+<div class="w-6 h-6 rounded-full bg-secondary border border-background"></div>
+</div>
+<span class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant">42 Contributors</span>
+</div>
+</div>
+<div class="group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-body font-bold text-lg group-hover:text-primary transition-colors">Route 66 Rally: Community Spotlight</h4>
+<span class="text-xs text-on-surface-variant font-label">2h ago</span>
+</div>
+<p class="text-secondary text-sm mb-4 line-clamp-1">Last weekend's gathering of owners in Santa Monica was nothing short of spectacular. Check out the gallery of 30+ vehicles...</p>
+<div class="flex gap-6 items-center">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container border border-background"></div>
+<div class="w-6 h-6 rounded-full bg-outline border border-background"></div>
+</div>
+<span class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant">128 Replies</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Community Spotlight Card -->
+<div class="md:col-span-5 bg-surface-container-low relative overflow-hidden group">
+<img alt="" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-1000" data-alt="vibrant photo of a group of enthusiasts gathered around a series of colorful classic and modern cars at a meet" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5tFMigQBhP2JdzNSu92Z4QvGJzFYBmSAnpb_TC3xKsanLQVdWZ_ylT1CmCfWwhukH7os9RpyWHLzeIe00fdolbqXLTAIHxcvYK2l0r4iXSeDqnlsTcLhnSsPVdLVmnw70bqfN4GknbwJxUoz51Cprk5i3HOZ9fEZ56u3rEtlfdKJJ_MzhVxtAmPLcxWIyEPftmC8tF6x94NUBVbZzipWnMOS3khdFR-DIoxz6myeP-k6_nJScl1IlS-C9ANdj7xZVVJSyZm8vfcaT"/>
+<div class="relative h-full p-12 flex flex-col justify-end bg-gradient-to-t from-background via-transparent to-transparent">
+<span class="font-label uppercase tracking-widest text-[10px] text-primary mb-2">Spotlight</span>
+<h3 class="font-headline italic text-4xl mb-6">Owner Stories: The Arctic Expedition</h3>
+<p class="text-secondary text-sm mb-8 max-w-sm">How one family took their SUV across the frozen tundras of Svalbard.</p>
+<button class="w-fit bg-primary text-on-primary px-8 py-3 font-label uppercase tracking-widest text-[10px] font-bold">Read the Journey</button>
+</div>
+</div>
+</div>
+</section>
+<!-- User Generated Content (Bento Gallery) -->
+<section class="mb-32">
+<h2 class="font-label uppercase tracking-[0.4em] text-sm mb-12 flex items-center gap-4">
+<span class="w-2 h-2 bg-primary"></span> 05. The Collection
+            </h2>
+<div class="columns-1 md:columns-3 gap-6 space-y-6">
+<div class="relative group bg-surface-container-high">
+<img alt="" class="w-full grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="low-angle shot of a custom matte black sports car in an industrial warehouse" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArWh4kAvBsLfKImKv7SWZojaP8OIdviEZQaHV1eIV78HAYcdQ67U_-5w07KyL1CV2FgOyhgoh14OMBqZp0hOp-0Shf7IaKknuM0pAuMlli8UM80jC9AOYr_SXVor94HXyTDj5RYMDFYs9j-OlZ1NP5LavUFtwm7PGdZYiK5-PVobmmuM6oeqcETSXQg6xavRfyXnpZYbMQPwKl0zCgKiVnZSW93LygFbPPeji2z-fEHBU7O76oydglnxSGeZX-H7RjTXL5XauOjqyx"/>
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="font-label text-[10px] uppercase tracking-widest text-white">Submitted by @vantage_point</p>
+</div>
+</div>
+<div class="relative group bg-surface-container-high">
+<img alt="" class="w-full grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="dynamic close up of a luxury car wheel rim spinning with motion blur" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsluYbPgPmhfS-uGfJEPvPyGc-SyarXSTB3mLQtHLX3vnvWs9a1mYg7FLXH8VK3epgCjWoDHik1EoeWrEo2cpyBOjPb9qSDeOL1BWEUt5jU8MrHdieciEJCieXbFVmYtVF5ksw6K9p1hxM8GPIdnGqIZ21WzZ9gJ2e36NSlwgM9v9-YnP9YVPQ0YUeoC2uWDEs7XJXnH-foDxF9VNnM9BjwLzo4dyRf9nWYhmwksYaOJ02_dsxBOHI1UGUbM80WFmymrmGb-m7C7Ar"/>
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="font-label text-[10px] uppercase tracking-widest text-white">Submitted by @aero_flow</p>
+</div>
+</div>
+<div class="relative group bg-surface-container-high">
+<img alt="" class="w-full grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="rear view of a luxury SUV driving into a mountainous sunset with taillights glowing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTdtPPwECiQYg61O1wmx4B6Kprn14KA2KZPAV86MlSkr60I_YN_z-RJ51GdEU7WI_0lTy8oq970PcUJ_PiRadcw8B41IpjPUyhcULxYn5bf1ZAXN8rt0Dc9pwp09MrZaQRhyJgOs-Vy8h7T2GIcuYEkRH5u7NpgsjH4CdNkZeUNE58ar2TIaeZj6jYCCJ4ZMnK0ArNz3uOPVfF9piOAHCdOgXTiVjOqbz44mqGAJBfy9376PaeM6j0bYhZfh79UCSBin5XJZn69b_l"/>
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="font-label text-[10px] uppercase tracking-widest text-white">Submitted by @peak_drive</p>
+</div>
+</div>
+<div class="relative group bg-surface-container-high">
+<img alt="" class="w-full grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="minimalist overhead shot of a white sports car parked on a white floor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuByLaLPcK1jJQ5yEhhwWmRd0gMS4xDCW9M440VroiZnNGXEpDsSzcj-1JuU0R7WVCf6SFMXyGWYwZ9reRXx9AYc9ibA5JJW0sPhI9PfcHZOPyvLKSmnqldgTYtkz7jOcKxZjuvqoHhd9wjI4SAIiuuwbNuQpXiU4jxeqea0e99UksGXCrzgl-h084TNNiV4O4v7Wt7AeV6x7olKAMBe8VG1u5SPRnonDtTVuP_emdxhF3fu1ovRkVwuPK0dBN90I8B9UO5JpSf2CcAE"/>
+<div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-slate-950/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+<p class="font-label text-[10px] uppercase tracking-widest text-white">Submitted by @studio_9</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Support/Interaction Widgets (FAB & Assistant) -->
+<div class="fixed bottom-12 right-12 z-50 flex flex-col items-end gap-6">
+<!-- Virtual Assistant Teaser -->
+<div class="glass-panel p-6 border border-outline-variant/20 max-w-xs shadow-2xl hidden md:block">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+<span class="font-label uppercase tracking-widest text-[10px]">Assistant Active</span>
+</div>
+<p class="font-body text-xs leading-relaxed text-on-surface mb-4">Hello. I am here to assist with technical specifications or booking your next service session.</p>
+<button class="w-full bg-white text-background py-3 font-label uppercase tracking-widest text-[10px] font-bold">Initiate Chat</button>
+</div>
+<!-- FAB -->
+<button class="w-16 h-16 bg-primary text-on-primary flex items-center justify-center group shadow-xl transition-all hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-3xl group-hover:rotate-12 transition-transform">support_agent</span>
+</button>
+</div>
+<!-- Footer -->
+<footer class="bg-slate-950 px-12 py-20 w-full border-t border-slate-800/30">
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-12 mb-20">
+<div class="col-span-2">
+<div class="text-3xl font-serif tracking-tighter text-slate-200 mb-8">TUT USA</div>
+<p class="text-slate-500 font-sans text-sm max-w-sm">Crafting the future of mobility with precision, luxury, and an uncompromising commitment to engineering excellence.</p>
+</div>
+<div>
+<h6 class="font-sans uppercase tracking-widest text-[10px] text-slate-200 mb-6">Vehicles</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Sedans</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">SUVs</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Electric</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-sans uppercase tracking-widest text-[10px] text-slate-200 mb-6">Company</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Owners</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Company</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Support</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-sans uppercase tracking-widest text-[10px] text-slate-200 mb-6">Legal</h6>
+<ul class="space-y-4">
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Privacy</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Legal</a></li>
+<li><a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">Cookies</a></li>
+</ul>
+</div>
+<div>
+<h6 class="font-sans uppercase tracking-widest text-[10px] text-slate-200 mb-6">Region</h6>
+<a class="text-slate-500 hover:text-slate-100 transition-colors duration-200 font-sans uppercase tracking-widest text-[10px]" href="#">USA/English</a>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-center gap-8 border-t border-slate-800/30 pt-12">
+<span class="font-sans uppercase tracking-widest text-[10px] text-slate-500">© 2024 TUT USA. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-8">
+<span class="material-symbols-outlined text-slate-500 hover:text-white cursor-pointer transition-colors" data-icon="facebook">social_leaderboard</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-white cursor-pointer transition-colors" data-icon="instagram">retweet</span>
+<span class="material-symbols-outlined text-slate-500 hover:text-white cursor-pointer transition-colors" data-icon="x">crossword</span>
+</div>
+</div>
+</footer>
+</body></html>

@@ -36,9 +36,87 @@ If the correct approach takes longer to implement — write it anyway. Shortcuts
 
 ---
 
+## Two-Agent Workflow
+
+This project uses two named agents: **Kyle** and **Erik**. Every task and every command must be attributed to one of them.
+
+### Agent Routing Rules
+
+| User says | Action |
+|-----------|--------|
+| `kyle implement` or `kyle /implement` | Kyle reads `WORK_BOARD_KYLE.md` and picks his next 🟢 OPEN task |
+| `erik implement` or `erik /implement` | Erik reads `WORK_BOARD_ERIK.md` and picks his next 🟢 OPEN task |
+| `kyle pick <ID>` | Kyle implements the specific task from `WORK_BOARD_KYLE.md` |
+| `erik pick <ID>` | Erik implements the specific task from `WORK_BOARD_ERIK.md` |
+| `work for kyle <description>` | Add a new task to `WORK_BOARD_KYLE.md` §3 |
+| `work for erik <description>` | Add a new task to `WORK_BOARD_ERIK.md` §3 |
+| `kyle status` / `erik status` | Show summary for that agent's board only |
+| `kyle continue` / `erik continue` | Resume the most recent PAUSED task on that agent's board |
+| `kyle finish` / `erik finish` | Complete or pause the current task on that agent's board |
+
+> **MANDATORY: If the user asks to implement, add, or work on a task WITHOUT specifying "kyle" or "erik",
+> you MUST ask "Is this for Kyle or Erik?" before taking ANY action. Do not guess. Do not proceed.**
+
+### Adding a New Task
+
+When the user says `work for kyle <description>` or `work for erik <description>`:
+
+**Step 1 — Act as Senior Project Manager.**
+You are a senior project manager on this project. Your goal is to transform the user's high-level description into one or more well-defined tasks in the standard work board format.
+
+Do the following analysis before writing anything to the board:
+
+1. **Read context first:**
+   - Read the agent's board (`WORK_BOARD_KYLE.md` or `WORK_BOARD_ERIK.md`) — understand existing task IDs and scope.
+   - Read `CLAUDE.md` architecture + conventions — understand which modules and layers the task touches.
+   - Read any relevant existing code if needed to understand current state.
+
+2. **Decompose the task:**
+   - If the description covers multiple independent concerns, split it into separate subtasks.
+   - A task is too big if it touches more than 3–4 modules OR has more than 8 ACs — split it.
+   - Each subtask must be independently implementable and verifiable.
+
+3. **Draft the task(s) in work board format.** For each task, produce:
+   ```
+   ID:          <next available ID, e.g. TA-05, E-01>
+   Priority:    <🔴 P0 / 🟠 P1 / 🟡 P2 / 🟢 P3 / 🧪 TA>
+   Title:       <concise action-oriented title>
+   Effort:      <realistic estimate, e.g. 2h / 1d / 3d>
+   Modules:     <list of modules/packages touched>
+   Blocked By:  <task IDs this depends on, or —>
+
+   Goal: <one sentence — what this task achieves>
+
+   read_first:
+   - <file or doc the agent must read before starting>
+
+   deliverables:
+   - <concrete output: file path + what it does>
+
+   acceptance_criteria:
+   - AC1: <specific, testable criterion>
+   - AC2: ...
+   ```
+
+4. **Present the draft to the user** — show all proposed task(s) and ask:
+   > "Does this match what you had in mind? Should I adjust scope, priority, split differently, or add/remove ACs before I write it to the board?"
+
+**Step 2 — Wait for user confirmation before writing to the board.**
+Do NOT add anything to `WORK_BOARD_KYLE.md` or `WORK_BOARD_ERIK.md` until the user explicitly confirms the task definition. After confirmation:
+
+5. Add the task row(s) to the agent's §3.
+6. Add the context packet(s) to the agent's §4.
+7. Do NOT start implementation — adding a task is a separate action from implementing it.
+
+---
+
 ## Work Board Protocol (SDLC)
 
-**Before starting ANY work, read `WORK_BOARD.md`.** It is the single source of truth for all implementation coordination: task status, module lock table (prevents two agents from editing the same module), context packets (exactly which files to read), acceptance criteria, and completion/handoff notes.
+**Before starting ANY work, read the correct board for the active agent:**
+- Kyle → `WORK_BOARD_KYLE.md` (tasks) + `WORK_BOARD.md §2` (shared module locks)
+- Erik → `WORK_BOARD_ERIK.md` (tasks) + `WORK_BOARD.md §2` (shared module locks)
+
+`WORK_BOARD.md` is the shared coordination hub: it holds the module lock table (prevents Kyle and Erik from editing the same module simultaneously) and the validation checklist.
 
 ### Task Lifecycle
 
@@ -62,18 +140,19 @@ If the correct approach takes longer to implement — write it anyway. Shortcuts
 | 6. **Unit Tests** | Run `cd flexcms && mvn test`. Fix any failures before continuing. | ❌ MUST pass — all tests green, no skips |
 | 7. **E2E Tests** | If `admin-e2e` package exists: `cd frontend/apps/admin-e2e && pnpm exec playwright test`. Apply the **Test Failure Protocol** (see below) on any failure. | ❌ MUST pass — 0 failing tests |
 | 8. **Pre-Push Gate** | Run the **full local validation** (see below). Fix any failures. **NEVER push to GitHub until every check passes locally.** | ❌ ALL must pass — zero exceptions |
-| 9. **Update Board** | §3: status → ✅ DONE. §2: clear locks. §5: add Completion Note (template in §5). | Every field in the template must be filled |
+| 9. **Update Board** | Agent's board §3: status → ✅ DONE. `WORK_BOARD.md §2`: clear locks. Agent's board §5: add Completion Note. | Every field in the template must be filled |
 | 10. **Commit & Push** | `git add -A && git commit -m "feat(<ID>): <description>" && git push` | Use item ID as commit scope |
 
 ### If you must stop mid-task (PAUSE)
 1. Ensure code compiles (never leave a broken build)
-2. §3: status → 🟠 PAUSED
-3. §5: add Handoff Note with exact continuation instructions (template in §5)
-4. Keep module locks in §2 (next agent needs them)
+2. Agent's board §3: status → 🟠 PAUSED
+3. Agent's board §5: add Handoff Note with exact continuation instructions (template in §5)
+4. Keep module locks in `WORK_BOARD.md §2` (next agent needs them)
 
 ### Multi-Agent Rules
 - **ONE agent per task** — never touch a 🔵 IN PROGRESS task
-- **Module locks are mandatory** — verify §2 before editing ANY file in a module
+- **Module locks are mandatory** — verify `WORK_BOARD.md §2` before editing ANY file in a module
+- **Kyle and Erik have separate boards** — never edit the other agent's board entries
 - **No data assumptions** — always read current source; another agent may have changed it
 - **Leave compilable code** — `mvn clean compile` must pass at all times
 
@@ -148,70 +227,81 @@ The task stays 🔵 IN PROGRESS until every test in that spec file passes on the
 ### Commands Reference
 
 > **All AI assistants MUST follow these command definitions, regardless of environment.**
-> In Claude Code (VS Code / CLI) these are invoked as `/implement`, `/pick`, etc.
+> In Claude Code (VS Code / CLI) these are invoked as `kyle /implement`, `erik /implement`, etc.
 > In GitHub Copilot, Cursor, JetBrains AI, or any other tool, execute the **exact same steps**
-> listed below whenever the user types the command name — with or without the `/` prefix.
-> The command definitions below are the authoritative specification. The slash syntax is just shorthand.
+> listed below whenever the user types the command — with or without the `/` prefix.
+> **Every command requires an agent prefix (kyle/erik). If missing, ask before proceeding.**
 
 ---
 
-#### `implement` — Pick next open task and implement it
+#### `<agent> implement` — Agent picks their next open task and implements it
 
-1. Read `WORK_BOARD.md` in full.
-2. Find the highest-priority 🟢 OPEN task (🔴 P0 → 🟠 P1 → 🟡 P2 → 🟢 P3 → 🧪 TA). Skip any 🔴 BLOCKED task whose blocker is not ✅ DONE. Skip any task whose modules are locked in §2.
-3. If a 🟠 PAUSED task exists for the same priority band — resume it instead (follow `/continue`).
-4. Execute the **Mandatory Workflow** steps 1–10 from the top of this file for that task.
-5. After the task is ✅ DONE, immediately loop back to step 1 and pick the next task. Continue until the user says stop.
+*Example: `kyle implement`, `erik /implement`*
+
+1. Determine the agent from the prefix (`kyle` → `WORK_BOARD_KYLE.md`, `erik` → `WORK_BOARD_ERIK.md`).
+2. Read `WORK_BOARD.md §2` (shared module locks) + the agent's board in full.
+3. Find the highest-priority 🟢 OPEN task (🔴 P0 → 🟠 P1 → 🟡 P2 → 🟢 P3 → 🧪 TA). Skip any 🔴 BLOCKED task whose blocker is not ✅ DONE. Skip any task whose modules are locked in §2.
+4. If a 🟠 PAUSED task exists for the same priority band — resume it instead (follow `continue`).
+5. Execute the **Mandatory Workflow** steps 1–10 for that task.
+6. After ✅ DONE, loop back to step 3 and pick the next task. Continue until the user says stop.
 
 ---
 
-#### `pick <TASK-ID>` — Implement a specific task by ID (e.g., `pick TA-00`, `pick P1-04`)
+#### `<agent> pick <TASK-ID>` — Agent implements a specific task by ID
 
-1. Read `WORK_BOARD.md` in full.
-2. Locate the task with the given ID in §3.
+*Example: `kyle pick TA-00`, `erik pick E-01`*
+
+1. Read `WORK_BOARD.md §2` + the agent's board in full.
+2. Locate the task with the given ID in the agent's §3.
 3. Verify its blockers are all ✅ DONE. If not, report which blocker is outstanding and stop.
-4. Verify no module lock conflicts in §2. If a conflict exists, report it and stop.
+4. Verify no module lock conflicts in `WORK_BOARD.md §2`. If a conflict exists, report it and stop.
 5. Execute the **Mandatory Workflow** steps 1–10 for that task.
 
 ---
 
-#### `continue` — Resume a paused task
+#### `<agent> continue` — Agent resumes their most recent paused task
 
-1. Read `WORK_BOARD.md` §5 (Completion & Handoff Notes) — find the most recent 🟠 PAUSED entry.
-2. Read the Handoff Note for that task (exact files touched, last completed step, blocking error if any).
+*Example: `kyle continue`, `erik continue`*
+
+1. Read the agent's board §5 — find the most recent 🟠 PAUSED entry.
+2. Read the Handoff Note (exact files touched, last completed step, blocking error if any).
 3. Read all files listed in `read_first` for that task's §4 Context Packet.
 4. Resume from the step indicated in the Handoff Note.
 5. Complete the task following the **Mandatory Workflow** from that step onward.
 
 ---
 
-#### `status` — Show work board summary
+#### `<agent> status` — Show agent's work board summary
 
-1. Read `WORK_BOARD.md` §2, §3.
+*Example: `kyle status`, `erik status`*
+
+1. Read `WORK_BOARD.md §2` + the agent's board §3.
 2. Print a summary table:
    - Count of tasks by status: 🟢 OPEN / 🔵 IN PROGRESS / 🟠 PAUSED / 🔴 BLOCKED / ✅ DONE
    - List every 🟢 OPEN and 🟠 PAUSED task by ID + title
    - List every 🔵 IN PROGRESS task with its locked modules
-   - List the next recommended task to pick up (highest priority available)
+   - List the next recommended task (highest priority available)
 3. Flag any anomalies: orphaned IN PROGRESS tasks, stale locks, missing completion notes.
 
 ---
 
-#### `finish` — Complete or pause the current task with documentation
+#### `<agent> finish` — Complete or pause agent's current task with documentation
 
-1. Identify which task is currently 🔵 IN PROGRESS (from §2 module locks or §3 status).
+*Example: `kyle finish`, `erik finish`*
+
+1. Identify which task is currently 🔵 IN PROGRESS on the agent's board (from `WORK_BOARD.md §2` locks or agent's §3 status).
 2. If the task is fully implemented and all ACs are met:
    a. Run the full Pre-Push Local Validation (all 5 steps).
-   b. If all pass: update §3 status → ✅ DONE, clear locks in §2, add Completion Note in §5, commit and push.
+   b. If all pass: update agent's §3 status → ✅ DONE, clear locks in `WORK_BOARD.md §2`, add Completion Note in agent's §5, commit and push.
 3. If the task cannot be completed right now:
    a. Ensure code compiles (`mvn clean compile`).
-   b. Update §3 status → 🟠 PAUSED, keep locks in §2.
-   c. Add Handoff Note in §5 with: last completed step, files modified, exact error or blocker, instructions for the next agent.
+   b. Update agent's §3 status → 🟠 PAUSED, keep locks in `WORK_BOARD.md §2`.
+   c. Add Handoff Note in agent's §5 with: last completed step, files modified, exact error or blocker, instructions for the next agent.
    d. Commit and push the partial work with message `wip(<ID>): <description>`.
 
 ---
 
-#### `validate` — Full build + work board consistency check
+#### `validate` — Full build + work board consistency check (no agent prefix needed)
 
 Execute every item in `WORK_BOARD.md §7 — Validation Checklist`:
 
@@ -219,7 +309,7 @@ Execute every item in `WORK_BOARD.md §7 — Validation Checklist`:
 2. `cd flexcms && mvn test` — must exit 0, 0 failures
 3. `cd frontend && pnpm install && pnpm build` — must exit 0
 4. If `frontend/apps/admin-e2e` exists: `cd frontend/apps/admin-e2e && pnpm exec playwright test --project=chromium` — must exit 0
-5. Work Board checks: no orphaned IN PROGRESS, no stale locks, every ✅ DONE has a §5 note, all BLOCKED blockers verified, all BUG-INLINE entries for DONE TA tasks are ✅ FIXED.
+5. Work Board checks across BOTH agent boards: no orphaned IN PROGRESS, no stale locks in `WORK_BOARD.md §2`, every ✅ DONE has a §5 note, all BLOCKED blockers verified, all BUG-INLINE entries for DONE TA tasks are ✅ FIXED.
 6. Code quality checks: no mock data in production code, no `System.out.println`, no commented-out blocks.
 7. Report a ✅ PASS / ❌ FAIL for each item. If any item fails, list the exact fix required.
 
@@ -372,6 +462,3 @@ Both files MUST be read before writing any UI code. If no matching folder exists
 ## Known Technical Debt
 
 - `SecurityConfig` has `permitAll()` in production profile — placeholder only, not permanent.
-- `PageApiController.getChildren()` manually `new ContentNodeService()` instead of DI — this is a bug.
-- `ContentNode.getChildren()` via `loadChildrenRecursive()` is an N+1 risk at scale.
-- Several list endpoints lack pagination.

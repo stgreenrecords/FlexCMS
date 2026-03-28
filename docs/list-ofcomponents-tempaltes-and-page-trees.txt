@@ -1,0 +1,4054 @@
+TUT USA WEBSITE DEFINITION
+==========================
+
+Website description
+TUT USA is the primary digital experience for a luxury automotive brand focused on vehicle discovery, premium product storytelling, innovation education, ownership support, and high-touch conversion journeys. The site must help shoppers explore and compare vehicles, understand advanced engineering and design features, stay current with brand news, and access trusted technical information after purchase. It should feel premium, credible, calm, and precise, with strong support for dealer contact, test-drive requests, offers, manuals, service content, and owner education.
+
+Main style guidelines for the designer
+1. Premium minimalism: Use a restrained, elegant visual system with generous spacing, strong alignment, and deliberate composition. Avoid clutter and excessive promotional noise.
+2. Automotive-first storytelling: Prioritize the car as the hero. Use large-format imagery, cinematic video, technical close-ups, and confident typography to communicate craftsmanship and performance.
+3. Luxurious but usable: Interfaces should feel exclusive without becoming obscure. Navigation, CTAs, specs, comparison tools, and owner documentation must remain easy to understand and fast to use.
+4. Precision and trust: Technical content, pricing language, ownership information, and regulatory details should appear structured, accurate, and dependable.
+5. Dark-light contrast discipline: Favor sophisticated neutral palettes, high contrast, and carefully controlled accent usage. Accent colors should be used for emphasis, not decoration.
+6. Editorial hierarchy: Headlines should be short and aspirational; body copy should be concise and informative; supporting labels should help users scan quickly.
+7. Motion with restraint: Use animation to reinforce premium feel, reveal vehicle details, and guide attention. Avoid decorative motion that competes with product content.
+8. Image and media standards: Visual assets should feel high-end, consistent, and realistic. Favor full-bleed hero imagery, polished studio photography, technical detail shots, and premium lifestyle scenes.
+9. Conversion design: Key actions such as Build, Compare, Book a Test Drive, Find a Dealer, Request a Quote, and Sign In should be highly visible but never aggressive.
+10. Ownership clarity: Manuals, service content, FAQs, and how-to material should prioritize readability, searchability, and structured navigation over brand theater.
+
+Grouped CMS Component Library (Filtered for self-contained components)
+Format: Category > Title | Short business goal | Fields with types
+Selection rule: Components are grouped by semantic/business purpose. Components that rely mainly on external triggers, automation, personalization engines, operational state, timers, or backend-driven event logic were filtered out.
+Kept: 406 components
+====================================================================================================
+
+LAYOUT & PAGE STRUCTURE
+-----------------------
+
+1. Section Divider
+Business goal: Visually separate content sections and improve pacing.
+Fields:
+  - style: enum
+  - label: text
+  - spacing: enum
+
+2. Spacer
+Business goal: Control white space between components for layout consistency.
+Fields:
+  - size: enum
+  - responsiveBehavior: enum
+
+3. Container
+Business goal: Wrap child components with shared layout, spacing, or theme settings.
+Fields:
+  - title: text
+  - children: list<reference>
+  - maxWidth: enum
+  - background: enum
+
+4. Grid Layout
+Business goal: Arrange child components into responsive columns for better composition.
+Fields:
+  - columnsDesktop: number
+  - columnsTablet: number
+  - columnsMobile: number
+  - items: list<reference>
+
+5. Two Column Layout
+Business goal: Place related content side by side for comparison or balance.
+Fields:
+  - leftContent: reference
+  - rightContent: reference
+  - ratio: enum
+  - stackOnMobile: boolean
+
+6. Two Columns Grid
+Business goal: Place reusable content modules into a fixed two-column grid that supports editorial balance, product comparison, or mixed media layouts.
+Fields:
+  - leftColumnItems: list<reference>
+  - rightColumnItems: list<reference>
+  - gap: enum
+  - stackOnMobile: boolean
+
+7. Three Column Layout
+Business goal: Organize concise repeated content in a scannable format.
+Fields:
+  - column1: reference
+  - column2: reference
+  - column3: reference
+  - gap: enum
+
+8. Card Grid
+Business goal: Render repeated cards in a consistent responsive layout.
+Fields:
+  - title: text
+  - cards: list<reference>
+  - columns: number
+  - showEqualHeight: boolean
+
+9. Sidebar Promo
+Business goal: Use sidebar space for a secondary offer or navigation aid.
+Fields:
+  - title: text
+  - description: text
+  - image: asset
+  - cta: link
+
+10. Sticky CTA
+Business goal: Keep a high-priority action visible as users scroll.
+Fields:
+  - label: text
+  - url: url
+  - triggerOffset: number
+  - position: enum
+
+11. Modal Dialog
+Business goal: Focus attention on a message, form, or decision without page navigation.
+Fields:
+  - title: text
+  - body: rich text
+  - size: enum
+  - trigger: enum
+  - dismissible: boolean
+
+12. Side Panel
+Business goal: Provide additional content or controls without leaving the current context.
+Fields:
+  - title: text
+  - content: reference
+  - position: enum
+  - width: enum
+
+13. Drawer Navigation
+Business goal: Support mobile or condensed navigation in an accessible overlay.
+Fields:
+  - menuItems: list<object>
+  - position: enum
+  - showAccountLinks: boolean
+
+14. Tooltip
+Business goal: Provide brief explanatory help on hover or focus.
+Fields:
+  - triggerLabel: text
+  - content: text
+  - position: enum
+
+15. Popover
+Business goal: Show richer contextual information near a trigger element.
+Fields:
+  - triggerLabel: text
+  - content: rich text
+  - position: enum
+  - dismissible: boolean
+
+16. Badge
+Business goal: Highlight a label such as new, sale, beta, or featured.
+Fields:
+  - text: text
+  - styleVariant: enum
+  - icon: asset
+
+17. Media Object
+Business goal: Pair media with text for compact summaries or feature explanations.
+Fields:
+  - title: text
+  - description: text
+  - media: asset
+  - mediaPosition: enum
+
+18. Page Header
+Business goal: Render top-of-page title area and supporting context consistently.
+Fields:
+  - title: text
+  - subtitle: text
+  - backgroundImage: asset
+  - breadcrumbs: list<link>
+
+19. Page Footer Section
+Business goal: Add a page-specific closing section with next actions or related info.
+Fields:
+  - headline: text
+  - body: text
+  - cta: link
+  - theme: enum
+
+20. Page Metadata
+Business goal: Store non-visual page settings that support governance and discoverability.
+Fields:
+  - pageTitle: text
+  - slug: text
+  - template: text
+  - tags: list<text>
+  - publishDate: datetime
+
+21. Empty State
+Business goal: Guide users when no data or results are available.
+Fields:
+  - title: text
+  - message: text
+  - illustration: asset
+  - cta: link
+
+22. Pagination
+Business goal: Break long result sets into manageable pages.
+Fields:
+  - currentPage: number
+  - totalPages: number
+  - baseUrl: url
+  - showFirstLast: boolean
+
+23. Filter Panel
+Business goal: Help users narrow results quickly using facets or attributes.
+Fields:
+  - title: text
+  - filters: list<object>
+  - applyMode: enum
+
+24. Sort Control
+Business goal: Let users reorder results based on relevance or preference.
+Fields:
+  - label: text
+  - options: list<text>
+  - defaultOption: text
+
+25. Tag List
+Business goal: Display associated categories or topics in a compact visual pattern.
+Fields:
+  - tags: list<text>
+  - linkMode: boolean
+
+26. Icon List
+Business goal: Combine icons with concise text to improve scan speed and comprehension.
+Fields:
+  - title: text
+  - items: list<object>
+  - iconPosition: enum
+
+27. Icon Card
+Business goal: Use icon-led cards to summarize benefits, steps, or categories.
+Fields:
+  - title: text
+  - description: text
+  - icon: asset
+  - cta: link
+
+28. Framed Message
+Business goal: Draw attention to a highlighted message using a contained visual style.
+Fields:
+  - title: text
+  - message: text
+  - styleVariant: enum
+  - icon: asset
+
+29. Error Page 404
+Business goal: Help users recover when a requested page cannot be found.
+Fields:
+  - title: text
+  - message: text
+  - suggestedLinks: list<link>
+  - searchEnabled: boolean
+
+30. Error Page 500
+Business goal: Explain a server issue and offer recovery paths to retain trust.
+Fields:
+  - title: text
+  - message: text
+  - supportLink: url
+  - retryLabel: text
+
+31. Progress Bar
+Business goal: Show completion or advancement to encourage users to continue.
+Fields:
+  - label: text
+  - value: number
+  - maxValue: number
+  - showPercent: boolean
+
+32. Step Indicator
+Business goal: Orient users in a multistep process or form journey.
+Fields:
+  - steps: list<text>
+  - currentStep: number
+  - orientation: enum
+
+EDITORIAL & ARTICLE CONTENT
+---------------------------
+
+33. Rich Text Block
+Business goal: Provide flexible formatted editorial content for pages, articles, and campaigns.
+Fields:
+  - heading: text
+  - body: rich text
+  - alignment: enum
+  - backgroundColor: color
+  - spacing: enum
+
+34. Plain Text Block
+Business goal: Display simple unformatted text for concise messages and supporting copy.
+Fields:
+  - title: text
+  - text: long text
+  - maxLength: number
+  - alignment: enum
+
+35. Heading
+Business goal: Highlight a section title to improve scannability and content hierarchy.
+Fields:
+  - text: text
+  - level: enum
+  - styleVariant: enum
+  - anchorId: text
+
+36. Subheading
+Business goal: Introduce a subsection and provide additional context beneath a main heading.
+Fields:
+  - text: text
+  - styleVariant: enum
+  - alignment: enum
+
+37. Paragraph
+Business goal: Deliver a single paragraph of body copy in a controlled layout.
+Fields:
+  - text: long text
+  - styleVariant: enum
+  - dropCap: boolean
+
+38. Quote
+Business goal: Emphasize a testimonial, statement, or citation to build trust or add authority.
+Fields:
+  - quoteText: long text
+  - authorName: text
+  - authorTitle: text
+  - source: url
+
+39. Pull Quote
+Business goal: Break up long content with a visually prominent excerpt that reinforces the message.
+Fields:
+  - quoteText: long text
+  - attribution: text
+  - alignment: enum
+
+40. Code Snippet
+Business goal: Present technical examples or configuration text in a readable format.
+Fields:
+  - title: text
+  - code: long text
+  - language: enum
+  - showLineNumbers: boolean
+
+41. Markdown Block
+Business goal: Allow teams to manage lightweight structured content using markdown syntax.
+Fields:
+  - title: text
+  - markdown: long text
+  - renderMode: enum
+
+42. Accordion
+Business goal: Organize expandable content sections to reduce page length and improve scanning.
+Fields:
+  - title: text
+  - items: list<object>
+  - allowMultipleOpen: boolean
+  - defaultOpenItem: number
+
+43. Tabs
+Business goal: Group related content into tabbed panels for faster comparison and discovery.
+Fields:
+  - title: text
+  - tabs: list<object>
+  - defaultTab: text
+  - orientation: enum
+
+44. Table
+Business goal: Present structured data for comparison, reference, or reporting purposes.
+Fields:
+  - caption: text
+  - columns: list<object>
+  - rows: list<object>
+  - striped: boolean
+
+45. Data Table
+Business goal: Display large structured datasets with sorting and filtering for utility content.
+Fields:
+  - title: text
+  - columns: list<object>
+  - rows: list<object>
+  - enableSort: boolean
+  - enableFilter: boolean
+
+46. Definition List
+Business goal: Explain key terms or concepts in a concise glossary-style format.
+Fields:
+  - title: text
+  - items: list<object>
+  - layout: enum
+
+47. Checklist
+Business goal: Guide users through steps, requirements, or tasks they need to complete.
+Fields:
+  - title: text
+  - items: list<object>
+  - showIcons: boolean
+
+48. Numbered Steps
+Business goal: Help users follow a process in the correct order to drive completion.
+Fields:
+  - title: text
+  - steps: list<object>
+  - orientation: enum
+
+49. Timeline
+Business goal: Show milestones or events over time for storytelling or project communication.
+Fields:
+  - title: text
+  - events: list<object>
+  - layout: enum
+
+50. Stat Counter
+Business goal: Highlight a key metric to reinforce proof points and business value.
+Fields:
+  - label: text
+  - value: number
+  - suffix: text
+  - animation: boolean
+
+51. KPI Card
+Business goal: Summarize one business metric in a compact visual component.
+Fields:
+  - title: text
+  - value: text
+  - trend: enum
+  - supportingText: text
+  - icon: asset
+
+52. Fact Box
+Business goal: Surface a quick fact or insight that supports the surrounding content.
+Fields:
+  - title: text
+  - text: long text
+  - icon: asset
+  - variant: enum
+
+53. Case Study Teaser
+Business goal: Promote proof-driven stories that support deeper evaluation.
+Fields:
+  - title: text
+  - summary: long text
+  - thumbnail: asset
+  - industry: text
+  - cta: link
+
+54. Case Study Detail
+Business goal: Publish a full customer success story with measurable business outcomes.
+Fields:
+  - headline: text
+  - challenge: long text
+  - solution: long text
+  - results: long text
+  - heroImage: asset
+  - downloadAsset: asset
+
+55. FAQ
+Business goal: Answer common questions to reduce support volume and purchase hesitation.
+Fields:
+  - title: text
+  - questions: list<object>
+  - schemaMarkup: boolean
+
+56. FAQ Item
+Business goal: Store a single reusable question and answer pair.
+Fields:
+  - question: text
+  - answer: rich text
+  - category: text
+
+57. Knowledge Base Article
+Business goal: Publish support content that helps users solve problems independently.
+Fields:
+  - title: text
+  - summary: text
+  - body: rich text
+  - category: text
+  - relatedArticles: list<reference>
+
+58. How-To Guide
+Business goal: Teach a process step by step to improve adoption and reduce friction.
+Fields:
+  - title: text
+  - introduction: long text
+  - steps: list<object>
+  - estimatedTime: number
+
+59. Glossary Entry
+Business goal: Define a term to educate readers and improve discoverability.
+Fields:
+  - term: text
+  - definition: long text
+  - relatedTerms: list<reference>
+
+60. Latest News
+Business goal: Keep users informed with the most recent announcements or stories.
+Fields:
+  - title: text
+  - source: reference
+  - count: number
+  - showDates: boolean
+
+61. News Card
+Business goal: Tease a news item with enough context to drive click-through.
+Fields:
+  - headline: text
+  - summary: text
+  - thumbnail: asset
+  - publishDate: date
+  - cta: link
+
+62. Article Card
+Business goal: Promote editorial content in lists, grids, or recommendations.
+Fields:
+  - title: text
+  - excerpt: text
+  - image: asset
+  - author: reference
+  - publishDate: date
+
+63. Article Detail
+Business goal: Render a full editorial story designed for reading and sharing.
+Fields:
+  - headline: text
+  - subtitle: text
+  - heroImage: asset
+  - body: rich text
+  - author: reference
+  - publishDate: date
+
+64. Blog Post
+Business goal: Publish thought leadership or updates in a flexible editorial format.
+Fields:
+  - title: text
+  - slug: text
+  - excerpt: text
+  - body: rich text
+  - featuredImage: asset
+  - tags: list<text>
+
+65. Blog Listing
+Business goal: Aggregate posts so visitors can browse by topic or recency.
+Fields:
+  - title: text
+  - posts: list<reference>
+  - showPagination: boolean
+  - enableTagFilter: boolean
+
+66. Press Release
+Business goal: Distribute official company announcements in a newsroom format.
+Fields:
+  - headline: text
+  - summary: text
+  - body: rich text
+  - releaseDate: datetime
+  - mediaContact: reference
+
+67. Feature List
+Business goal: Explain key capabilities to support evaluation and differentiation.
+Fields:
+  - title: text
+  - features: list<object>
+  - iconStyle: enum
+
+68. Feature Comparison
+Business goal: Help buyers compare offerings or options side by side.
+Fields:
+  - title: text
+  - columns: list<object>
+  - rows: list<object>
+  - highlightDifferences: boolean
+
+69. Story Card
+Business goal: Blend editorial storytelling and visual design in a reusable teaser.
+Fields:
+  - title: text
+  - excerpt: text
+  - image: asset
+  - category: text
+  - cta: link
+
+70. Milestone Card
+Business goal: Highlight a key achievement, deadline, or project marker.
+Fields:
+  - title: text
+  - date: date
+  - description: text
+  - status: enum
+
+71. Roadmap Card
+Business goal: Summarize a future initiative or planned enhancement.
+Fields:
+  - title: text
+  - quarter: text
+  - description: text
+  - status: enum
+
+72. Milestone Timeline
+Business goal: Visualize a sequence of planned or completed milestones.
+Fields:
+  - title: text
+  - milestones: list<object>
+  - layout: enum
+
+73. Fact Sheet
+Business goal: Summarize an organization, product, or event in a concise reference format.
+Fields:
+  - title: text
+  - facts: list<object>
+  - downloadFile: asset
+
+74. Executive Profile
+Business goal: Introduce a leader and support investor, media, or recruiting goals.
+Fields:
+  - name: text
+  - title: text
+  - bio: long text
+  - photo: asset
+  - quotes: list<text>
+
+75. Board Member Profile
+Business goal: Present governance leadership information in a professional format.
+Fields:
+  - name: text
+  - role: text
+  - bio: long text
+  - photo: asset
+  - committeeMemberships: list<text>
+
+76. Leadership Grid
+Business goal: Show multiple leaders together to communicate organizational strength.
+Fields:
+  - title: text
+  - leaders: list<reference>
+  - layout: enum
+
+77. CSR Highlight
+Business goal: Promote corporate responsibility efforts and outcomes.
+Fields:
+  - title: text
+  - summary: long text
+  - image: asset
+  - cta: link
+
+78. ESG Metric
+Business goal: Show sustainability or governance metrics for transparency and trust.
+Fields:
+  - label: text
+  - value: text
+  - reportingPeriod: text
+  - methodologyNote: text
+
+79. Impact Story
+Business goal: Tell a mission-driven story that demonstrates positive outcomes.
+Fields:
+  - title: text
+  - body: rich text
+  - media: asset
+  - cta: link
+
+80. Publication Citation
+Business goal: Format and present a publication reference consistently.
+Fields:
+  - title: text
+  - authors: list<text>
+  - journal: text
+  - publicationDate: date
+  - doi: text
+
+81. Research Paper Detail
+Business goal: Publish or promote academic-style research content in a structured form.
+Fields:
+  - title: text
+  - abstract: long text
+  - authors: list<text>
+  - file: asset
+  - keywords: list<text>
+
+82. Dataset Download
+Business goal: Provide access to a reusable dataset for analysis or integration.
+Fields:
+  - title: text
+  - description: text
+  - file: asset
+  - format: text
+  - license: text
+
+83. Methodology Note
+Business goal: Explain how a study, report, or metric was produced.
+Fields:
+  - title: text
+  - body: rich text
+  - owner: text
+  - version: text
+
+84. Lab Result Summary
+Business goal: Present test findings or structured results in a concise view.
+Fields:
+  - title: text
+  - summary: long text
+  - metrics: list<object>
+  - date: date
+
+85. Compliance Checklist
+Business goal: Help teams verify completion of required standards or controls.
+Fields:
+  - title: text
+  - items: list<object>
+  - owner: text
+  - reviewDate: date
+
+86. Risk Indicator
+Business goal: Communicate a level of risk in a simple, trackable format.
+Fields:
+  - label: text
+  - riskLevel: enum
+  - description: text
+  - owner: text
+
+87. Incident Report
+Business goal: Capture and publish essential details about an incident.
+Fields:
+  - title: text
+  - summary: long text
+  - severity: enum
+  - dateTime: datetime
+  - actionsTaken: list<text>
+
+88. Runbook Section
+Business goal: Provide operational instructions for common support or system tasks.
+Fields:
+  - title: text
+  - steps: list<object>
+  - owner: text
+  - relatedSystems: list<text>
+
+89. Knowledge Panel
+Business goal: Combine summary, links, and metadata for high-value reference content.
+Fields:
+  - title: text
+  - summary: text
+  - keyLinks: list<link>
+  - metadata: list<object>
+
+90. Quick Links
+Business goal: Offer a set of high-priority shortcuts for efficiency.
+Fields:
+  - title: text
+  - links: list<link>
+  - iconMode: boolean
+
+91. Benchmark Table
+Business goal: Compare results against standards, peers, or prior periods.
+Fields:
+  - title: text
+  - benchmarks: list<object>
+  - comparisonType: enum
+  - notes: text
+
+92. Reference Link Card
+Business goal: Promote an external source or destination with helpful context.
+Fields:
+  - title: text
+  - description: text
+  - url: url
+  - icon: asset
+
+93. Reading Progress
+Business goal: Encourage completion by showing how far through content a user is.
+Fields:
+  - label: text
+  - showPercent: boolean
+  - position: enum
+
+94. Estimated Read Time
+Business goal: Set expectations and improve engagement with transparent time cost.
+Fields:
+  - minutes: number
+  - label: text
+
+95. Table Of Contents
+Business goal: Help users navigate long content and understand structure quickly.
+Fields:
+  - title: text
+  - items: list<link>
+  - sticky: boolean
+
+96. Footnote List
+Business goal: Provide references or clarifications without cluttering the main narrative.
+Fields:
+  - items: list<object>
+  - styleVariant: enum
+
+97. Author List
+Business goal: Show multiple contributors for collaborative content pieces.
+Fields:
+  - authors: list<reference>
+  - displayStyle: enum
+
+98. Revision Notice
+Business goal: Inform users that content has changed materially since a prior version.
+Fields:
+  - message: text
+  - revisionDate: date
+  - version: text
+  - changeLogUrl: url
+
+99. Archive Notice
+Business goal: Explain that content is historical and may not reflect current guidance.
+Fields:
+  - message: text
+  - archiveDate: date
+  - replacementLink: url
+
+100. Content Rating
+Business goal: Allow users to rate helpfulness or quality of content.
+Fields:
+  - question: text
+  - scale: enum
+  - submitAction: url
+  - thankYouMessage: text
+
+101. News Card Alt
+Business goal: Present card content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+MEDIA, VISUAL STORYTELLING & ASSETS
+-----------------------------------
+
+102. HTML Embed
+Business goal: Insert custom third-party or advanced markup where approved by governance.
+Fields:
+  - title: text
+  - html: long text
+  - sandboxMode: boolean
+  - consentCategory: enum
+
+103. Carousel
+Business goal: Rotate featured content or promotions in a space-efficient format.
+Fields:
+  - slides: list<object>
+  - autoRotate: boolean
+  - rotationInterval: number
+  - showControls: boolean
+
+104. Content Slider
+Business goal: Show multiple content cards horizontally to encourage browsing.
+Fields:
+  - title: text
+  - items: list<reference>
+  - itemsPerView: number
+  - showArrows: boolean
+
+105. Image Gallery
+Business goal: Display multiple images to support product, editorial, or portfolio storytelling.
+Fields:
+  - title: text
+  - images: list<asset>
+  - layout: enum
+  - lightbox: boolean
+
+106. Lightbox Gallery
+Business goal: Allow users to view media in an enlarged immersive overlay.
+Fields:
+  - title: text
+  - items: list<asset>
+  - enableCaptions: boolean
+  - downloadAllowed: boolean
+
+107. Before After Image
+Business goal: Demonstrate transformation or improvement with an interactive comparison.
+Fields:
+  - beforeImage: asset
+  - afterImage: asset
+  - labelBefore: text
+  - labelAfter: text
+
+108. Image With Caption
+Business goal: Provide supporting context and accessibility for standalone imagery.
+Fields:
+  - image: asset
+  - caption: text
+  - credit: text
+  - altText: text
+
+109. Video Embed
+Business goal: Include hosted video content to educate, persuade, or support users.
+Fields:
+  - title: text
+  - videoUrl: url
+  - posterImage: asset
+  - transcript: long text
+  - autoplay: boolean
+
+110. Audio Player
+Business goal: Distribute podcasts, interviews, or audio messages within content pages.
+Fields:
+  - title: text
+  - audioFile: asset
+  - description: text
+  - showDownload: boolean
+
+111. Podcast Episode
+Business goal: Promote a single podcast episode and encourage listens or subscriptions.
+Fields:
+  - episodeTitle: text
+  - summary: long text
+  - audioFile: asset
+  - duration: number
+  - subscribeLink: url
+
+112. Testimonial Slider
+Business goal: Present multiple endorsements in a compact social proof section.
+Fields:
+  - title: text
+  - testimonials: list<object>
+  - autoRotate: boolean
+
+113. Logo Grid
+Business goal: Build trust by displaying customer, partner, or certification logos.
+Fields:
+  - title: text
+  - logos: list<asset>
+  - columns: number
+  - linkMode: boolean
+
+114. Document Download
+Business goal: Provide direct access to a file such as a PDF, brochure, or report.
+Fields:
+  - title: text
+  - description: text
+  - file: asset
+  - fileType: text
+  - fileSize: text
+
+115. Brochure Download
+Business goal: Promote a branded collateral asset for sales enablement and lead capture.
+Fields:
+  - title: text
+  - summary: text
+  - brochureFile: asset
+  - gated: boolean
+  - formReference: reference
+
+116. Whitepaper Download
+Business goal: Offer deeper thought leadership content to generate qualified leads.
+Fields:
+  - title: text
+  - abstract: long text
+  - file: asset
+  - gated: boolean
+  - formReference: reference
+
+117. Ebook Download
+Business goal: Provide educational long-form content that nurtures prospective buyers.
+Fields:
+  - title: text
+  - description: long text
+  - coverImage: asset
+  - file: asset
+  - gated: boolean
+
+118. Report Download
+Business goal: Share research or benchmark content that supports authority and lead capture.
+Fields:
+  - title: text
+  - summary: long text
+  - reportFile: asset
+  - publishDate: date
+  - gated: boolean
+
+119. Masonry Gallery
+Business goal: Display varied media sizes in an efficient visually dynamic grid.
+Fields:
+  - title: text
+  - items: list<asset>
+  - columns: number
+  - lightbox: boolean
+
+120. Infographic Embed
+Business goal: Present visualized data or process content to improve comprehension.
+Fields:
+  - title: text
+  - image: asset
+  - downloadFile: asset
+  - altDescription: long text
+
+121. Chart Embed
+Business goal: Show a chart or graph that supports a data-driven argument.
+Fields:
+  - title: text
+  - chartType: enum
+  - dataSource: url
+  - caption: text
+
+122. Download Center
+Business goal: Centralize files and assets for easier self-service access.
+Fields:
+  - title: text
+  - items: list<reference>
+  - filterCategories: list<text>
+  - searchEnabled: boolean
+
+123. Asset Detail
+Business goal: Provide metadata and context for a downloadable or reusable asset.
+Fields:
+  - title: text
+  - description: text
+  - file: asset
+  - usageRights: text
+  - relatedAssets: list<reference>
+
+124. Media Library Card
+Business goal: Represent a media asset in internal libraries or galleries.
+Fields:
+  - title: text
+  - thumbnail: asset
+  - assetType: enum
+  - lastModified: datetime
+
+125. Brand Guideline Section
+Business goal: Communicate design standards and approved usage rules.
+Fields:
+  - title: text
+  - body: rich text
+  - examples: list<asset>
+  - downloads: list<asset>
+
+126. Color Palette
+Business goal: Document approved brand colors for consistency across teams.
+Fields:
+  - title: text
+  - colors: list<object>
+  - usageNotes: text
+
+127. Typography Guide
+Business goal: Define approved type styles to maintain visual consistency.
+Fields:
+  - title: text
+  - styles: list<object>
+  - usageNotes: text
+
+128. Icon Library
+Business goal: Publish approved icons for internal teams or digital products.
+Fields:
+  - title: text
+  - icons: list<asset>
+  - downloadZip: asset
+
+129. Design Token Table
+Business goal: Document reusable design values for product and web consistency.
+Fields:
+  - title: text
+  - tokens: list<object>
+  - platform: text
+
+130. Brand Asset Download
+Business goal: Provide controlled access to logos and brand materials.
+Fields:
+  - title: text
+  - assetFiles: list<asset>
+  - usageTerms: text
+  - contact: reference
+
+131. Press Kit
+Business goal: Bundle media-ready assets and facts to support external coverage.
+Fields:
+  - title: text
+  - companyOverview: long text
+  - assets: list<asset>
+  - contact: reference
+
+132. Media Coverage Card
+Business goal: Show earned media mentions to reinforce authority and awareness.
+Fields:
+  - publication: text
+  - headline: text
+  - date: date
+  - url: url
+  - logo: asset
+
+133. Resource Card
+Business goal: Surface downloadable or viewable resources to support lead generation.
+Fields:
+  - title: text
+  - description: text
+  - thumbnail: asset
+  - resourceType: enum
+  - cta: link
+
+134. Resource List
+Business goal: Aggregate multiple assets so users can browse educational content efficiently.
+Fields:
+  - title: text
+  - resources: lisNAVIGATION, SEARCH & DISCOVERY
+------------------------------
+
+135. Search Bar
+Business goal: Help users quickly find relevant content, products, or support answers.
+Fields:
+  - placeholder: text
+  - searchScope: enum
+  - suggestionsEnabled: boolean
+
+136. Search Results
+Business goal: Display matching items and filters for efficient content discovery.
+Fields:
+  - title: text
+  - resultsSource: url
+  - showFilters: boolean
+  - resultsPerPage: number
+
+137. Breadcrumb
+Business goal: Clarify a page’s location within site hierarchy and improve navigation.
+Fields:
+  - items: list<link>
+  - showHome: boolean
+
+
+138. Navigation
+Business goal: Provide the global site header with brand access, primary wayfinding, account entry points, and responsive navigation behavior.
+Fields:
+  - logo: reference
+  - primaryLinks: list<reference>
+  - utilityLinks: list<link>
+  - accountEntry: reference
+  - sticky: boolean
+  - mobileBehavior: enum
+
+139. Primary Navigation
+Business goal: Guide users to major site sections and core destinations.
+Fields:
+  - menuItems: list<object>
+  - sticky: boolean
+  - mobileBehavior: enum
+
+140. Links Group (Navigation)
+Business goal: Organize top-level and mega-menu links into manageable groups that support scannable global navigation.
+Fields:
+  - groupTitle: text
+  - links: list<link>
+  - emphasisStyle: enum
+  - featuredLink: link
+
+141. Mega Menu
+Business goal: Expose deeper site structure for large enterprise information architectures.
+Fields:
+  - sections: list<object>
+  - featuredLinks: list<link>
+  - promoCard: reference
+
+142. Secondary Navigation
+Business goal: Provide contextual navigation within a subsection or experience.
+Fields:
+  - title: text
+  - links: list<link>
+  - styleVariant: enum
+
+143. Footer
+Business goal: Offer global utility links, legal information, and supplementary navigation.
+Fields:
+  - logo: reference
+  - footerLinkGroups: list<reference>
+  - copyrightText: text
+  - socialLinks: list<link>
+  - legalLinks: list<link>
+
+144. Links Group (Footer)
+Business goal: Structure footer destinations into clear clusters such as shopping, ownership, company, and legal links.
+Fields:
+  - groupTitle: text
+  - links: list<link>
+  - layoutStyle: enum
+  - audienceLabel: text
+
+145. Logo
+Business goal: Represent the TUT master brand consistently across the site header, footer, and key branded surfaces.
+Fields:
+  - brandName: text
+  - image: asset
+  - altText: text
+  - destinationUrl: url
+  - themeVariant: enum
+
+146. Account / Sign In
+Business goal: Give visitors and owners a clear entry point to authenticate, access saved vehicles, and manage account-level actions.
+Fields:
+  - label: text
+  - signInUrl: url
+  - icon: asset
+  - showProfileState: boolean
+  - supportLinks: list<link>
+
+147. Site Map
+Business goal: Expose a hierarchical list of pages to improve findability and crawlability.
+Fields:
+  - title: text
+  - rootPages: list<reference>
+  - includeHidden: boolean
+
+148. Back To Top
+Business goal: Help users quickly return to the start of long pages.
+Fields:
+  - label: text
+  - showAfterScroll: number
+
+149. Side Navigation
+Business goal: Support in-page or section-level movement for long-form content.
+Fields:
+  - title: text
+  - items: list<link>
+  - sticky: boolean
+
+150. Anchor Links
+Business goal: Jump users to important sections of the current page for faster access.
+Fields:
+  - links: list<link>
+  - orientation: enum
+
+151. Text Link
+Business goal: Provide inline navigation without overwhelming visual emphasis.
+Fields:
+  - label: text
+  - url: url
+  - trackingId: text
+
+152. Button Group
+Business goal: Present multiple related calls to action in a consistent pattern.
+Fields:
+  - buttons: list<link>
+  - alignment: enum
+
+153. Link List
+Business goal: Offer a compact list of destinations for navigation or resources.
+Fields:
+  - title: text
+  - links: list<link>
+  - columns: number
+
+154. Related Content
+Business goal: Increase engagement by recommending additional relevant items.
+Fields:
+  - title: text
+  - items: list<reference>
+  - selectionMode: enum
+
+155. Recommended Articles
+Business goal: Encourage continued reading with contextually relevant editorial links.
+Fields:
+  - title: text
+  - articles: list<reference>
+  - algorithm: enum
+
+156. Category Card
+Business goal: Present a category and encourage exploration of grouped content or products.
+Fields:
+  - title: text
+  - description: text
+  - image: asset
+  - cta: link
+
+157. Category Grid
+Business goal: Support browsing across multiple categories at once.
+Fields:
+  - title: text
+  - categories: list<reference>
+  - columns: number
+
+158. Bookmark Button
+Business goal: Let users save a page or item for easy return.
+Fields:
+  - label: text
+  - targetReference: reference
+  - storageMode: enum
+
+159. Skip Link
+Business goal: Improve keyboard navigation by jumping past repeated interface elements.
+Fields:
+  - label: text
+  - targetId: text
+
+160. Language Switcher
+Business goal: Allow users to switch locale for a more relevant experience.
+Fields:
+  - availableLocales: list<text>
+  - currentLocale: text
+  - fallbackLocale: text
+
+161. Country Selector
+Business goal: Route users to the most relevant regional content or experience.
+Fields:
+  - countries: list<object>
+  - defaultCountry: text
+  - redirectBehavior: enum
+
+162. Currency Selector
+Business goal: Let users browse prices in a preferred currency.
+Fields:
+  - currencies: list<text>
+  - defaultCurrency: text
+  - exchangeRateSource: url
+
+regional content or experience.
+Fields:
+  - countries: list<object>
+  - defaultCountry: text
+  - redirectBehavior: enum
+
+163. Currency Selector
+Business goal: Let users browse prices in a preferred currency.
+Fields:
+  - currencies: list<text>
+  - defaultCurrency: text
+  - exchangeRateSource: url
+
+CALLS TO ACTION, PROMOTIONS & CAMPAIGNS
+---------------------------------------
+
+164. Alert Banner
+Business goal: Communicate urgent information, outages, or policy messages clearly.
+Fields:
+  - message: text
+  - severity: enum
+  - dismissible: boolean
+  - link: url
+
+165. Inline Alert
+Business goal: Place contextual status or guidance near relevant content or forms.
+Fields:
+  - message: text
+  - severity: enum
+  - icon: asset
+
+166. Announcement Bar
+Business goal: Promote an important update across the site with high visibility.
+Fields:
+  - text: text
+  - linkLabel: text
+  - linkUrl: url
+  - startDate: datetime
+  - endDate: datetime
+
+167. Hero Banner
+Business goal: Create a strong first impression and drive users toward a primary action.
+Fields:
+  - eyebrow: text
+  - headline: text
+  - subheadline: text
+  - backgroundImage: asset
+  - primaryCta: link
+  - secondaryCta: link
+
+168. Split Hero
+Business goal: Balance marketing copy and media side by side to improve engagement.
+Fields:
+  - headline: text
+  - body: long text
+  - media: asset
+  - primaryCta: link
+  - layout: enum
+
+169. Video Hero
+Business goal: Use motion to communicate value quickly and increase landing page impact.
+Fields:
+  - headline: text
+  - body: long text
+  - video: asset
+  - posterImage: asset
+  - primaryCta: link
+
+170. Image Banner
+Business goal: Add a wide visual section that supports brand storytelling and promotions.
+Fields:
+  - headline: text
+  - image: asset
+  - overlayStyle: enum
+  - cta: link
+
+171. Promo Banner
+Business goal: Drive clicks to a campaign, offer, or seasonal destination.
+Fields:
+  - title: text
+  - description: text
+  - image: asset
+  - cta: link
+  - theme: enum
+
+172. CTA Button
+Business goal: Drive a primary user action such as purchase, signup, or contact.
+Fields:
+  - label: text
+  - url: url
+  - styleVariant: enum
+  - openInNewTab: boolean
+
+173. Featured Content
+Business goal: Promote priority stories, pages, or assets with elevated visibility.
+Fields:
+  - title: text
+  - items: list<reference>
+  - layout: enum
+
+174. Newsletter Signup
+Business goal: Capture subscriber interest for ongoing email engagement.
+Fields:
+  - title: text
+  - description: text
+  - formReference: reference
+  - successMessage: text
+  - consentText: text
+
+175. Email Signup
+Business goal: Collect email addresses for alerts, promotions, or content updates.
+Fields:
+  - headline: text
+  - placeholder: text
+  - submitLabel: text
+  - successMessage: text
+  - optInRequired: boolean
+
+176. Pricing Table
+Business goal: Compare plans clearly so buyers can choose the right option.
+Fields:
+  - title: text
+  - plans: list<object>
+  - highlightedPlan: text
+  - billingToggle: boolean
+
+177. Plan Card
+Business goal: Summarize a single product tier or subscription offering.
+Fields:
+  - planName: text
+  - price: text
+  - features: list<text>
+  - cta: link
+  - badge: text
+
+178. Campaign Landing Section
+Business goal: Support a dedicated campaign narrative with focused messaging and action.
+Fields:
+  - headline: text
+  - body: rich text
+  - media: asset
+  - primaryCta: link
+  - trackingCode: text
+
+179. Promo Tile
+Business goal: Promote a destination or offer in a small reusable card format.
+Fields:
+  - title: text
+  - description: text
+  - image: asset
+  - cta: link
+
+180. Offer Card
+Business goal: Communicate a discount or promotion and prompt redemption.
+Fields:
+  - title: text
+  - description: text
+  - offerCode: text
+  - expiryDate: date
+  - cta: link
+
+181. Collection Spotlight
+Business goal: Feature a curated set of items tied to a campaign or theme.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - cta: link
+
+182. Promo Ribbon
+Business goal: Add a slim promotional label to pages or cards without dominating layout.
+Fields:
+  - text: text
+  - position: enum
+  - styleVariant: enum
+
+183. Bundle Offer
+Business goal: Promote grouped products or services to increase order value.
+Fields:
+  - title: text
+  - includedItems: list<reference>
+  - bundlePrice: number
+  - cta: link
+
+184. Gift Guide
+Business goal: Curate recommended items for a theme, audience, or season.
+Fields:
+  - title: text
+  - description: text
+  - products: list<reference>
+  - audience: text
+
+185. Donation CTA
+Business goal: Encourage users to support a cause or initiative financially.
+Fields:
+  - title: text
+  - description: text
+  - donationUrl: url
+  - suggestedAmounts: list<number>
+
+186. Promo Card
+Business goal: Present card content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+187. Seasonal Campaign Block
+Business goal: Support time-bound thematic campaigns with reusable content structure.
+Fields:
+  - title: text
+  - description: text
+  - image: asset
+  - startDate: date
+  - endDate: date
+  - cta: link
+
+188. Buyer Guide
+Business goal: Help prospects understand evaluation criteria and selection steps.
+Fields:
+  - title: text
+  - introduction: long text
+  - sections: list<object>
+  - downloadFile: asset
+
+189. Implementation Plan
+Business goal: Outline steps, roles, and timing for successful rollout.
+Fields:
+  - title: text
+  - phases: list<object>
+  - owners: list<text>
+  - estimatedDuration: text
+
+190. Success Plan
+Business goal: Describe a customer’s path to value, adoption, and outcome tracking.
+Fields:
+  - title: text
+  - goals: list<text>
+  - milestones: list<object>
+  - owner: text
+
+191. Campaign Hero
+Business goal: Present hero content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+192. Product Hero
+Business goal: Present hero content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+193. Event Hero
+Business goal: Present hero content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+194. Recruiting Hero
+Business goal: Present hero content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+195. Investor Hero
+Business goal: Present hero content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+196. Brand Story Hero
+Business goal: Present hero content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+197. Offer Card Alt
+Business goal: Present card content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+198. Trial Signup
+Business goal: Encourage product-led growth by letting users start a free trial.
+Fields:
+  - title: text
+  - description: text
+  - formReference: reference
+  - trialLengthDays: number
+
+199. Demo Request CTA
+Business goal: Convert product interest into a meeting with sales.
+Fields:
+  - title: text
+  - description: text
+  - cta: link
+  - supportingPoints: list<text>
+
+200. Gift Card Promo
+Business goal: Encourage prepaid purchases and gifting behavior.
+Fields:
+  - title: text
+  - description: text
+  - amountOptions: list<number>
+  - cta: link
+
+201. Sales Enablement Asset
+Business goal: Store collateral that helps sales teams advance opportunities.
+Fields:
+  - title: text
+  - description: text
+  - assetFile: asset
+  - salesStage: text
+  - persona: text
+
+202. Battlecard
+Business goal: Summarize competitive positioning for internal sales and marketing teams.
+Fields:
+  - competitorName: text
+  - summary: long text
+  - strengths: list<text>
+  - weaknesses: list<text>
+  - talkingPoints: list<text>
+
+203. Competitive Comparison Table
+Business goal: Help internal or external users compare competing options structurally.
+Fields:
+  - title: text
+  - competitors: list<object>
+  - criteria: list<object>
+  - visibility: enum
+
+204. Marketplace Listing Card
+Business goal: Promote an app, extension, or integration in a catalog.
+Fields:
+  - title: text
+  - summary: text
+  - logo: asset
+  - rating: number
+  - cta: link
+
+205. Persona Showcase
+Business goal: Present multiple personas or audience types for internal alignment.
+Fields:
+  - title: text
+  - personas: list<reference>
+  - layout: enum
+
+206. Seasonal Hero
+Business goal: Present hero content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+FORMS, DATA CAPTURE & CONSENT
+-----------------------------
+
+207. Lead Form
+Business goal: Capture prospect information to support sales follow-up and qualification.
+Fields:
+  - title: text
+  - description: text
+  - fields: list<object>
+  - submitAction: url
+  - successRedirect: url
+
+208. Contact Form
+Business goal: Allow users to send inquiries to the business from the website.
+Fields:
+  - title: text
+  - description: text
+  - fields: list<object>
+  - recipientGroup: text
+  - spamProtection: boolean
+
+209. Support Form
+Business goal: Collect structured issue details so support teams can respond efficiently.
+Fields:
+  - title: text
+  - issueTypes: list<text>
+  - fields: list<object>
+  - caseRouting: enum
+
+210. Feedback Form
+Business goal: Gather customer input to improve services, products, or content.
+Fields:
+  - title: text
+  - questions: list<object>
+  - anonymousAllowed: boolean
+  - submitAction: url
+
+211. Survey
+Business goal: Collect structured responses for research, satisfaction, or segmentation.
+Fields:
+  - title: text
+  - questions: list<object>
+  - progressBar: boolean
+  - thankYouMessage: text
+
+212. Poll
+Business goal: Capture a quick opinion or preference with minimal effort.
+Fields:
+  - question: text
+  - options: list<text>
+  - showResults: boolean
+  - endDate: datetime
+
+213. Quiz
+Business goal: Engage users with interactive questions that educate or segment them.
+Fields:
+  - title: text
+  - questions: list<object>
+  - passScore: number
+  - resultsMessage: text
+
+214. Calculator
+Business goal: Help users estimate costs, savings, or outcomes to support conversion.
+Fields:
+  - title: text
+  - inputs: list<object>
+  - formula: text
+  - resultLabel: text
+  - disclaimer: text
+
+215. Form Field Text
+Business goal: Capture a short free-text response in a reusable form model.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - placeholder: text
+  - maxLength: number
+
+216. Form Field Textarea
+Business goal: Capture a longer open-ended response from a user.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - placeholder: text
+  - maxLength: number
+
+217. Form Field Email
+Business goal: Collect an email address using appropriate validation.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - placeholder: text
+
+218. Form Field Phone
+Business goal: Collect a phone number for service or sales follow-up.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - formatHint: text
+
+219. Form Field Select
+Business goal: Offer a single-choice dropdown to standardize responses.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - options: list<text>
+
+220. Form Field Radio Group
+Business goal: Allow one choice from a small visible set of options.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - options: list<text>
+
+221. Form Field Checkbox
+Business goal: Capture a boolean selection such as consent or preference.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - defaultChecked: boolean
+
+222. Form Field Checkbox Group
+Business goal: Allow multiple selections from a predefined set.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - options: list<text>
+
+223. Form Field Date
+Business goal: Collect a calendar date in a validated format.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - minDate: date
+  - maxDate: date
+
+224. Form Field File Upload
+Business goal: Allow users to submit supporting documents or media.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - allowedTypes: list<text>
+  - maxFileSizeMb: number
+
+225. Form Field Consent
+Business goal: Record permission for communications or processing activities.
+Fields:
+  - label: text
+  - name: text
+  - required: boolean
+  - policyLink: url
+  - consentVersion: text
+
+226. Cookie Banner
+Business goal: Collect consent and explain tracking categories in a compliant way.
+Fields:
+  - message: text
+  - policyLink: url
+  - categories: list<object>
+  - consentMode: enum
+
+227. Privacy Notice
+Business goal: Explain how user data is collected, used, and protected.
+Fields:
+  - title: text
+  - body: rich text
+  - lastUpdated: date
+  - owner: text
+
+228. Terms And Conditions
+Business goal: Publish contractual website or service terms for legal transparency.
+Fields:
+  - title: text
+  - body: rich text
+  - effectiveDate: date
+  - version: text
+
+229. Consent Manager
+Business goal: Give users control over tracking and privacy preferences.
+Fields:
+  - title: text
+  - categories: list<object>
+  - saveAction: url
+  - defaultState: enum
+
+230. Comment Form
+Business goal: Allow users to submit a public comment or reply.
+Fields:
+  - title: text
+  - fields: list<object>
+  - moderationRequired: boolean
+
+231. Application Form
+Business goal: Collect candidate information in a structured recruiting workflow.
+Fields:
+  - title: text
+  - fields: list<object>
+  - resumeUpload: boolean
+  - submitAction: url
+
+232. Quote Request Form
+Business goal: Capture information needed to prepare a personalized quote.
+Fields:
+  - title: text
+  - fields: list<object>
+  - productType: text
+  - submitAction: url
+
+233. Prescription Refill Form
+Business goal: Reduce call volume by enabling structured refill requests online.
+Fields:
+  - title: text
+  - fields: list<object>
+  - pharmacyLocations: list<text>
+  - submitAction: url
+
+234. Returns Form
+Business goal: Make return initiation easier and reduce support dependency.
+Fields:
+  - title: text
+  - fields: list<object>
+  - returnReasons: list<text>
+  - submitAction: url
+
+235. Data Request Form
+Business goal: Collect privacy-related requests such as access or deletion.
+Fields:
+  - title: text
+  - requestTypes: list<text>
+  - fields: list<object>
+  - submitAction: url
+
+236. Age Gate
+Business goal: Restrict access to age-sensitive content or products.
+Fields:
+  - title: text
+  - message: text
+  - minimumAge: number
+  - successRedirect: url
+
+237. Meeting Request Form
+Business goal: Capture information required to schedule a business meeting.
+Fields:
+  - title: text
+  - fields: list<object>
+  - availableTopics: list<text>
+  - submitAction: url
+
+238. Idea Submission Form
+Business goal: Collect product or service ideas from customers or employees.
+Fields:
+  - title: text
+  - fields: list<object>
+  - categoryOptions: list<text>
+  - submitAction: url
+
+239. Helpfulness Vote
+Business goal: Gather simple yes or no feedback on content usefulness.
+Fields:
+  - question: text
+  - yesLabel: text
+  - noLabel: text
+  - submitAction: url
+
+240. Report Issue Link
+Business goal: Let users flag problems with content, product info, or site behavior.
+Fields:
+  - label: text
+  - url: url
+  - issueTypeOptions: list<text>
+
+241. Accessibility Statement
+Business goal: Publish the organization’s accessibility commitment and contact path.
+Fields:
+  - title: text
+  - body: rich text
+  - contact: reference
+  - lastUpdated: date
+
+242. Do Not Sell Link
+Business goal: Support privacy rights requests required in some jurisdictions.
+Fields:
+  - label: text
+  - requestUrl: url
+  - regions: list<text>
+
+243. Petition Form
+Business goal: Enable users to support a cause with a clear public action.
+Fields:
+  - title: text
+  - description: text
+  - fields: list<object>
+  - submitAction: url
+
+244. Volunteer Signup
+Business goal: Capture interest and availability for volunteer activities.
+Fields:
+  - title: text
+  - description: text
+  - formReference: reference
+  - locations: list<text>
+
+245. Membership Signup
+Business goal: Convert visitors into members or subscribers with recurring value.
+Fields:
+  - title: text
+  - benefits: list<text>
+  - plans: list<object>
+  - cta: link
+
+246. Franchise Inquiry Form
+Business goal: Capture leads from prospective franchise or partner applicants.
+Fields:
+  - title: text
+  - fields: list<object>
+  - territoryOptions: list<text>
+  - submitAction: url
+
+247. Warranty Registration
+Business goal: Capture ownership details to activate warranty coverage.
+Fields:
+  - title: text
+  - fields: list<object>
+  - productLookup: boolean
+  - submitAction: url
+
+248. VIN Lookup
+Business goal: Let users identify product eligibility or history using a unique identifier.
+Fields:
+  - title: text
+  - inputLabel: text
+  - validationPattern: text
+  - submitAction: url
+
+COMMERCE, CATALOG & MERCHANDISING
+---------------------------------
+
+249. Product Card
+Business goal: Present a product with key information that supports click-through or purchase.
+Fields:
+  - productName: text
+  - image: asset
+  - price: number
+  - shortDescription: text
+  - cta: link
+
+250. Product Grid
+Business goal: Show multiple products in a browsable catalog layout.
+Fields:
+  - title: text
+  - products: list<reference>
+  - columns: number
+  - enableSorting: boolean
+
+251. Product Detail
+Business goal: Provide full information needed for evaluation and conversion.
+Fields:
+  - productName: text
+  - sku: text
+  - gallery: list<asset>
+  - description: rich text
+  - price: number
+  - specifications: list<object>
+
+252. Product Gallery
+Business goal: Show product visuals from different angles or use cases.
+Fields:
+  - images: list<asset>
+  - zoomEnabled: boolean
+  - showThumbnails: boolean
+
+253. Product Specs
+Business goal: Display detailed technical information for informed comparison.
+Fields:
+  - title: text
+  - specGroups: list<object>
+  - downloadSheet: asset
+
+254. Product Variants
+Business goal: Let users explore available options such as size, color, or model.
+Fields:
+  - variantOptions: list<object>
+  - defaultVariant: text
+  - stockAware: boolean
+
+255. Add To Cart
+Business goal: Enable direct purchase flow initiation from a product context.
+Fields:
+  - buttonLabel: text
+  - productReference: reference
+  - quantityDefault: number
+  - showMiniCart: boolean
+
+256. Mini Cart
+Business goal: Let users review cart contents without leaving the current page.
+Fields:
+  - title: text
+  - cartSource: url
+  - showSubtotal: boolean
+  - checkoutUrl: url
+
+257. Cart Summary
+Business goal: Show selected items, totals, and savings before checkout.
+Fields:
+  - items: list<object>
+  - subtotal: number
+  - discount: number
+  - taxEstimate: number
+  - checkoutUrl: url
+
+258. Checkout Progress
+Business goal: Reduce checkout abandonment by clarifying remaining steps.
+Fields:
+  - steps: list<text>
+  - currentStep: number
+  - completedSteps: list<number>
+
+259. Coupon Entry
+Business goal: Allow users to apply promotional discounts during purchase flow.
+Fields:
+  - label: text
+  - placeholder: text
+  - validationEndpoint: url
+  - errorMessage: text
+
+260. Upsell Recommendation
+Business goal: Increase average order value with relevant add-on suggestions.
+Fields:
+  - title: text
+  - products: list<reference>
+  - placement: enum
+
+261. Cross Sell
+Business goal: Promote complementary items that enhance the main purchase.
+Fields:
+  - title: text
+  - products: list<reference>
+  - selectionLogic: enum
+
+262. Wishlist Button
+Business goal: Let users save products or content for later consideration.
+Fields:
+  - label: text
+  - itemReference: reference
+  - requiresLogin: boolean
+
+263. Saved Items List
+Business goal: Help returning users revisit previously saved products or content.
+Fields:
+  - title: text
+  - items: list<reference>
+  - emptyStateMessage: text
+
+264. Review Summary
+Business goal: Provide aggregate ratings and sentiment to support decision-making.
+Fields:
+  - averageRating: number
+  - reviewCount: number
+  - ratingDistribution: list<object>
+
+265. Review List
+Business goal: Display customer reviews to add social proof and detail.
+Fields:
+  - reviews: list<object>
+  - sortOptions: list<text>
+  - showFilters: boolean
+
+266. Star Rating
+Business goal: Visualize a rating score in a compact familiar format.
+Fields:
+  - rating: number
+  - maxRating: number
+  - reviewCount: number
+
+267. Review Form
+Business goal: Collect structured product or service feedback from customers.
+Fields:
+  - title: text
+  - fields: list<object>
+  - moderationRequired: boolean
+
+268. Comparison Tool
+Business goal: Enable side-by-side evaluation of products or solutions.
+Fields:
+  - title: text
+  - items: list<reference>
+  - comparisonFields: list<text>
+  - maxItems: number
+
+269. Configurator
+Business goal: Guide users through option selection for a tailored product or solution.
+Fields:
+  - title: text
+  - steps: list<object>
+  - pricingLogic: text
+  - completionCta: link
+
+270. Merchandise Card
+Business goal: Promote branded or retail merchandise with direct action.
+Fields:
+  - productName: text
+  - image: asset
+  - price: number
+  - cta: link
+  - badge: text
+
+271. Meal Plan Card
+Business goal: Summarize a plan and prompt selection or purchase.
+Fields:
+  - title: text
+  - description: text
+  - price: number
+  - includedMeals: number
+  - cta: link
+
+272. Recipe Card
+Business goal: Present one recipe in a reusable format that encourages cooking engagement.
+Fields:
+  - title: text
+  - description: text
+  - image: asset
+  - prepTime: number
+  - cta: link
+
+273. Recipe Detail
+Business goal: Provide ingredients and steps for a complete cooking experience.
+Fields:
+  - title: text
+  - heroImage: asset
+  - ingredients: list<text>
+  - steps: list<object>
+  - nutritionFacts: list<object>
+
+274. Nutrition Facts
+Business goal: Publish dietary information for compliance and informed choice.
+Fields:
+  - servingSize: text
+  - calories: number
+  - nutrients: list<object>
+  - allergens: list<text>
+
+275. Allergen Notice
+Business goal: Warn users about ingredients or exposure risks.
+Fields:
+  - title: text
+  - message: text
+  - allergens: list<text>
+  - contact: reference
+
+276. Returns Policy
+Business goal: Clarify eligibility, timelines, and process for returns.
+Fields:
+  - title: text
+  - body: rich text
+  - effectiveDate: date
+  - contact: reference
+
+277. Preorder CTA
+Business goal: Convert demand ahead of product availability.
+Fields:
+  - title: text
+  - description: text
+  - releaseDate: date
+  - cta: link
+
+278. License Selector
+Business goal: Help buyers choose the right entitlement or subscription model.
+Fields:
+  - title: text
+  - licenseOptions: list<object>
+  - comparisonMode: boolean
+
+279. Comparison Card
+Business goal: Tease a comparison experience or summarize one compared item.
+Fields:
+  - title: text
+  - summary: text
+  - cta: link
+  - badge: text
+
+ACCOUNT, PORTAL & TRANSACTIONAL
+-------------------------------
+
+280. Login Form
+Business goal: Authenticate returning users so they can access protected experiences.
+Fields:
+  - title: text
+  - usernameLabel: text
+  - passwordLabel: text
+  - forgotPasswordUrl: url
+  - submitAction: url
+
+281. Registration Form
+Business goal: Create a new account to support personalization and retention.
+Fields:
+  - title: text
+  - fields: list<object>
+  - submitAction: url
+  - successRedirect: url
+
+282. Password Reset
+Business goal: Help users recover access to their account securely.
+Fields:
+  - title: text
+  - submitAction: url
+  - successMessage: text
+  - tokenExpiryMinutes: number
+
+283. Profile Summary
+Business goal: Provide a quick overview of key user account information.
+Fields:
+  - title: text
+  - fields: list<object>
+  - editUrl: url
+
+284. Profile Editor
+Business goal: Allow users to update personal, business, or preference data.
+Fields:
+  - title: text
+  - fields: list<object>
+  - submitAction: url
+  - successMessage: text
+
+285. Address Block
+Business goal: Store and display a structured mailing or billing address.
+Fields:
+  - recipient: text
+  - street1: text
+  - street2: text
+  - city: text
+  - postalCode: text
+  - country: text
+
+286. Billing Address Form
+Business goal: Collect invoicing address details to support transactions.
+Fields:
+  - title: text
+  - fields: list<object>
+  - sameAsShipping: boolean
+
+287. Shipping Address Form
+Business goal: Capture delivery details required for fulfillment.
+Fields:
+  - title: text
+  - fields: list<object>
+  - addressValidation: boolean
+
+288. Order Summary
+Business goal: Show purchase details after checkout to confirm the transaction.
+Fields:
+  - orderNumber: text
+  - items: list<object>
+  - totals: list<object>
+  - deliveryEstimate: text
+
+289. Subscription Status
+Business goal: Communicate plan status, renewal timing, and entitlements.
+Fields:
+  - planName: text
+  - status: enum
+  - renewalDate: date
+  - manageUrl: url
+
+290. Billing History
+Business goal: Let users review previous charges, invoices, and payment status.
+Fields:
+  - title: text
+  - invoices: list<object>
+  - downloadPdf: boolean
+
+291. Invoice Download
+Business goal: Provide access to a formal invoice or receipt document.
+Fields:
+  - invoiceNumber: text
+  - invoiceDate: date
+  - file: asset
+  - amount: number
+
+292. Payment Method Card
+Business goal: Show stored payment details in a masked reusable component.
+Fields:
+  - brand: text
+  - last4: text
+  - expiryMonth: number
+  - expiryYear: number
+  - isDefault: boolean
+
+293. Payment Form
+Business goal: Securely collect payment details during checkout or billing updates.
+Fields:
+  - title: text
+  - provider: text
+  - fields: list<object>
+  - tokenizationEnabled: boolean
+
+294. Loyalty Summary
+Business goal: Show points, tier, and rewards to reinforce retention.
+Fields:
+  - pointsBalance: number
+  - tierName: text
+  - nextTierThreshold: number
+  - rewardsUrl: url
+
+295. Rewards Card
+Business goal: Promote a redeemable benefit or member perk.
+Fields:
+  - title: text
+  - description: text
+  - pointsRequired: number
+  - cta: link
+
+296. Dashboard Widget
+Business goal: Surface a compact personalized data point or shortcut in a dashboard.
+Fields:
+  - title: text
+  - dataSource: url
+  - refreshInterval: number
+  - emptyState: text
+
+297. Status Badge
+Business goal: Communicate concise state information such as active, draft, or delayed.
+Fields:
+  - label: text
+  - status: enum
+  - tooltip: text
+
+298. Portal Shortcut
+Business goal: Provide a fast route into a customer, partner, or employee portal.
+Fields:
+  - title: text
+  - description: text
+  - url: url
+  - icon: asset
+
+299. SSO Button
+Business goal: Support streamlined sign-in using an external identity provider.
+Fields:
+  - label: text
+  - provider: text
+  - loginUrl: url
+  - icon: asset
+
+300. Partner Portal Link
+Business goal: Provide role-specific access to partner enablement materials.
+Fields:
+  - title: text
+  - description: text
+  - portalUrl: url
+  - audience: text
+
+301. Entitlement Summary
+Business goal: Show what features or content a user can access.
+Fields:
+  - title: text
+  - entitlements: list<object>
+  - renewalDate: date
+  - upgradeUrl: url
+
+302. Reactivation Offer
+Business goal: Win back former users with a targeted incentive.
+Fields:
+  - title: text
+  - description: text
+  - offerDetails: text
+  - cta: link
+
+303. Member Benefit Card
+Business goal: Summarize one member-exclusive benefit to encourage sign-up.
+Fields:
+  - title: text
+  - description: text
+  - icon: asset
+  - eligibility: text
+
+EVENTS, BOOKING, TRAVEL & HOSPITALITY
+-------------------------------------
+
+304. Webinar Promo
+Business goal: Drive registrations for an upcoming webinar event.
+Fields:
+  - title: text
+  - summary: long text
+  - dateTime: datetime
+  - speakers: list<reference>
+  - registrationUrl: url
+
+305. Webinar Replay
+Business goal: Extend the life of webinar content by offering on-demand access.
+Fields:
+  - title: text
+  - summary: long text
+  - videoUrl: url
+  - slidesFile: asset
+  - cta: link
+
+306. Event Card
+Business goal: Promote an event and encourage attendance or registration.
+Fields:
+  - eventName: text
+  - summary: text
+  - startDate: datetime
+  - location: text
+  - cta: link
+
+307. Event List
+Business goal: Help users explore multiple upcoming events in one place.
+Fields:
+  - title: text
+  - events: list<reference>
+  - showFilters: boolean
+  - layout: enum
+
+308. Event Detail
+Business goal: Provide full event information to support conversion and attendance.
+Fields:
+  - eventName: text
+  - description: long text
+  - startDate: datetime
+  - endDate: datetime
+  - venue: text
+  - registrationUrl: url
+
+309. Agenda
+Business goal: Outline session timing and speakers for conferences or webinars.
+Fields:
+  - title: text
+  - items: list<object>
+  - timeZone: text
+
+310. Speaker Profile
+Business goal: Introduce an event speaker and build session credibility.
+Fields:
+  - name: text
+  - title: text
+  - organization: text
+  - bio: long text
+  - photo: asset
+
+311. Booking Widget
+Business goal: Convert interest into appointments, reservations, or service bookings.
+Fields:
+  - title: text
+  - availabilitySource: url
+  - serviceTypes: list<text>
+  - confirmationMessage: text
+
+312. Appointment Scheduler
+Business goal: Allow users to select a date and time for a meeting or service.
+Fields:
+  - title: text
+  - calendarSource: url
+  - durationOptions: list<number>
+  - timeZone: text
+
+313. Reservation Card
+Business goal: Show a booking or reservation summary to support confidence and service.
+Fields:
+  - referenceNumber: text
+  - serviceName: text
+  - dateTime: datetime
+  - location: text
+  - manageUrl: url
+
+314. Itinerary
+Business goal: Present a multi-stop or multi-day plan in a structured travel format.
+Fields:
+  - title: text
+  - segments: list<object>
+  - travelerNames: list<text>
+  - downloadPdf: boolean
+
+315. Seat Map
+Business goal: Let users view or choose seat locations during booking.
+Fields:
+  - title: text
+  - mapDataSource: url
+  - selectedSeat: text
+  - legend: list<object>
+
+316. Room Selector
+Business goal: Support hotel or accommodation choice with room-level options.
+Fields:
+  - title: text
+  - rooms: list<object>
+  - occupancyFilters: list<object>
+  - cta: link
+
+317. Reservation Form
+Business goal: Collect details needed to book a table, service, or venue.
+Fields:
+  - title: text
+  - fields: list<object>
+  - availabilitySource: url
+  - confirmationMessage: text
+
+318. Delivery Slot Selector
+Business goal: Let users choose a preferred delivery time to improve convenience.
+Fields:
+  - title: text
+  - slots: list<object>
+  - defaultSlot: text
+  - submitAction: url
+
+319. Roadshow Schedule
+Business goal: Present dates and cities for a traveling event series.
+Fields:
+  - title: text
+  - stops: list<object>
+  - registerUrl: url
+
+320. Venue Card
+Business goal: Summarize one event venue or location.
+Fields:
+  - name: text
+  - address: text
+  - capacity: number
+  - mapUrl: url
+  - image: asset
+
+321. Workshop Card
+Business goal: Promote a practical session with date, topic, and registration details.
+Fields:
+  - title: text
+  - summary: text
+  - dateTime: datetime
+  - instructor: reference
+  - cta: link
+
+322. Training Schedule
+Business goal: Show upcoming sessions to improve enrollment and planning.
+Fields:
+  - title: text
+  - sessions: list<object>
+  - timeZone: text
+  - registerUrl: url
+
+323. Event Card Alt
+Business goal: Present card content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+324. Community Event Card
+Business goal: Promote a meetup, user group, or community-hosted activity.
+Fields:
+  - title: text
+  - summary: text
+  - dateTime: datetime
+  - location: text
+  - cta: link
+
+325. Expo Booth Info
+Business goal: Help event attendees locate and engage with an exhibitor presence.
+Fields:
+  - boothNumber: text
+  - hall: text
+  - eventName: text
+  - meetingUrl: url
+
+326. Menu Card
+Business goal: Present a restaurant or service menu item clearly.
+Fields:
+  - itemName: text
+  - description: text
+  - price: number
+  - dietaryTags: list<text>
+  - image: asset
+
+327. Menu List
+Business goal: Organize multiple menu items for browsing or ordering.
+Fields:
+  - title: text
+  - categories: list<object>
+  - showPrices: boolean
+
+COMMUNITY, SOCIAL PROOF & ENGAGEMENT
+------------------------------------
+
+328. Contact Card
+Business goal: Present essential contact information in a clear and reusable format.
+Fields:
+  - name: text
+  - role: text
+  - email: email
+  - phone: text
+  - photo: asset
+
+329. Team Member Profile
+Business goal: Introduce staff or leadership to build credibility and personal connection.
+Fields:
+  - fullName: text
+  - jobTitle: text
+  - bio: long text
+  - photo: asset
+  - socialLinks: list<link>
+
+330. Author Bio
+Business goal: Support editorial transparency by identifying the content author.
+Fields:
+  - name: text
+  - bio: long text
+  - photo: asset
+  - profileUrl: url
+
+331. Testimonial
+Business goal: Use customer praise to reduce doubt and support purchase decisions.
+Fields:
+  - quote: long text
+  - customerName: text
+  - customerTitle: text
+  - company: text
+  - photo: asset
+
+332. Client List
+Business goal: Show representative customers to strengthen market credibility.
+Fields:
+  - title: text
+  - clients: list<object>
+  - sortOrder: enum
+
+333. Media Contact
+Business goal: Provide journalists with the right person and channel for inquiries.
+Fields:
+  - name: text
+  - title: text
+  - email: email
+  - phone: text
+
+334. Chat Widget
+Business goal: Offer real-time support or sales assistance to reduce drop-off.
+Fields:
+  - title: text
+  - provider: text
+  - offlineMessage: text
+  - routingRule: text
+
+335. Virtual Assistant
+Business goal: Automate common questions to improve support efficiency and response speed.
+Fields:
+  - title: text
+  - botEndpoint: url
+  - welcomeMessage: text
+  - fallbackContact: text
+
+336. Social Share
+Business goal: Encourage distribution of content across social platforms.
+Fields:
+  - title: text
+  - networks: list<text>
+  - shareUrl: url
+  - shareText: text
+
+337. Social Follow
+Business goal: Grow audience reach by linking to brand social profiles.
+Fields:
+  - title: text
+  - profiles: list<link>
+  - iconStyle: enum
+
+338. Social Feed
+Business goal: Display recent social posts to add freshness and community proof.
+Fields:
+  - title: text
+  - sourceHandle: text
+  - network: enum
+  - postCount: number
+
+339. Instagram Gallery
+Business goal: Show brand or community imagery to reinforce lifestyle and trust.
+Fields:
+  - title: text
+  - feedSource: text
+  - postCount: number
+  - linkToPost: boolean
+
+340. LinkedIn Feed
+Business goal: Promote professional updates, employer brand, or thought leadership.
+Fields:
+  - title: text
+  - companyPage: url
+  - postCount: number
+
+341. X Feed
+Business goal: Surface short-form announcements or live commentary from a brand account.
+Fields:
+  - title: text
+  - handle: text
+  - postCount: number
+  - excludeReplies: boolean
+
+342. Trust Badges
+Business goal: Reduce hesitation by displaying security, quality, or accreditation markers.
+Fields:
+  - title: text
+  - badges: list<asset>
+  - captions: list<text>
+
+343. Certification List
+Business goal: Show credentials and certifications that support credibility.
+Fields:
+  - title: text
+  - certifications: list<object>
+  - showExpiration: boolean
+
+344. Award Showcase
+Business goal: Highlight awards to reinforce brand authority and recognition.
+Fields:
+  - title: text
+  - awards: list<object>
+  - layout: enum
+
+345. Partner Showcase
+Business goal: Promote ecosystem partners and strategic alliances.
+Fields:
+  - title: text
+  - partners: list<object>
+  - cta: link
+
+346. Partner Detail
+Business goal: Present deeper information about a partnership and its value to customers.
+Fields:
+  - partnerName: text
+  - summary: long text
+  - logo: asset
+  - website: url
+  - offeringDetails: rich text
+
+347. Community Forum Teaser
+Business goal: Drive participation in a support or user community.
+Fields:
+  - title: text
+  - description: text
+  - cta: link
+  - stats: list<object>
+
+348. Discussion Thread Preview
+Business goal: Surface community conversations relevant to the current page.
+Fields:
+  - title: text
+  - threads: list<object>
+  - showReplyCount: boolean
+
+349. Comments
+Business goal: Enable user discussion to build engagement and community.
+Fields:
+  - title: text
+  - commentsSource: url
+  - moderationEnabled: boolean
+  - sortOrder: enum
+
+350. User Generated Gallery
+Business goal: Show approved customer-submitted media to boost authenticity.
+Fields:
+  - title: text
+  - items: list<object>
+  - submissionUrl: url
+  - moderationStatus: enum
+
+351. Community Spotlight
+Business goal: Highlight a user, member, or partner story to deepen engagement.
+Fields:
+  - title: text
+  - story: rich text
+  - photo: asset
+  - cta: link
+
+352. Donor Wall
+Business goal: Recognize contributors publicly to encourage philanthropy and trust.
+Fields:
+  - title: text
+  - donors: list<object>
+  - groupByLevel: boolean
+
+353. Mentor Profile
+Business goal: Introduce a mentor or advisor to support trust in a program.
+Fields:
+  - name: text
+  - role: text
+  - bio: long text
+  - photo: asset
+  - expertise: list<text>
+
+354. Champion Story
+Business goal: Highlight a power user or advocate to inspire peer adoption.
+Fields:
+  - title: text
+  - story: rich text
+  - person: reference
+  - cta: link
+
+355. Vote Card
+Business goal: Let users support ideas, proposals, or nominations.
+Fields:
+  - title: text
+  - description: text
+  - voteCount: number
+  - submitAction: url
+
+356. Partner Finder
+Business goal: Help users locate certified partners or resellers.
+Fields:
+  - title: text
+  - apiEndpoint: url
+  - filters: list<object>
+  - mapEnabled: boolean
+
+357. Partner Tier Badge
+Business goal: Communicate partner program level in a compact visual form.
+Fields:
+  - tierName: text
+  - icon: asset
+  - description: text
+
+358. Profile Card
+Business goal: Present card content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+BRAND, CORPORATE, INVESTOR & GOVERNANCE
+---------------------------------------
+
+359. Investor Metric
+Business goal: Highlight a financial or operational measure for investor audiences.
+Fields:
+  - label: text
+  - value: text
+  - period: text
+  - trend: enum
+
+360. Financial Table
+Business goal: Present structured investor or reporting data clearly.
+Fields:
+  - title: text
+  - columns: list<object>
+  - rows: list<object>
+  - downloadCsv: boolean
+
+361. SEC Filing Download
+Business goal: Provide access to required regulatory filings and reports.
+Fields:
+  - title: text
+  - filingType: text
+  - file: asset
+  - filingDate: date
+
+362. Earnings Call Promo
+Business goal: Promote upcoming or archived investor calls.
+Fields:
+  - title: text
+  - dateTime: datetime
+  - webcastUrl: url
+  - transcriptFile: asset
+
+363. Investor Contact
+Business goal: Give analysts and investors a clear outreach channel.
+Fields:
+  - name: text
+  - title: text
+  - email: email
+  - phone: text
+
+364. Compliance Notice
+Business goal: Publish regulatory, legal, or policy statements required by the business.
+Fields:
+  - title: text
+  - body: rich text
+  - effectiveDate: date
+  - region: text
+
+365. Policy Document
+Business goal: Store a reusable corporate or site policy for publishing and governance.
+Fields:
+  - title: text
+  - body: rich text
+  - owner: text
+  - reviewDate: date
+  - version: text
+
+366. Document Version History
+Business goal: Track revision changes to governed content for auditability.
+Fields:
+  - documentTitle: text
+  - versions: list<object>
+  - currentVersion: text
+
+367. Internal Note
+Business goal: Store editor-only guidance that should not appear to public visitors.
+Fields:
+  - title: text
+  - note: long text
+  - visibility: enum
+
+368. Office Location
+Business goal: Present workplace details for recruiting or contact purposes.
+Fields:
+  - officeName: text
+  - address: text
+  - map: url
+  - photo: asset
+  - amenities: list<text>
+
+369. Culture Card
+Business goal: Showcase values, benefits, or ways of working for employer branding.
+Fields:
+  - title: text
+  - description: text
+  - icon: asset
+  - link: url
+
+370. Benefits List
+Business goal: Explain employee benefits to improve employer attractiveness.
+Fields:
+  - title: text
+  - benefits: list<object>
+  - layout: enum
+
+371. Grant Opportunity
+Business goal: Promote funding availability and encourage qualified applications.
+Fields:
+  - title: text
+  - summary: long text
+  - eligibility: text
+  - deadlineDate: date
+  - applyUrl: url
+
+372. Sponsor Showcase
+Business goal: Highlight sponsors supporting an event, program, or organization.
+Fields:
+  - title: text
+  - sponsors: list<object>
+  - cta: link
+
+373. Recall Notice
+Business goal: Alert customers to safety or product issues requiring action.
+Fields:
+  - title: text
+  - message: text
+  - affectedProducts: list<text>
+  - actionUrl: url
+
+374. Job Listing Card
+Business goal: Promote an open role and drive qualified applications.
+Fields:
+  - jobTitle: text
+  - department: text
+  - location: text
+  - employmentType: enum
+  - applyUrl: url
+
+375. Job Listings
+Business goal: Aggregate vacancies so candidates can explore opportunities efficiently.
+Fields:
+  - title: text
+  - jobs: list<reference>
+  - filterOptions: list<object>
+  - searchEnabled: boolean
+
+376. Job Detail
+Business goal: Provide full role information, expectations, and application path.
+Fields:
+  - jobTitle: text
+  - location: text
+  - description: rich text
+  - requirements: rich text
+  - applyUrl: url
+
+377. Analyst Report Promo
+Business goal: Promote third-party analyst coverage to support credibility.
+Fields:
+  - title: text
+  - summary: text
+  - provider: text
+  - assetFile: asset
+  - gated: boolean
+
+SUPPORT, DOCUMENTATION & KNOWLEDGE
+----------------------------------
+
+378. Roadmap Section
+Business goal: Share upcoming priorities to build confidence and collect interest.
+Fields:
+  - title: text
+  - items: list<object>
+  - disclaimer: text
+
+379. Escalation Matrix
+Business goal: Explain who is contacted at each severity level in support workflows.
+Fields:
+  - title: text
+  - levels: list<object>
+  - owner: text
+  - lastReviewed: date
+
+LOCATION, LOCAL & PHYSICAL PRESENCE
+-----------------------------------
+
+380. Map Embed
+Business goal: Show a physical location or area coverage to support offline conversion.
+Fields:
+  - title: text
+  - mapUrl: url
+  - address: text
+  - zoomLevel: number
+
+381. Location Card
+Business goal: Summarize a single branch, office, or venue and help users find it.
+Fields:
+  - name: text
+  - address: text
+  - phone: text
+  - hours: long text
+  - mapLink: url
+
+382. Store Locator
+Business goal: Help users find nearby physical locations to increase local conversion.
+Fields:
+  - title: text
+  - apiEndpoint: url
+  - searchRadius: number
+  - showFilters: boolean
+
+383. Interactive Map
+Business goal: Let users explore geographic data, coverage, or locations dynamically.
+Fields:
+  - title: text
+  - mapDataSource: url
+  - defaultRegion: text
+  - legend: list<object>
+
+384. Branch Locator
+Business goal: Help users find nearby financial branches or ATMs.
+Fields:
+  - title: text
+  - apiEndpoint: url
+  - locationTypes: list<text>
+  - searchRadius: number
+
+385. ATM Locator
+Business goal: Support self-service by helping users find a nearby ATM.
+Fields:
+  - title: text
+  - apiEndpoint: url
+  - feeFreeOnly: boolean
+  - accessibilityFilters: list<text>
+
+386. Clinic Locator
+Business goal: Help patients find nearby care locations.
+Fields:
+  - title: text
+  - apiEndpoint: url
+  - specialtyFilters: list<text>
+  - openNow: boolean
+
+387. Campus Location
+Business goal: Help prospects find a campus and understand local context.
+Fields:
+  - name: text
+  - address: text
+  - mapLink: url
+  - programs: list<text>
+  - photo: asset
+
+388. Provider Profile
+Business goal: Introduce a clinician or provider to support informed selection.
+Fields:
+  - name: text
+  - specialty: text
+  - bio: long text
+  - photo: asset
+  - locations: list<reference>
+
+389. Pickup Location Card
+Business goal: Show where an item can be collected and what to expect.
+Fields:
+  - name: text
+  - address: text
+  - hours: long text
+  - mapUrl: url
+
+390. Service Center Card
+Business goal: Present an authorized service location with support details.
+Fields:
+  - name: text
+  - address: text
+  - phone: text
+  - services: list<text>
+  - appointmentUrl: url
+
+391. Location Card Alt
+Business goal: Present card content in a reusable structured pattern that supports discoverability, consistency, and conversion.
+Fields:
+  - title: text
+  - description: text
+  - items: list<reference>
+  - layout: enum
+  - cta: link
+
+392. Dealer Locator
+Business goal: Help users find authorized sellers or service providers nearby.
+Fields:
+  - title: text
+  - apiEndpoint: url
+  - radiusOptions: list<number>
+  - filters: list<object>
+
+EDUCATION, LEARNING & DEVELOPER CONTENT
+---------------------------------------
+
+393. Course Card
+Business goal: Promote one educational course or training offer.
+Fields:
+  - courseTitle: text
+  - summary: text
+  - duration: text
+  - level: text
+  - cta: link
+
+394. Course Catalog
+Business goal: Aggregate training options so users can browse by need or level.
+Fields:
+  - title: text
+  - courses: list<reference>
+  - filters: list<object>
+  - searchEnabled: boolean
+
+395. Lesson Detail
+Business goal: Deliver instructional content in a structured learning format.
+Fields:
+  - title: text
+  - body: rich text
+  - durationMinutes: number
+  - attachments: list<asset>
+  - nextLesson: reference
+
+396. Certificate Download
+Business goal: Provide proof of completion or achievement.
+Fields:
+  - title: text
+  - recipientName: text
+  - completionDate: date
+  - certificateFile: asset
+
+397. Faculty Profile
+Business goal: Present instructor expertise to build confidence in a program.
+Fields:
+  - name: text
+  - title: text
+  - bio: long text
+  - photo: asset
+  - specialties: list<text>
+
+398. Program Overview
+Business goal: Explain a degree, course path, or certification offer.
+Fields:
+  - title: text
+  - summary: long text
+  - duration: text
+  - outcomes: list<text>
+  - cta: link
+
+399. API Documentation Teaser
+Business goal: Guide developers to technical docs, keys, or onboarding resources.
+Fields:
+  - title: text
+  - description: text
+  - cta: link
+  - tags: list<text>
+
+400. API Endpoint Reference
+Business goal: Document one endpoint so developers can integrate successfully.
+Fields:
+  - name: text
+  - method: enum
+  - path: text
+  - description: long text
+  - parameters: list<object>
+  - responseExample: long text
+
+401. SDK Download
+Business goal: Provide official developer tools for faster adoption and integration.
+Fields:
+  - title: text
+  - platform: text
+  - version: text
+  - downloadUrl: url
+  - documentationUrl: url
+
+402. Sample Code
+Business goal: Help developers get started quickly with implementation examples.
+Fields:
+  - title: text
+  - language: enum
+  - code: long text
+  - repositoryUrl: url
+
+403. Sandbox Access CTA
+Business goal: Encourage sign-up for a trial or developer sandbox environment.
+Fields:
+  - title: text
+  - description: text
+  - cta: link
+  - eligibilityNote: text
+
+404. Certification Path
+Business goal: Explain required steps toward earning a certification.
+Fields:
+  - title: text
+  - levels: list<object>
+  - estimatedDuration: text
+  - cta: link
+
+405. Integration Detail
+Business goal: Explain how a platform integration works and why it matters.
+Fields:
+  - title: text
+  - summary: long text
+  - logo: asset
+  - supportedFeatures: list<text>
+  - documentationUrl: url
+
+406. System Requirement List
+Business goal: Clarify minimum and recommended environments for software adoption.
+Fields:
+  - title: text
+  - requirements: list<object>
+  - supportedPlatforms: list<text>
+
+INDUSTRY-SPECIFIC BUSINESS COMPONENTS
+-------------------------------------
+
+407. Mortgage Calculator
+Business goal: Estimate payments to support financial decision-making.
+Fields:
+  - title: text
+  - loanAmount: number
+  - rate: number
+  - termYears: number
+  - resultFields: list<text>
+
+408. Rate Table
+Business goal: Present current rates for financial products in a comparable format.
+Fields:
+  - title: text
+  - products: list<object>
+  - effectiveDate: date
+  - disclaimer: text
+
+409. Loan Offer Card
+Business goal: Present a lending option and encourage inquiry or application.
+Fields:
+  - title: text
+  - apr: text
+  - term: text
+  - eligibilitySummary: text
+  - cta: link
+
+410. Insurance Plan Card
+Business goal: Explain one coverage option and move users toward quote or purchase.
+Fields:
+  - planName: text
+  - coverageSummary: text
+  - startingPrice: text
+  - cta: link
+
+411. Patient Appointment Card
+Business goal: Summarize a healthcare appointment and help manage attendance.
+Fields:
+  - providerName: text
+  - specialty: text
+  - dateTime: datetime
+  - location: text
+  - manageUrl: url
+
+412. Patient Portal Shortcut
+Business goal: Drive secure access to appointments, records, and messages.
+Fields:
+  - title: text
+  - description: text
+  - portalUrl: url
+  - icon: asset
+
+
+====================================================================================================
+
+PAGE TEMPLATE LIBRARY FOR TUT LUXURY CAR BRAND
+Format: Template Name | Business goal | Primary audience | Embedded components (required in template) | Allowed optional components (authors may add)
+Scope note: These templates are tailored for a premium automotive brand website focused on vehicle sales, innovation storytelling, latest updates, owner support, and education. Embedded components are part of the default template structure. Allowed optional components are available in the page editor for that template.
+
+TEMPLATE GOVERNANCE RULES
+-------------------------
+1. Embedded components are structurally part of the template and should not be removed by page authors unless the template is forked by platform admins.
+2. Allowed optional components are the approved authoring set for that template. Authors should not add components outside this set.
+3. Luxury-brand pages should prioritize high-quality media, restrained CTA density, strong product storytelling, and technical accuracy.
+4. Owner-support and education templates should prioritize search, navigation, documentation, and downloadable assets over promotional blocks.
+5. Shared design-system components such as Navigation, Footer, Logo, Page Metadata, Breadcrumb, CTA Button, FAQ, and Related Content should be reused consistently across template families.
+
+1. Global Home Page
+Business goal: Present the brand, hero products, innovation leadership, latest updates, and high-priority conversion paths in one premium entry experience.
+Primary audience: All visitors, especially first-time prospects and returning brand followers.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Hero Banner
+  - Campaign Hero
+  - Product Grid
+  - Feature List
+  - Featured Content
+  - Latest News
+  - Dealer Locator
+  - Newsletter Signup
+  - Footer
+Allowed optional components (authors may add):
+  - Video Hero
+  - Image Banner
+  - Split Hero
+  - Story Card
+  - Testimonial Slider
+  - Logo Grid
+  - KPI Card
+  - Stat Counter
+  - Award Showcase
+  - Partner Showcase
+  - Collection Spotlight
+  - Promo Tile
+  - Promo Banner
+  - Resource Card
+  - Resource List
+  - Quote
+  - Pull Quote
+  - FAQ
+  - CTA Button
+  - Button Group
+
+2. Brand Story / About TUT Page
+Business goal: Communicate heritage, craftsmanship, design philosophy, sustainability commitments, and premium brand positioning.
+Primary audience: Brand researchers, press, high-intent buyers, partners.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Brand Story Hero
+  - Rich Text Block
+  - Timeline
+  - Leadership Grid
+  - CSR Highlight
+  - ESG Metric
+  - Award Showcase
+  - Footer
+Allowed optional components (authors may add):
+  - Image Gallery
+  - Video Embed
+  - Quote
+  - Pull Quote
+  - Milestone Card
+  - Milestone Timeline
+  - Fact Box
+  - Icon List
+  - Logo Grid
+  - Publication Citation
+  - Press Kit
+  - Media Coverage Card
+  - Resource Card
+  - Resource List
+  - FAQ
+
+3. Model Overview / Lineup Landing Page
+Business goal: Showcase the full vehicle portfolio and help shoppers quickly understand differences between model families.
+Primary audience: Prospective buyers in the discovery phase.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Product Hero
+  - Category Grid
+  - Product Grid
+  - Filter Panel
+  - Sort Control
+  - Comparison Tool
+  - CTA Button
+  - Footer
+Allowed optional components (authors may add):
+  - Product Card
+  - Product Gallery
+  - Feature List
+  - Feature Comparison
+  - Story Card
+  - Fact Box
+  - KPI Card
+  - Stat Counter
+  - Promo Ribbon
+  - Offer Card
+  - Video Embed
+  - FAQ
+  - Dealer Locator
+  - Button Group
+
+4. Vehicle Model Detail Page
+Business goal: Drive consideration and conversion for a specific car model with premium storytelling, specifications, media, and lead actions.
+Primary audience: High-intent shoppers comparing or evaluating a specific model.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Breadcrumb
+  - Product Hero
+  - Product Gallery
+  - Product Specs
+  - Feature List
+  - CTA Button
+  - Quote Request Form
+  - Dealer Locator
+  - Related Content
+  - Footer
+Allowed optional components (authors may add):
+  - Configurator
+  - Comparison Tool
+  - Feature Comparison
+  - Video Embed
+  - Image Gallery
+  - Before After Image
+  - Testimonial
+  - Review Summary
+  - Fact Sheet
+  - Brochure Download
+  - Document Download
+  - FAQ
+  - Offer Card
+  - Financing and Leasing section handled via: Pricing Table, Plan Card, Loan Offer Card, Rate Table
+  - Button Group
+
+5. Build & Configure Page
+Business goal: Let users explore trims, options, colors, and packages while moving toward quote, reservation, or dealer contact.
+Primary audience: Buyers ready to personalize a vehicle.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Breadcrumb
+  - Product Hero
+  - Configurator
+  - Product Variants
+  - Product Gallery
+  - Product Specs
+  - Pricing Table
+  - CTA Button
+  - Dealer Locator
+  - Footer
+Allowed optional components (authors may add):
+  - Feature Comparison
+  - Comparison Card
+  - Offer Card
+  - Bundle Offer
+  - Quote Request Form
+  - Contact Form
+  - FAQ
+  - Video Embed
+  - Fact Box
+  - Framed Message
+  - Brochure Download
+
+6. Compare Models Page
+Business goal: Help buyers compare key specs, features, pricing logic, and use-case fit across multiple TUT models.
+Primary audience: Mid- to late-stage shoppers narrowing options.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Comparison Tool
+  - Feature Comparison
+  - Benchmark Table
+  - CTA Button
+  - Dealer Locator
+  - Footer
+Allowed optional components (authors may add):
+  - Product Card
+  - Comparison Card
+  - KPI Card
+  - Fact Box
+  - FAQ
+  - Brochure Download
+  - Quote
+  - Pull Quote
+  - Video Embed
+  - Product Gallery
+
+7. Innovation Hub Page
+Business goal: Present TUT innovations across safety, electrification, autonomous systems, materials, connectivity, and design engineering.
+Primary audience: Tech-focused buyers, media, analysts, enthusiasts.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Video Hero
+  - Category Grid
+  - Feature List
+  - Story Card
+  - Resource List
+  - CTA Button
+  - Footer
+Allowed optional components (authors may add):
+  - Image Gallery
+  - Video Embed
+  - Infographic Embed
+  - Chart Embed
+  - Milestone Timeline
+  - Fact Sheet
+  - Publication Citation
+  - Research Paper Detail
+  - Methodology Note
+  - Dataset Download
+  - FAQ
+  - Quote
+  - Pull Quote
+  - Tabs
+  - Accordion
+
+8. Innovation Feature Detail Page
+Business goal: Explain one innovation in depth, including customer benefit, technical logic, proof points, and related models.
+Primary audience: Researchers, buyers, journalists, owners seeking technical understanding.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Breadcrumb
+  - Page Header
+  - Rich Text Block
+  - Feature List
+  - Fact Box
+  - Related Content
+  - CTA Button
+  - Footer
+Allowed optional components (authors may add):
+  - Video Embed
+  - Image With Caption
+  - Before After Image
+  - Chart Embed
+  - Table
+  - Data Table
+  - Definition List
+  - FAQ
+  - Document Download
+  - Fact Sheet
+  - Methodology Note
+  - Quote
+  - Pull Quote
+  - Product Card
+
+9. News & Updates Landing Page
+Business goal: Publish and organize latest corporate updates, product launches, announcements, and editorial stories.
+Primary audience: General public, press, customers, investors.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Search Bar
+  - Filter Panel
+  - Sort Control
+  - Blog Listing
+  - Latest News
+  - Pagination
+  - Footer
+Allowed optional components (authors may add):
+  - News Card
+  - Press Release
+  - Story Card
+  - Category Card
+  - Category Grid
+  - Featured Content
+  - Promo Banner
+  - Newsletter Signup
+  - Recommended Articles
+  - Tag List
+
+10. News / Press / Article Detail Page
+Business goal: Deliver a polished editorial reading experience for product announcements, executive perspectives, and brand news.
+Primary audience: Readers, press, search traffic, subscribers.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Breadcrumb
+  - Article Detail
+  - Author List
+  - Estimated Read Time
+  - Table Of Contents
+  - Social Share
+  - Related Content
+  - Footer
+Allowed optional components (authors may add):
+  - Image With Caption
+  - Video Embed
+  - Quote
+  - Pull Quote
+  - FAQ
+  - Document Download
+  - Press Kit
+  - Media Coverage Card
+  - Recommended Articles
+  - Newsletter Signup
+  - Footnote List
+  - Revision Notice
+
+11. Owners Hub Landing Page
+Business goal: Give owners a single entry point to manuals, maintenance, warranties, software resources, account tools, and support.
+Primary audience: Existing vehicle owners.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Search Bar
+  - Side Navigation
+  - Category Grid
+  - Quick Links
+  - Warranty Registration
+  - VIN Lookup
+  - Support Hero
+  - Footer
+Allowed optional components (authors may add):
+  - Knowledge Panel
+  - Resource Card
+  - Resource List
+  - FAQ
+  - Document Download
+  - Video Embed
+  - Service Center Card
+  - Dealer Locator
+  - Contact Card
+  - Login Form
+  - Portal Shortcut
+
+12. Owner Manual / Technical Documentation Page
+Business goal: Provide detailed technical information, operating instructions, downloadable manuals, and structured reference content.
+Primary audience: Owners, technicians, service advisors.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Breadcrumb
+  - Knowledge Base Article
+  - Table Of Contents
+  - Anchor Links
+  - Document Download
+  - Revision Notice
+  - Footer
+Allowed optional components (authors may add):
+  - Definition List
+  - Numbered Steps
+  - FAQ Item
+  - Table
+  - Data Table
+  - Image With Caption
+  - Video Embed
+  - Warning / note handled via: Framed Message, Inline Alert
+  - Fact Box
+  - Footnote List
+  - Glossary Entry
+  - Reference Link Card
+
+13. Service & Maintenance Page
+Business goal: Help owners understand maintenance schedules, service offerings, parts quality, and booking pathways.
+Primary audience: Existing owners and aftersales prospects.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Feature List
+  - FAQ
+  - Service Center Card
+  - Appointment Scheduler
+  - Contact Card
+  - Footer
+Allowed optional components (authors may add):
+  - Video Embed
+  - Numbered Steps
+  - Timeline
+  - Table
+  - Pricing Table
+  - Plan Card
+  - Warranty Registration
+  - VIN Lookup
+  - Dealer Locator
+  - Resource Card
+  - Resource List
+  - Framed Message
+
+14. Dealer / Showroom Locator Page
+Business goal: Help shoppers and owners find dealers, showrooms, and service centers with rich local information.
+Primary audience: Prospects and owners needing a nearby physical location.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Search Bar
+  - Dealer Locator
+  - Interactive Map
+  - Location Card
+  - Contact Card
+  - Footer
+Allowed optional components (authors may add):
+  - Service Center Card
+  - Office Location
+  - Appointment Scheduler
+  - Reservation Card
+  - FAQ
+  - Framed Message
+  - Inline Alert
+  - Category Filter handled via: Filter Panel
+
+15. Book a Test Drive Page
+Business goal: Convert high-intent visitors into qualified test-drive leads while reinforcing premium expectations.
+Primary audience: Prospective buyers close to conversion.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Product Card
+  - Dealer Locator
+  - Appointment Scheduler
+  - Meeting Request Form
+  - Privacy Notice
+  - Footer
+Allowed optional components (authors may add):
+  - Product Gallery
+  - Feature List
+  - Framed Message
+  - FAQ
+  - Contact Card
+  - Quote
+  - Offer Card
+  - Inline Alert
+
+16. Offers / Financing / Leasing Page
+Business goal: Explain commercial offers, ownership plans, financing options, and luxury mobility packages in a clear, compliant format.
+Primary audience: Buyers evaluating affordability and ownership structure.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Pricing Table
+  - Plan Card
+  - Loan Offer Card
+  - Rate Table
+  - FAQ
+  - CTA Button
+  - Footer
+Allowed optional components (authors may add):
+  - Offer Card
+  - Promo Banner
+  - Bundle Offer
+  - Comparison Card
+  - Contact Form
+  - Quote Request Form
+  - Fact Box
+  - Framed Message
+  - Document Download
+  - Terms And Conditions
+
+17. Accessories / Lifestyle Collection Page
+Business goal: Present branded accessories and lifestyle items that extend the TUT ownership experience.
+Primary audience: Owners, fans, gift buyers.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Collection Spotlight
+  - Product Grid
+  - Filter Panel
+  - Sort Control
+  - Footer
+Allowed optional components (authors may add):
+  - Merchandise Card
+  - Product Card
+  - Image Gallery
+  - Promo Ribbon
+  - Gift Guide
+  - Offer Card
+  - Review Summary
+  - Wishlist Button
+  - FAQ
+  - Related Content
+
+18. Learning / Education Hub Page
+Business goal: Organize educational content about vehicle technology, ownership, safety, charging, software, and premium driving know-how.
+Primary audience: Prospects, owners, enthusiasts, partner educators.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Search Bar
+  - Category Grid
+  - Course Catalog
+  - Resource List
+  - FAQ
+  - Footer
+Allowed optional components (authors may add):
+  - Course Card
+  - Lesson Detail
+  - Video Embed
+  - Numbered Steps
+  - How-To Guide
+  - Glossary Entry
+  - Checklist
+  - Quiz
+  - Fact Box
+  - Document Download
+  - Certificate Download
+  - Faculty Profile
+  - Program Overview
+
+19. Safety, Charging & Ownership How-To Page
+Business goal: Deliver task-based guidance for vehicle operation, charging, safety features, and best practices.
+Primary audience: Owners and prospective EV / advanced-feature adopters.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Breadcrumb
+  - How-To Guide
+  - Numbered Steps
+  - FAQ
+  - Related Content
+  - Footer
+Allowed optional components (authors may add):
+  - Video Embed
+  - Checklist
+  - Framed Message
+  - Inline Alert
+  - Table
+  - Definition List
+  - Image With Caption
+  - Glossary Entry
+  - Document Download
+  - VIN Lookup
+  - Contact Card
+
+20. Contact / Concierge / Support Page
+Business goal: Provide premium-contact options for sales, ownership support, concierge assistance, and escalation paths.
+Primary audience: Prospects, owners, partners, media.
+Embedded components (required in template):
+  - Page Metadata
+  - Navigation
+  - Page Header
+  - Support Hero
+  - Contact Card
+  - Contact Form
+  - Support Form
+  - FAQ
+  - Footer
+Allowed optional components (authors may add):
+  - Chat Widget
+  - Virtual Assistant
+  - Dealer Locator
+  - Service Center Card
+  - Office Location
+  - Escalation Matrix
+  - Inline Alert
+  - Framed Message
+  - Quick Links
+  - Privacy Notice
+  - Terms And Conditions
+
+CONTENT TREE FOR TUT USA WEBSITE
+--------------------------------
+Format: Tree level | Page name | Page description | Page template
+Purpose: Define the US website information architecture for TUT. Each item represents a publishable page and specifies the most appropriate template.
+
+ROOT
+1. L0 | TUT USA Website Root | US market root for all public TUT brand, vehicle, innovation, ownership, commerce-support, and help content. | Global Home Page
+
+PRIMARY SECTIONS
+2. L1 | Home | Premium entry page for the TUT USA website with featured vehicles, innovation stories, latest updates, and conversion paths. | Global Home Page
+3. L1 | Vehicles | Section landing page for browsing the TUT vehicle portfolio by model family and body style. | Model Overview / Lineup Landing Page
+4. L1 | Innovation | Editorial landing page for advanced vehicle technology, safety systems, electrification, materials, and design innovation. | Innovation Hub Page
+5. L1 | News & Updates | Publishing hub for company announcements, launches, product news, and editorial updates. | News & Updates Landing Page
+6. L1 | Owners | Ownership support hub for manuals, service, charging, maintenance, and educational content. | Owners Hub Landing Page
+7. L1 | Offers & Finance | Landing page for current offers, leasing, financing, and purchase-support journeys. | Offers / Financing / Leasing Page
+8. L1 | Accessories | Landing page for branded accessories, vehicle add-ons, and luxury lifestyle collections. | Accessories / Lifestyle Collection Page
+9. L1 | Learn | Educational landing page for buying guides, EV learning, feature explainers, and ownership how-to content. | Learning / Education Hub Page
+10. L1 | Contact & Concierge | Premium support entry page for concierge contact, help, inquiries, and assistance. | Contact / Concierge / Support Page
+
+VEHICLES
+11. L2 | Vehicle Lineup | Overview of all TUT models available in the US market. | Model Overview / Lineup Landing Page
+12. L2 | Compare Vehicles | Structured comparison page for evaluating selected TUT models side by side. | Compare Models Page
+13. L2 | Build & Configure | Entry page for configuring a selected vehicle, package, and options. | Build & Configure Page
+
+SEDANS
+14. L3 | Sedans | Category page for TUT sedan models. | Model Overview / Lineup Landing Page
+15. L4 | TUT S | Model detail page for the flagship luxury sedan. | Vehicle Model Detail Page
+16. L5 | Build TUT S | Dedicated configuration page for TUT S. | Build & Configure Page
+17. L5 | Compare TUT S | Preloaded comparison page for TUT S against peer models. | Compare Models Page
+18. L4 | TUT E | Model detail page for the executive sedan. | Vehicle Model Detail Page
+19. L5 | Build TUT E | Dedicated configuration page for TUT E. | Build & Configure Page
+
+SUVS
+20. L3 | SUVs | Category page for TUT SUV and crossover models. | Model Overview / Lineup Landing Page
+21. L4 | TUT X | Model detail page for the performance luxury SUV. | Vehicle Model Detail Page
+22. L5 | Build TUT X | Dedicated configuration page for TUT X. | Build & Configure Page
+23. L5 | Compare TUT X | Preloaded comparison page for TUT X against peer models. | Compare Models Page
+24. L4 | TUT Q | Model detail page for the grand touring SUV. | Vehicle Model Detail Page
+25. L5 | Build TUT Q | Dedicated configuration page for TUT Q. | Build & Configure Page
+
+ELECTRIC
+26. L3 | Electric Vehicles | Category page for TUT electric models and electrified mobility. | Model Overview / Lineup Landing Page
+27. L4 | TUT Eon | Model detail page for the all-electric grand tourer. | Vehicle Model Detail Page
+28. L5 | Build TUT Eon | Dedicated configuration page for TUT Eon. | Build & Configure Page
+29. L5 | Compare TUT Eon | Preloaded comparison page for TUT Eon against peer models. | Compare Models Page
+
+INNOVATION
+30. L2 | Innovation Overview | Overview page for all innovation themes across the TUT brand. | Innovation Hub Page
+31. L2 | Electrification | Innovation story page about battery systems, charging, range, and energy management. | Innovation Feature Detail Page
+32. L2 | Performance Engineering | Innovation story page about powertrain, chassis, dynamics, and driving precision. | Innovation Feature Detail Page
+33. L2 | Driver Assistance | Innovation story page about safety systems, assistive intelligence, and confidence features. | Innovation Feature Detail Page
+34. L2 | Craftsmanship & Materials | Innovation story page about interior materials, design detail, and luxury execution. | Innovation Feature Detail Page
+35. L2 | Connectivity & Digital Cabin | Innovation story page about infotainment, connected services, and software experience. | Innovation Feature Detail Page
+
+NEWS & UPDATES
+36. L2 | News Landing | Overview page for the latest TUT announcements and stories. | News & Updates Landing Page
+37. L2 | Product Launch Article | Detail article page for a new model or feature announcement. | News / Press / Article Detail Page
+38. L2 | Press Release Article | Detail article page for formal corporate or product communications. | News / Press / Article Detail Page
+39. L2 | Event Coverage Article | Detail article page for launch events, auto shows, or media previews. | News / Press / Article Detail Page
+
+OWNERS
+40. L2 | Owners Overview | Main ownership landing page with segmented pathways for manuals, service, and support. | Owners Hub Landing Page
+41. L2 | Manuals & Technical Documents | Searchable library of manuals, guides, and technical downloads. | Owner Manual / Technical Documentation Page
+42. L2 | Service & Maintenance | Service education and maintenance support page with booking pathways. | Service & Maintenance Page
+43. L2 | Charging & EV Ownership | Help page for charging, range best practices, and EV ownership guidance. | Safety, Charging & Ownership How-To Page
+44. L2 | Safety & Assistance How-To | Help page explaining safety and assistance features in owner-friendly language. | Safety, Charging & Ownership How-To Page
+45. L2 | Warranty & Coverage | Ownership support page for warranty and coverage education. | Service & Maintenance Page
+
+OFFERS, FINANCE, AND RETAIL SUPPORT
+46. L2 | Offers & Incentives | Landing page for current retail programs and model-specific offers. | Offers / Financing / Leasing Page
+47. L2 | Financing & Leasing | Education and conversion page for finance and lease options. | Offers / Financing / Leasing Page
+48. L2 | Book a Test Drive | Conversion page for scheduling a premium test-drive appointment. | Book a Test Drive Page
+49. L2 | Find a Dealer | Dealer and showroom lookup page with geolocation and contact pathways. | Dealer / Showroom Locator Page
+
+ACCESSORIES
+50. L2 | Accessories Overview | Landing page for vehicle accessories and branded lifestyle items. | Accessories / Lifestyle Collection Page
+51. L2 | Performance Accessories | Collection page for performance-oriented vehicle accessories. | Accessories / Lifestyle Collection Page
+52. L2 | Interior Accessories | Collection page for cabin and comfort enhancements. | Accessories / Lifestyle Collection Page
+53. L2 | Lifestyle Collection | Collection page for apparel, luggage, and luxury brand goods. | Accessories / Lifestyle Collection Page
+
+LEARN
+54. L2 | Learning Overview | Entry page for buyer education, feature explainers, and ownership learning content. | Learning / Education Hub Page
+55. L2 | EV Buying Guide | Educational guide for evaluating electric vehicle ownership. | Learning / Education Hub Page
+56. L2 | Model Comparison Guide | Educational page helping users choose the right TUT vehicle. | Learning / Education Hub Page
+57. L2 | Ownership How-To Article | Practical instructional page for common ownership tasks. | Safety, Charging & Ownership How-To Page
+58. L2 | Feature Explainer Article | Educational page describing a specific vehicle technology or system. | Innovation Feature Detail Page
+
+CONTACT & CONCIERGE
+59. L2 | Contact Us | General support and inquiry page for TUT USA visitors. | Contact / Concierge / Support Page
+60. L2 | Concierge Request | White-glove assistance page for premium pre-sale or owner requests. | Contact / Concierge / Support Page
+61. L2 | Roadside & Emergency Help | Support page for urgent ownership assistance and service contacts. | Contact / Concierge / Support Page
+
+TEMPLATE-LEVEL NOTES FOR PLATFORM TEAMS
+--------------------------------------
+- Use the Global Home Page, Model Overview, Model Detail, Innovation Hub, News Landing, Owners Hub, Learning Hub, and Contact / Concierge templates as the primary top-level template families.
+- Reuse shared structural components across templates for consistency: Page Metadata, Breadcrumb, Primary Navigation, Footer, Search Bar, Filter Panel, Sort Control, CTA Button, FAQ, Related Content, and Contact Card.
+- Restrict commerce-heavy components to retail-oriented templates only. For a luxury automotive brand, most vehicle journeys should lead to dealer contact, reservation, quote, or appointment rather than direct checkout.
+- Keep knowledge and owner documentation templates largely free of campaign components so content remains trustworthy, scannable, and service-oriented.
+- Keep innovation pages media-rich but technically disciplined: combine Feature List, Fact Box, Table / Data Table, Methodology Note, Fact Sheet, and related downloads.
+- Allow platform admins to localize dealer, legal, financing, and owner-support content by region without changing the base template logic.

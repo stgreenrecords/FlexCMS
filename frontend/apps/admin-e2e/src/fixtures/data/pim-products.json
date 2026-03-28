@@ -1,0 +1,42 @@
+{
+  "content": [
+    {
+      "id": "prod-001",
+      "sku": "TUT-SUV-2026",
+      "name": "TUT Ranger SUV 2026",
+      "catalogId": "tut-vehicles",
+      "status": "PUBLISHED",
+      "price": 42999.00,
+      "currency": "GBP",
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-03-28T10:00:00Z"
+    },
+    {
+      "id": "prod-002",
+      "sku": "TUT-EV-2026",
+      "name": "TUT Spark EV 2026",
+      "catalogId": "tut-vehicles",
+      "status": "PUBLISHED",
+      "price": 38500.00,
+      "currency": "GBP",
+      "createdAt": "2026-02-01T10:00:00Z",
+      "updatedAt": "2026-03-27T14:00:00Z"
+    },
+    {
+      "id": "prod-003",
+      "sku": "TUT-ACC-001",
+      "name": "All-Weather Floor Mats",
+      "catalogId": "tut-accessories",
+      "status": "DRAFT",
+      "price": 129.00,
+      "currency": "GBP",
+      "createdAt": "2026-03-01T10:00:00Z",
+      "updatedAt": "2026-03-25T09:00:00Z"
+    }
+  ],
+  "totalElements": 3,
+  "totalPages": 1,
+  "size": 20,
+  "number": 0
+}
+
