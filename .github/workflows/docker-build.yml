@@ -1,4 +1,4 @@
-name: Build & Push Docker Image
+name: Build & Push Docker Images
 
 on:
   # Trigger after CI passes (not on every push — avoids redundant builds)
@@ -10,7 +10,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/flexcms-app
 
 jobs:
   build-and-push:
@@ -22,6 +21,19 @@ jobs:
     permissions:
       contents: read
       packages: write
+
+    strategy:
+      matrix:
+        include:
+          - image: flexcms-app
+            context: flexcms
+            dockerfile: flexcms/Dockerfile
+          - image: flexcms-admin
+            context: frontend
+            dockerfile: frontend/apps/admin/Dockerfile
+          - image: flexcms-site
+            context: frontend
+            dockerfile: frontend/apps/site-nextjs/Dockerfile
 
     steps:
       - name: Checkout
@@ -41,7 +53,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,prefix=,format=short
@@ -49,9 +61,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: flexcms
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}

@@ -3,7 +3,7 @@ name: Deploy to QA
 on:
   # Auto-deploy after Docker image is built and pushed
   workflow_run:
-    workflows: ["Build & Push Docker Image"]
+    workflows: ["Build & Push Docker Images"]
     types: [completed]
     branches: [main]
 
@@ -47,12 +47,16 @@ jobs:
             APP_DIR="/opt/flexcms"
             sudo mkdir -p "$APP_DIR"
 
-            # Copy compose files (only if newer)
+            # Copy compose files
             sudo cp /tmp/flexcms-deploy/docker-compose.qa.yml "$APP_DIR/docker-compose.yml"
             sudo cp /tmp/flexcms-deploy/init-db.sql "$APP_DIR/init-db.sql"
             rm -rf /tmp/flexcms-deploy
 
             cd "$APP_DIR"
+
+            # Set public hostname for frontend env vars
+            PUBLIC_IP=$(curl -sf http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || echo "localhost")
+            echo "QA_PUBLIC_HOST=${PUBLIC_IP}" | sudo tee .env > /dev/null
 
             # Login to GHCR if token provided, otherwise try anonymous
             if [ -n "$GHCR_TOKEN" ]; then
@@ -60,7 +64,7 @@ jobs:
             fi
 
             # Pull latest images and restart
-            sudo docker compose pull author publish 2>/dev/null || echo "Pull skipped (image may need auth — set QA_GHCR_TOKEN secret)"
+            sudo docker compose pull 2>/dev/null || echo "Some images failed to pull — check GHCR"
             sudo docker compose up -d
 
             echo "Waiting for services to start..."
@@ -79,9 +83,19 @@ jobs:
             done
             if [ "$OK" = false ]; then
               echo "❌ Author API did not become healthy"
-              echo "=== Author logs (last 50 lines) ==="
-              sudo docker compose logs --tail=50 author
+              echo "=== Author logs (last 30 lines) ==="
+              sudo docker compose logs --tail=30 author
             fi
+
+            # Health check Admin UI
+            for i in 1 2 3; do
+              if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+                echo "✅ Admin UI healthy"
+                break
+              fi
+              echo "Waiting for Admin UI... (attempt $i/3)"
+              sleep 5
+            done
 
             echo ""
             echo "=== Service Status ==="

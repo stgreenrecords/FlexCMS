@@ -15,13 +15,15 @@
 | Instance Type | `m7i-flex.large` (2 vCPU, 8GB RAM, Free Tier) |
 | Public IP | `3.78.187.128` |
 | Region | `eu-central-1` |
-| Security Group | `sg-0ce6fba45747dd5b3` (ports: 22, 8080, 8081, 9001, 15672) |
+| Security Group | `sg-0ce6fba45747dd5b3` (ports: 22, 3000, 3001, 8080, 8081, 9001, 15672) |
 | SSH Key | `flexcms-qa` (`~/.ssh/flexcms-qa.pem`) |
 
 ### Endpoints
 
 | Service | URL |
 |---|---|
+| **Admin UI** | http://3.78.187.128:3000 |
+| **Reference Site** | http://3.78.187.128:3001 |
 | **Author API** | http://3.78.187.128:8080 |
 | **Publish API** | http://3.78.187.128:8081 |
 | **RabbitMQ Management** | http://3.78.187.128:15672 (flexcms / FlexCmsQA2024!) |

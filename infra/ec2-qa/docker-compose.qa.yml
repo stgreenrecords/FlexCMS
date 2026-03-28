@@ -196,6 +196,34 @@ services:
       elasticsearch:
         condition: service_healthy
 
+  # --- Frontend Apps ---
+
+  admin:
+    image: ghcr.io/stgreenrecords/flexcms-admin:latest
+    container_name: flexcms-admin
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_FLEXCMS_API: http://${QA_PUBLIC_HOST:-localhost}:8080
+      NEXT_PUBLIC_FLEXCMS_PUBLISH_URL: http://${QA_PUBLIC_HOST:-localhost}:8081
+      NEXT_PUBLIC_FLEXCMS_SITE_URL: http://${QA_PUBLIC_HOST:-localhost}:3001
+    depends_on:
+      - author
+
+  site:
+    image: ghcr.io/stgreenrecords/flexcms-site:latest
+    container_name: flexcms-site
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_FLEXCMS_API: http://author:8080
+      NEXT_PUBLIC_FLEXCMS_PUBLISH_URL: http://publish:8081
+      PORT: "3001"
+    depends_on:
+      - author
+
 volumes:
   postgres_data:
   redis_data:
