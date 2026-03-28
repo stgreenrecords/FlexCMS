@@ -1,0 +1,47 @@
+name: Deploy to QA
+
+on:
+  # Auto-deploy after Docker image is built and pushed
+  workflow_run:
+    workflows: ["Build & Push Docker Image"]
+    types: [completed]
+    branches: [main]
+
+  workflow_dispatch:    # Manual trigger
+
+concurrency:
+  group: deploy-qa
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to QA (EC2)
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.QA_HOST }}
+          username: ec2-user
+          key: ${{ secrets.QA_SSH_KEY }}
+          script: |
+            cd /opt/flexcms
+            sudo docker compose pull
+            sudo docker compose up -d
+            echo "Waiting for services to start..."
+            sleep 15
+            # Health check
+            for i in 1 2 3 4 5; do
+              if curl -sf http://localhost:8080/actuator/health > /dev/null 2>&1; then
+                echo "✅ Author API healthy"
+                break
+              fi
+              echo "Waiting for Author API... (attempt $i)"
+              sleep 10
+            done
+            sudo docker compose ps
+
