@@ -1,6 +1,7 @@
 # WORK_BOARD_ERIK.md — Erik's Task Board
 
 > **Agent: Erik**
+> **Before implementing anything:** Read `hints_for_agent.md` — known problems and solutions (mandatory).
 > **Module locks:** Check `WORK_BOARD.md §2` before touching any module.
 > **Completed tasks archive:** `docs/WORK_BOARD_ARCHIVE.md`
 > Updated: 2026-03-29

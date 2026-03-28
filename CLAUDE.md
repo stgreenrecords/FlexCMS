@@ -112,9 +112,11 @@ Do NOT add anything to `WORK_BOARD_KYLE.md` or `WORK_BOARD_ERIK.md` until the us
 
 ## Work Board Protocol (SDLC)
 
-**Before starting ANY work, read the correct board for the active agent:**
-- Kyle → `WORK_BOARD_KYLE.md` (tasks) + `WORK_BOARD.md §2` (shared module locks)
-- Erik → `WORK_BOARD_ERIK.md` (tasks) + `WORK_BOARD.md §2` (shared module locks)
+**Before starting ANY work, read these files in order:**
+1. `hints_for_agent.md` — **MANDATORY first read** — known problems and their solutions; saves you from repeating dead ends
+2. The correct board for the active agent:
+   - Kyle → `WORK_BOARD_KYLE.md` (tasks) + `WORK_BOARD.md §2` (shared module locks)
+   - Erik → `WORK_BOARD_ERIK.md` (tasks) + `WORK_BOARD.md §2` (shared module locks)
 
 `WORK_BOARD.md` is the shared coordination hub: it holds the module lock table (prevents Kyle and Erik from editing the same module simultaneously) and the validation checklist.
 
@@ -132,6 +134,7 @@ Do NOT add anything to `WORK_BOARD_KYLE.md` or `WORK_BOARD_ERIK.md` until the us
 
 | Step | Action | Validation Gate |
 |------|--------|-----------------|
+| 0. **Hints** | Read `hints_for_agent.md` in full. Note any hints relevant to this task's technology stack. | Do this before every session — new hints may have been added |
 | 1. **Pick** | Find 🟢 OPEN item (🔴 P0 first, then 🟠 PAUSED). Check §2 Module Lock — skip if locked. | Blocker items must be ✅ DONE |
 | 2. **Claim** | Update §3 status → 🔵 IN PROGRESS. Lock modules in §2 (your task ID + date). | — |
 | 3. **Context** | Read §4 Context Packet. Read ALL `read_first` files. If no packet exists, read source files in "Modules Touched". | Do NOT start coding until you understand the current code |
@@ -155,6 +158,20 @@ Do NOT add anything to `WORK_BOARD_KYLE.md` or `WORK_BOARD_ERIK.md` until the us
 - **Kyle and Erik have separate boards** — never edit the other agent's board entries
 - **No data assumptions** — always read current source; another agent may have changed it
 - **Leave compilable code** — `mvn clean compile` must pass at all times
+
+### ✏️ Hints Protocol (mandatory)
+
+**When to write a hint:** If you run a command or apply an approach that fails, try again, fail again, and eventually find the real fix — write a hint entry in `hints_for_agent.md` immediately after resolving it. Threshold: **2 or more failed attempts before finding the solution**.
+
+**What to record:**
+- The exact error or symptom (copy-paste from terminal if possible)
+- What you tried that did NOT work (so future agents skip those paths)
+- The exact solution (command, config change, or code change)
+- Why it works (root cause, one sentence)
+
+**Format:** Add new hints at the TOP of `hints_for_agent.md` using the template in that file.
+
+**Goal:** If the same problem appears again — in this task, the next task, or months later — the next agent reads the hint and goes straight to the solution instead of spending 30 minutes repeating your dead ends.
 
 ### ⛔ Pre-Push Local Validation (MANDATORY — zero exceptions)
 

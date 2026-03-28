@@ -1,6 +1,7 @@
 # WORK_BOARD_KYLE.md — Kyle's Task Board
 
 > **Agent: Kyle**
+> **Before implementing anything:** Read `hints_for_agent.md` — known problems and solutions (mandatory).
 > **Module locks:** Check `WORK_BOARD.md §2` before touching any module.
 > **Completed tasks archive:** `docs/WORK_BOARD_ARCHIVE.md`
 > Updated: 2026-03-29
@@ -21,7 +22,7 @@
 |----|--------|-------|--------|-----------------|------------|
 | TA-00 | ✅ DONE | **Foundation & Instrumentation — admin-e2e package, Playwright config, data-testid attributes, fixtures, POMs** | 3d | `apps/admin-e2e` (new), `apps/admin`, `packages/ui` | — |
 | TA-01 | ✅ DONE | **Phase 1 Critical — dashboard, content-tree, page-editor, DAM browser, workflows (UI-001→UI-086)** | 5d | `apps/admin-e2e` | TA-00 |
-| TA-02 | 🟢 OPEN | **Phase 2 High — sites, PIM catalog, PIM editor, PIM import, PIM schema (UI-052→UI-095)** | 4d | `apps/admin-e2e` | TA-01 |
+| TA-02 | 🔵 IN PROGRESS | **Phase 2 High — sites, PIM catalog, PIM editor, PIM import, PIM schema (UI-052→UI-095)** | 4d | `apps/admin-e2e` | TA-01 |
 | TA-03 | 🔴 BLOCKED | **Phase 3 Medium — preview, experience fragments, translations, error states, accessibility (UI-096→UI-105, A11Y, UIERR)** | 4d | `apps/admin-e2e` | TA-02 |
 | TA-04 | 🔴 BLOCKED | **Phase 4 Visual Regression + hardening — dark theme, responsive, DnD retries, test tagging** | 2d | `apps/admin-e2e` | TA-03 |
 
