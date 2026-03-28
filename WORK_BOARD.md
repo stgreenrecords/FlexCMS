@@ -30,10 +30,11 @@
 2. **Claim** → Update status to 🔵 IN PROGRESS, lock modules in §2
 3. **Context** → Read §4 Context Packet (or source files in "Modules Touched")
 4. **Implement** → Follow `CLAUDE.md` conventions; verify every AC
-5. **Validate** → `cd flexcms && mvn clean compile` (backend) + frontend type-check
-6. **CI Gate** → Ensure GitHub Actions CI passes (push & check workflow results)
-7. **Update** → Move to ✅ DONE, clear locks in §2, add notes in §5
-8. **Push** → `git add -A && git commit && git push`
+5. **Validate** → `cd flexcms && mvn clean compile` (backend) + `cd frontend && pnpm build` (frontend)
+6. **Test** → `cd flexcms && mvn test` — all tests must pass
+7. **⛔ Pre-Push Gate** → Run ALL local validations (see `CLAUDE.md` §Pre-Push). **NEVER push until every check passes locally.**
+8. **Update** → Move to ✅ DONE, clear locks in §2, add notes in §5
+9. **Push** → `git add -A && git commit && git push`
 
 ### Rules
 - **ONE agent per task.** Never work on a task that is 🔵 IN PROGRESS by another agent.

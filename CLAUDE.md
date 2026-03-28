@@ -54,8 +54,9 @@ If the correct approach takes longer to implement — write it anyway. Shortcuts
 | 4. **Implement** | Follow `CLAUDE.md` conventions. Verify each AC as you go. | No mock/dummy data in production code |
 | 5. **Build** | Backend: `cd flexcms && mvn clean compile`. Frontend: `cd frontend && pnpm build`. | ❌ MUST pass — do not proceed if build fails |
 | 6. **Test** | Run `cd flexcms && mvn test` if tests exist. Fix any failures. | ❌ MUST pass — all tests green |
-| 7. **Update Board** | §3: status → ✅ DONE. §2: clear locks. §5: add Completion Note (template in §5). | Every field in the template must be filled |
-| 8. **Commit & Push** | `git add -A && git commit -m "feat(<ID>): <description>" && git push` | Use item ID as commit scope |
+| 7. **Pre-Push Gate** | Run the **full local validation** (see below). Fix any failures. **NEVER push to GitHub until every check passes locally.** | ❌ ALL must pass — zero exceptions |
+| 8. **Update Board** | §3: status → ✅ DONE. §2: clear locks. §5: add Completion Note (template in §5). | Every field in the template must be filled |
+| 9. **Commit & Push** | `git add -A && git commit -m "feat(<ID>): <description>" && git push` | Use item ID as commit scope |
 
 ### If you must stop mid-task (PAUSE)
 1. Ensure code compiles (never leave a broken build)
@@ -68,6 +69,35 @@ If the correct approach takes longer to implement — write it anyway. Shortcuts
 - **Module locks are mandatory** — verify §2 before editing ANY file in a module
 - **No data assumptions** — always read current source; another agent may have changed it
 - **Leave compilable code** — `mvn clean compile` must pass at all times
+
+### ⛔ Pre-Push Local Validation (MANDATORY — zero exceptions)
+
+> **IMPORTANT: NEVER push to GitHub until ALL of the following pass locally.**
+> A failed CI build wastes time, blocks other agents, and may break the QA deployment pipeline.
+> Run these checks in order. If ANY step fails, fix it before proceeding.
+
+```bash
+# Step 1: Backend compile (all modules)
+cd flexcms && mvn clean compile
+# ❌ If this fails → fix compile errors before anything else
+
+# Step 2: Backend tests
+cd flexcms && mvn test
+# ❌ If this fails → fix failing tests; never skip or @Ignore them
+
+# Step 3: Frontend build (all packages in dependency order)
+cd frontend && pnpm install && pnpm build
+# ❌ If this fails → fix TypeScript/build errors
+
+# Step 4: Docker image build (if you changed backend code)
+cd flexcms && docker build -t flexcms-app:local-test .
+# ❌ If this fails → fix Dockerfile or packaging issues
+# ℹ️  Skip this step ONLY if your changes are frontend-only
+```
+
+**After ALL 4 steps pass → you may commit and push.**
+
+If you cannot get a step to pass after 3 attempts, **PAUSE the task** (update WORK_BOARD.md §3 → 🟠 PAUSED, add Handoff Note in §5 with the exact error) rather than pushing broken code.
 
 ### Slash Commands
 ```

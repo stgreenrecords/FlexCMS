@@ -31,16 +31,25 @@ Three pillars share the Spring Boot monorepo: **CMS** (content tree), **DAM** (a
 
 ## Mandatory Build Gates (every task)
 
+> **⛔ NEVER push to GitHub until ALL of these pass locally. No exceptions.**
+
 ```bash
-# Backend compile (must pass — no exceptions)
+# 1. Backend compile (must pass — no exceptions)
 cd flexcms && mvn clean compile
 
-# Backend unit tests
+# 2. Backend unit tests (must pass — never skip or @Ignore)
 cd flexcms && mvn test
 
-# Frontend (must pass)
-cd frontend && pnpm build
+# 3. Frontend build (must pass)
+cd frontend && pnpm install && pnpm build
+
+# 4. Docker image build (if backend code changed)
+cd flexcms && docker build -t flexcms-app:local-test .
+# Skip ONLY if changes are frontend-only
 ```
+
+**If ANY step fails → fix it locally. Do NOT push broken code.**
+If you cannot fix after 3 attempts → PAUSE the task (WORK_BOARD.md §3 → 🟠 PAUSED) with a Handoff Note describing the error.
 
 Commit format: `feat(P2-01): description` or `fix(BUG-03): description`
 
