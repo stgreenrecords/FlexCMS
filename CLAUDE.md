@@ -53,10 +53,11 @@ If the correct approach takes longer to implement — write it anyway. Shortcuts
 | 3. **Context** | Read §4 Context Packet. Read ALL `read_first` files. If no packet exists, read source files in "Modules Touched". | Do NOT start coding until you understand the current code |
 | 4. **Implement** | Follow `CLAUDE.md` conventions. Verify each AC as you go. | No mock/dummy data in production code |
 | 5. **Build** | Backend: `cd flexcms && mvn clean compile`. Frontend: `cd frontend && pnpm build`. | ❌ MUST pass — do not proceed if build fails |
-| 6. **Test** | Run `cd flexcms && mvn test` if tests exist. Fix any failures. | ❌ MUST pass — all tests green |
-| 7. **Pre-Push Gate** | Run the **full local validation** (see below). Fix any failures. **NEVER push to GitHub until every check passes locally.** | ❌ ALL must pass — zero exceptions |
-| 8. **Update Board** | §3: status → ✅ DONE. §2: clear locks. §5: add Completion Note (template in §5). | Every field in the template must be filled |
-| 9. **Commit & Push** | `git add -A && git commit -m "feat(<ID>): <description>" && git push` | Use item ID as commit scope |
+| 6. **Unit Tests** | Run `cd flexcms && mvn test`. Fix any failures before continuing. | ❌ MUST pass — all tests green, no skips |
+| 7. **E2E Tests** | If `admin-e2e` package exists: `cd frontend/apps/admin-e2e && pnpm exec playwright test`. Apply the **Test Failure Protocol** (see below) on any failure. | ❌ MUST pass — 0 failing tests |
+| 8. **Pre-Push Gate** | Run the **full local validation** (see below). Fix any failures. **NEVER push to GitHub until every check passes locally.** | ❌ ALL must pass — zero exceptions |
+| 9. **Update Board** | §3: status → ✅ DONE. §2: clear locks. §5: add Completion Note (template in §5). | Every field in the template must be filled |
+| 10. **Commit & Push** | `git add -A && git commit -m "feat(<ID>): <description>" && git push` | Use item ID as commit scope |
 
 ### If you must stop mid-task (PAUSE)
 1. Ensure code compiles (never leave a broken build)
@@ -81,7 +82,7 @@ If the correct approach takes longer to implement — write it anyway. Shortcuts
 cd flexcms && mvn clean compile
 # ❌ If this fails → fix compile errors before anything else
 
-# Step 2: Backend tests
+# Step 2: Backend unit + integration tests
 cd flexcms && mvn test
 # ❌ If this fails → fix failing tests; never skip or @Ignore them
 
@@ -89,15 +90,54 @@ cd flexcms && mvn test
 cd frontend && pnpm install && pnpm build
 # ❌ If this fails → fix TypeScript/build errors
 
-# Step 4: Docker image build (if you changed backend code)
+# Step 4: E2E tests — mock API mode (no running backend required)
+# Run only if admin-e2e package exists
+if [ -d "frontend/apps/admin-e2e" ]; then
+  cd frontend/apps/admin-e2e && pnpm exec playwright test --project=chromium
+fi
+# ❌ If this fails → apply Test Failure Protocol (see below)
+
+# Step 5: Docker image build (if you changed backend code)
 cd flexcms && docker build -t flexcms-app:local-test .
 # ❌ If this fails → fix Dockerfile or packaging issues
 # ℹ️  Skip this step ONLY if your changes are frontend-only
 ```
 
-**After ALL 4 steps pass → you may commit and push.**
+**After ALL steps pass → you may commit and push.**
 
 If you cannot get a step to pass after 3 attempts, **PAUSE the task** (update WORK_BOARD.md §3 → 🟠 PAUSED, add Handoff Note in §5 with the exact error) rather than pushing broken code.
+
+---
+
+### 🧪 Test Failure Protocol (applies to E2E Playwright tests)
+
+When a Playwright test fails after you implement a feature, fix a bug, or write a new test:
+
+**Step 1 — Diagnose the failure:**
+- Read the Playwright error output carefully
+- Check if it's a **test syntax/selector error** or a **real product defect**
+
+**Step 2a — If the test itself is wrong** (bad selector, wrong assertion, race condition):
+- Fix the test code
+- Re-run the specific test: `pnpm exec playwright test <spec-file> --project=chromium`
+- Continue fixing until it passes
+- No bug entry needed
+
+**Step 2b — If the product is wrong** (expected behaviour not achieved):
+- The feature/fix you just implemented has a defect
+- Record the bug **inline in the current task's §4 Context Packet** in `WORK_BOARD.md`
+  using the `🐛 BUG-INLINE` format (see WORK_BOARD.md §6)
+- Fix the **code** (not the test — the test is correct)
+- Re-run the test until it passes
+- Update the inline bug entry with resolution notes
+
+**Step 3 — Never mark a TA-xx task DONE while any test is failing.**
+The task stays 🔵 IN PROGRESS until every test in that spec file passes on the first run
+(no skips, no retries relied upon).
+
+**Step 4 — After all tests pass:**
+- Inline bug entries in §4 are updated to `✅ FIXED`
+- The TA task completion note in §5 summarises bugs found + fixes applied
 
 ### Slash Commands
 ```
@@ -146,6 +186,24 @@ cd frontend/apps/admin && pnpm dev
 
 # Frontend — typecheck
 cd frontend && pnpm tsc --noEmit
+
+# E2E tests — run all (mock API mode, no backend needed)
+cd frontend/apps/admin-e2e && pnpm exec playwright test
+
+# E2E tests — run single spec
+cd frontend/apps/admin-e2e && pnpm exec playwright test tests/phase1-critical/dashboard.spec.ts
+
+# E2E tests — run with browser UI (headed mode, for debugging)
+cd frontend/apps/admin-e2e && pnpm exec playwright test --headed --project=chromium
+
+# E2E tests — show HTML report after run
+cd frontend/apps/admin-e2e && pnpm exec playwright show-report
+
+# E2E tests — run only smoke suite across all browsers
+cd frontend/apps/admin-e2e && pnpm exec playwright test --grep @smoke
+
+# E2E tests — update visual regression snapshots (after intentional UI change)
+cd frontend/apps/admin-e2e && pnpm exec playwright test --update-snapshots
 ```
 
 ## Architecture
