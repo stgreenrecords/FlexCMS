@@ -52,7 +52,7 @@ RUN addgroup -S flexcms && adduser -S flexcms -G flexcms
 
 COPY --from=builder --chown=flexcms:flexcms /app/apps/site-nextjs/.next/standalone ./
 COPY --from=builder --chown=flexcms:flexcms /app/apps/site-nextjs/.next/static ./apps/site-nextjs/.next/static
-COPY --from=builder --chown=flexcms:flexcms /app/apps/site-nextjs/public ./apps/site-nextjs/public 2>/dev/null || true
+COPY --from=builder --chown=flexcms:flexcms /app/apps/site-nextjs/public ./apps/site-nextjs/public
 
 USER flexcms
 EXPOSE 3001
