@@ -31,7 +31,7 @@ jobs:
           host: ${{ secrets.QA_HOST }}
           username: ec2-user
           key: ${{ secrets.QA_SSH_KEY }}
-          source: "infra/ec2-qa/docker-compose.qa.yml,infra/ec2-qa/init-db.sql"
+          source: "infra/ec2-qa/docker-compose.qa.yml,infra/ec2-qa/init-db.sql,infra/ec2-qa/nginx.conf"
           target: "/tmp/flexcms-deploy"
           strip_components: 2
 
@@ -50,6 +50,7 @@ jobs:
             # Copy compose files
             sudo cp /tmp/flexcms-deploy/docker-compose.qa.yml "$APP_DIR/docker-compose.yml"
             sudo cp /tmp/flexcms-deploy/init-db.sql "$APP_DIR/init-db.sql"
+            sudo cp /tmp/flexcms-deploy/nginx.conf "$APP_DIR/nginx.conf"
             rm -rf /tmp/flexcms-deploy
 
             cd "$APP_DIR"

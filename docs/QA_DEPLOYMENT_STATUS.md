@@ -13,26 +13,28 @@
 |---|---|
 | Instance ID | `i-0b24a45dae8b17021` |
 | Instance Type | `m7i-flex.large` (2 vCPU, 8GB RAM, Free Tier) |
-| Public IP | `3.78.187.128` |
+| Public IP | `63.182.174.144` (Elastic IP — permanent) |
 | Region | `eu-central-1` |
-| Security Group | `sg-0ce6fba45747dd5b3` (ports: 22, 3000, 3001, 8080, 8081, 9001, 15672) |
+| Security Group | `sg-0ce6fba45747dd5b3` (ports: 22, 80, 8080, 8081, 9001, 15672) |
 | SSH Key | `flexcms-qa` (`~/.ssh/flexcms-qa.pem`) |
 
-### Endpoints
+### Endpoints (via Nginx reverse proxy on port 80)
 
 | Service | URL |
 |---|---|
-| **Admin UI** | http://3.78.187.128:3000 |
-| **Reference Site** | http://3.78.187.128:3001 |
-| **Author API** | http://3.78.187.128:8080 |
-| **Publish API** | http://3.78.187.128:8081 |
-| **RabbitMQ Management** | http://3.78.187.128:15672 (flexcms / FlexCmsQA2024!) |
-| **MinIO Console** | http://3.78.187.128:9001 (minioadmin / minioadmin) |
-| Health Check | http://3.78.187.128:8080/actuator/health |
+| **Admin UI** | http://admin.flexcmsdemo.store |
+| **Reference Site** | http://flexcmsdemo.store |
+| **Author API** | http://api.flexcmsdemo.store |
+| **Publish API** | http://publish.flexcmsdemo.store |
+| **Swagger/OpenAPI** | http://api.flexcmsdemo.store/swagger-ui.html |
+| **GraphiQL** | http://api.flexcmsdemo.store/graphiql |
+| **RabbitMQ Management** | http://63.182.174.144:15672 (flexcms / FlexCmsQA2024!) |
+| **MinIO Console** | http://63.182.174.144:9001 (minioadmin / minioadmin) |
+| Health Check | http://api.flexcmsdemo.store/actuator/health |
 
 ### SSH Access
 ```bash
-ssh -i ~/.ssh/flexcms-qa.pem ec2-user@3.78.187.128
+ssh -i ~/.ssh/flexcms-qa.pem ec2-user@63.182.174.144
 ```
 
 ### Manage Services
@@ -91,7 +93,7 @@ The workflow `.github/workflows/docker-build.yml` builds and pushes on every `ma
 2. Wait for the workflow to complete (~5-8 minutes)
 3. SSH into QA instance and pull the new image:
    ```bash
-   ssh -i ~/.ssh/flexcms-qa.pem ec2-user@3.78.187.128
+   ssh -i ~/.ssh/flexcms-qa.pem ec2-user@63.182.174.144
    cd /opt/flexcms
    sudo docker compose pull
    sudo docker compose up -d
@@ -111,7 +113,7 @@ docker build -t ghcr.io/stgreenrecords/flexcms-app:latest .
 docker push ghcr.io/stgreenrecords/flexcms-app:latest
 
 # 4. SSH into QA and pull
-ssh -i ~/.ssh/flexcms-qa.pem ec2-user@3.78.187.128
+ssh -i ~/.ssh/flexcms-qa.pem ec2-user@63.182.174.144
 cd /opt/flexcms
 sudo docker compose pull && sudo docker compose up -d
 ```
@@ -119,7 +121,7 @@ sudo docker compose pull && sudo docker compose up -d
 ### Option 3: Build on QA instance directly
 
 ```bash
-ssh -i ~/.ssh/flexcms-qa.pem ec2-user@3.78.187.128
+ssh -i ~/.ssh/flexcms-qa.pem ec2-user@63.182.174.144
 
 # Install git + clone repo
 sudo yum install -y git
