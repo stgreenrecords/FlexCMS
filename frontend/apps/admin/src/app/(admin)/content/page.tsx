@@ -39,7 +39,8 @@ interface ApiContentNode {
   locale?: string;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
+import { getApiBase } from '@/lib/apiBase';
+const API_BASE = getApiBase();
 
 function apiToUiNode(n: ApiContentNode): ContentNode {
   const statusMap: Record<string, ContentStatus> = {

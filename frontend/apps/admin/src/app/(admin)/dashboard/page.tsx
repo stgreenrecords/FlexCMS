@@ -22,7 +22,8 @@ interface ActivityItem {
 // API
 // ---------------------------------------------------------------------------
 
-const API_BASE = process.env.NEXT_PUBLIC_FLEXCMS_API ?? 'http://localhost:8080';
+import { getApiBase } from '@/lib/apiBase';
+const API_BASE = getApiBase();
 
 interface DashboardStats {
   totalPages: string;

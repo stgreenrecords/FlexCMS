@@ -12,12 +12,14 @@ export function createServerClient() {
   });
 }
 
+import { getApiBase } from './apiBase';
+
 /**
  * Client-side FlexCMS client config.
  * Used in React Query hooks and client components.
  */
 export const clientConfig = {
-  apiUrl: process.env.NEXT_PUBLIC_FLEXCMS_API_URL ?? 'http://localhost:8080',
+  apiUrl: process.env.NEXT_PUBLIC_FLEXCMS_API_URL ?? getApiBase(),
   defaultSite: process.env.NEXT_PUBLIC_FLEXCMS_DEFAULT_SITE ?? 'corporate',
   defaultLocale: process.env.NEXT_PUBLIC_FLEXCMS_DEFAULT_LOCALE ?? 'en',
 };

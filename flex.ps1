@@ -424,6 +424,140 @@ switch ($Command) {
         }
     }
 
+    "seed" {
+        Write-Banner "Seeding DAM assets for TUT sample site"
+
+        # 1) Health-check author backend
+        Write-Host "    Checking Author API at http://localhost:8080 ..." -ForegroundColor Yellow
+        $apiUp = $false
+        for ($i = 0; $i -lt 30; $i++) {
+            try {
+                $null = Invoke-WebRequest "http://localhost:8080/actuator/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+                $apiUp = $true; break
+            } catch { Start-Sleep 2 }
+        }
+        if (-not $apiUp) {
+            Write-Host "    Author API not reachable. Start it first: flex start local author" -ForegroundColor Red
+            exit 1
+        }
+        Write-Host "    Author API is UP" -ForegroundColor Green
+
+        # 2) Upload DAM assets
+        $assetsRoot = Join-Path $RootDir "Design" "assets"
+        $assetMap = @(
+            @{Folder="/dam/tut/shared/brand";     File="z-image-turbo_00001_.png";    Sub="1024x1024"; Name="tut-logo.png"},
+            @{Folder="/dam/tut/shared/banners";   File="Flux2-Klein_00001_.png";      Sub="banner";    Name="hero-home.png"},
+            @{Folder="/dam/tut/shared/banners";   File="Flux2-Klein_00002_.png";      Sub="banner";    Name="hero-models.png"},
+            @{Folder="/dam/tut/shared/banners";   File="Flux2-Klein_00005_.png";      Sub="banner";    Name="hero-innovation.png"},
+            @{Folder="/dam/tut/shared/banners";   File="openart-image_1774524665435_8ee570b7_1774524666604_bccc0b4c.png"; Sub="banner"; Name="hero-safety.png"},
+            @{Folder="/dam/tut/shared/banners";   File="openart-image_1774524670799_60639cbb_1774524671922_18d47bfd.png"; Sub="banner"; Name="hero-about.png"},
+            @{Folder="/dam/tut/shared/banners";   File="openart-image_1774524671714_bb094f70_1774524672752_2a5d0d5e.png"; Sub="banner"; Name="hero-heritage.png"},
+            @{Folder="/dam/tut/shared/banners";   File="openart-image_1774524675992_c9e45a26_1774524677335_26fd5455.png"; Sub="banner"; Name="cta-test-drive.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo1_00001_.png";   Sub="1024x1024"; Name="tut-sovereign.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo1_00002_.png";   Sub="1024x1024"; Name="tut-sovereign-2.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo1_00003_.png";   Sub="1024x1024"; Name="tut-sovereign-3.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo2_00001_.png";   Sub="1024x1024"; Name="tut-vanguard.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo2_00002_.png";   Sub="1024x1024"; Name="tut-vanguard-2.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo2_00003_.png";   Sub="1024x1024"; Name="tut-vanguard-3.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo3_00001_.png";   Sub="1024x1024"; Name="tut-eclipse.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo3_00002_.png";   Sub="1024x1024"; Name="tut-eclipse-2.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo3_00003_.png";   Sub="1024x1024"; Name="tut-eclipse-3.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo4_00001_.png";   Sub="1024x1024"; Name="tut-apex.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo4_00002_.png";   Sub="1024x1024"; Name="tut-apex-2.png"},
+            @{Folder="/dam/tut/shared/models";    File="z-image-turbo4_00003_.png";   Sub="1024x1024"; Name="tut-apex-3.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_00002_.png";      Sub="1024x1024"; Name="innovation-engine.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_00003_.png";      Sub="1024x1024"; Name="innovation-aero.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_00004_.png";      Sub="1024x1024"; Name="innovation-ai.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_00005_.png";      Sub="1024x1024"; Name="safety-shield.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_00006_.png";      Sub="1024x1024"; Name="safety-night.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_00007_.png";      Sub="1024x1024"; Name="safety-assist.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_00008_.png";      Sub="1024x1024"; Name="interior-cockpit.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_203003_.png";     Sub="1024x1024"; Name="interior-materials.png"},
+            @{Folder="/dam/tut/shared/features";  File="Flux2-Klein_203004_.png";     Sub="1024x1024"; Name="sustainability.png"},
+            @{Folder="/dam/tut/shared/lifestyle"; File="z-image-turbo_00003_.png";    Sub="1024x1024"; Name="driving-experience.png"},
+            @{Folder="/dam/tut/shared/lifestyle"; File="z-image-turbo_00004_.png";    Sub="1024x1024"; Name="concierge.png"},
+            @{Folder="/dam/tut/shared/lifestyle"; File="z-image-turbo_00005_.png";    Sub="1024x1024"; Name="heritage-1.png"},
+            @{Folder="/dam/tut/shared/lifestyle"; File="z-image-turbo_00006_.png";    Sub="1024x1024"; Name="heritage-2.png"},
+            @{Folder="/dam/tut/shared/lifestyle"; File="z-image-turbo_00007_.png";    Sub="1024x1024"; Name="craftsmanship.png"}
+        )
+
+        $uploaded = 0; $skipped = 0; $errors = 0
+        foreach ($a in $assetMap) {
+            $srcPath = Join-Path $assetsRoot $a.Sub $a.File
+            $damPath = "$($a.Folder)/$($a.Name)"
+
+            if (-not (Test-Path $srcPath)) {
+                Write-Host "    SKIP (missing source): $srcPath" -ForegroundColor Yellow
+                $skipped++; continue
+            }
+
+            # Check if already uploaded
+            try {
+                $check = Invoke-WebRequest "http://localhost:8080/api/author/assets/by-path?path=$([Uri]::EscapeDataString($damPath))" `
+                    -Method GET -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
+                if ($check.StatusCode -eq 200) {
+                    Write-Host "    SKIP (exists): $damPath" -ForegroundColor DarkGray
+                    $skipped++; continue
+                }
+            } catch {}
+
+            # Upload via multipart form
+            try {
+                $boundary = [System.Guid]::NewGuid().ToString()
+                $fileBytes = [System.IO.File]::ReadAllBytes($srcPath)
+                $fileName  = $a.Name
+                $enc       = [System.Text.Encoding]::UTF8
+
+                $bodyLines = @(
+                    "--$boundary",
+                    "Content-Disposition: form-data; name=`"file`"; filename=`"$fileName`"",
+                    "Content-Type: image/png",
+                    "",
+                    ""
+                )
+                $bodyEnd = @(
+                    "",
+                    "--$boundary",
+                    "Content-Disposition: form-data; name=`"path`"",
+                    "",
+                    $damPath,
+                    "--$boundary",
+                    "Content-Disposition: form-data; name=`"siteId`"",
+                    "",
+                    "tut-gb",
+                    "--$boundary",
+                    "Content-Disposition: form-data; name=`"userId`"",
+                    "",
+                    "admin",
+                    "--$boundary--",
+                    ""
+                )
+
+                $headerBytes = $enc.GetBytes(($bodyLines -join "`r`n"))
+                $footerBytes = $enc.GetBytes(($bodyEnd   -join "`r`n"))
+                $bodyBytes   = New-Object byte[] ($headerBytes.Length + $fileBytes.Length + $footerBytes.Length)
+                [System.Buffer]::BlockCopy($headerBytes, 0, $bodyBytes, 0, $headerBytes.Length)
+                [System.Buffer]::BlockCopy($fileBytes,   0, $bodyBytes, $headerBytes.Length, $fileBytes.Length)
+                [System.Buffer]::BlockCopy($footerBytes, 0, $bodyBytes, $headerBytes.Length + $fileBytes.Length, $footerBytes.Length)
+
+                $resp = Invoke-WebRequest "http://localhost:8080/api/author/assets" `
+                    -Method POST -Body $bodyBytes `
+                    -ContentType "multipart/form-data; boundary=$boundary" `
+                    -TimeoutSec 30 -UseBasicParsing -ErrorAction Stop
+
+                Write-Host "    OK: $damPath" -ForegroundColor Green
+                $uploaded++
+            } catch {
+                Write-Host "    ERROR: $damPath — $($_.Exception.Message)" -ForegroundColor Red
+                $errors++
+            }
+        }
+
+        Write-Host ""
+        Write-Host "    Done: $uploaded uploaded, $skipped skipped, $errors errors" -ForegroundColor Cyan
+        Write-Host ""
+    }
+
     "reset" {
         Write-Banner "Resetting all data (volumes will be deleted)"
         Ensure-Env
@@ -446,6 +580,7 @@ switch ($Command) {
     flex stop  local                   Stop everything
     flex status                        Health-check all
     flex logs  <service>               Tail service log
+    flex seed                          Upload DAM assets for TUT sample site
     flex reset                         Wipe all data & volumes
 
   SERVICES (pick any combination)
