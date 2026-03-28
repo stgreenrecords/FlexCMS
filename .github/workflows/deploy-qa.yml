@@ -22,26 +22,69 @@ jobs:
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload compose files to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.QA_HOST }}
+          username: ec2-user
+          key: ${{ secrets.QA_SSH_KEY }}
+          source: "infra/ec2-qa/docker-compose.qa.yml,infra/ec2-qa/init-db.sql"
+          target: "/tmp/flexcms-deploy"
+          strip_components: 2
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.QA_HOST }}
           username: ec2-user
           key: ${{ secrets.QA_SSH_KEY }}
+          envs: GHCR_TOKEN
           script: |
-            cd /opt/flexcms
-            sudo docker compose pull
+            set -e
+            APP_DIR="/opt/flexcms"
+            sudo mkdir -p "$APP_DIR"
+
+            # Copy compose files (only if newer)
+            sudo cp /tmp/flexcms-deploy/docker-compose.qa.yml "$APP_DIR/docker-compose.yml"
+            sudo cp /tmp/flexcms-deploy/init-db.sql "$APP_DIR/init-db.sql"
+            rm -rf /tmp/flexcms-deploy
+
+            cd "$APP_DIR"
+
+            # Login to GHCR if token provided, otherwise try anonymous
+            if [ -n "$GHCR_TOKEN" ]; then
+              echo "$GHCR_TOKEN" | sudo docker login ghcr.io --username token --password-stdin
+            fi
+
+            # Pull latest images and restart
+            sudo docker compose pull author publish 2>/dev/null || echo "Pull skipped (image may need auth — set QA_GHCR_TOKEN secret)"
             sudo docker compose up -d
+
             echo "Waiting for services to start..."
-            sleep 15
-            # Health check
-            for i in 1 2 3 4 5; do
+            sleep 20
+
+            # Health check Author API
+            OK=false
+            for i in 1 2 3 4 5 6; do
               if curl -sf http://localhost:8080/actuator/health > /dev/null 2>&1; then
                 echo "✅ Author API healthy"
+                OK=true
                 break
               fi
-              echo "Waiting for Author API... (attempt $i)"
+              echo "Waiting for Author API... (attempt $i/6)"
               sleep 10
             done
-            sudo docker compose ps
+            if [ "$OK" = false ]; then
+              echo "❌ Author API did not become healthy"
+              echo "=== Author logs (last 50 lines) ==="
+              sudo docker compose logs --tail=50 author
+            fi
 
+            echo ""
+            echo "=== Service Status ==="
+            sudo docker compose ps
+        env:
+          GHCR_TOKEN: ${{ secrets.QA_GHCR_TOKEN }}
