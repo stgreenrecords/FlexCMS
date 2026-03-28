@@ -1,5 +1,11 @@
 # CLAUDE.md
 
+> **This file is binding for ALL AI assistants working in this repository — Claude Code, GitHub Copilot,
+> Cursor, JetBrains AI, ChatGPT, Gemini, or any other tool. The workflow, commands, and rules defined
+> here are not optional and apply regardless of which IDE or AI product you are using. If your environment
+> does not support slash commands natively, read the "Commands Reference" section below and execute the
+> steps manually whenever the user invokes a command by name.**
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Identity
@@ -139,15 +145,83 @@ The task stays 🔵 IN PROGRESS until every test in that spec file passes on the
 - Inline bug entries in §4 are updated to `✅ FIXED`
 - The TA task completion note in §5 summarises bugs found + fixes applied
 
-### Slash Commands
-```
-/implement     Pick next open task, implement, validate, update board
-/pick P1-04    Implement a specific task by ID
-/continue      Resume a paused task (reads handoff notes from §5)
-/status        Show work board summary (counts + next available tasks)
-/finish        Complete or pause current task with proper documentation
-/validate      Full build + work board consistency check (§7 checklist)
-```
+### Commands Reference
+
+> **All AI assistants MUST follow these command definitions, regardless of environment.**
+> In Claude Code (VS Code / CLI) these are invoked as `/implement`, `/pick`, etc.
+> In GitHub Copilot, Cursor, JetBrains AI, or any other tool, execute the **exact same steps**
+> listed below whenever the user types the command name — with or without the `/` prefix.
+> The command definitions below are the authoritative specification. The slash syntax is just shorthand.
+
+---
+
+#### `implement` — Pick next open task and implement it
+
+1. Read `WORK_BOARD.md` in full.
+2. Find the highest-priority 🟢 OPEN task (🔴 P0 → 🟠 P1 → 🟡 P2 → 🟢 P3 → 🧪 TA). Skip any 🔴 BLOCKED task whose blocker is not ✅ DONE. Skip any task whose modules are locked in §2.
+3. If a 🟠 PAUSED task exists for the same priority band — resume it instead (follow `/continue`).
+4. Execute the **Mandatory Workflow** steps 1–10 from the top of this file for that task.
+5. After the task is ✅ DONE, immediately loop back to step 1 and pick the next task. Continue until the user says stop.
+
+---
+
+#### `pick <TASK-ID>` — Implement a specific task by ID (e.g., `pick TA-00`, `pick P1-04`)
+
+1. Read `WORK_BOARD.md` in full.
+2. Locate the task with the given ID in §3.
+3. Verify its blockers are all ✅ DONE. If not, report which blocker is outstanding and stop.
+4. Verify no module lock conflicts in §2. If a conflict exists, report it and stop.
+5. Execute the **Mandatory Workflow** steps 1–10 for that task.
+
+---
+
+#### `continue` — Resume a paused task
+
+1. Read `WORK_BOARD.md` §5 (Completion & Handoff Notes) — find the most recent 🟠 PAUSED entry.
+2. Read the Handoff Note for that task (exact files touched, last completed step, blocking error if any).
+3. Read all files listed in `read_first` for that task's §4 Context Packet.
+4. Resume from the step indicated in the Handoff Note.
+5. Complete the task following the **Mandatory Workflow** from that step onward.
+
+---
+
+#### `status` — Show work board summary
+
+1. Read `WORK_BOARD.md` §2, §3.
+2. Print a summary table:
+   - Count of tasks by status: 🟢 OPEN / 🔵 IN PROGRESS / 🟠 PAUSED / 🔴 BLOCKED / ✅ DONE
+   - List every 🟢 OPEN and 🟠 PAUSED task by ID + title
+   - List every 🔵 IN PROGRESS task with its locked modules
+   - List the next recommended task to pick up (highest priority available)
+3. Flag any anomalies: orphaned IN PROGRESS tasks, stale locks, missing completion notes.
+
+---
+
+#### `finish` — Complete or pause the current task with documentation
+
+1. Identify which task is currently 🔵 IN PROGRESS (from §2 module locks or §3 status).
+2. If the task is fully implemented and all ACs are met:
+   a. Run the full Pre-Push Local Validation (all 5 steps).
+   b. If all pass: update §3 status → ✅ DONE, clear locks in §2, add Completion Note in §5, commit and push.
+3. If the task cannot be completed right now:
+   a. Ensure code compiles (`mvn clean compile`).
+   b. Update §3 status → 🟠 PAUSED, keep locks in §2.
+   c. Add Handoff Note in §5 with: last completed step, files modified, exact error or blocker, instructions for the next agent.
+   d. Commit and push the partial work with message `wip(<ID>): <description>`.
+
+---
+
+#### `validate` — Full build + work board consistency check
+
+Execute every item in `WORK_BOARD.md §7 — Validation Checklist`:
+
+1. `cd flexcms && mvn clean compile` — must exit 0
+2. `cd flexcms && mvn test` — must exit 0, 0 failures
+3. `cd frontend && pnpm install && pnpm build` — must exit 0
+4. If `frontend/apps/admin-e2e` exists: `cd frontend/apps/admin-e2e && pnpm exec playwright test --project=chromium` — must exit 0
+5. Work Board checks: no orphaned IN PROGRESS, no stale locks, every ✅ DONE has a §5 note, all BLOCKED blockers verified, all BUG-INLINE entries for DONE TA tasks are ✅ FIXED.
+6. Code quality checks: no mock data in production code, no `System.out.println`, no commented-out blocks.
+7. Report a ✅ PASS / ❌ FAIL for each item. If any item fails, list the exact fix required.
 
 ## Build Commands
 
