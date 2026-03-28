@@ -3,6 +3,10 @@
 # FlexCMS — Initialize RDS databases and extensions
 # Run ONCE after the first CloudFormation deployment.
 # Requires: psql, AWS CLI, network access to RDS (via SSM tunnel or VPN)
+#
+# NOTE: The ECS init containers (db-init) in main.yml now handle database
+# creation automatically on task start. This script is kept as a fallback
+# and for manual extensions setup.
 # =============================================================================
 set -euo pipefail
 
@@ -20,18 +24,18 @@ export PGPASSWORD="$DB_PASSWORD"
 echo "=== Initializing RDS databases for flexcms-${ENV} ==="
 echo "  Endpoint: ${RDS_ENDPOINT}"
 
-# Create databases
+# Create databases (connect to 'postgres' — the default DB created by RDS)
 echo ">>> Creating flexcms_author database..."
-psql -h "$RDS_ENDPOINT" -U flexcms -d flexcms -c "CREATE DATABASE flexcms_author;" 2>/dev/null || echo "  (already exists)"
+psql -h "$RDS_ENDPOINT" -U flexcms -d postgres -c "CREATE DATABASE flexcms_author;" 2>/dev/null || echo "  (already exists)"
 
 echo ">>> Creating flexcms_publish database..."
-psql -h "$RDS_ENDPOINT" -U flexcms -d flexcms -c "CREATE DATABASE flexcms_publish;" 2>/dev/null || echo "  (already exists)"
+psql -h "$RDS_ENDPOINT" -U flexcms -d postgres -c "CREATE DATABASE flexcms_publish;" 2>/dev/null || echo "  (already exists)"
 
 echo ">>> Creating flexcms_pim database..."
-psql -h "$RDS_ENDPOINT" -U flexcms -d flexcms -c "CREATE DATABASE flexcms_pim;" 2>/dev/null || echo "  (already exists)"
+psql -h "$RDS_ENDPOINT" -U flexcms -d postgres -c "CREATE DATABASE flexcms_pim;" 2>/dev/null || echo "  (already exists)"
 
 # Enable extensions on each database
-for DB in flexcms flexcms_author flexcms_publish; do
+for DB in flexcms_author flexcms_publish; do
   echo ">>> Enabling extensions on ${DB}..."
   psql -h "$RDS_ENDPOINT" -U flexcms -d "$DB" -c "
     CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";
@@ -47,4 +51,3 @@ psql -h "$RDS_ENDPOINT" -U flexcms -d flexcms_pim -c "
 "
 
 echo "=== RDS initialization complete ==="
-

@@ -61,8 +61,8 @@ Resources:
       MasterUsername: flexcms
       MasterUserPassword: !Ref DBMasterPassword
       # 'postgres' is the standard initial DB. The application databases
-      # (flexcms_author, flexcms_publish, flexcms_pim) are created by Flyway at
-      # first boot — they must not be specified here.
+      # (flexcms_author, flexcms_publish, flexcms_pim) are created by the
+      # db-init ECS init container at first boot — they must not be specified here.
       DBName: postgres
       DBSubnetGroupName: !Ref DBSubnetGroup
       DBParameterGroupName: !Ref DBParameterGroup

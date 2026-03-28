@@ -280,9 +280,40 @@ Resources:
       ExecutionRoleArn: !GetAtt EcsExecutionRole.Arn
       TaskRoleArn: !GetAtt EcsTaskRole.Arn
       ContainerDefinitions:
+        # Init container — creates databases on first deploy (idempotent)
+        - Name: db-init
+          Image: postgres:16-alpine
+          Essential: false
+          Memory: 256
+          Command:
+            - /bin/sh
+            - -c
+            - |
+              for db in flexcms_author flexcms_publish flexcms_pim; do
+                echo "Ensuring database $db exists..."
+                PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U flexcms -d postgres \
+                  -c "SELECT 1 FROM pg_database WHERE datname='$db'" | grep -q 1 \
+                  || PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U flexcms -d postgres \
+                       -c "CREATE DATABASE $db OWNER flexcms;"
+              done
+              echo "Database initialization complete."
+          Environment:
+            - Name: DB_HOST
+              Value: !GetAtt DatabaseStack.Outputs.DBEndpoint
+            - Name: DB_PASSWORD
+              Value: !Ref DBMasterPassword
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AuthorLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: db-init
         - Name: flexcms-author
           Image: !Sub ghcr.io/stgreenrecords/flexcms-app:${DockerImageTag}
           Essential: true
+          DependsOn:
+            - ContainerName: db-init
+              Condition: SUCCESS
           PortMappings: [{ContainerPort: 8080}]
           Environment:
             - {Name: SPRING_PROFILES_ACTIVE, Value: author}
@@ -350,9 +381,40 @@ Resources:
       ExecutionRoleArn: !GetAtt EcsExecutionRole.Arn
       TaskRoleArn: !GetAtt EcsTaskRole.Arn
       ContainerDefinitions:
+        # Init container — creates databases on first deploy (idempotent)
+        - Name: db-init
+          Image: postgres:16-alpine
+          Essential: false
+          Memory: 256
+          Command:
+            - /bin/sh
+            - -c
+            - |
+              for db in flexcms_author flexcms_publish flexcms_pim; do
+                echo "Ensuring database $db exists..."
+                PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U flexcms -d postgres \
+                  -c "SELECT 1 FROM pg_database WHERE datname='$db'" | grep -q 1 \
+                  || PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U flexcms -d postgres \
+                       -c "CREATE DATABASE $db OWNER flexcms;"
+              done
+              echo "Database initialization complete."
+          Environment:
+            - Name: DB_HOST
+              Value: !GetAtt DatabaseStack.Outputs.DBEndpoint
+            - Name: DB_PASSWORD
+              Value: !Ref DBMasterPassword
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref PublishLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: db-init
         - Name: flexcms-publish
           Image: !Sub ghcr.io/stgreenrecords/flexcms-app:${DockerImageTag}
           Essential: true
+          DependsOn:
+            - ContainerName: db-init
+              Condition: SUCCESS
           PortMappings: [{ContainerPort: 8081}]
           Environment:
             - {Name: SPRING_PROFILES_ACTIVE, Value: publish}

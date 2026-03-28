@@ -1,7 +1,7 @@
 # FlexCMS QA Deployment Status
 
-**Last updated:** 2026-03-27
-**Target environment:** `qa.flexcmsdemo.store` (AWS Account: 698643712979, Region: eu-central-1)
+**Last updated:** 2026-03-28
+**Target environment:** AWS Account 698643712979, Region `eu-central-1`
 **AWS IAM User:** `spa-deployer` (AdministratorAccess)
 
 ---
@@ -10,216 +10,136 @@
 
 | Phase | Status | Notes |
 |---|---|---|
-| Infrastructure CFN templates | ✅ Done | All templates fixed and committed |
-| ACM Certificates requested | ✅ Done | Pending DNS validation |
-| Route53 hosted zone created | ✅ Done | flexcmsdemo.store |
-| ACM DNS validation record added | ✅ Done | Added to Route53 |
-| CloudFormation first deploy attempt | ❌ Failed | ECS SLR propagation delay |
-| ECS Service-Linked Role | ✅ Fixed | Created at 17:43 UTC — needs ~2 min to propagate |
-| Stack cleanup | 🔄 In progress | Deleting ROLLBACK_COMPLETE stack |
-| **Stack redeploy** | ⏳ Pending | Ready to retry after delete completes |
-| RDS initialization | ⏳ Pending | Run init-rds.sh after stack is up |
-| Frontend Docker images | ⏳ Pending | Build after Author ALB DNS is known |
-| Admin UI + Site-nextjs deploy | ⏳ Pending | Phase 2 after backend confirmed |
-| DNS CNAME records | ⏳ Pending | Point subdomains at ALBs/CloudFront |
-| ACM cert activation | ⏳ Pending | Auto-activates once DNS propagates |
-| HTTPS listeners | ⏳ Pending | Redeploy with cert ARNs after validation |
-| Endpoint verification | ⏳ Pending | Final step |
+| Infrastructure CFN templates | ✅ Done | Init containers added for DB creation |
+| Broker instance type fix | ✅ Done | `mq.t3.micro` → `mq.m5.large` (deprecated April 1 2026) |
+| DB init container added | ✅ Done | `db-init` sidecar creates databases before Spring Boot starts |
+| Domain DNS | ⛔ Blocked | `flexcmsdemo.store` managed by external org — using ALB DNS directly |
+| ACM Certificates | ⛔ Blocked | Cannot validate without DNS control — deploy HTTP-only |
+| CloudFormation deploy | 🔄 In progress | Deploying with fixed template |
+| RDS initialization | ✅ Automated | Init containers handle `CREATE DATABASE` automatically |
+| Frontend Docker images | ⏳ Pending | Phase 2 after backend confirmed healthy |
+| Endpoint verification | ⏳ Pending | Use ALB DNS names directly |
 
 ---
 
-## What Was Done This Session
+## Root Cause Analysis — Previous Failure
 
-### CloudFormation Templates (all committed, pushed to main)
+The stack failed because **ECS services could not stabilize** (3+ hours then timeout):
 
-**`infra/cfn/network.yml`**
-- Added `EcsElasticIngress` rule: port 9200 self-ingress within ECS security group
-  (allows Elasticsearch container to receive from other ECS tasks)
-
-**`infra/cfn/messaging.yml`**
-- Added `BrokerHostname` output: parses `amqps://hostname:5671` AMQP endpoint to extract
-  just the hostname (needed for `SPRING_RABBITMQ_HOST` env var)
-
-**`infra/cfn/main.yml`** — major update:
-- **Fixed:** Added `SPRING_RABBITMQ_HOST` to Author + Publish task definitions
-- **Fixed:** Added `SPRING_ELASTICSEARCH_URIS` to Author + Publish task definitions
-- **Fixed:** Author ALB is now `internet-facing` for QA, `internal` for prod
-- **New:** Cloud Map private DNS namespace (`flexcms-qa.local`) for ECS service discovery
-- **New:** Elasticsearch ECS Fargate service with Cloud Map service discovery
-  (Spring connects via `http://elasticsearch.flexcms-qa.local:9200`)
-- **New:** Admin UI ALB + ECS service (conditional on `AdminImageUri` parameter)
-- **New:** Site-nextjs ALB + ECS service (conditional on `SiteImageUri` parameter)
-- **New:** HTTPS listeners for all 4 ALBs (conditional on `CertificateArn`)
-- **New:** CloudFront custom domain + ACM cert (conditional on `CloudFrontCertificateArn`)
-- **New parameters:** `AdminImageUri`, `SiteImageUri`, `DomainName`, `CertificateArn`,
-  `CloudFrontCertificateArn`, `AdminDesiredCount`, `SiteDesiredCount`
-
-**`infra/cfn/params/qa.json`** — added new parameters:
-- `DomainName=qa.flexcmsdemo.store`
-- `AdminImageUri=` (empty = skip until phase 2)
-- `SiteImageUri=` (empty = skip until phase 2)
-- `CertificateArn=` (fill after cert validates)
-- `CloudFrontCertificateArn=` (fill after cert validates)
-
-**`infra/scripts/deploy.sh`** — complete rewrite:
-- Two-phase deployment: `--action create` (backend) then `--build-frontend` (phase 2)
-- `--build-frontend` flag: builds Admin UI + Site-nextjs Docker images, pushes to ECR
-- `--cert-arn` / `--cf-cert-arn` flags: enable HTTPS after cert validation
-- Post-deploy hints: prints all DNS CNAME records needed + initialization commands
-
-**`frontend/apps/site-nextjs/next.config.js`**
-- Added `STANDALONE=1` support (same as admin app) for Docker standalone output
-
-**`frontend/apps/site-nextjs/Dockerfile`** — created (was missing):
-- Multi-stage build: deps → builder → runtime
-- Builds SDK → React → Site-nextjs in dependency order
-- Same pattern as `frontend/apps/admin/Dockerfile`
+| Root Cause | Fix Applied |
+|---|---|
+| `flexcms_author`, `flexcms_publish`, `flexcms_pim` databases didn't exist on fresh RDS (only `postgres`) | Added `db-init` init container to both AuthorTaskDef and PublishTaskDef |
+| `mq.t3.micro` deprecated (blocked for new brokers after April 1 2026) | Updated `qa.json` to `mq.m5.large` |
+| `flexcmsdemo.store` externally managed — can't validate ACM certs or set DNS | Cleared `DomainName` param — deploy HTTP-only with ALB DNS names |
+| `init-rds.sh` connected to non-existent `flexcms` database instead of `postgres` | Fixed to use `-d postgres` |
 
 ---
 
-## ACM Certificates
+## Template Changes (this session)
 
-| Certificate | Region | ARN | Status |
-|---|---|---|---|
-| `*.qa.flexcmsdemo.store` (CloudFront) | us-east-1 | `arn:aws:acm:us-east-1:698643712979:certificate/ee155dbc-06e2-44f6-b778-8512066410d1` | PENDING_VALIDATION |
-| `*.qa.flexcmsdemo.store` (ALBs) | eu-central-1 | `arn:aws:acm:eu-central-1:698643712979:certificate/b83a48ac-2fe5-47ef-85a5-32585202cc16` | PENDING_VALIDATION |
+### `infra/cfn/main.yml`
+- **Added `db-init` init container** to `AuthorTaskDef` and `PublishTaskDef`:
+  - Uses `postgres:16-alpine` image (has `psql`)
+  - Creates `flexcms_author`, `flexcms_publish`, `flexcms_pim` databases idempotently
+  - Main Spring Boot container has `DependsOn: [{ContainerName: db-init, Condition: SUCCESS}]`
+  - Eliminates the need for manual `init-rds.sh` execution
 
-**DNS validation record added to Route53:**
-```
-Name:  _5e40f07113a4a2a38d538e17bdd3e954.qa.flexcmsdemo.store.
-Type:  CNAME
-Value: _8e641d9bb9ae07d8af268bff7f183340.jkddzztszm.acm-validations.aws.
-```
-Both certs use the same validation record. They will auto-validate once DNS propagates (~5-30 min).
+### `infra/cfn/params/qa.json`
+- `BrokerInstanceType`: `mq.t3.micro` → `mq.m5.large`
+- `DomainName`: `qa.flexcmsdemo.store` → `` (empty — HTTP-only, use ALB DNS)
 
-**Route53 Hosted Zone:** `Z05181351Y3HRB0E9SDL8` (flexcmsdemo.store.)
+### `infra/cfn/database.yml`
+- Fixed misleading comment: databases created by init containers, not Flyway
 
-> ⚠️ **Action required:** The domain `flexcmsdemo.store` must be delegated to AWS Route53
-> by updating the nameservers at your domain registrar to:
-> - `ns-1532.awsdns-63.org`
-> - `ns-1859.awsdns-40.co.uk`
-> - `ns-134.awsdns-16.com`
-> - `ns-746.awsdns-29.net`
-> Until this is done, ACM cert validation and DNS routing will not work.
+### `infra/scripts/init-rds.sh`
+- Fixed: connect to `postgres` database (not `flexcms` which doesn't exist on fresh RDS)
+- Added note that init containers now handle this automatically
 
 ---
 
-## Next Steps (in order)
+## Deploy Command (ready to execute)
 
-### Step 1 — Update Domain Registrar NS Records
-Point `flexcmsdemo.store` to the AWS Route53 nameservers listed above.
+```powershell
+# 1. Cleanup retained S3 buckets (if any from previous rollback)
+aws s3 rb s3://flexcms-qa-assets-698643712979 --force --region eu-central-1 2>$null
 
-### Step 2 — Wait for Stack Delete + Redeploy Backend
+# 2. Upload nested templates
+$BUCKET = "flexcms-qa-cfn-templates-698643712979"
+Get-ChildItem "infra\cfn\*.yml" | Where-Object { $_.Name -ne "main.yml" } | ForEach-Object {
+    aws s3 cp $_.FullName "s3://$BUCKET/$($_.Name)" --region eu-central-1 --quiet
+}
 
-```bash
-# Wait for stack deletion to complete (if not already)
-aws cloudformation wait stack-delete-complete --stack-name flexcms-qa --region eu-central-1
-
-# Redeploy (ECS SLR now propagated)
-export FLEXCMS_DB_PASSWORD="FlexCmsQA2024!"
-export FLEXCMS_MQ_PASSWORD="FlexCmsQA2024!"
-bash infra/scripts/deploy.sh --env qa --action create
+# 3. Deploy stack
+aws cloudformation deploy `
+  --stack-name flexcms-qa `
+  --template-file infra\cfn\main.yml `
+  --parameter-overrides `
+    EnvironmentName=qa `
+    DockerImageTag=latest `
+    DBMasterPassword=FlexCmsQA2024! `
+    BrokerPassword=FlexCmsQA2024! `
+    TemplateBucketUrl=https://flexcms-qa-cfn-templates-698643712979.s3.eu-central-1.amazonaws.com `
+    DBInstanceClass=db.t3.micro `
+    DBAllocatedStorage=20 `
+    CacheNodeType=cache.t3.micro `
+    BrokerInstanceType=mq.m5.large `
+    AuthorDesiredCount=1 `
+    PublishDesiredCount=2 `
+    PublishMaxCount=6 `
+  --capabilities CAPABILITY_NAMED_IAM `
+  --region eu-central-1 `
+  --no-fail-on-empty-changeset
 ```
 
-### Step 3 — Initialize RDS Databases (first deploy only)
+**Expected timeline:** ~30-40 min (RDS ~10 min, MQ ~20 min, ECS stabilization ~5 min)
 
+---
+
+## QA Access (after deploy succeeds)
+
+All services accessible via HTTP on ALB DNS names (no custom domain needed):
+
+| Service | URL |
+|---|---|
+| Author API | `http://<AuthorALBDns>/actuator/health/readiness` |
+| Publish API | `http://<PublishALBDns>/actuator/health/readiness` |
+| CloudFront CDN | `https://<CloudFrontDomain>` |
+| Admin UI | Phase 2 — `http://<AdminALBDns>` |
+| Site | Phase 2 — `http://<SiteALBDns>` |
+
+Get ALB DNS names after deploy:
 ```bash
-RDS_EP=$(aws cloudformation describe-stacks --stack-name flexcms-qa \
-  --query "Stacks[0].Outputs[?OutputKey=='RDSEndpoint'].OutputValue" \
-  --output text --region eu-central-1)
-
-bash infra/scripts/init-rds.sh qa "$RDS_EP" "FlexCmsQA2024!"
-```
-> Note: RDS is in private subnets. Run this from an EC2 bastion in the VPC or
-> via `aws ssm start-session` with port forwarding.
-
-### Step 4 — Build + Deploy Frontend Images
-
-```bash
-# After backend stack is confirmed healthy:
-bash infra/scripts/deploy.sh --env qa --action update --build-frontend
-```
-
-This will:
-1. Get Author ALB DNS from stack outputs
-2. Build Admin UI Docker image with `NEXT_PUBLIC_FLEXCMS_API=http://<AuthorALB>`
-3. Build Site-nextjs Docker image
-4. Push both to ECR
-5. Update CFN stack with the ECR image URIs → ECS deploys the frontend
-
-### Step 5 — Enable HTTPS (after cert validation)
-
-```bash
-# Check cert status
-aws acm describe-certificate \
-  --certificate-arn "arn:aws:acm:eu-central-1:698643712979:certificate/b83a48ac-2fe5-47ef-85a5-32585202cc16" \
-  --region eu-central-1 --query "Certificate.Status"
-
-# When both certs show ISSUED:
-bash infra/scripts/deploy.sh --env qa --action update \
-  --cert-arn "arn:aws:acm:eu-central-1:698643712979:certificate/b83a48ac-2fe5-47ef-85a5-32585202cc16" \
-  --cf-cert-arn "arn:aws:acm:us-east-1:698643712979:certificate/ee155dbc-06e2-44f6-b778-8512066410d1"
-```
-
-### Step 6 — Add DNS CNAME Records
-
-After the stack is up, get ALB DNS names from outputs and add to Route53:
-
-```bash
-# Get all ALB DNS names
 aws cloudformation describe-stacks --stack-name flexcms-qa \
   --query "Stacks[0].Outputs[*].[OutputKey,OutputValue]" --output table --region eu-central-1
 ```
 
-Add these CNAMEs in Route53 (hosted zone `Z05181351Y3HRB0E9SDL8`):
-
-| Subdomain | Points to |
-|---|---|
-| `qa.flexcmsdemo.store` | CloudFront domain (e.g. `d1abc123.cloudfront.net`) |
-| `api.qa.flexcmsdemo.store` | Author ALB DNS |
-| `admin.qa.flexcmsdemo.store` | Admin ALB DNS |
-| `site.qa.flexcmsdemo.store` | Site ALB DNS |
-
-### Step 7 — Verify All Endpoints
-
-```bash
-# After DNS propagates and ECS tasks are healthy:
-
-# 1. Author API health
-curl http://api.qa.flexcmsdemo.store/actuator/health/readiness
-
-# 2. Publish API health
-curl http://<PublishALBDns>/actuator/health/readiness
-
-# 3. Author API — component registry
-curl http://api.qa.flexcmsdemo.store/api/content/v1/component-registry | jq .
-
-# 4. CloudFront / Site
-curl https://qa.flexcmsdemo.store
-
-# 5. Admin UI
-curl https://admin.qa.flexcmsdemo.store
-
-# 6. RabbitMQ replication test
-# POST content to Author, publish it, verify it appears on Publish
-
-# 7. S3/DAM — upload test asset via Admin UI
-
-# 8. Elasticsearch — verify search indexing
-curl http://<AuthorALBDns>/api/search/health
-```
-
 ---
 
-## Known Issues / Risks
+## Architecture (deployed on ECS Fargate — NO EC2 instances)
 
-| Issue | Severity | Resolution |
-|---|---|---|
-| `NEXT_PUBLIC_FLEXCMS_API` baked at Docker build time | Medium | Image is built with Author ALB URL; must rebuild if ALB DNS changes |
-| Elasticsearch single-node (ephemeral) | Low | QA only — no persistence; data lost on task restart |
-| RDS in private subnet — no direct access for init-rds.sh | Medium | Use SSM port forwarding or EC2 bastion |
-| ACM certs require NS delegation first | High | Update registrar NS before validation can complete |
-| ECS SLR propagation delay (caused first stack failure) | Low | Already fixed — SLR was created at 17:43 UTC |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        ECS Fargate Cluster                       │
+│                                                                   │
+│  ┌──────────────┐  ┌───────────────┐  ┌────────────────────┐    │
+│  │ db-init       │  │ db-init        │  │ Elasticsearch      │    │
+│  │ (postgres:16) │  │ (postgres:16)  │  │ (8.13.4)           │    │
+│  │ ↓ SUCCESS     │  │ ↓ SUCCESS      │  │ Cloud Map DNS      │    │
+│  │ Author App    │  │ Publish App    │  │ :9200              │    │
+│  │ :8080         │  │ :8081          │  └────────────────────┘    │
+│  └──────┬───────┘  └──────┬────────┘                             │
+│         │                  │                                       │
+├─────────┼──────────────────┼───────────────────────────────────────┤
+│  ALB    │           ALB    │                                       │
+│  Auth   ▼           Pub    ▼         CloudFront                    │
+│  :80              :80            (S3 + SSR fallback)               │
+└─────────────────────────────────────────────────────────────────┘
+          │                  │                │
+     ┌────┴─────┐     ┌─────┴──────┐    ┌────┴──────┐
+     │ RDS PG16 │     │ ElastiCache│    │ Amazon MQ │
+     │ Private  │     │ Redis      │    │ RabbitMQ  │
+     └──────────┘     └────────────┘    └───────────┘
+```
 
 ---
 
@@ -233,3 +153,21 @@ curl http://<AuthorALBDns>/api/search/health
 | RabbitMQ user | `flexcms` |
 | AWS Region | `eu-central-1` |
 | AWS Account | `698643712979` |
+
+---
+
+## Phase 2 — Frontend Deploy (after backend is healthy)
+
+```bash
+# Build and deploy frontend containers to ECR + update stack
+bash infra/scripts/deploy.sh --env qa --action update --build-frontend
+```
+
+## Custom Domain (future — requires external org cooperation)
+
+If the external org can add a **subdomain delegation** for `qa.flexcmsdemo.store`:
+1. Ask them to add NS records for `qa.flexcmsdemo.store` pointing to our Route53 hosted zone
+2. Request ACM certificates in both `us-east-1` and `eu-central-1`
+3. Redeploy with `--cert-arn` and `--cf-cert-arn` flags
+
+Alternatively, register a new domain we control (e.g., `flexcms-qa.dev`).
