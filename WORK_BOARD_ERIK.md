@@ -14,9 +14,9 @@
 
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
-| E-01 | 🟢 OPEN | **Foundation: clean old TUT content + new TUT USA site skeleton + XF paths** | 1d | `flexcms-app` (Flyway), `flexcms-core` | — |
-| E-02 | 🔴 BLOCKED | **Backend: register all 406 component definitions (Flyway V16)** | 3d | `flexcms-app` (Flyway) | E-01 |
-| E-06 | 🔴 BLOCKED | **Frontend renderers: Navigation & Discovery + XF locking (27 components)** | 3d | `apps/site-nextjs`, `apps/admin` | E-01, E-02 |
+| E-01 | ✅ DONE | **Foundation: clean old TUT content + new TUT USA site skeleton + XF paths** | 1d | `flexcms-app` (Flyway), `flexcms-core` | — |
+| E-02 | 🟢 OPEN | **Backend: register all 406 component definitions (Flyway V16)** | 3d | `flexcms-app` (Flyway) | E-01 |
+| E-06 | 🟢 OPEN | **Frontend renderers: Navigation & Discovery + XF locking (27 components)** | 3d | `apps/site-nextjs`, `apps/admin` | E-01, E-02 |
 
 ### 🟠 P1 — High
 
@@ -457,6 +457,20 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 > Entries go at the TOP. Most recent first.
 
 ---
+
+### E-01 — Foundation: Clean Old TUT Content + New TUT USA Site Skeleton
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — `DELETE FROM component_definitions WHERE resource_type LIKE 'tut/%'` removes all 18 old components; verified by migration SQL correctness
+  - [x] AC2 — 10 nodes inserted under `content.tut-usa` (1 L0 root + 9 L1 section pages); counted in migration SQL
+  - [x] AC3 — XF nodes exist at `content.experience-fragments.tut-usa.global.navigation` (fragmentType: header, DRAFT) and `content.experience-fragments.tut-usa.global.footer` (fragmentType: footer, DRAFT); master xf-page variations also seeded
+  - [x] AC4 — `mvn clean compile` passed (0 errors); `mvn test` passed (BUILD SUCCESS, all 41 tests green)
+**Files Changed:**
+  - `flexcms/flexcms-app/src/main/resources/db/migration/V15__tut_usa_foundation.sql` — new Flyway migration: DELETE old tut/* data, INSERT tut-usa site + domain mappings, 10 content nodes (L0+L1), XF hierarchy (navigation+footer+master variants), XF metadata registry entries
+**Build Verified:** Yes — `mvn clean compile` and `mvn test` BUILD SUCCESS
+**Notes:** Old tut-gb/de/fr/ca sites remain in the `sites` table and `domain_mappings` (not deleted per task scope). Old XF metadata for those sites IS deleted. L1 nodes placed directly under `content.tut-usa` (no locale container for this USA English-only site). XF master variation nodes seeded as DRAFT — ready for component authoring in E-06.
 
 ### DONE Template
 ```
