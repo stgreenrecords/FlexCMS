@@ -23,7 +23,7 @@
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
 | E-03 | ✅ DONE | **Frontend renderers: Layout & Page Structure (32 components)** | 3d | `apps/site-nextjs` | E-02 |
-| E-04 | 🔴 BLOCKED | **Frontend renderers: Editorial & Article Content (68 components)** | 5d | `apps/site-nextjs` | E-02 |
+| E-04 | ✅ DONE | **Frontend renderers: Editorial & Article Content (68 components)** | 5d | `apps/site-nextjs` | E-02 |
 | E-05 | 🔴 BLOCKED | **Frontend renderers: Media, Visual Storytelling & Assets (33 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-07 | 🔴 BLOCKED | **Frontend renderers: CTAs, Promotions & Campaigns (43 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-08 | 🔴 BLOCKED | **Frontend renderers: Forms, Data Capture & Consent (42 components)** | 3d | `apps/site-nextjs` | E-02 |
@@ -455,6 +455,23 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-04 — Frontend Renderers: Editorial & Article Content (68 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 68 components implemented as named-export `.tsx` files in `tut-usa/editorial/`; zero hardcoded data
+  - [x] AC2 — Rich text fields use `safeHtml()` regex guard stripping `<script>` tags before `dangerouslySetInnerHTML` — no raw innerHTML injection
+  - [x] AC3 — All image asset fields have resolution documented in JSDoc (hero 1920×1080, thumbnail 400×300, profile 300×300, icons 48×48, featured image 1200×630)
+  - [x] AC4 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/editorial/` — 68 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 68 components registered under `tut-usa/editorial-article-content/<slug>` (Accordion aliased EditorialAccordion, StatCounter aliased EditorialStatCounter to avoid tut/* conflicts)
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** `'use client'` applied to Accordion, Tabs, DataTable, StatCounter, ReadingProgress, ContentRating. Aggregation components (Faq, BlogListing, LatestNews, LeadershipGrid, AuthorList) accept children prop. All text content data-driven; no lorem ipsum or hardcoded values.
 
 ---
 
