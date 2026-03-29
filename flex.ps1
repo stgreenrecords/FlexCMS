@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   FlexCMS CLI — single command to manage local development services.
 
