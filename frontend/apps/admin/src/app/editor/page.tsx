@@ -677,6 +677,12 @@ function EditorInner() {
               transition: 'width 0.3s ease',
             }}
           >
+            {/* Locked XF Navigation slot — cannot be moved, edited, or deleted */}
+            <LockedXfSlot
+              label="Experience Fragment — Navigation"
+              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/navigation"
+            />
+
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -765,6 +771,12 @@ function EditorInner() {
                 )}
               </DragOverlay>
             </DndContext>
+
+            {/* Locked XF Footer slot — cannot be moved, edited, or deleted */}
+            <LockedXfSlot
+              label="Experience Fragment — Footer"
+              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/footer"
+            />
           </div>
         </section>
 
@@ -861,6 +873,45 @@ function EditorInner() {
           </span>
         </div>
       </footer>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// LockedXfSlot — read-only Experience Fragment reference (nav/footer)
+// Authors cannot move, edit, or delete these slots from the canvas.
+// ---------------------------------------------------------------------------
+
+function LockedXfSlot({ label, xfEditPath }: { label: string; xfEditPath: string }) {
+  return (
+    <div
+      className="flex items-center justify-between px-6 py-3 mx-0"
+      style={{
+        background: 'rgba(48,40,20,0.7)',
+        borderTop: '1px solid rgba(180,140,50,0.3)',
+        borderBottom: '1px solid rgba(180,140,50,0.3)',
+      }}
+    >
+      <div className="flex items-center gap-3">
+        {/* Lock icon */}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b0860a" strokeWidth="2" aria-hidden="true">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#c9a84c' }}>
+          {label}
+        </span>
+      </div>
+      <a
+        href={xfEditPath}
+        className="text-xs font-medium transition-colors"
+        style={{ color: '#b0c6ff' }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = '#ffffff'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = '#b0c6ff'; }}
+        title="Open in Experience Fragments editor"
+      >
+        Edit in Experience Fragments →
+      </a>
     </div>
   );
 }

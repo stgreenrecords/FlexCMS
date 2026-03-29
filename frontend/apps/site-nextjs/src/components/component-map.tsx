@@ -114,6 +114,36 @@ import { LanguageSelector } from './tut/LanguageSelector';
 import { StatCounter } from './tut/StatCounter';
 import { Testimonial } from './tut/Testimonial';
 import { ModelComparison } from './tut/ModelComparison';
+import {
+  SearchBar,
+  SearchResults,
+  TutUsaBreadcrumb,
+  TutUsaNavigation,
+  PrimaryNavigation,
+  LinksGroupNavigation,
+  MegaMenu,
+  SecondaryNavigation,
+  TutUsaFooter,
+  LinksGroupFooter,
+  TutUsaLogo,
+  AccountSignIn,
+  TutUsaSiteMap,
+  BackToTop,
+  SideNavigation,
+  AnchorLinks,
+  TextLink,
+  ButtonGroup,
+  LinkList,
+  RelatedContent,
+  RecommendedArticles,
+  CategoryCard,
+  CategoryGrid,
+  BookmarkButton,
+  SkipLink,
+  LanguageSwitcher,
+  CountrySelector,
+  CurrencySelector,
+} from './tut-usa/navigation';
 import React from 'react';
 
 // ---------------------------------------------------------------------------
@@ -147,6 +177,35 @@ export const componentMap = new ComponentMapper<any>()
     'tut/stat-counter': StatCounter,
     'tut/testimonial': Testimonial,
     'tut/model-comparison': ModelComparison,
+    // TUT USA — Navigation, Search & Discovery
+    'tut-usa/navigation-search-discovery/search-bar': SearchBar,
+    'tut-usa/navigation-search-discovery/search-results': SearchResults,
+    'tut-usa/navigation-search-discovery/breadcrumb': TutUsaBreadcrumb,
+    'tut-usa/navigation-search-discovery/navigation': TutUsaNavigation,
+    'tut-usa/navigation-search-discovery/primary-navigation': PrimaryNavigation,
+    'tut-usa/navigation-search-discovery/links-group-navigation': LinksGroupNavigation,
+    'tut-usa/navigation-search-discovery/mega-menu': MegaMenu,
+    'tut-usa/navigation-search-discovery/secondary-navigation': SecondaryNavigation,
+    'tut-usa/navigation-search-discovery/footer': TutUsaFooter,
+    'tut-usa/navigation-search-discovery/links-group-footer': LinksGroupFooter,
+    'tut-usa/navigation-search-discovery/logo': TutUsaLogo,
+    'tut-usa/navigation-search-discovery/account-sign-in': AccountSignIn,
+    'tut-usa/navigation-search-discovery/site-map': TutUsaSiteMap,
+    'tut-usa/navigation-search-discovery/back-to-top': BackToTop,
+    'tut-usa/navigation-search-discovery/side-navigation': SideNavigation,
+    'tut-usa/navigation-search-discovery/anchor-links': AnchorLinks,
+    'tut-usa/navigation-search-discovery/text-link': TextLink,
+    'tut-usa/navigation-search-discovery/button-group': ButtonGroup,
+    'tut-usa/navigation-search-discovery/link-list': LinkList,
+    'tut-usa/navigation-search-discovery/related-content': RelatedContent,
+    'tut-usa/navigation-search-discovery/recommended-articles': RecommendedArticles,
+    'tut-usa/navigation-search-discovery/category-card': CategoryCard,
+    'tut-usa/navigation-search-discovery/category-grid': CategoryGrid,
+    'tut-usa/navigation-search-discovery/bookmark-button': BookmarkButton,
+    'tut-usa/navigation-search-discovery/skip-link': SkipLink,
+    'tut-usa/navigation-search-discovery/language-switcher': LanguageSwitcher,
+    'tut-usa/navigation-search-discovery/country-selector': CountrySelector,
+    'tut-usa/navigation-search-discovery/currency-selector': CurrencySelector,
   })
   .setFallback(({ data }: any) => (
     <div className="p-4 border border-dashed border-gray-300 rounded">

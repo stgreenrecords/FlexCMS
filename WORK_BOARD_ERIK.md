@@ -16,7 +16,7 @@
 |----|--------|-------|--------|-----------------|------------|
 | E-01 | ✅ DONE | **Foundation: clean old TUT content + new TUT USA site skeleton + XF paths** | 1d | `flexcms-app` (Flyway), `flexcms-core` | — |
 | E-02 | ✅ DONE | **Backend: register all 406 component definitions (Flyway V16)** | 3d | `flexcms-app` (Flyway) | E-01 |
-| E-06 | 🟢 OPEN | **Frontend renderers: Navigation & Discovery + XF locking (27 components)** | 3d | `apps/site-nextjs`, `apps/admin` | E-01, E-02 |
+| E-06 | ✅ DONE | **Frontend renderers: Navigation & Discovery + XF locking (27 components)** | 3d | `apps/site-nextjs`, `apps/admin` | E-01, E-02 |
 
 ### 🟠 P1 — High
 
@@ -455,6 +455,29 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-06 — Frontend Renderers: Navigation & Discovery + XF Locking
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 28 navigation components implemented as named-export `.tsx` files in `tut-usa/navigation/`; zero hardcoded data
+  - [x] AC2 — Navigation and Footer rendered from XF paths via `XfNavigation`/`XfFooter` client components injected in `layout.tsx`; NOT from per-page `components` array
+  - [x] AC3 — Admin page editor shows locked XF slots (`LockedXfSlot` component) for Navigation (top) and Footer (bottom) with lock icon and "Edit in Experience Fragments →" link
+  - [x] AC4 — Locked XF slots are outside the DndContext/SortableContext — cannot be moved, selected, edited, or deleted
+  - [x] AC5 — "Edit in Experience Fragments →" links to correct XF path in admin editor
+  - [x] AC6 — `pnpm build` passed (8/8 packages, 0 TypeScript errors); `mvn test` BUILD SUCCESS (41/41 green)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/navigation/` — 28 component `.tsx` files + `index.ts`
+  - `frontend/apps/site-nextjs/src/components/tut-usa/XfNavigation.tsx` — client component fetching XF nav from backend
+  - `frontend/apps/site-nextjs/src/components/tut-usa/XfFooter.tsx` — client component fetching XF footer from backend
+  - `frontend/apps/site-nextjs/src/app/layout.tsx` — injects XfNavigation + XfFooter at layout level
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 28 components registered under `tut-usa/navigation-search-discovery/<slug>`
+  - `frontend/apps/admin/src/app/editor/page.tsx` — `LockedXfSlot` component; locked Nav before DndContext, locked Footer after
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS; `mvn test` 41/41 green
+**Notes:** Spec duplicate for 161/162 means 28 unique components. `BackToTop` needs `'use client'` for `window.scrollTo`.
 
 ---
 
