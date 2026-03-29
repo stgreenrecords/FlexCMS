@@ -2,20 +2,41 @@
   {
     "id": "schema-vehicle",
     "name": "Vehicle",
+    "version": "v1",
     "description": "Core vehicle product schema",
+    "active": true,
     "catalogId": "tut-vehicles",
-    "fieldCount": 8,
-    "createdAt": "2026-01-01T00:00:00Z",
-    "fields": [
-      { "id": "f1", "name": "sku", "label": "SKU", "type": "TEXT", "required": true, "order": 1 },
-      { "id": "f2", "name": "name", "label": "Product Name", "type": "TEXT", "required": true, "order": 2 },
-      { "id": "f3", "name": "price", "label": "Price", "type": "NUMBER", "required": true, "order": 3 },
-      { "id": "f4", "name": "currency", "label": "Currency", "type": "SELECT", "required": true, "order": 4, "options": ["GBP", "EUR", "USD"] },
-      { "id": "f5", "name": "description", "label": "Description", "type": "TEXTAREA", "required": false, "order": 5 },
-      { "id": "f6", "name": "inStock", "label": "In Stock", "type": "BOOLEAN", "required": false, "order": 6 },
-      { "id": "f7", "name": "modelYear", "label": "Model Year", "type": "NUMBER", "required": false, "order": 7 },
-      { "id": "f8", "name": "segment", "label": "Segment", "type": "SELECT", "required": false, "order": 8, "options": ["SUV", "Sedan", "Hatchback", "Electric"] }
-    ]
+    "attributeGroups": {
+      "groups": [
+        {
+          "id": "g-general",
+          "name": "General Information",
+          "required": false,
+          "fields": [
+            { "id": "f1", "label": "SKU",          "internalId": "sku",   "type": "text",    "required": true,  "validationRegex": "", "inherited": false, "localized": false },
+            { "id": "f2", "label": "Product Name", "internalId": "name",  "type": "text",    "required": true,  "validationRegex": "", "inherited": false, "localized": true  },
+            { "id": "f3", "label": "Price",        "internalId": "price", "type": "numeric", "required": true,  "validationRegex": "", "inherited": false, "localized": false }
+          ]
+        },
+        {
+          "id": "g-specs",
+          "name": "Technical Specs",
+          "required": false,
+          "fields": [
+            { "id": "f4", "label": "Engine", "internalId": "engine", "type": "text", "required": false, "validationRegex": "", "inherited": false, "localized": false }
+          ]
+        }
+      ]
+    },
+    "schemaDef": {
+      "type": "object",
+      "properties": {
+        "sku":   { "title": "SKU",          "type": "string" },
+        "name":  { "title": "Product Name", "type": "string", "x-localized": true },
+        "price": { "title": "Price",        "type": "number" }
+      },
+      "required": ["sku", "name", "price"]
+    }
   }
 ]
 

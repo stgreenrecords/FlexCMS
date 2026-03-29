@@ -15,7 +15,7 @@
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
 | E-01 | ✅ DONE | **Foundation: clean old TUT content + new TUT USA site skeleton + XF paths** | 1d | `flexcms-app` (Flyway), `flexcms-core` | — |
-| E-02 | 🟢 OPEN | **Backend: register all 406 component definitions (Flyway V16)** | 3d | `flexcms-app` (Flyway) | E-01 |
+| E-02 | 🔵 IN PROGRESS | **Backend: register all 406 component definitions (Flyway V16)** | 3d | `flexcms-app` (Flyway) | E-01 |
 | E-06 | 🟢 OPEN | **Frontend renderers: Navigation & Discovery + XF locking (27 components)** | 3d | `apps/site-nextjs`, `apps/admin` | E-01, E-02 |
 
 ### 🟠 P1 — High
