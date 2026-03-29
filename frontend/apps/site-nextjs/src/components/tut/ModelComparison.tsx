@@ -9,7 +9,10 @@ interface PimProduct {
   attributes: Record<string, unknown>;
 }
 
-const PIM_API = process.env.NEXT_PUBLIC_FLEXCMS_API_URL ?? 'http://localhost:8080';
+const PIM_API =
+  process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
+  process.env.NEXT_PUBLIC_FLEXCMS_API ??
+  '';
 
 /** tut/model-comparison — side-by-side comparison of 2–3 PIM products. */
 export function ModelComparison({ data }: { data: Record<string, unknown> }) {

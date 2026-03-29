@@ -4,13 +4,14 @@
 from __future__ import annotations
 
 import sys
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable
 
 import requests
 
-AUTHOR_API = "http://localhost:8080"
+AUTHOR_API = os.environ.get("FLEXCMS_AUTHOR_API", "http://localhost:8080")
 USER_ID = "admin"
 SITE_ID = "tut-usa"
 ROOT_PATH = "tut-usa"

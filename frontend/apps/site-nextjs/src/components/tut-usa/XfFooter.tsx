@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react';
 import { TutUsaFooter } from './navigation/TutUsaFooter';
 
-const CMS_API = process.env.NEXT_PUBLIC_FLEXCMS_API_URL ?? 'http://localhost:8080';
+const CMS_API =
+  process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
+  process.env.NEXT_PUBLIC_FLEXCMS_API ??
+  '';
 
 interface Props {
   /** ltree-style path to the XF content node, e.g. "content/experience-fragments/tut-usa/global/footer" */

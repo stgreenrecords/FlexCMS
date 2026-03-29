@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -13,7 +14,7 @@ from typing import Any
 
 import requests
 
-AUTHOR_API = "http://localhost:8080"
+AUTHOR_API = os.environ.get("FLEXCMS_AUTHOR_API", "http://localhost:8080")
 USER_ID = "admin"
 SITE_ID = "tut-usa"
 MISSING_ASSETS_DIR = Path(__file__).resolve().parent.parent / "Design" / "missing-assets"

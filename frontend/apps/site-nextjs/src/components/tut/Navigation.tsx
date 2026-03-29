@@ -8,7 +8,10 @@ interface NavItem {
   children?: NavItem[];
 }
 
-const CMS_API = process.env.NEXT_PUBLIC_FLEXCMS_API_URL ?? 'http://localhost:8080';
+const CMS_API =
+  process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
+  process.env.NEXT_PUBLIC_FLEXCMS_API ??
+  '';
 
 /** tut/navigation — site header navigation with optional language selector. */
 export function Navigation({ data }: { data: Record<string, unknown> }) {

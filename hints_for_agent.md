@@ -27,6 +27,15 @@
 
 ## Hints
 
+### 2026-03-29 - Route 53 change batches from PowerShell can fail on quoting and UTF-8 BOM
+**Context:** Updating DNS records with `aws route53 change-resource-record-sets` from PowerShell
+**Symptom:** AWS CLI rejects the batch with JSON parse errors like `Invalid JSON` or `Expected: '=', received: 'ď'` even though the payload looks correct
+**What failed:**
+- Passing a large JSON batch inline as a quoted PowerShell string
+- Writing the batch with `Set-Content -Encoding utf8`, which can prepend a BOM that the AWS CLI then rejects
+**Solution:** Write the Route 53 batch to a file using UTF-8 without BOM, for example with `[System.IO.File]::WriteAllText(..., (New-Object System.Text.UTF8Encoding($false)))`, then call `aws route53 change-resource-record-sets --change-batch file://...`
+**Why it works:** It avoids both PowerShell string-escaping issues and the BOM bytes that break AWS CLI parsing for `file://` batch payloads.
+
 ### 2026-03-29 â€” Missing author routes can come from stale Maven module jars
 **Context:** Local `author` or `publish` app starts, but some controller routes behave as if they do not exist even though the source code clearly defines them
 **Symptom:** Requests like `/api/author/content/children` or `/api/author/assets/{id}/content` return `No static resource ...`; OpenAPI output is also missing those routes; `javap` on workspace `target/classes` shows the methods exist, but `javap` on the installed jar in `.m2` shows an older controller without them

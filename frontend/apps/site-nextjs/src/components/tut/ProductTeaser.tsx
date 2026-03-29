@@ -10,7 +10,10 @@ interface PimProduct {
   status: string;
 }
 
-const PIM_API = process.env.NEXT_PUBLIC_FLEXCMS_API_URL ?? 'http://localhost:8080';
+const PIM_API =
+  process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
+  process.env.NEXT_PUBLIC_FLEXCMS_API ??
+  '';
 
 /** tut/product-teaser — fetches a PIM product by SKU and renders a configurable teaser. */
 export function ProductTeaser({ data }: { data: Record<string, unknown> }) {
