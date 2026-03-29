@@ -27,7 +27,7 @@
 | E-05 | ✅ DONE | **Frontend renderers: Media, Visual Storytelling & Assets (33 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-07 | ✅ DONE | **Frontend renderers: CTAs, Promotions & Campaigns (43 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-08 | ✅ DONE | **Frontend renderers: Forms, Data Capture & Consent (42 components)** | 3d | `apps/site-nextjs` | E-02 |
-| E-09 | 🟢 OPEN | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-09 | ✅ DONE | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-10 | 🟢 OPEN | **Frontend renderers: Account, Portal & Transactional (24 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-11 | 🟢 OPEN | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-12 | 🟢 OPEN | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
@@ -455,6 +455,22 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-09 — Frontend Renderers: Commerce, Catalog & Merchandising (31 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 31 components implemented (249–279 inclusive) as named-export `.tsx` files in `tut-usa/commerce/`; zero hardcoded data
+  - [x] AC2 — Product image fields have resolution in JSDoc (ProductCard 600×600, ProductGallery 960×720, RecipeCard 600×400, RecipeDetail heroImage 1200×600)
+  - [x] AC3 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/commerce/` — 31 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 31 registrations under `tut-usa/commerce-catalog-merchandising/<slug>` (CommerceProductSpecs aliased to avoid conflict with tut/ProductSpecs)
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** CommerceProductSpecs aliased because `ProductSpecs` already imported from `tut/`. ReturnsPolicy uses `safeHtml()` for rich-text body field. All cart/checkout components are presentational only — no API calls.
 
 ---
 
