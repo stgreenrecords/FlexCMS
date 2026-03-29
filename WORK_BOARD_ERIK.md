@@ -22,7 +22,7 @@
 
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
-| E-03 | 🔴 BLOCKED | **Frontend renderers: Layout & Page Structure (32 components)** | 3d | `apps/site-nextjs` | E-02 |
+| E-03 | ✅ DONE | **Frontend renderers: Layout & Page Structure (32 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-04 | 🔴 BLOCKED | **Frontend renderers: Editorial & Article Content (68 components)** | 5d | `apps/site-nextjs` | E-02 |
 | E-05 | 🔴 BLOCKED | **Frontend renderers: Media, Visual Storytelling & Assets (33 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-07 | 🔴 BLOCKED | **Frontend renderers: CTAs, Promotions & Campaigns (43 components)** | 3d | `apps/site-nextjs` | E-02 |
@@ -455,6 +455,25 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-03 — Frontend Renderers: Layout & Page Structure (32 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 32 components implemented as named-export `.tsx` files in `tut-usa/layout/`; zero hardcoded data
+  - [x] AC2 — All 32 registered in `component-map.tsx` under `tut-usa/layout-page-structure/<slug>`
+  - [x] AC3 — Zero hardcoded dummy data; all content rendered from `data` prop with typed interfaces
+  - [x] AC4 — Container components (Container, GridLayout, TwoColumnLayout, TwoColumnsGrid, ThreeColumnLayout, CardGrid, ModalDialog, SidePanel, DrawerNavigation) accept and render `children`
+  - [x] AC5 — All image `asset` fields have resolution documented in JSDoc (SidebarPromo: 400×500, MediaObject: 800×600, PageHeader: 1920×600, Badge/FramedMessage icon: 24×24, IconCard icon: 64×64, EmptyState illustration: 400×300)
+  - [x] AC6 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/layout/` — 32 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 32 components registered (Container aliased as LayoutContainer, CardGrid aliased as LayoutCardGrid to avoid conflicts)
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** `Container` and `CardGrid` conflicted with existing names in component-map.tsx — aliased with `LayoutContainer` / `LayoutCardGrid`. `GridLayout` uses `useId()` + scoped `<style>` for responsive column counts. `'use client'` applied to StickyCta, ModalDialog, SidePanel, DrawerNavigation, Tooltip, Popover. `PageMetadata` renders `null` (non-visual).
 
 ---
 
