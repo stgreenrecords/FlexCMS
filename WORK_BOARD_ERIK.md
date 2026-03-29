@@ -29,7 +29,7 @@
 | E-08 | ✅ DONE | **Frontend renderers: Forms, Data Capture & Consent (42 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-09 | ✅ DONE | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-10 | ✅ DONE | **Frontend renderers: Account, Portal & Transactional (24 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-11 | 🟢 OPEN | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-11 | ✅ DONE | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-12 | 🟢 OPEN | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-13 | 🟢 OPEN | **Frontend renderers: Corporate/Investor + Education + Location (48 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-14 | 🟢 OPEN | **Backend + Frontend: 20 Page Templates** | 2d | `flexcms-app` (Flyway), `flexcms-core`, `apps/site-nextjs` | E-02 |
@@ -455,6 +455,22 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-11 — Frontend Renderers: Events, Booking, Travel & Hospitality (24 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 24 components implemented (304–327 inclusive) as named-export `.tsx` files in `tut-usa/events/`; zero hardcoded data
+  - [x] AC2 — Image fields documented (SpeakerProfile photo 400×400, VenueCard 800×400, MenuCard 400×300)
+  - [x] AC3 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/events/` — 24 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 24 registrations under `tut-usa/events-booking-travel-hospitality/<slug>`
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** BookingWidget/AppointmentScheduler are presentational — no live calendar API calls. DeliverySlotSelector uses radio inputs. SeatMap shows a placeholder viewport. All booking/reservation forms have `onSubmit` prevented.
 
 ---
 
