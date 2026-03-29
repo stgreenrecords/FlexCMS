@@ -22,8 +22,8 @@
 |----|--------|-------|--------|-----------------|------------|
 | TA-00 | ✅ DONE | **Foundation & Instrumentation — admin-e2e package, Playwright config, data-testid attributes, fixtures, POMs** | 3d | `apps/admin-e2e` (new), `apps/admin`, `packages/ui` | — |
 | TA-01 | ✅ DONE | **Phase 1 Critical — dashboard, content-tree, page-editor, DAM browser, workflows (UI-001→UI-086)** | 5d | `apps/admin-e2e` | TA-00 |
-| TA-02 | 🔵 IN PROGRESS | **Phase 2 High — sites, PIM catalog, PIM editor, PIM import, PIM schema (UI-052→UI-095)** | 4d | `apps/admin-e2e` | TA-01 |
-| TA-03 | 🔴 BLOCKED | **Phase 3 Medium — preview, experience fragments, translations, error states, accessibility (UI-096→UI-105, A11Y, UIERR)** | 4d | `apps/admin-e2e` | TA-02 |
+| TA-02 | ✅ DONE | **Phase 2 High — sites, PIM catalog, PIM editor, PIM import, PIM schema (UI-052→UI-095)** | 4d | `apps/admin-e2e` | TA-01 |
+| TA-03 | 🟢 OPEN | **Phase 3 Medium — preview, experience fragments, translations, error states, accessibility (UI-096→UI-105, A11Y, UIERR)** | 4d | `apps/admin-e2e` | TA-02 |
 | TA-04 | 🔴 BLOCKED | **Phase 4 Visual Regression + hardening — dark theme, responsive, DnD retries, test tagging** | 2d | `apps/admin-e2e` | TA-03 |
 
 ---
@@ -180,6 +180,31 @@
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### TA-02 — Phase 2 High Priority Tests
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Kyle
+**AC Verification:**
+  - [x] AC1 — All 5 spec files pass: `pnpm exec playwright test tests/phase2-high/ --project=chromium` → 37 passed, 0 failed
+  - [x] AC2 — 0 failing tests, 0 skipped
+  - [x] AC3 — All UI-052 → UI-095 covered (5 spec files × 7–9 tests each)
+**Files Changed:**
+  - `frontend/apps/admin-e2e/tests/phase2-high/sites.spec.ts` — 9 tests (UI-087→UI-095)
+  - `frontend/apps/admin-e2e/tests/phase2-high/pim-catalog.spec.ts` — 4 tests (UI-052→UI-055)
+  - `frontend/apps/admin-e2e/tests/phase2-high/pim-editor.spec.ts` — 6 tests (UI-056→UI-061)
+  - `frontend/apps/admin-e2e/tests/phase2-high/pim-import.spec.ts` — 7 tests (UI-062→UI-068)
+  - `frontend/apps/admin-e2e/tests/phase2-high/pim-schema.spec.ts` — 11 tests (UI-069→UI-079)
+  - `frontend/apps/admin-e2e/src/fixtures/data/pim-schemas.json` — updated to proper ApiSchema format (added `version`, `active`, `attributeGroups` with groups/fields)
+**Build Verified:** Yes — `mvn test` BUILD SUCCESS (41 tests, 0 failures); `pnpm build` 8/8 successful
+**Notes:**
+  - Schema page expects `GET /api/pim/v1/schemas` response as `{ items: [...] }` — each spec wraps the fixture inline.
+  - Import page uses hardcoded `const API_BASE = '/api/pim/v1'` and expects `{ items: [...] }` for catalogs endpoint.
+  - Publish button accessible name includes material-symbols icon text ("publish Publish") — use `locator('button').filter({ hasText: 'Publish' }).last()`.
+  - DnD tests (UI-072–074) tagged `@dnd` — use low-level mouse API from `dnd-helpers.ts`; marked `test.slow()`.
+  - `test.describe.configure()` cannot be called inside a test body — only at describe level.
 
 ---
 

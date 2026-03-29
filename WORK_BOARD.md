@@ -87,7 +87,7 @@ Use one of these formats when requesting new work:
 | `packages/vue` | — | — | — |
 | `packages/ui` | — | — | — |
 | `apps/admin` | — | — | — |
-| `apps/admin-e2e` | TA-02 | Kyle | 2026-03-29 |
+| `apps/admin-e2e` | — | — | — |
 | `apps/site-nextjs` | — | — | — |
 | `apps/site-nuxt` | — | — | — |
 | `apps/build-worker` | — | — | — |
