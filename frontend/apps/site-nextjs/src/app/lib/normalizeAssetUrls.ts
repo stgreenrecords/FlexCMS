@@ -2,38 +2,37 @@ import type { PageResponse } from '@flexcms/sdk';
 
 const AUTHOR_ASSET_PREFIX = '/api/author/assets/';
 
-export function normalizePageAssetUrls(pageData: PageResponse, apiUrl: string): PageResponse {
-  const normalizedApiUrl = apiUrl.replace(/\/$/, '');
-
+export function normalizePageAssetUrls(pageData: PageResponse): PageResponse {
   return {
     page: pageData.page,
-    components: pageData.components.map((component) => normalizeComponent(component, normalizedApiUrl)),
+    components: pageData.components.map((component) => normalizeComponent(component)),
   };
 }
 
-function normalizeComponent(component: PageResponse['components'][number], apiUrl: string): PageResponse['components'][number] {
+function normalizeComponent(component: PageResponse['components'][number]): PageResponse['components'][number] {
   return {
     ...component,
-    data: normalizeValue(component.data, apiUrl) as Record<string, unknown>,
-    children: component.children?.map((child) => normalizeComponent(child, apiUrl)),
+    data: normalizeValue(component.data) as Record<string, unknown>,
+    children: component.children?.map((child) => normalizeComponent(child)),
   };
 }
 
-function normalizeValue(value: unknown, apiUrl: string): unknown {
+function normalizeValue(value: unknown): unknown {
   if (typeof value === 'string') {
     if (value.startsWith(AUTHOR_ASSET_PREFIX)) {
-      return `${apiUrl}${value}`;
+      // Keep DAM asset URLs relative so the current host/proxy can serve them.
+      return value;
     }
     return value;
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => normalizeValue(item, apiUrl));
+    return value.map((item) => normalizeValue(item));
   }
 
   if (value && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).map(([key, nested]) => [key, normalizeValue(nested, apiUrl)]),
+      Object.entries(value).map(([key, nested]) => [key, normalizeValue(nested)]),
     );
   }
 

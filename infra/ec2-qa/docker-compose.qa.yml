@@ -218,7 +218,9 @@ services:
     expose:
       - "3001"
     environment:
-      NEXT_PUBLIC_FLEXCMS_API: http://author:8080
+      FLEXCMS_API_URL: http://author:8080
+      NEXT_PUBLIC_FLEXCMS_API_URL: ""
+      NEXT_PUBLIC_FLEXCMS_API: ""
       NEXT_PUBLIC_FLEXCMS_PUBLISH_URL: http://publish:8081
       PORT: "3001"
     depends_on:

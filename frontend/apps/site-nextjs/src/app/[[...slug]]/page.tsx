@@ -19,7 +19,7 @@ export default async function CmsPage({ params }: { params: { slug?: string[] } 
   const client = new FlexCmsClient({ apiUrl, defaultSite, defaultLocale });
 
   try {
-    const pageData = normalizePageAssetUrls(await client.getPage(path), apiUrl);
+    const pageData = normalizePageAssetUrls(await client.getPage(path));
     return (
       <CmsPageClient
         pageData={pageData}
