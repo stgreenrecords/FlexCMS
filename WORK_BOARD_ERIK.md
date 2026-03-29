@@ -24,7 +24,7 @@
 |----|--------|-------|--------|-----------------|------------|
 | E-03 | ✅ DONE | **Frontend renderers: Layout & Page Structure (32 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-04 | ✅ DONE | **Frontend renderers: Editorial & Article Content (68 components)** | 5d | `apps/site-nextjs` | E-02 |
-| E-05 | 🔴 BLOCKED | **Frontend renderers: Media, Visual Storytelling & Assets (33 components)** | 3d | `apps/site-nextjs` | E-02 |
+| E-05 | ✅ DONE | **Frontend renderers: Media, Visual Storytelling & Assets (33 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-07 | 🔴 BLOCKED | **Frontend renderers: CTAs, Promotions & Campaigns (43 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-08 | 🔴 BLOCKED | **Frontend renderers: Forms, Data Capture & Consent (42 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-09 | 🔴 BLOCKED | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
@@ -455,6 +455,23 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-05 — Frontend Renderers: Media, Visual Storytelling & Assets (33 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 33 components implemented in `tut-usa/media/`; zero hardcoded data
+  - [x] AC2 — Every image/video asset field has resolution JSDoc (carousel 1920×800, before/after 800×500, video poster 1280×720, gallery images 800×600, thumbnails 400×300, logos 120×40, icons 48×48)
+  - [x] AC3 — Gallery/carousel components accept items array — no hardcoded slide count
+  - [x] AC4 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/media/` — 33 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 33 registrations under `tut-usa/media-visual-storytelling-assets/<slug>` (VideoEmbed aliased TutUsaVideoEmbed)
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** `'use client'` on Carousel, ContentSlider, LightboxGallery, BeforeAfterImage, TestimonialSlider. HtmlEmbed uses iframe sandbox for sandboxMode=true. VideoEmbed aliased to avoid conflict with tut/VideoEmbed.
 
 ---
 
