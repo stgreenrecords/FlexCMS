@@ -44,8 +44,8 @@ const registryFixture = {
 
 // ── Fixture: page node — editor fetches from /api/author/content/page ──────
 const pageFixture = {
-  id: 'e1',
-  path: 'content.tut-gb.en.home',
+  id: 'p1',
+  path: 'content.tut-usa.en.home',
   name: 'home',
   resourceType: 'flexcms/page',
   status: 'DRAFT',
@@ -55,7 +55,7 @@ const pageFixture = {
   children: [
     {
       id: 'c1',
-      path: 'content.tut-gb.en.home.hero-1',
+      path: 'content.tut-usa.en.home.hero-1',
       name: 'hero-1',
       resourceType: 'flexcms/hero',
       status: 'DRAFT',
@@ -64,7 +64,7 @@ const pageFixture = {
     },
     {
       id: 'c2',
-      path: 'content.tut-gb.en.home.text-1',
+      path: 'content.tut-usa.en.home.text-1',
       name: 'text-1',
       resourceType: 'flexcms/text-block',
       status: 'DRAFT',
@@ -105,7 +105,7 @@ test.beforeEach(async ({ page }) => {
 test.describe('Page Editor @smoke @regression', () => {
 
   test('UI-021: editor loads with component palette and canvas', async ({ page }) => {
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.locator('header')).toBeVisible();
     await expect(page.locator('aside').first()).toBeVisible();
   });
@@ -114,20 +114,20 @@ test.describe('Page Editor @smoke @regression', () => {
     const registryCall = page.waitForResponse(
       (r) => r.url().includes('/api/content/v1/component-registry'),
     );
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await registryCall;
     // Palette renders component titles from the registry — scope to left panel aside to avoid strict-mode violation
     await expect(page.locator('aside').first().getByText('Hero Banner')).toBeVisible({ timeout: 10_000 });
   });
 
   test('UI-023: canvas renders loaded page components', async ({ page }) => {
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     // The hero component preview shows the title prop value
     await expect(page.getByText('Drive the Future')).toBeVisible({ timeout: 10_000 });
   });
 
   test('UI-024: clicking a canvas component shows property inputs in right panel', async ({ page }) => {
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByText('Drive the Future')).toBeVisible({ timeout: 10_000 });
     await page.getByText('Drive the Future').first().click();
     // Right panel should show text inputs for string properties
@@ -135,7 +135,7 @@ test.describe('Page Editor @smoke @regression', () => {
   });
 
   test('UI-025: enum field in right panel renders as a select element', async ({ page }) => {
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByText('Drive the Future')).toBeVisible({ timeout: 10_000 });
     await page.getByText('Drive the Future').first().click();
     // Variant field has enum values and renders as <select>
@@ -146,7 +146,7 @@ test.describe('Page Editor @smoke @regression', () => {
     const saveCall = page.waitForResponse(
       (r) => r.url().includes('/api/author/content/node/properties') && r.status() === 200,
     );
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     // Wait for components to load (they have nodePath so save will call API)
     await expect(page.getByText('Drive the Future')).toBeVisible({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Save' }).click();
@@ -154,7 +154,7 @@ test.describe('Page Editor @smoke @regression', () => {
   });
 
   test('UI-037: viewport toggle buttons switch between desktop/tablet/mobile', async ({ page }) => {
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByRole('button', { name: 'tablet' })).toBeVisible({ timeout: 10_000 });
     await page.getByRole('button', { name: 'tablet' }).click();
     await expect(page.getByRole('button', { name: 'desktop' })).toBeVisible();
@@ -164,20 +164,20 @@ test.describe('Page Editor @smoke @regression', () => {
     const publishCall = page.waitForResponse(
       (r) => r.url().includes('/api/author/content/node/status') && r.status() === 200,
     );
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByRole('button', { name: 'Publish' })).toBeVisible({ timeout: 10_000 });
     await page.getByRole('button', { name: 'Publish' }).click();
     await publishCall;
   });
 
   test('UI-021b: editor top bar shows Save and Publish buttons', async ({ page }) => {
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByRole('button', { name: 'Save' })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('button', { name: 'Publish' })).toBeVisible();
   });
 
   test('UI-021c: editor shows viewport toggle buttons (desktop/tablet/mobile)', async ({ page }) => {
-    await page.goto('/editor?path=/tut-gb/en/home');
+    await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByRole('button', { name: 'desktop' })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('button', { name: 'tablet' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'mobile' })).toBeVisible();

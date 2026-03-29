@@ -10,8 +10,8 @@
  */
 import type { Page } from '@playwright/test';
 import rootChildren from './data/content-children-root.json';
-import tutGbChildren from './data/content-children-tut-gb.json';
-import tutGbEnChildren from './data/content-children-tut-gb-en.json';
+import tutUsaChildren from './data/content-children-tut-usa.json';
+import tutUsaEnChildren from './data/content-children-tut-usa-en.json';
 import assetsList from './data/assets-list.json';
 import workflowList from './data/workflow-list.json';
 import componentRegistry from './data/component-registry.json';
@@ -37,9 +37,9 @@ export async function setupAllApiMocks(page: Page): Promise<void> {
       const path = searchParams.get('path') ?? 'content';
       let data: unknown[];
       switch (path) {
-        case 'content':           data = rootChildren;      break;
-        case 'content.tut-gb':    data = tutGbChildren;     break;
-        case 'content.tut-gb.en': data = tutGbEnChildren;   break;
+        case 'content':            data = rootChildren;       break;
+        case 'content.tut-usa':    data = tutUsaChildren;    break;
+        case 'content.tut-usa.en': data = tutUsaEnChildren;  break;
         default:                  data = [];
       }
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
@@ -51,7 +51,7 @@ export async function setupAllApiMocks(page: Page): Promise<void> {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          content: tutGbEnChildren,
+          content: tutUsaEnChildren,
           totalElements: 1005,
           totalPages: 51,
           size: 20,

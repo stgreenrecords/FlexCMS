@@ -9,7 +9,7 @@ import { CmsPageClient } from './CmsPageClient';
  * Client component (CmsPageClient): FlexCMS context, component tree rendering
  */
 export default async function CmsPage({ params }: { params: { slug?: string[] } }) {
-  const defaultSite = process.env.FLEXCMS_DEFAULT_SITE ?? 'tut-gb';
+  const defaultSite = process.env.FLEXCMS_DEFAULT_SITE ?? 'tut-usa';
   const defaultLocale = process.env.FLEXCMS_DEFAULT_LOCALE ?? 'en';
   const path = params.slug ? `/${params.slug.join('/')}` : `/${defaultSite}/${defaultLocale}/home`;
 

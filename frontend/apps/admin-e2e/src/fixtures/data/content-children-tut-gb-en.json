@@ -1,10 +1,1 @@
-[
-  { "id": "e1", "path": "content.tut-gb.en.home", "name": "home", "resourceType": "flexcms/page", "parentPath": "content.tut-gb.en", "status": "PUBLISHED", "siteId": "tut-gb", "locale": "en", "modifiedBy": "admin", "modifiedAt": "2026-03-28T10:00:00Z", "children": [] },
-  { "id": "e2", "path": "content.tut-gb.en.models", "name": "models", "resourceType": "flexcms/page", "parentPath": "content.tut-gb.en", "status": "PUBLISHED", "siteId": "tut-gb", "locale": "en", "modifiedBy": "admin", "modifiedAt": "2026-03-28T09:00:00Z", "children": [] },
-  { "id": "e3", "path": "content.tut-gb.en.innovation", "name": "innovation", "resourceType": "flexcms/page", "parentPath": "content.tut-gb.en", "status": "DRAFT", "siteId": "tut-gb", "locale": "en", "modifiedBy": "editor1", "modifiedAt": "2026-03-27T15:00:00Z", "children": [] },
-  { "id": "e4", "path": "content.tut-gb.en.safety", "name": "safety", "resourceType": "flexcms/page", "parentPath": "content.tut-gb.en", "status": "IN_REVIEW", "siteId": "tut-gb", "locale": "en", "modifiedBy": "editor1", "modifiedAt": "2026-03-27T11:00:00Z", "children": [] },
-  { "id": "e5", "path": "content.tut-gb.en.about", "name": "about", "resourceType": "flexcms/page", "parentPath": "content.tut-gb.en", "status": "PUBLISHED", "siteId": "tut-gb", "locale": "en", "modifiedBy": "admin", "modifiedAt": "2026-03-26T10:00:00Z", "children": [] },
-  { "id": "e6", "path": "content.tut-gb.en.contact", "name": "contact", "resourceType": "flexcms/page", "parentPath": "content.tut-gb.en", "status": "ARCHIVED", "siteId": "tut-gb", "locale": "en", "modifiedBy": "admin", "modifiedAt": "2026-03-25T10:00:00Z", "children": [] },
-  { "id": "e7", "path": "content.tut-gb.en.legal", "name": "legal", "resourceType": "flexcms/page", "parentPath": "content.tut-gb.en", "status": "PUBLISHED", "siteId": "tut-gb", "locale": "en", "modifiedBy": "admin", "modifiedAt": "2026-03-24T10:00:00Z", "children": [] }
-]
-
+[]

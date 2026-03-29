@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import rootChildren from './data/content-children-root.json';
-import tutGbChildren from './data/content-children-tut-gb.json';
-import tutGbEnChildren from './data/content-children-tut-gb-en.json';
+import tutUsaChildren from './data/content-children-tut-usa.json';
+import tutUsaEnChildren from './data/content-children-tut-usa-en.json';
 
 /**
  * Registers API route mocks on a Playwright page.
@@ -27,9 +27,9 @@ export async function setupApiMocks(page: Page): Promise<void> {
       const path = searchParams.get('path') ?? 'content';
       let data: unknown[];
       switch (path) {
-        case 'content':           data = rootChildren;      break;
-        case 'content.tut-gb':    data = tutGbChildren;     break;
-        case 'content.tut-gb.en': data = tutGbEnChildren;   break;
+        case 'content':            data = rootChildren;      break;
+        case 'content.tut-usa':    data = tutUsaChildren;   break;
+        case 'content.tut-usa.en': data = tutUsaEnChildren; break;
         default:                  data = [];
       }
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
@@ -41,7 +41,7 @@ export async function setupApiMocks(page: Page): Promise<void> {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          content: tutGbEnChildren,
+          content: tutUsaEnChildren,
           totalElements: 1005,
           totalPages: 51,
           size: 20,
@@ -56,10 +56,7 @@ export async function setupApiMocks(page: Page): Promise<void> {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify([
-          { siteId: 'tut-gb', title: 'TUT Motors UK' },
-          { siteId: 'tut-de', title: 'TUT Motors DE' },
-          { siteId: 'tut-fr', title: 'TUT Motors FR' },
-          { siteId: 'tut-ca', title: 'TUT Motors CA' },
+          { siteId: 'tut-usa', title: 'TUT United States' },
         ]),
       });
     }
@@ -70,10 +67,7 @@ export async function setupApiMocks(page: Page): Promise<void> {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify([
-          { siteId: 'tut-gb', title: 'TUT Motors UK', defaultLocale: 'en', supportedLocales: 'en',    active: true },
-          { siteId: 'tut-de', title: 'TUT Motors DE', defaultLocale: 'de', supportedLocales: 'de',    active: true },
-          { siteId: 'tut-fr', title: 'TUT Motors FR', defaultLocale: 'fr', supportedLocales: 'fr',    active: true },
-          { siteId: 'tut-ca', title: 'TUT Motors CA', defaultLocale: 'en', supportedLocales: 'en,fr', active: true },
+          { siteId: 'tut-usa', title: 'TUT United States', defaultLocale: 'en', supportedLocales: 'en', active: true },
         ]),
       });
     }

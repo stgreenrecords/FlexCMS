@@ -1,39 +1,11 @@
 [
   {
-    "siteId": "tut-gb",
-    "title": "TUT Motors UK",
+    "siteId": "tut-usa",
+    "title": "TUT United States",
     "defaultLocale": "en",
     "supportedLocales": "en",
     "active": true,
     "createdAt": "2026-01-01T00:00:00Z",
     "updatedAt": "2026-03-28T10:00:00Z"
-  },
-  {
-    "siteId": "tut-de",
-    "title": "TUT Motors DE",
-    "defaultLocale": "de",
-    "supportedLocales": "de",
-    "active": true,
-    "createdAt": "2026-01-01T00:00:00Z",
-    "updatedAt": "2026-03-28T10:00:00Z"
-  },
-  {
-    "siteId": "tut-fr",
-    "title": "TUT Motors FR",
-    "defaultLocale": "fr",
-    "supportedLocales": "fr",
-    "active": true,
-    "createdAt": "2026-01-01T00:00:00Z",
-    "updatedAt": "2026-03-28T10:00:00Z"
-  },
-  {
-    "siteId": "tut-ca",
-    "title": "TUT Motors CA",
-    "defaultLocale": "en",
-    "supportedLocales": "en,fr",
-    "active": true,
-    "createdAt": "2026-01-01T00:00:00Z",
-    "updatedAt": "2026-03-27T14:30:00Z"
   }
 ]
-

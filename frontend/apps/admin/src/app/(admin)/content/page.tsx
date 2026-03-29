@@ -14,8 +14,8 @@ interface ContentNode {
   name: string;
   icon: string;
   status: ContentStatus;
-  ltreePath: string;   // e.g. "content.experience-fragments.tut-ca"
-  urlPath: string;     // e.g. "/content/experience-fragments/tut-ca"
+  ltreePath: string;   // e.g. "content.experience-fragments.tut-usa"
+  urlPath: string;     // e.g. "/content/experience-fragments/tut-usa"
   lastModified: string;
   author: { initials: string; name: string; color: string };
 }

@@ -1,70 +1,19 @@
 [
   {
     "id": "27fb0d94-e076-49fa-9551-31f31ef6ca13",
-    "path": "content.tut-gb",
-    "name": "tut-gb",
-    "resourceType": "flexcms/site-root",
-    "parentPath": "content",
-    "orderIndex": 0,
-    "properties": {},
-    "version": 1,
-    "status": "DRAFT",
-    "siteId": "tut-gb",
-    "locale": null,
-    "createdBy": "admin",
-    "modifiedBy": "admin",
-    "modifiedAt": "2026-03-28T10:00:00Z",
-    "children": []
-  },
-  {
-    "id": "0b87c801-523d-4e7f-8e4e-9c2861562d16",
-    "path": "content.tut-de",
-    "name": "tut-de",
-    "resourceType": "flexcms/site-root",
-    "parentPath": "content",
-    "orderIndex": 0,
-    "properties": {},
-    "version": 1,
-    "status": "DRAFT",
-    "siteId": "tut-de",
-    "locale": null,
-    "createdBy": "admin",
-    "modifiedBy": "admin",
-    "modifiedAt": "2026-03-28T10:00:00Z",
-    "children": []
-  },
-  {
-    "id": "aaa11111-1111-1111-1111-111111111111",
-    "path": "content.tut-fr",
-    "name": "tut-fr",
+    "path": "content.tut-usa",
+    "name": "tut-usa",
     "resourceType": "flexcms/site-root",
     "parentPath": "content",
     "orderIndex": 0,
     "properties": {},
     "version": 1,
     "status": "PUBLISHED",
-    "siteId": "tut-fr",
+    "siteId": "tut-usa",
     "locale": null,
     "createdBy": "admin",
     "modifiedBy": "admin",
     "modifiedAt": "2026-03-28T10:00:00Z",
-    "children": []
-  },
-  {
-    "id": "bbb22222-2222-2222-2222-222222222222",
-    "path": "content.tut-ca",
-    "name": "tut-ca",
-    "resourceType": "flexcms/site-root",
-    "parentPath": "content",
-    "orderIndex": 0,
-    "properties": {},
-    "version": 1,
-    "status": "PUBLISHED",
-    "siteId": "tut-ca",
-    "locale": null,
-    "createdBy": "admin",
-    "modifiedBy": "admin",
-    "modifiedAt": "2026-03-27T14:30:00Z",
     "children": []
   },
   {
@@ -73,7 +22,7 @@
     "name": "experience-fragments",
     "resourceType": "flexcms/container",
     "parentPath": "content",
-    "orderIndex": 0,
+    "orderIndex": 1,
     "properties": {},
     "version": 1,
     "status": "PUBLISHED",
@@ -85,4 +34,3 @@
     "children": []
   }
 ]
-

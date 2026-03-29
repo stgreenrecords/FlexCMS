@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function PreviewPage({ params }: { params: { slug?: string[] } }) {
-  const defaultSite = process.env.FLEXCMS_DEFAULT_SITE ?? 'tut-gb';
+  const defaultSite = process.env.FLEXCMS_DEFAULT_SITE ?? 'tut-usa';
   const defaultLocale = process.env.FLEXCMS_DEFAULT_LOCALE ?? 'en';
   const path = params.slug ? `/${params.slug.join('/')}` : `/${defaultSite}/${defaultLocale}/home`;
 

@@ -2,7 +2,7 @@
   {
     "id": "wf-001",
     "workflowName": "Publish Review",
-    "contentPath": "content.tut-gb.en.home",
+    "contentPath": "content.tut-usa.en.home",
     "status": "ACTIVE",
     "startedBy": "editor1",
     "startedAt": "2026-03-28T08:00:00Z",
@@ -12,7 +12,7 @@
   {
     "id": "wf-002",
     "workflowName": "Content Approval",
-    "contentPath": "content.tut-gb.en.models",
+    "contentPath": "content.tut-usa.en.vehicles",
     "status": "ACTIVE",
     "startedBy": "editor2",
     "startedAt": "2026-03-27T14:00:00Z",
@@ -22,7 +22,7 @@
   {
     "id": "wf-003",
     "workflowName": "Publish Review",
-    "contentPath": "content.tut-de.de.home",
+    "contentPath": "content.tut-usa.en.innovation",
     "status": "COMPLETED",
     "startedBy": "editor3",
     "startedAt": "2026-03-26T10:00:00Z",
@@ -30,4 +30,3 @@
     "lastComment": "Approved by senior editor"
   }
 ]
-

@@ -1,16 +1,1 @@
-[
-  {
-    "id": "d1111111-1111-1111-1111-111111111111",
-    "path": "content.tut-gb.en",
-    "name": "en",
-    "resourceType": "flexcms/page",
-    "parentPath": "content.tut-gb",
-    "status": "PUBLISHED",
-    "siteId": "tut-gb",
-    "locale": "en",
-    "modifiedBy": "admin",
-    "modifiedAt": "2026-03-28T10:00:00Z",
-    "children": []
-  }
-]
-
+[]

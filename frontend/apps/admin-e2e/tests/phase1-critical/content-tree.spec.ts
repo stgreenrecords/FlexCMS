@@ -7,8 +7,8 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import rootChildren from '../../src/fixtures/data/content-children-root.json';
-import tutGbChildren from '../../src/fixtures/data/content-children-tut-gb.json';
-import tutGbEnChildren from '../../src/fixtures/data/content-children-tut-gb-en.json';
+import tutUsaChildren from '../../src/fixtures/data/content-children-tut-usa.json';
+import tutUsaEnChildren from '../../src/fixtures/data/content-children-tut-usa-en.json';
 
 // ── API mocks ─────────────────────────────────────────────────────────────
 test.beforeEach(async ({ page }) => {
@@ -20,26 +20,23 @@ test.beforeEach(async ({ page }) => {
     if (pathname.includes('/api/author/content/children')) {
       const path = searchParams.get('path') ?? 'content';
       const data =
-        path === 'content'            ? rootChildren :
-        path === 'content.tut-gb'     ? tutGbChildren :
-        path === 'content.tut-gb.en'  ? tutGbEnChildren :
+        path === 'content'             ? rootChildren :
+        path === 'content.tut-usa'     ? tutUsaChildren :
+        path === 'content.tut-usa.en'  ? tutUsaEnChildren :
         [];
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
     }
     if (pathname.includes('/api/author/content/list')) {
       return route.fulfill({
         status: 200, contentType: 'application/json',
-        body: JSON.stringify({ content: tutGbEnChildren, totalElements: 1005, totalPages: 51, size: 20, number: 0 }),
+        body: JSON.stringify({ content: tutUsaEnChildren, totalElements: 1005, totalPages: 51, size: 20, number: 0 }),
       });
     }
     if (pathname.includes('/api/author/sites')) {
       return route.fulfill({
         status: 200, contentType: 'application/json',
         body: JSON.stringify([
-          { siteId: 'tut-gb', title: 'TUT Motors UK' },
-          { siteId: 'tut-de', title: 'TUT Motors DE' },
-          { siteId: 'tut-fr', title: 'TUT Motors FR' },
-          { siteId: 'tut-ca', title: 'TUT Motors CA' },
+          { siteId: 'tut-usa', title: 'TUT United States' },
         ]),
       });
     }
@@ -64,19 +61,16 @@ test.describe('Content Tree Page @smoke @regression', () => {
     await apiCall;
 
     await expect(page.getByRole('heading', { name: 'Content Tree' })).toBeVisible();
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
-    await expect(rowByName(page, 'tut-de')).toBeVisible();
-    await expect(rowByName(page, 'tut-fr')).toBeVisible();
-    await expect(rowByName(page, 'tut-ca')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
     await expect(rowByName(page, 'experience-fragments')).toBeVisible();
   });
 
   test('UI-008: clicking a folder row loads its children', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
-    const childApiCall = page.waitForResponse((r) => r.url().includes('path=content.tut-gb'));
-    await rowByName(page, 'tut-gb').click();
+    const childApiCall = page.waitForResponse((r) => r.url().includes('path=content.tut-usa'));
+    await rowByName(page, 'tut-usa').click();
     await childApiCall;
 
     await expect(rowByName(page, 'en')).toBeVisible();
@@ -84,14 +78,14 @@ test.describe('Content Tree Page @smoke @regression', () => {
 
   test('UI-009: breadcrumb shows navigation path', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
     const breadcrumb = page.locator('.flex.items-center.gap-1.mb-2');
     await expect(breadcrumb.getByText('Content')).toBeVisible();
 
-    await rowByName(page, 'tut-gb').click();
+    await rowByName(page, 'tut-usa').click();
     await expect(rowByName(page, 'en')).toBeVisible();
-    await expect(breadcrumb.getByText('tut-gb')).toBeVisible();
+    await expect(breadcrumb.getByText('tut-usa')).toBeVisible();
 
     await rowByName(page, 'en').click();
     await expect(rowByName(page, 'home')).toBeVisible();
@@ -100,41 +94,41 @@ test.describe('Content Tree Page @smoke @regression', () => {
 
   test('UI-010: breadcrumb click navigates back to that level', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
-    await rowByName(page, 'tut-gb').click();
+    await rowByName(page, 'tut-usa').click();
     await expect(rowByName(page, 'en')).toBeVisible();
     await rowByName(page, 'en').click();
     await expect(rowByName(page, 'home')).toBeVisible();
 
     await page.locator('.flex.items-center.gap-1.mb-2').getByText('Content').first().click();
 
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
-    await expect(rowByName(page, 'tut-de')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
+    await expect(rowByName(page, 'experience-fragments')).toBeVisible();
   });
 
   test('UI-011: up-one-level button works', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
-    await rowByName(page, 'tut-gb').click();
+    await rowByName(page, 'tut-usa').click();
     await expect(rowByName(page, 'en')).toBeVisible();
 
     await page.getByTitle('Up one level').click();
 
-    await expect(rowByName(page, 'tut-de')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
   });
 
   test('UI-012: status badges show Live, Draft, In Review, Archived', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
-    await rowByName(page, 'tut-gb').click();
+    await rowByName(page, 'tut-usa').click();
     await expect(rowByName(page, 'en')).toBeVisible();
     await rowByName(page, 'en').click();
     await expect(rowByName(page, 'home')).toBeVisible();
 
-    // home=PUBLISHED(Live), innovation=DRAFT, safety=IN_REVIEW, contact=ARCHIVED
+    // home=PUBLISHED(Live), innovation=DRAFT, news=IN_REVIEW, offers=ARCHIVED
     await expect(page.getByText('Live').first()).toBeVisible();
     await expect(page.getByText('Draft').first()).toBeVisible();
     await expect(page.getByText('In Review').first()).toBeVisible();
@@ -143,16 +137,16 @@ test.describe('Content Tree Page @smoke @regression', () => {
 
   test('UI-013: search filters content rows', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
-    await rowByName(page, 'tut-gb').click();
+    await rowByName(page, 'tut-usa').click();
     await expect(rowByName(page, 'en')).toBeVisible();
     await rowByName(page, 'en').click();
     await expect(rowByName(page, 'home')).toBeVisible();
 
-    await page.getByPlaceholder('Filter by name or URL...').fill('model');
+    await page.getByPlaceholder('Filter by name or URL...').fill('vehicle');
 
-    await expect(rowByName(page, 'models')).toBeVisible();
+    await expect(rowByName(page, 'vehicles')).toBeVisible();
     await expect(rowByName(page, 'home')).not.toBeVisible();
   });
 
@@ -179,9 +173,9 @@ test.describe('Content Tree Page @smoke @regression', () => {
 
   test('UI-016: three-dot action menu shows Edit, Preview, Publish', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
-    await rowByName(page, 'tut-gb').click();
+    await rowByName(page, 'tut-usa').click();
     await expect(rowByName(page, 'en')).toBeVisible();
     await rowByName(page, 'en').click();
     await expect(rowByName(page, 'home')).toBeVisible();
@@ -198,33 +192,32 @@ test.describe('Content Tree Page @smoke @regression', () => {
     page.on('request', (req) => { if (req.url().includes('/api/')) apiCalls.push(req.url()); });
 
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
 
     expect(apiCalls.find((u) => u.includes('/api/author/content/children'))).toBeTruthy();
   });
 
   test('UI-022: direct URL with path param loads correct children', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
-    await expect(rowByName(page, 'tut-de')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
+    await expect(rowByName(page, 'experience-fragments')).toBeVisible();
   });
 
   test('UI-007b: item count footer shows correct number', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
     await expect(rowByName(page, 'experience-fragments')).toBeVisible();
 
-    await expect(page.getByText(/Showing.*5.*items/)).toBeVisible();
+    await expect(page.getByText(/Showing.*2.*items/)).toBeVisible();
   });
 
   test('UI-007c: select-all checkbox selects all rows', async ({ page }) => {
     await page.goto('/content');
-    await expect(rowByName(page, 'tut-gb')).toBeVisible();
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
     await expect(rowByName(page, 'experience-fragments')).toBeVisible();
 
     await page.locator('thead input[type="checkbox"]').click();
 
-    await expect(page.getByText('5 selected')).toBeVisible();
+    await expect(page.getByText('2 selected')).toBeVisible();
   });
 });
-

@@ -119,7 +119,7 @@ test.describe('Site Management @smoke @regression', () => {
     await apiRequest;
     await expect(page.getByRole('heading', { name: /site manager/i })).toBeVisible({ timeout: 10_000 });
     // Fixture site IDs appear in the DOM as text
-    await expect(page.getByText('tut-gb')).toBeVisible();
+    await expect(page.getByText('tut-usa')).toBeVisible();
   });
 });
 

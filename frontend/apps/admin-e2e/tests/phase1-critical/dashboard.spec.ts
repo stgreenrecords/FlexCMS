@@ -4,7 +4,7 @@
  * Self-contained: routes set up inline via test.beforeEach.
  */
 import { test, expect } from '@playwright/test';
-import tutGbEnChildren from '../../src/fixtures/data/content-children-tut-gb-en.json';
+import tutUsaEnChildren from '../../src/fixtures/data/content-children-tut-usa-en.json';
 
 test.beforeEach(async ({ page }) => {
   if (process.env['USE_LIVE_API']) return;
@@ -15,17 +15,14 @@ test.beforeEach(async ({ page }) => {
     if (pathname.includes('/api/author/content/list')) {
       return route.fulfill({
         status: 200, contentType: 'application/json',
-        body: JSON.stringify({ content: tutGbEnChildren, totalElements: 1005, totalPages: 51, size: 20, number: 0 }),
+        body: JSON.stringify({ content: tutUsaEnChildren, totalElements: 1005, totalPages: 51, size: 20, number: 0 }),
       });
     }
     if (pathname.includes('/api/author/sites')) {
       return route.fulfill({
         status: 200, contentType: 'application/json',
         body: JSON.stringify([
-          { siteId: 'tut-gb', title: 'TUT Motors UK' },
-          { siteId: 'tut-de', title: 'TUT Motors DE' },
-          { siteId: 'tut-fr', title: 'TUT Motors FR' },
-          { siteId: 'tut-ca', title: 'TUT Motors CA' },
+          { siteId: 'tut-usa', title: 'TUT United States' },
         ]),
       });
     }

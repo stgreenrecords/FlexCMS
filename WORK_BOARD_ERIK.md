@@ -30,8 +30,8 @@
 | E-09 | ✅ DONE | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-10 | ✅ DONE | **Frontend renderers: Account, Portal & Transactional (24 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-11 | ✅ DONE | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-12 | 🟢 OPEN | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-13 | 🟢 OPEN | **Frontend renderers: Corporate/Investor + Education + Location (48 components)** | 3d | `apps/site-nextjs` | E-02 |
+| E-12 | ✅ DONE | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-13 | ✅ DONE | **Frontend renderers: Corporate/Investor + Education + Location (48 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-14 | 🟢 OPEN | **Backend + Frontend: 20 Page Templates** | 2d | `flexcms-app` (Flyway), `flexcms-core`, `apps/site-nextjs` | E-02 |
 | E-15 | 🔴 BLOCKED | **Content tree: 61 pages with contextual dummy data + missing assets log** | 3d | `scripts`, `flexcms-app` | E-01, E-06, E-14 |
 
@@ -455,6 +455,40 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-13 — Frontend Renderers: Corporate/Investor + Education + Location (48 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 48 components implemented; zero hardcoded data. Corporate/Governance: 21 (359–379), Location: 13 (380–392), Education: 14 (393–406)
+  - [x] AC2 — Map/location components accept coordinates and labels from `data` prop; locator components are fully presentational — no hardcoded locations
+  - [x] AC3 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/corporate/` — 21 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/tut-usa/location/` — 13 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/tut-usa/education/` — 14 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 48 registrations under 4 group slugs
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** `JobListings` uses `'use client'` for search/filter state. Support components (RoadmapSection, EscalationMatrix) in corporate folder. Rich text fields guarded with `safeHtml()`.
+
+---
+
+### E-12 — Frontend Renderers: Community, Social Proof & Engagement (30 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 30 components implemented (328–357) as named-export `.tsx` files in `tut-usa/community/`; zero hardcoded data
+  - [x] AC2 — Avatar/profile image fields documented (ContactCard photo 80×80, TeamMemberProfile photo in JSDoc, AuthorBio avatar, MentorProfile photo, CommunitySpotlight image)
+  - [x] AC3 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/community/` — 30 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 30 registrations under `tut-usa/community-social-proof-engagement/<slug>`
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** `CommunityTestimonial` aliased (conflicts with `tut/Testimonial`). `ChatWidget` and `VirtualAssistant` are presentational — no live WebSocket/API connections. Social feed components (SocialFeed, InstagramGallery, LinkedInFeed, XFeed) accept items array — no live API calls.
 
 ---
 
