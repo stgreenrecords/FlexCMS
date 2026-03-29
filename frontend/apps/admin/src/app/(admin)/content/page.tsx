@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Button } from '@flexcms/ui';
 
 // ---------------------------------------------------------------------------
@@ -30,6 +30,7 @@ interface ApiContentNode {
   id: string;
   name: string;
   path: string;
+  parentPath?: string;
   resourceType: string;
   status: string;
   modifiedAt?: string;
@@ -95,6 +96,7 @@ export default function ContentTreePage() {
   const [loading, setLoading]         = useState(true);
   const [viewMode, setViewMode]       = useState<'list' | 'tree'>('list');
   const [stats, setStats]             = useState<{ totalPages: number; siteCount: number } | null>(null);
+  const allNodesCacheRef = useRef<{ nodes: ApiContentNode[]; totalElements: number } | null>(null);
 
   // Folder navigation state
   const [currentPath, setCurrentPath] = useState<string>('content');
@@ -102,30 +104,96 @@ export default function ContentTreePage() {
     { name: 'Content', path: 'content' },
   ]);
 
+  async function fetchAllNodes(): Promise<{ nodes: ApiContentNode[]; totalElements: number }> {
+    if (allNodesCacheRef.current) {
+      return allNodesCacheRef.current;
+    }
+
+    const pageSize = 200;
+    let page = 0;
+    let totalPages = 1;
+    let totalElements = 0;
+    const nodes: ApiContentNode[] = [];
+
+    while (page < totalPages) {
+      const response = await fetch(`${API_BASE}/api/author/content/list?page=${page}&size=${pageSize}`);
+      if (!response.ok) {
+        throw new Error(`Failed to load content list: ${response.status}`);
+      }
+
+      const data = await response.json() as {
+        content?: ApiContentNode[];
+        totalElements?: number;
+        totalPages?: number;
+      };
+
+      nodes.push(...(Array.isArray(data.content) ? data.content : []));
+      totalElements = data.totalElements ?? nodes.length;
+      totalPages = data.totalPages ?? 1;
+      page += 1;
+    }
+
+    const payload = { nodes, totalElements };
+    allNodesCacheRef.current = payload;
+    return payload;
+  }
+
   // Fetch aggregate stats once on mount
   useEffect(() => {
-    Promise.all([
-      fetch(`${API_BASE}/api/author/content/list?size=1`).then((r) => r.ok ? r.json() : null),
-      fetch(`${API_BASE}/api/author/sites`).then((r) => r.ok ? r.json() : null),
-    ]).then(([listResp, sitesResp]) => {
-      const totalPages = listResp?.totalElements ?? 0;
-      const siteCount  = Array.isArray(sitesResp) ? sitesResp.length : 0;
-      setStats({ totalPages, siteCount });
-    }).catch(() => { /* stats are non-critical */ });
+    fetchAllNodes()
+      .then(({ nodes, totalElements }) => {
+        const siteCount = nodes.filter(
+          (node) => node.parentPath === 'content' && node.resourceType === 'flexcms/site-root',
+        ).length;
+        setStats({ totalPages: totalElements, siteCount });
+      })
+      .catch(() => { /* stats are non-critical */ });
   }, []);
 
   // Fetch direct children whenever currentPath changes
   useEffect(() => {
+    let cancelled = false;
+
     setLoading(true);
     setSelected(new Set());
     setActionMenuId(null);
-    fetch(`${API_BASE}/api/author/content/children?path=${encodeURIComponent(currentPath)}`)
-      .then((r) => r.ok ? r.json() : Promise.reject(r.status))
-      .then((data: ApiContentNode[]) => {
-        setNodes(Array.isArray(data) ? data.map(apiToUiNode) : []);
-      })
-      .catch(() => setNodes([]))
-      .finally(() => setLoading(false));
+
+    async function loadNodes() {
+      try {
+        const response = await fetch(`${API_BASE}/api/author/content/children?path=${encodeURIComponent(currentPath)}`);
+        if (response.ok) {
+          const data = await response.json() as ApiContentNode[];
+          if (!cancelled) {
+            setNodes(Array.isArray(data) ? data.map(apiToUiNode) : []);
+          }
+          return;
+        }
+
+        throw new Error(`children endpoint failed: ${response.status}`);
+      } catch {
+        try {
+          const { nodes: allNodes } = await fetchAllNodes();
+          const filtered = allNodes.filter((node) => node.parentPath === currentPath);
+          if (!cancelled) {
+            setNodes(filtered.map(apiToUiNode));
+          }
+        } catch {
+          if (!cancelled) {
+            setNodes([]);
+          }
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadNodes();
+
+    return () => {
+      cancelled = true;
+    };
   }, [currentPath]);
 
   // Navigate into a folder

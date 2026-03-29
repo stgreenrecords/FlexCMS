@@ -162,7 +162,7 @@ start_backend_service() {
   banner "$label  :$port"
   (
     cd "$FLEXCMS_DIR"
-    mvn spring-boot:run -pl flexcms-app -Dspring-boot.run.profiles="$profile" \
+    mvn spring-boot:run -pl flexcms-app -am -Dspring-boot.run.profiles="$profile" \
       > "$log_file" 2>&1
   ) &
   local pid=$!
@@ -456,4 +456,3 @@ case "${1:-help}" in
   reset)  cmd_reset ;;
   *)      cmd_help ;;
 esac
-

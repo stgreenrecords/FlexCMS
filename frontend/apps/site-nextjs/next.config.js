@@ -2,6 +2,10 @@
 const nextConfig = {
   // Transpile @flexcms/* packages so Next.js processes their JSX
   transpilePackages: ['@flexcms/sdk', '@flexcms/react'],
+  experimental: {
+    workerThreads: true,
+    webpackBuildWorker: false,
+  },
   // Standalone output for Docker (produces self-contained server.js)
   // Disabled on Windows local dev because symlink creation requires elevated permissions.
   ...(process.env.STANDALONE === '1' ? { output: 'standalone' } : {}),

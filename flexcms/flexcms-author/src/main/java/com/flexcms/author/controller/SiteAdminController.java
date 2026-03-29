@@ -47,8 +47,8 @@ public class SiteAdminController {
     @Operation(summary = "List sites", description = "Returns all registered sites.")
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
-    public ResponseEntity<List<Site>> listSites() {
-        return ResponseEntity.ok(siteService.listSites());
+    public ResponseEntity<List<SiteManagementService.AdminSiteSummary>> listSites() {
+        return ResponseEntity.ok(siteService.listSiteSummaries());
     }
 
     @Operation(summary = "Get site summary", description = "Returns a summary for a specific site including page count and locale info.")

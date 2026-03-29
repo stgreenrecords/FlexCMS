@@ -1,5 +1,6 @@
 import { FlexCmsClient } from '@flexcms/sdk';
 import { CmsPageClient } from '../../[[...slug]]/CmsPageClient';
+import { normalizePageAssetUrls } from '../../lib/normalizeAssetUrls';
 
 /**
  * Draft preview route — /preview/...
@@ -22,7 +23,7 @@ export default async function PreviewPage({ params }: { params: { slug?: string[
   const client = new FlexCmsClient({ apiUrl, defaultSite, defaultLocale });
 
   try {
-    const pageData = await client.getPage(path);
+    const pageData = normalizePageAssetUrls(await client.getPage(path), apiUrl);
     return (
       <CmsPageClient
         pageData={pageData}

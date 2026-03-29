@@ -27,6 +27,26 @@
 
 ## Hints
 
+### 2026-03-29 â€” Missing author routes can come from stale Maven module jars
+**Context:** Local `author` or `publish` app starts, but some controller routes behave as if they do not exist even though the source code clearly defines them
+**Symptom:** Requests like `/api/author/content/children` or `/api/author/assets/{id}/content` return `No static resource ...`; OpenAPI output is also missing those routes; `javap` on workspace `target/classes` shows the methods exist, but `javap` on the installed jar in `.m2` shows an older controller without them
+**What failed:**
+- Restarting the backend repeatedly
+- Assuming `mvn spring-boot:run -pl flexcms-app` would automatically use freshly compiled dependent modules
+- Debugging the controller source as if the running process had already loaded it
+**Solution:** Start Spring Boot with reactor modules included: `mvn spring-boot:run -pl flexcms-app -am ...` or otherwise install/rebuild dependent modules before running. Update local helper scripts to include `-am`.
+**Why it works:** Without `-am`, `flexcms-app` can resolve internal module dependencies from stale artifacts in the local Maven repository instead of the current workspace module outputs. The app then runs old controller code even when the source tree is newer.
+
+### 2026-03-29 â€” Do not loop on killing and restarting local servers
+**Context:** Debugging local `author`/`publish`/Next.js issues where content or assets do not appear
+**Symptom:** Agent repeatedly asks for approval to stop processes or rerun servers, but the same endpoint failures continue after restart
+**What failed:**
+- Repeatedly requesting approval to kill the same process and restart it
+- Treating a successful restart as evidence that the root cause was fixed
+- Asking for more process-control approvals before proving whether the failure is runtime config, stale build output, or actual code behavior
+**Solution:** Before asking to kill or restart anything again, first verify whether restart already changed the failing behavior. Check the exact endpoint responses, inspect current logs, and confirm whether the problem persists unchanged. Only request another process stop/restart when there is a specific new reason it will help, and state that reason clearly.
+**Why it works:** Restarting is only useful when it changes the runtime state. If the same endpoints fail in the same way after restart, more restart requests only create approval churn and waste time without moving the fix forward.
+
 ### 2026-03-29 — Playwright tests fail with 404 on JS chunks in dev server
 **Context:** Running `pnpm exec playwright test` against the admin app
 **Symptom:** React app fails to hydrate; browser console shows 404 errors for `.js` chunks; tests time out waiting for elements that never appear

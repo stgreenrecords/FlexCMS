@@ -27,6 +27,7 @@ import { CSS } from '@dnd-kit/utilities';
 // ---------------------------------------------------------------------------
 
 import { getApiBase } from '@/lib/apiBase';
+import { normalizeAssetUrl } from '@/lib/normalizeAssetUrls';
 const API_BASE = getApiBase();
 
 // ---------------------------------------------------------------------------
@@ -64,6 +65,23 @@ interface PageComponent {
   nodePath?: string;    // ltree path (set when loaded from API)
   label: string;
   props: Record<string, unknown>;
+  isLocked?: boolean;
+  lockReason?: string;
+}
+
+interface TemplateComponentRef {
+  title?: string;
+  resourceType?: string;
+}
+
+interface PageTemplateDefinition {
+  name: string;
+  title?: string;
+  description?: string;
+  embeddedComponents?: TemplateComponentRef[];
+  allowedComponents?: TemplateComponentRef[];
+  embeddedComponentTypes?: string[];
+  allowedComponentTypes?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -173,6 +191,59 @@ function registryToPalette(defs: ComponentDefinition[]): PaletteItem[] {
   });
 }
 
+const XF_LOCKED_COMPONENT_TYPES = new Set([
+  'tut-usa/navigation-search-discovery/navigation',
+  'tut-usa/navigation-search-discovery/footer',
+]);
+
+function buildEmbeddedTemplateComponents(
+  template: PageTemplateDefinition | null,
+  defs: ComponentDefinition[],
+  pageComponents: PageComponent[],
+): PageComponent[] {
+  if (!template) {
+    return pageComponents;
+  }
+
+  const embeddedRefs = (template.embeddedComponents ?? []).filter(
+    (ref) => ref.resourceType && !XF_LOCKED_COMPONENT_TYPES.has(ref.resourceType),
+  );
+
+  if (embeddedRefs.length === 0) {
+    return pageComponents;
+  }
+
+  const remaining = [...pageComponents];
+  const merged: PageComponent[] = [];
+
+  for (const ref of embeddedRefs) {
+    const index = remaining.findIndex((component) => component.resourceType === ref.resourceType);
+    const definition = defs.find((item) => item.resourceType === ref.resourceType);
+
+    if (index >= 0) {
+      const existing = remaining.splice(index, 1)[0];
+      merged.push({
+        ...existing,
+        isLocked: true,
+        lockReason: `Embedded by template ${template.title ?? template.name}`,
+      });
+      continue;
+    }
+
+    instanceCounter++;
+    merged.push({
+      instanceId: `tpl-${instanceCounter}`,
+      resourceType: ref.resourceType!,
+      label: ref.title ?? definition?.title ?? definition?.name ?? 'Template Component',
+      props: {},
+      isLocked: true,
+      lockReason: `Embedded by template ${template.title ?? template.name}`,
+    });
+  }
+
+  return [...merged, ...remaining];
+}
+
 // ---------------------------------------------------------------------------
 // Page component (entry point with Suspense boundary)
 // ---------------------------------------------------------------------------
@@ -205,6 +276,7 @@ function EditorInner() {
   const [registry, setRegistry] = useState<ComponentDefinition[]>([]);
   const [palette, setPalette] = useState<PaletteItem[]>([]);
   const [components, setComponents] = useState<PageComponent[]>([]);
+  const [pageTemplate, setPageTemplate] = useState<PageTemplateDefinition | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [leftTab, setLeftTab] = useState<'components' | 'layers' | 'assets'>('components');
   const [savedAt, setSavedAt] = useState<string>('—');
@@ -237,20 +309,43 @@ function EditorInner() {
       ? fetch(pageUrl).then((r) => (r.ok ? r.json() : Promise.reject(`Page ${r.status}`))).catch(() => null)
       : Promise.resolve(null);
 
-    Promise.all([fetchRegistry, fetchPage]).then(([reg, page]) => {
+    Promise.all([fetchRegistry, fetchPage]).then(async ([reg, page]) => {
       const defs: ComponentDefinition[] = reg.components ?? [];
       setRegistry(defs);
-      setPalette(registryToPalette(defs));
 
+      let template: PageTemplateDefinition | null = null;
       if (page) {
         const pageNode = page as ApiContentNode;
+        const templateName = typeof pageNode.properties?.['template'] === 'string'
+          ? String(pageNode.properties?.['template'])
+          : '';
+
+        if (templateName) {
+          const templateResponse = await fetch(`${API_BASE}/api/author/content/templates/${encodeURIComponent(templateName)}`);
+          if (templateResponse.ok) {
+            template = await templateResponse.json() as PageTemplateDefinition;
+          }
+        }
+
+        setPageTemplate(template);
         setIsDraft(pageNode.status !== 'PUBLISHED');
+
         const pageComps = (pageNode.children ?? []).map((child: ApiContentNode) =>
           nodeToPageComponent(child, defs),
         );
-        setComponents(pageComps);
-        if (pageComps.length > 0) setSelectedId(pageComps[0].instanceId);
+        const mergedComponents = buildEmbeddedTemplateComponents(template, defs, pageComps);
+        setComponents(mergedComponents);
+        setPalette(
+          template?.allowedComponentTypes?.length
+            ? registryToPalette(defs).filter((item) => template?.allowedComponentTypes?.includes(item.resourceType))
+            : registryToPalette(defs),
+        );
+        if (mergedComponents.length > 0) setSelectedId(mergedComponents[0].instanceId);
+      } else {
+        setPageTemplate(null);
+        setPalette(registryToPalette(defs));
       }
+
       setIsLoading(false);
     }).catch((err) => {
       setLoadError(String(err));
@@ -296,7 +391,8 @@ function EditorInner() {
       props: { ...item.defaultProps },
     };
     setComponents((prev) => {
-      const clamped = Math.max(0, Math.min(idx, prev.length));
+      const requestedIdx = Math.max(0, Math.min(idx, prev.length));
+      const clamped = prev[requestedIdx]?.isLocked ? prev.length : requestedIdx;
       return [...prev.slice(0, clamped), newComp, ...prev.slice(clamped)];
     });
     setSelectedId(newComp.instanceId);
@@ -313,7 +409,7 @@ function EditorInner() {
       if (item) setActiveDrag({ type: 'palette', item });
     } else {
       const comp = components.find((c) => c.instanceId === id);
-      if (comp) setActiveDrag({ type: 'canvas', component: comp });
+      if (comp && !comp.isLocked) setActiveDrag({ type: 'canvas', component: comp });
     }
     setInsertPreviewIdx(null);
   }
@@ -324,6 +420,10 @@ function EditorInner() {
     const overId = String(over.id);
     // over a canvas item → preview insert before it
     const idx = components.findIndex((c) => c.instanceId === overId);
+    if (idx >= 0 && components[idx]?.isLocked) {
+      setInsertPreviewIdx(null);
+      return;
+    }
     setInsertPreviewIdx(idx >= 0 ? idx : components.length);
   }
 
@@ -345,6 +445,9 @@ function EditorInner() {
           setComponents((prev) => {
             const oldIdx = prev.findIndex((c) => c.instanceId === activeId);
             const newIdx = prev.findIndex((c) => c.instanceId === String(over.id));
+            if (oldIdx < 0 || newIdx < 0 || prev[oldIdx]?.isLocked || prev[newIdx]?.isLocked) {
+              return prev;
+            }
             return arrayMove(prev, oldIdx, newIdx);
           });
         }
@@ -356,13 +459,14 @@ function EditorInner() {
   }
 
   function deleteComponent(instanceId: string) {
+    if (components.find((c) => c.instanceId === instanceId)?.isLocked) return;
     setComponents((prev) => prev.filter((c) => c.instanceId !== instanceId));
     if (selectedId === instanceId) setSelectedId(null);
   }
 
   function duplicateComponent(instanceId: string) {
     const src = components.find((c) => c.instanceId === instanceId);
-    if (!src) return;
+    if (!src || src.isLocked) return;
     instanceCounter++;
     const dup: PageComponent = {
       ...src,
@@ -425,7 +529,7 @@ function EditorInner() {
   }
 
   function resetToDefaults() {
-    if (!selectedComponent) return;
+    if (!selectedComponent || selectedComponent.isLocked) return;
     const item = palette.find((p) => p.resourceType === selectedComponent.resourceType);
     if (!item) return;
     setComponents((prev) =>
@@ -512,6 +616,11 @@ function EditorInner() {
             <span className="text-[0.65rem] font-mono mt-0.5" style={{ color: '#8d90a0' }}>
               {contentPath}
             </span>
+            {pageTemplate && (
+              <span className="text-[0.6rem] uppercase tracking-[0.2em] mt-1" style={{ color: '#c9a84c' }}>
+                {pageTemplate.title ?? pageTemplate.name}
+              </span>
+            )}
           </div>
         )}
 
@@ -574,6 +683,20 @@ function EditorInner() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-6">
+            {pageTemplate && (
+              <div
+                className="px-3 py-3 rounded-lg"
+                style={{ background: 'rgba(48,40,20,0.45)', border: '1px solid rgba(180,140,50,0.25)' }}
+              >
+                <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: '#c9a84c' }}>
+                  Template Rules
+                </p>
+                <p className="text-xs leading-relaxed" style={{ color: '#d7d1bf' }}>
+                  {pageTemplate.title ?? pageTemplate.name} limits this palette to approved optional components and locks embedded structure on the canvas.
+                </p>
+              </div>
+            )}
+
             {/* Tab switcher */}
             <div className="flex flex-col gap-1">
               {([
@@ -599,7 +722,11 @@ function EditorInner() {
             {leftTab === 'components' && (
               <>
                 {palette.length === 0 ? (
-                  <p className="text-xs px-3" style={{ color: '#8d90a0' }}>No components registered.</p>
+                  <p className="text-xs px-3" style={{ color: '#8d90a0' }}>
+                    {pageTemplate
+                      ? 'This template has no optional components available in the palette.'
+                      : 'No components registered.'}
+                  </p>
                 ) : (
                   Object.entries(paletteGroups).map(([group, items]) => (
                     <div key={group}>
@@ -637,6 +764,11 @@ function EditorInner() {
                     <span style={{ color: '#8d90a0', fontSize: 11 }}>{idx + 1}</span>
                     <span className="shrink-0"><BlockIcon /></span>
                     <span className="truncate">{c.label}</span>
+                    {c.isLocked && (
+                      <span className="ml-auto text-[9px] uppercase tracking-widest" style={{ color: '#c9a84c' }}>
+                        Locked
+                      </span>
+                    )}
                   </button>
                 ))}
                 {components.length === 0 && (
@@ -709,11 +841,11 @@ function EditorInner() {
                       onDelete={() => deleteComponent(comp.instanceId)}
                       onDuplicate={() => duplicateComponent(comp.instanceId)}
                       onMoveUp={() => {
-                        if (idx === 0) return;
+                        if (idx === 0 || comp.isLocked || components[idx - 1]?.isLocked) return;
                         setComponents((prev) => arrayMove(prev, idx, idx - 1));
                       }}
                       onMoveDown={() => {
-                        if (idx === components.length - 1) return;
+                        if (idx === components.length - 1 || comp.isLocked || components[idx + 1]?.isLocked) return;
                         setComponents((prev) => arrayMove(prev, idx, idx + 1));
                       }}
                     />
@@ -795,12 +927,21 @@ function EditorInner() {
                 ? `${selectedComponent.label} (${selectedComponent.resourceType})`
                 : 'Select a component to edit'}
             </p>
+            {selectedComponent?.isLocked && (
+              <p className="text-[11px] mt-2" style={{ color: '#c9a84c' }}>
+                {selectedComponent.lockReason ?? 'This component is locked by the assigned page template.'}
+              </p>
+            )}
           </div>
 
           {selectedComponent ? (
             <>
               <div className="flex-1 overflow-y-auto p-5 space-y-6">
-                {selectedSchema.length === 0 ? (
+                {selectedComponent.isLocked ? (
+                  <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
+                    Template-embedded components are read-only here. Adjust the template definition instead of editing this page instance.
+                  </p>
+                ) : selectedSchema.length === 0 ? (
                   <p className="text-xs" style={{ color: '#8d90a0' }}>
                     No editable properties for this component.
                   </p>
@@ -819,8 +960,9 @@ function EditorInner() {
               <div className="p-4" style={{ borderTop: '1px solid rgba(66,70,84,0.1)' }}>
                 <button
                   onClick={resetToDefaults}
+                  disabled={selectedComponent.isLocked}
                   className="w-full py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all"
-                  style={{ background: '#2a2a2a', color: '#8d90a0' }}
+                  style={{ background: '#2a2a2a', color: '#8d90a0', opacity: selectedComponent.isLocked ? 0.45 : 1 }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(176,198,255,0.1)'; (e.currentTarget as HTMLButtonElement).style.color = '#b0c6ff'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; (e.currentTarget as HTMLButtonElement).style.color = '#8d90a0'; }}
                 >
@@ -1002,7 +1144,7 @@ function SortableCanvasItem({
     transform,
     transition,
     isDragging: isSortableDragging,
-  } = useSortable({ id: component.instanceId });
+  } = useSortable({ id: component.instanceId, disabled: component.isLocked });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -1020,7 +1162,7 @@ function SortableCanvasItem({
         onDuplicate={onDuplicate}
         onMoveUp={onMoveUp}
         onMoveDown={onMoveDown}
-        dragHandleProps={{ ...attributes, ...listeners }}
+        dragHandleProps={component.isLocked ? undefined : { ...attributes, ...listeners }}
       />
     </div>
   );
@@ -1054,37 +1196,57 @@ function CanvasComponent({
       onClick={onClick}
       className="relative group cursor-pointer transition-all"
       style={{
-        border: isSelected ? '2px solid #b0c6ff' : '2px solid transparent',
-        outline: isSelected ? '4px solid rgba(176,198,255,0.08)' : 'none',
+        border: isSelected
+          ? component.isLocked ? '2px solid #c9a84c' : '2px solid #b0c6ff'
+          : '2px solid transparent',
+        outline: isSelected
+          ? component.isLocked ? '4px solid rgba(201,168,76,0.14)' : '4px solid rgba(176,198,255,0.08)'
+          : 'none',
       }}
     >
       {isSelected && (
         <div
           className="absolute flex items-center gap-3 px-3 py-1 rounded-t-lg text-[11px] font-bold"
-          style={{ top: -36, left: -2, background: '#b0c6ff', color: '#002d6f', zIndex: 10 }}
+          style={{
+            top: -36,
+            left: -2,
+            background: component.isLocked ? '#c9a84c' : '#b0c6ff',
+            color: component.isLocked ? '#2e2300' : '#002d6f',
+            zIndex: 10,
+          }}
         >
           {/* Drag handle — activates dnd-kit sortable */}
-          <span
-            {...(dragHandleProps as React.HTMLAttributes<HTMLSpanElement>)}
-            title="Drag to reorder"
-            style={{ cursor: 'grab', display: 'flex', alignItems: 'center', color: '#002d6f' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <DragHandleIcon />
-          </span>
+          {component.isLocked ? (
+            <span title="Locked by template" style={{ display: 'flex', alignItems: 'center' }}>
+              <LockIcon />
+            </span>
+          ) : (
+            <span
+              {...(dragHandleProps as React.HTMLAttributes<HTMLSpanElement>)}
+              title="Drag to reorder"
+              style={{ cursor: 'grab', display: 'flex', alignItems: 'center', color: '#002d6f' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DragHandleIcon />
+            </span>
+          )}
           <span>{component.label}</span>
           <div className="flex gap-2">
-            <button title="Move up"   onClick={(e) => { e.stopPropagation(); onMoveUp(); }}   style={{ color: '#002d6f' }}><ArrowUpIcon /></button>
-            <button title="Move down" onClick={(e) => { e.stopPropagation(); onMoveDown(); }} style={{ color: '#002d6f' }}><ArrowDownIcon /></button>
-            <button title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(); }} style={{ color: '#002d6f' }}><CopyIcon /></button>
-            <button title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(); }}    style={{ color: '#002d6f' }}><TrashIcon /></button>
+            {!component.isLocked && (
+              <>
+                <button title="Move up"   onClick={(e) => { e.stopPropagation(); onMoveUp(); }}   style={{ color: '#002d6f' }}><ArrowUpIcon /></button>
+                <button title="Move down" onClick={(e) => { e.stopPropagation(); onMoveDown(); }} style={{ color: '#002d6f' }}><ArrowDownIcon /></button>
+                <button title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(); }} style={{ color: '#002d6f' }}><CopyIcon /></button>
+                <button title="Delete"    onClick={(e) => { e.stopPropagation(); onDelete(); }}    style={{ color: '#002d6f' }}><TrashIcon /></button>
+              </>
+            )}
           </div>
         </div>
       )}
       {!isSelected && (
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-          style={{ border: '1px solid rgba(176,198,255,0.3)' }}
+          style={{ border: component.isLocked ? '1px solid rgba(201,168,76,0.45)' : '1px solid rgba(176,198,255,0.3)' }}
         />
       )}
       <ComponentPreview component={component} />
@@ -1149,7 +1311,8 @@ function ComponentPreview({ component }: { component: PageComponent }) {
 
   // Image types
   if (type.includes('image') || type.includes('photo') || type.includes('media')) {
-    const src = String(props['src'] ?? props['imagePath'] ?? props['imageUrl'] ?? '');
+    const rawSrc = String(props['src'] ?? props['imagePath'] ?? props['imageUrl'] ?? '');
+    const src = rawSrc ? normalizeAssetUrl(rawSrc, API_BASE) : '';
     const alt = String(props['alt'] ?? props['altText'] ?? '');
     return (
       <div className="flex items-center justify-center" style={{ height: 200, background: '#2a2a2a', color: '#8d90a0' }}>
@@ -1378,4 +1541,5 @@ function TrashIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fi
 function ArrowUpIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>; }
 function ArrowDownIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>; }
 function BlockIcon() { return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>; }
+function LockIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>; }
 function DragHandleIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="7" r="1.5"/><circle cx="15" cy="7" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="17" r="1.5"/><circle cx="15" cy="17" r="1.5"/></svg>; }

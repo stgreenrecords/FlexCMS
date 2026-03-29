@@ -32,8 +32,8 @@
 | E-11 | ✅ DONE | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-12 | ✅ DONE | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-13 | ✅ DONE | **Frontend renderers: Corporate/Investor + Education + Location (48 components)** | 3d | `apps/site-nextjs` | E-02 |
-| E-14 | 🟢 OPEN | **Backend + Frontend: 20 Page Templates** | 2d | `flexcms-app` (Flyway), `flexcms-core`, `apps/site-nextjs` | E-02 |
-| E-15 | 🔴 BLOCKED | **Content tree: 61 pages with contextual dummy data + missing assets log** | 3d | `scripts`, `flexcms-app` | E-01, E-06, E-14 |
+| E-14 | ✅ DONE | **Backend + Frontend: 20 Page Templates** | 2d | `flexcms-app` (Flyway), `flexcms-core`, `apps/site-nextjs` | E-02 |
+| E-15 | ✅ DONE | **Content tree: 61 pages with contextual dummy data + missing assets log** | 3d | `scripts`, `flexcms-app` | — |
 
 ---
 
@@ -455,6 +455,48 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-15 — Content Tree: 61 Pages with Contextual Dummy Data + Missing Assets Log
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — `python scripts/seed_tut_usa_website.py` completed successfully and seeded the full TUT USA page set
+  - [x] AC2 — the seeder publishes every seeded path through `/api/author/content/node/status`
+  - [x] AC3 — seeded page APIs return contextual automotive content for real TUT models, owners, offers, and innovation topics; no lorem ipsum used
+  - [x] AC4 — `GET /api/content/v1/pages/content/tut-usa/home` returned a populated component tree after seeding
+  - [x] AC5 — `Design/sample-website-tut/missing-assets.txt` populated with 152 detailed entries
+  - [x] AC6 — navigation/footer XF nodes exist and were verified at `experience-fragments/tut-usa/global/navigation/master/navigation` and `experience-fragments/tut-usa/global/footer/master/footer`
+  - [x] AC7 — `mvn test` passed; `pnpm build` passed
+**Files Changed:**
+  - `scripts/seed_tut_usa_website.py` — re-runnable Author API seeder; updated to seed in place without relying on the broken subtree delete endpoint
+  - `Design/sample-website-tut/missing-assets.txt` — 152 missing-asset prompts with resolution and context
+**Build Verified:** Yes — `mvn test` and `pnpm build` passed
+**Notes:** Local Docker services were already running. The local author app was started with `author,local`, and the seeder was then executed successfully. The backend delete endpoint currently fails for subtree deletes in local dev (`DELETE FROM content_nodes WHERE path::text LIKE ? || '%'`), so the seeder now updates/creates deterministic nodes in place for rerun safety.
+
+---
+
+### E-14 — Backend + Frontend: 20 Page Templates
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — added 20 page templates in `V17__tut_usa_page_templates.sql` with embedded and allowed component type lists
+  - [x] AC2 — admin editor palette now filters to template-allowed components when a page has a template
+  - [x] AC3 — template-embedded components render as locked/read-only in the page canvas
+  - [x] AC4 — `mvn clean compile`, `mvn test`, and `pnpm build` passed
+**Files Changed:**
+  - `flexcms/flexcms-app/src/main/resources/db/migration/V17__tut_usa_page_templates.sql` — seeded template definitions
+  - `flexcms/flexcms-core/src/main/java/com/flexcms/core/service/TemplateRegistryService.java` — template registry/service
+  - `flexcms/flexcms-author/src/main/java/com/flexcms/author/controller/TemplateDefinitionController.java` — author API for templates
+  - `flexcms/flexcms-core/src/test/java/com/flexcms/core/service/TemplateRegistryServiceTest.java` — registry coverage
+  - `frontend/apps/admin/src/app/editor/page.tsx` — palette filtering and locked embedded template components
+  - `frontend/apps/admin/next.config.js` — disabled webpack build worker for sandbox-safe builds
+  - `frontend/apps/site-nextjs/next.config.js` — disabled webpack build worker for sandbox-safe builds
+**Build Verified:** Yes — `mvn clean compile`, `mvn test`, and `pnpm build` passed
+**Notes:** The Next.js `spawn EPERM` issue was resolved by setting `experimental.workerThreads=true` and `experimental.webpackBuildWorker=false` in both Next apps.
 
 ---
 

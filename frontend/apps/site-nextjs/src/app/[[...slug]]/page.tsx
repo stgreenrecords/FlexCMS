@@ -1,5 +1,6 @@
 import { FlexCmsClient } from '@flexcms/sdk';
 import { CmsPageClient } from './CmsPageClient';
+import { normalizePageAssetUrls } from '../lib/normalizeAssetUrls';
 
 /**
  * Catch-all page route — fetches CMS content server-side via @flexcms/sdk
@@ -18,7 +19,7 @@ export default async function CmsPage({ params }: { params: { slug?: string[] } 
   const client = new FlexCmsClient({ apiUrl, defaultSite, defaultLocale });
 
   try {
-    const pageData = await client.getPage(path);
+    const pageData = normalizePageAssetUrls(await client.getPage(path), apiUrl);
     return (
       <CmsPageClient
         pageData={pageData}

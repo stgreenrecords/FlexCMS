@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Manages multi-site lifecycle: create sites, manage domains, configure templates.
@@ -79,8 +81,40 @@ public class SiteManagementService {
     /**
      * List all sites.
      */
+    @Transactional(readOnly = true)
     public List<Site> listSites() {
         return siteRepository.findAll();
+    }
+
+    /**
+     * List all sites in a JSON-safe shape for admin APIs.
+     */
+    @Transactional(readOnly = true)
+    public List<AdminSiteSummary> listSiteSummaries() {
+        Map<String, List<DomainMappingDto>> domainsBySite = domainMappingRepo.findAll().stream()
+                .collect(Collectors.groupingBy(
+                        DomainMapping::getSiteId,
+                        Collectors.mapping(this::toDomainDto, Collectors.toList())
+                ));
+
+        return siteRepository.findAll().stream()
+                .map(site -> new AdminSiteSummary(
+                        site.getSiteId(),
+                        site.getTitle(),
+                        site.getDescription(),
+                        site.getContentRoot(),
+                        site.getDamRoot(),
+                        site.getConfigRoot(),
+                        site.getDefaultLocale(),
+                        site.getSupportedLocales(),
+                        site.getAllowedTemplates(),
+                        site.getSettings(),
+                        site.isActive(),
+                        site.getCreatedAt(),
+                        site.getUpdatedAt(),
+                        domainsBySite.getOrDefault(site.getSiteId(), List.of())
+                ))
+                .toList();
     }
 
     /**
@@ -96,6 +130,47 @@ public class SiteManagementService {
         summary.put("domains", domainMappingRepo.findBySiteId(siteId));
         return summary;
     }
+
+    private DomainMappingDto toDomainDto(DomainMapping mapping) {
+        return new DomainMappingDto(
+                mapping.getId(),
+                mapping.getDomain(),
+                mapping.getSiteId(),
+                mapping.getLocale(),
+                mapping.getPathPrefix(),
+                mapping.isPrimary(),
+                mapping.isHttpsRequired(),
+                mapping.getCreatedAt()
+        );
+    }
+
+    public record AdminSiteSummary(
+            String siteId,
+            String title,
+            String description,
+            String contentRoot,
+            String damRoot,
+            String configRoot,
+            String defaultLocale,
+            List<String> supportedLocales,
+            List<String> allowedTemplates,
+            Map<String, Object> settings,
+            boolean active,
+            java.time.Instant createdAt,
+            java.time.Instant updatedAt,
+            List<DomainMappingDto> domains
+    ) {}
+
+    public record DomainMappingDto(
+            UUID id,
+            String domain,
+            String siteId,
+            String locale,
+            String pathPrefix,
+            boolean primary,
+            boolean httpsRequired,
+            java.time.Instant createdAt
+    ) {}
 
     private void createRootNodes(String siteId, String locale, String userId) {
         // Content root: content.{siteId}.{locale}

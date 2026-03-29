@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { XfNavigation } from '../components/tut-usa/XfNavigation';
 import { XfFooter } from '../components/tut-usa/XfFooter';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'TUT USA',

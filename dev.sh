@@ -68,13 +68,13 @@ cmd_backend() {
   cd "${ROOT_DIR}/flexcms"
   mvn clean compile -B -q
   green ">>> Build complete. Starting on http://localhost:8080 ..."
-  mvn spring-boot:run -pl flexcms-app -Dspring-boot.run.profiles=author
+  mvn spring-boot:run -pl flexcms-app -am -Dspring-boot.run.profiles=author
 }
 
 cmd_backend_publish() {
   blue ">>> Starting Publish backend on http://localhost:8081 ..."
   cd "${ROOT_DIR}/flexcms"
-  mvn spring-boot:run -pl flexcms-app -Dspring-boot.run.profiles=publish
+  mvn spring-boot:run -pl flexcms-app -am -Dspring-boot.run.profiles=publish
 }
 
 cmd_frontend() {

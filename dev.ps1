@@ -112,7 +112,7 @@ function Start-Author {
 Set-Location '$FlexcmsDir'
 Write-Host '>>> FlexCMS Author starting on :8080 ...' -ForegroundColor Cyan
 Write-Host '    Logs: $logFile' -ForegroundColor DarkGray
-mvn spring-boot:run -pl flexcms-app ``-Dspring-boot.run.profiles=author 2>&1 | Tee-Object -FilePath '$logFile'
+mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=author 2>&1 | Tee-Object -FilePath '$logFile'
 Write-Host '>>> Author stopped. Press any key.' -ForegroundColor Yellow
 `$null = `$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 "@
@@ -131,7 +131,7 @@ function Start-Publish {
 Set-Location '$FlexcmsDir'
 Write-Host '>>> FlexCMS Publish starting on :8081 ...' -ForegroundColor Cyan
 Write-Host '    Logs: $logFile' -ForegroundColor DarkGray
-mvn spring-boot:run -pl flexcms-app ``-Dspring-boot.run.profiles=publish 2>&1 | Tee-Object -FilePath '$logFile'
+mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=publish 2>&1 | Tee-Object -FilePath '$logFile'
 Write-Host '>>> Publish stopped. Press any key.' -ForegroundColor Yellow
 `$null = `$Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
 "@
