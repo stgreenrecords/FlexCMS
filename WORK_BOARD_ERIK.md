@@ -28,7 +28,7 @@
 | E-07 | ✅ DONE | **Frontend renderers: CTAs, Promotions & Campaigns (43 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-08 | ✅ DONE | **Frontend renderers: Forms, Data Capture & Consent (42 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-09 | ✅ DONE | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-10 | 🟢 OPEN | **Frontend renderers: Account, Portal & Transactional (24 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-10 | ✅ DONE | **Frontend renderers: Account, Portal & Transactional (24 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-11 | 🟢 OPEN | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-12 | 🟢 OPEN | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
 | E-13 | 🟢 OPEN | **Frontend renderers: Corporate/Investor + Education + Location (48 components)** | 3d | `apps/site-nextjs` | E-02 |
@@ -455,6 +455,22 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-10 — Frontend Renderers: Account, Portal & Transactional (24 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 24 components implemented (280–303 inclusive) as named-export `.tsx` files in `tut-usa/account/`; zero hardcoded data
+  - [x] AC2 — Shared `AccountField` type defined in `RegistrationForm.tsx`, reused by `ProfileSummary`, `ProfileEditor`, `BillingAddressForm`, `ShippingAddressForm`, `PaymentForm`
+  - [x] AC3 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/account/` — 24 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 24 registrations under `tut-usa/account-portal-transactional/<slug>`
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** All forms are presentational only — no API calls. LoyaltySummary shows progress bar toward next tier. StatusBadge maps status enum to color classes. PortalShortcut renders as full anchor tag.
 
 ---
 
