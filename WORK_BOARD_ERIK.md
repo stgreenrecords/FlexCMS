@@ -25,14 +25,14 @@
 | E-03 | ✅ DONE | **Frontend renderers: Layout & Page Structure (32 components)** | 3d | `apps/site-nextjs` | E-02 |
 | E-04 | ✅ DONE | **Frontend renderers: Editorial & Article Content (68 components)** | 5d | `apps/site-nextjs` | E-02 |
 | E-05 | ✅ DONE | **Frontend renderers: Media, Visual Storytelling & Assets (33 components)** | 3d | `apps/site-nextjs` | E-02 |
-| E-07 | 🔴 BLOCKED | **Frontend renderers: CTAs, Promotions & Campaigns (43 components)** | 3d | `apps/site-nextjs` | E-02 |
-| E-08 | 🔴 BLOCKED | **Frontend renderers: Forms, Data Capture & Consent (42 components)** | 3d | `apps/site-nextjs` | E-02 |
-| E-09 | 🔴 BLOCKED | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-10 | 🔴 BLOCKED | **Frontend renderers: Account, Portal & Transactional (24 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-11 | 🔴 BLOCKED | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-12 | 🔴 BLOCKED | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
-| E-13 | 🔴 BLOCKED | **Frontend renderers: Corporate/Investor + Education + Location (48 components)** | 3d | `apps/site-nextjs` | E-02 |
-| E-14 | 🔴 BLOCKED | **Backend + Frontend: 20 Page Templates** | 2d | `flexcms-app` (Flyway), `flexcms-core`, `apps/site-nextjs` | E-02 |
+| E-07 | ✅ DONE | **Frontend renderers: CTAs, Promotions & Campaigns (43 components)** | 3d | `apps/site-nextjs` | E-02 |
+| E-08 | 🟢 OPEN | **Frontend renderers: Forms, Data Capture & Consent (42 components)** | 3d | `apps/site-nextjs` | E-02 |
+| E-09 | 🟢 OPEN | **Frontend renderers: Commerce, Catalog & Merchandising (30 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-10 | 🟢 OPEN | **Frontend renderers: Account, Portal & Transactional (24 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-11 | 🟢 OPEN | **Frontend renderers: Events, Booking & Hospitality (24 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-12 | 🟢 OPEN | **Frontend renderers: Community, Social Proof & Engagement (30 components)** | 2d | `apps/site-nextjs` | E-02 |
+| E-13 | 🟢 OPEN | **Frontend renderers: Corporate/Investor + Education + Location (48 components)** | 3d | `apps/site-nextjs` | E-02 |
+| E-14 | 🟢 OPEN | **Backend + Frontend: 20 Page Templates** | 2d | `flexcms-app` (Flyway), `flexcms-core`, `apps/site-nextjs` | E-02 |
 | E-15 | 🔴 BLOCKED | **Content tree: 61 pages with contextual dummy data + missing assets log** | 3d | `scripts`, `flexcms-app` | E-01, E-06, E-14 |
 
 ---
@@ -455,6 +455,22 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-07 — Frontend Renderers: CTAs, Promotions & Campaigns (43 components)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 43 components implemented as named-export `.tsx` files in `tut-usa/ctas/`; zero hardcoded data
+  - [x] AC2 — Hero and banner components with image fields have resolution in JSDoc (HeroBanner bg 1920×820, SplitHero media 960×820, ImageBanner 1920×600, PromoBanner 1200×400, PromoTile 400×300, SeasonalCampaignBlock 1200×600, CampaignLandingSection 1200×600, MarketplaceListingCard logo 120×40, VideoHero posterImage 1280×720)
+  - [x] AC3 — `pnpm build` passed (8/8 packages, 0 TypeScript errors)
+**Files Changed:**
+  - `frontend/apps/site-nextjs/src/components/tut-usa/ctas/` — 43 `.tsx` components + `index.ts` barrel
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx` — 43 registrations under `tut-usa/calls-to-action-promotions-campaigns/<slug>` (CtasHeroBanner aliased to avoid conflict with tut/HeroBanner)
+**Build Verified:** Yes — `pnpm build` 8/8 SUCCESS
+**Notes:** `'use client'` on AlertBanner (dismissible state), PricingTable (billing toggle state). CtasHeroBanner aliased because `HeroBanner` already imported from `tut/`. AnnouncementBar and SeasonalCampaignBlock auto-hide based on startDate/endDate. Form components (NewsletterSignup, EmailSignup, TrialSignup) are presentational only — no submit handlers.
 
 ---
 
