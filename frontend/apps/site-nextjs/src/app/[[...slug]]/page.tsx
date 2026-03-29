@@ -15,6 +15,10 @@ export default async function CmsPage({ params }: { params: { slug?: string[] } 
   const path = params.slug ? `/${params.slug.join('/')}` : `/${defaultSite}/${defaultLocale}/home`;
 
   const apiUrl = process.env.FLEXCMS_API_URL ?? 'http://localhost:8080';
+  const publicApiUrl =
+    process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
+    process.env.NEXT_PUBLIC_FLEXCMS_API ??
+    '';
 
   const client = new FlexCmsClient({ apiUrl, defaultSite, defaultLocale });
 
@@ -23,7 +27,7 @@ export default async function CmsPage({ params }: { params: { slug?: string[] } 
     return (
       <CmsPageClient
         pageData={pageData}
-        apiUrl={apiUrl}
+        apiUrl={publicApiUrl}
         defaultSite={defaultSite}
         defaultLocale={defaultLocale}
       />
