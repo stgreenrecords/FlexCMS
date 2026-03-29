@@ -76,7 +76,7 @@ Use one of these formats when requesting new work:
 | `flexcms-search` | — | — | — |
 | `flexcms-clientlibs` | — | — | — |
 | `flexcms-pim` | — | — | — |
-| `flexcms-app` | E-02 | Erik | 2026-03-29 |
+| `flexcms-app` | — | — | — |
 
 ### Frontend Packages
 

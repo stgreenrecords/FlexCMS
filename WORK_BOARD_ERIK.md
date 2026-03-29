@@ -15,7 +15,7 @@
 | ID | Status | Title | Effort | Modules Touched | Blocked By |
 |----|--------|-------|--------|-----------------|------------|
 | E-01 | ✅ DONE | **Foundation: clean old TUT content + new TUT USA site skeleton + XF paths** | 1d | `flexcms-app` (Flyway), `flexcms-core` | — |
-| E-02 | 🔵 IN PROGRESS | **Backend: register all 406 component definitions (Flyway V16)** | 3d | `flexcms-app` (Flyway) | E-01 |
+| E-02 | ✅ DONE | **Backend: register all 406 component definitions (Flyway V16)** | 3d | `flexcms-app` (Flyway) | E-01 |
 | E-06 | 🟢 OPEN | **Frontend renderers: Navigation & Discovery + XF locking (27 components)** | 3d | `apps/site-nextjs`, `apps/admin` | E-01, E-02 |
 
 ### 🟠 P1 — High
@@ -455,6 +455,23 @@ missing asset number 1 tut-s-hero-front-three-quarter.jpg, content/tut-usa/vehic
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### E-02 — Backend: Register All 406 Component Definitions (Flyway V16)
+**Status:** ✅ DONE
+**Date:** 2026-03-29
+**Agent:** Erik
+**AC Verification:**
+  - [x] AC1 — 406 INSERT rows present in V16 migration; `SELECT COUNT(*) FROM component_definitions WHERE resource_type LIKE 'tut-usa/%'` will return 406
+  - [x] AC2 — All 14 group_name values present with correct component distribution
+  - [x] AC3 — Every component has a valid non-empty `data_schema` JSON Schema with typed properties
+  - [x] AC4 — `GET /api/content/v1/component-registry` will return all 406 tut-usa components grouped correctly
+  - [x] AC5 — `mvn clean compile` passed (0 errors); `mvn test` passed (BUILD SUCCESS, all 41 tests green)
+**Files Changed:**
+  - `flexcms/flexcms-app/src/main/resources/db/migration/V16__tut_usa_component_definitions.sql` — 406 INSERT rows across 14 groups; JSON Schema per component using proper type annotations (x-rich-text, x-asset, x-reference, format: uri, etc.)
+**Build Verified:** Yes — `mvn clean compile` and `mvn test` BUILD SUCCESS (41/41 tests)
+**Notes:** All 406 components generated from spec. `is_container=TRUE` applied to layout containers (Container, Grid Layout, Two Column Layout, Two Columns Grid, Three Column Layout, Card Grid) and aggregation components (Blog Listing, Leadership Grid, Author List). `::jsonb` cast operator verified correct. E-06 is now unblocked (E-01 ✅ and E-02 ✅).
 
 ---
 
