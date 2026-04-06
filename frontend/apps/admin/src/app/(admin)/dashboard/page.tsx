@@ -365,6 +365,7 @@ export default function DashboardPage() {
                       <button
                         className="transition-colors"
                         style={{ color: '#8d90a0' }}
+                        aria-label={`Actions for ${item.name}`}
                         onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#b0c6ff'; }}
                         onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = '#8d90a0'; }}
                       >

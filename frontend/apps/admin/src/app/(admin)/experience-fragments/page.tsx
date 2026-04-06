@@ -166,7 +166,7 @@ export default function ExperienceFragmentsPage() {
 
           <div className="flex items-end justify-between">
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: '#e5e2e1' }}>
+              <h1 className="text-3xl font-extrabold tracking-tight" data-testid="xf-heading" style={{ color: '#e5e2e1' }}>
                 Experience Fragments
               </h1>
               <p className="text-sm mt-1" style={{ color: '#8d90a0' }}>
@@ -194,6 +194,7 @@ export default function ExperienceFragmentsPage() {
                 Manage Channels
               </button>
               <Button
+                data-testid="xf-create-btn"
                 style={{
                   background: 'linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%)',
                   color: '#002d6f',
@@ -226,6 +227,7 @@ export default function ExperienceFragmentsPage() {
                   placeholder="Filter by name or path..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
+                  data-testid="xf-search"
                   className="w-full rounded-lg pl-10 pr-4 py-2 text-sm outline-none"
                   style={{
                     background: '#201f1f',
@@ -266,6 +268,7 @@ export default function ExperienceFragmentsPage() {
 
           {/* Table */}
           <div
+            data-testid="xf-table"
             className="rounded-xl overflow-hidden"
             style={{
               background: '#1c1b1b',

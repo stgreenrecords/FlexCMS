@@ -539,6 +539,7 @@ export default function DamBrowserPage() {
                 <button
                   onClick={() => setViewMode('grid')}
                   aria-pressed={viewMode === 'grid'}
+                  aria-label="Grid view"
                   className={`h-7 w-7 flex items-center justify-center rounded-[var(--radius-sm)] transition-colors
                     ${viewMode === 'grid'
                       ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm'
@@ -549,6 +550,7 @@ export default function DamBrowserPage() {
                 <button
                   onClick={() => setViewMode('list')}
                   aria-pressed={viewMode === 'list'}
+                  aria-label="List view"
                   className={`h-7 w-7 flex items-center justify-center rounded-[var(--radius-sm)] transition-colors
                     ${viewMode === 'list'
                       ? 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)] shadow-sm'

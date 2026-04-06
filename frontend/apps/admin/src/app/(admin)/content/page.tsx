@@ -349,7 +349,7 @@ export default function ContentTreePage() {
               </div>
               <ToolbarButton icon={<FilterIcon />} label="Filter" />
               <ToolbarButton icon={<SortIcon />}   label="Sort" />
-              <ToolbarButton icon={<MoreIcon />} />
+              <ToolbarButton icon={<MoreIcon />} ariaLabel="More options" />
             </div>
           </div>
 
@@ -419,6 +419,7 @@ export default function ContentTreePage() {
                       checked={allSelected}
                       ref={(el) => { if (el) el.indeterminate = someSelected; }}
                       onChange={toggleSelectAll}
+                      aria-label="Select all items"
                       className="cursor-pointer"
                       style={{ accentColor: '#b0c6ff', width: 14, height: 14 }}
                     />
@@ -640,6 +641,7 @@ function ContentRow({
           type="checkbox"
           checked={isSelected}
           onChange={onSelect}
+          aria-label={`Select ${node.name}`}
           className="cursor-pointer"
           style={{ accentColor: '#b0c6ff', width: 14, height: 14 }}
         />
@@ -700,6 +702,7 @@ function ContentRow({
           <button
             onClick={() => onActionMenu(showActionMenu ? null : node.id)}
             className="p-1 rounded transition-colors"
+            aria-label={`Actions for ${node.name}`}
             style={{ color: '#8d90a0' }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
@@ -764,10 +767,11 @@ function ContentRow({
 // Toolbar button
 // ---------------------------------------------------------------------------
 
-function ToolbarButton({ icon, label }: { icon: React.ReactNode; label?: string }) {
+function ToolbarButton({ icon, label, ariaLabel }: { icon: React.ReactNode; label?: string; ariaLabel?: string }) {
   return (
     <button
       className="h-9 rounded-lg flex items-center gap-2 text-xs font-medium transition-colors"
+      aria-label={ariaLabel ?? label}
       style={{
         padding: label ? '0 12px' : '0 10px',
         background: '#201f1f',

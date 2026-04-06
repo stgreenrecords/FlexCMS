@@ -288,7 +288,7 @@ function TranslationManagerPage() {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: '#e5e2e1' }}>
+          <h1 className="text-4xl font-extrabold tracking-tight" data-testid="translations-heading" style={{ color: '#e5e2e1' }}>
             Language Matrix
           </h1>
           <p className="mt-2 max-w-xl text-sm" style={{ color: '#8d90a0' }}>
@@ -353,6 +353,7 @@ function TranslationManagerPage() {
                 placeholder="Search keys..."
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                data-testid="translations-search"
                 className="bg-transparent border-none text-sm focus:outline-none w-40"
                 style={{ color: '#e5e2e1' }}
               />

@@ -135,6 +135,19 @@ export async function setupAllApiMocks(page: Page): Promise<void> {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(pimSchemas) });
     }
 
+    // ── Experience Fragments ──────────────────────────────────────────────
+    if (pathname.includes('/api/author/xf/')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { id: 'xf-1', name: 'Global Navigation', path: 'content.corporate.en.xf.global-nav', modifiedAt: '2026-03-01T10:00:00Z', createdBy: 'admin' },
+          { id: 'xf-2', name: 'Footer Legal',      path: 'content.corporate.en.xf.footer-legal', modifiedAt: '2026-03-02T10:00:00Z', createdBy: 'admin' },
+          { id: 'xf-3', name: 'Cookie Banner',     path: 'content.corporate.en.xf.cookie-banner', modifiedAt: '2026-03-03T10:00:00Z', createdBy: 'editor' },
+        ]),
+      });
+    }
+
     // ── Catch-all ────────────────────────────────────────────────────────
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
   });

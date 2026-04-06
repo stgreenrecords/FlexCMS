@@ -350,7 +350,7 @@ function ComponentRegistryPage() {
 
       return matchSearch && matchGroup && matchStatus;
     });
-  }, [searchQuery, groupFilter, statusFilter]);
+  }, [components, searchQuery, groupFilter, statusFilter]);
 
   const totalPages = Math.ceil(filteredComponents.length / PAGE_SIZE);
 
@@ -376,7 +376,7 @@ function ComponentRegistryPage() {
             </BreadcrumbList>
           </Breadcrumb>
 
-          <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: '#e5e2e1' }}>
+          <h1 className="text-4xl font-extrabold tracking-tight" data-testid="components-heading" style={{ color: '#e5e2e1' }}>
             Component Registry
           </h1>
           <p className="mt-2 max-w-xl text-sm" style={{ color: '#8d90a0' }}>
@@ -466,6 +466,7 @@ function ComponentRegistryPage() {
                   placeholder="Filter by name or resource type..."
                   value={searchQuery}
                   onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                  data-testid="components-search"
                   className="bg-transparent border-none text-sm focus:outline-none"
                   style={{ color: '#e5e2e1', width: '260px' }}
                 />
@@ -475,6 +476,7 @@ function ComponentRegistryPage() {
               <select
                 value={groupFilter}
                 onChange={(e) => { setGroupFilter(e.target.value as ComponentGroup | 'all'); setCurrentPage(1); }}
+                aria-label="Filter by component group"
                 className="rounded-lg text-xs focus:outline-none px-3 py-2"
                 style={{ background: '#353534', border: '1px solid #42465422', color: '#c3c6d6' }}
               >
@@ -488,6 +490,7 @@ function ComponentRegistryPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => { setStatusFilter(e.target.value as ComponentStatus | 'all'); setCurrentPage(1); }}
+                aria-label="Filter by component status"
                 className="rounded-lg text-xs focus:outline-none px-3 py-2"
                 style={{ background: '#353534', border: '1px solid #42465422', color: '#c3c6d6' }}
               >
@@ -712,6 +715,7 @@ function ComponentRegistryPage() {
               <span className="text-xs font-medium" style={{ color: '#8d90a0' }}>Rows per page:</span>
               <select
                 defaultValue="25"
+                aria-label="Rows per page"
                 className="rounded-lg text-xs font-bold px-3 py-1.5 focus:outline-none"
                 style={{ background: '#2a2a2a', border: '1px solid #42465422', color: '#c3c6d6' }}
               >

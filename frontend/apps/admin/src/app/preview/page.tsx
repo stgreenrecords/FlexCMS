@@ -197,6 +197,7 @@ function PreviewContent() {
             <button
               key={mode}
               onClick={() => { setPreviewMode(mode); setIframeKey((k) => k + 1); setLoading(true); }}
+              data-testid={mode === 'draft' ? 'preview-draft-toggle' : 'preview-published-toggle'}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors capitalize"
               style={{
                 background: previewMode === mode ? 'var(--color-primary)' : 'transparent',
@@ -229,6 +230,7 @@ function PreviewContent() {
             <button
               key={vp.id}
               onClick={() => setViewport(vp.id)}
+              data-testid={`preview-viewport-${vp.id}`}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors"
               style={{
                 background:
@@ -256,6 +258,7 @@ function PreviewContent() {
 
         {/* URL bar */}
         <div
+          data-testid="preview-url-bar"
           className="flex-1 min-w-0 flex items-center gap-2 px-3 rounded-[var(--radius-md)] border text-sm"
           style={{
             background: 'var(--color-background)',
@@ -277,6 +280,7 @@ function PreviewContent() {
           {/* Refresh */}
           <button
             onClick={refresh}
+            data-testid="preview-refresh-btn"
             className="p-2 rounded-[var(--radius-md)] transition-colors hover:bg-[var(--color-accent)]"
             style={{ color: 'var(--color-muted-foreground)' }}
             title="Refresh preview"
@@ -295,6 +299,7 @@ function PreviewContent() {
           {/* Copy URL */}
           <button
             onClick={copyUrl}
+            data-testid="preview-copy-url-btn"
             className="p-2 rounded-[var(--radius-md)] transition-colors hover:bg-[var(--color-accent)]"
             style={{
               color: copied ? 'var(--color-primary)' : 'var(--color-muted-foreground)',
@@ -319,6 +324,7 @@ function PreviewContent() {
             href={previewUrl}
             target="_blank"
             rel="noopener noreferrer"
+            data-testid="preview-open-tab-btn"
             className="p-2 rounded-[var(--radius-md)] transition-colors hover:bg-[var(--color-accent)]"
             style={{ color: 'var(--color-muted-foreground)' }}
             title="Open in new tab"
@@ -335,6 +341,7 @@ function PreviewContent() {
           {/* Edit in page editor */}
           <Link
             href={`/editor?path=${encodeURIComponent(rawPath)}`}
+            data-testid="preview-edit-btn"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-[var(--radius-md)] transition-colors"
             style={{
               background: 'var(--color-primary)',
@@ -402,6 +409,7 @@ function PreviewContent() {
             ref={iframeRef}
             src={previewUrl}
             title={`Preview: ${rawPath}`}
+            data-testid="preview-iframe"
             className="w-full"
             style={{
               border: 'none',
@@ -434,6 +442,7 @@ function PreviewContent() {
       {/* Status bar                                                           */}
       {/* ------------------------------------------------------------------ */}
       <footer
+        data-testid="preview-status-bar"
         className="shrink-0 flex items-center justify-between px-4 text-xs"
         style={{
           height: '28px',

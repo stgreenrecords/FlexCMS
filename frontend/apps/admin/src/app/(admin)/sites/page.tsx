@@ -223,6 +223,7 @@ export default function SiteManagerPage() {
                     checked={allSelected}
                     ref={(el) => { if (el) el.indeterminate = someSelected; }}
                     onChange={toggleSelectAll}
+                    aria-label="Select all sites"
                     className="cursor-pointer"
                     style={{ accentColor: '#b0c6ff', width: 14, height: 14 }}
                   />
@@ -259,6 +260,7 @@ export default function SiteManagerPage() {
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleSelect(site.id)}
+                        aria-label={`Select ${site.name}`}
                         className="cursor-pointer"
                         style={{ accentColor: '#b0c6ff', width: 14, height: 14 }}
                       />
@@ -294,6 +296,7 @@ export default function SiteManagerPage() {
                         <button
                           onClick={() => setActionMenuId(actionMenuId === site.id ? null : site.id)}
                           className="p-1 rounded transition-colors"
+                          aria-label={`Actions for ${site.name}`}
                           style={{ color: '#8d90a0' }}
                           onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; }}
                           onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
