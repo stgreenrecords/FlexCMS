@@ -30,7 +30,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test.describe('Dashboard Page @smoke', () => {
+test.describe('Dashboard Page @smoke @regression', () => {
 
   test('UI-001: page loads and renders the heading', async ({ page }) => {
     await page.goto('/dashboard');

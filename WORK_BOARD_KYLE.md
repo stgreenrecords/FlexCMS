@@ -24,7 +24,7 @@
 | TA-01 | ✅ DONE | **Phase 1 Critical — dashboard, content-tree, page-editor, DAM browser, workflows (UI-001→UI-086)** | 5d | `apps/admin-e2e` | TA-00 |
 | TA-02 | ✅ DONE | **Phase 2 High — sites, PIM catalog, PIM editor, PIM import, PIM schema (UI-052→UI-095)** | 4d | `apps/admin-e2e` | TA-01 |
 | TA-03 | ✅ DONE | **Phase 3 Medium — preview, experience fragments, translations, error states, accessibility (UI-096→UI-105, A11Y, UIERR)** | 4d | `apps/admin-e2e` | TA-02 |
-| TA-04 | 🟢 OPEN | **Phase 4 Visual Regression + hardening — dark theme, responsive, DnD retries, test tagging** | 2d | `apps/admin-e2e` | TA-03 |
+| TA-04 | ✅ DONE | **Phase 4 Visual Regression + hardening — dark theme, responsive, DnD retries, test tagging** | 2d | `apps/admin-e2e` | TA-03 |
 
 ---
 
@@ -180,6 +180,30 @@
 ## §5 — Completion & Handoff Notes
 
 > Entries go at the TOP. Most recent first.
+
+---
+
+### TA-04 — Phase 4 Visual Regression + Hardening
+**Status:** ✅ DONE
+**Date:** 2026-04-07
+**Agent:** Kyle
+**AC Verification:**
+  - [x] AC1 — `pnpm exec playwright test tests/visual-regression/ --project=chromium --update-snapshots` generated baseline snapshots (9 screenshots)
+  - [x] AC2 — `pnpm exec playwright test tests/visual-regression/ --project=chromium` passes on second run: 9 passed, 0 failed
+  - [x] AC3 — All existing tests pass with tagging/hardening changes: `pnpm exec playwright test --project=chromium` → 146 passed, 0 failed
+  - [x] AC4 — `pnpm exec playwright test --project=chromium --grep @smoke` runtime: 2.76 seconds (< 2 minutes)
+**Files Changed:**
+  - `frontend/apps/admin-e2e/tests/visual-regression/dark-theme.spec.ts` — added 5 dark-theme visual baseline tests (`@visual @regression`)
+  - `frontend/apps/admin-e2e/tests/visual-regression/responsive.spec.ts` — added 4 responsive visual baseline tests (`@visual @regression`)
+  - `frontend/apps/admin-e2e/tests/visual-regression/dark-theme.spec.ts-snapshots/*.png` — generated Playwright baseline images
+  - `frontend/apps/admin-e2e/tests/visual-regression/responsive.spec.ts-snapshots/*.png` — generated Playwright baseline images
+  - `frontend/apps/admin-e2e/screenshots/chromium/*.png` — copied chromium baseline snapshot PNGs for deliverable folder
+  - `frontend/apps/admin-e2e/tests/phase1-critical/dashboard.spec.ts` — added `@regression` tag to dashboard suite
+  - `frontend/apps/admin-e2e/tests/phase2-high/pim-schema.spec.ts` — added `test.describe.configure({ retries: 2 })` for DnD flake hardening
+**Build Verified:** Yes — `mvn clean compile` BUILD SUCCESS; `mvn test` (41 tests, 0 failures) BUILD SUCCESS; `pnpm build` (8/8 successful)
+**Notes:**
+  - DnD tests remain tagged `@dnd` (UI-072, UI-073, UI-074); retries now configured at suite level for schema editor.
+  - Visual tests disable CSS animations/transitions before snapshots to reduce false positives.
 
 ---
 

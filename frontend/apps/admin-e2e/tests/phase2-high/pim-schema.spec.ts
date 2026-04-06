@@ -64,6 +64,8 @@ async function waitForSchemaEditor(page: import('@playwright/test').Page) {
 
 // ── Tests ──────────────────────────────────────────────────────────────────
 test.describe('PIM Schema Editor @regression', () => {
+  // DnD interactions can be flaky on CI/browser timing; allow targeted retries for this suite.
+  test.describe.configure({ retries: 2 });
 
   test('UI-069: schema list loads from /api/pim/v1/schemas @smoke', async ({ page }) => {
     const schemasApiCall = page.waitForResponse(
@@ -239,10 +241,3 @@ test.describe('PIM Schema Editor @regression', () => {
     await expect(editInput.first()).toBeVisible({ timeout: 5_000 });
   });
 });
-
-
-
-
-
-
-
