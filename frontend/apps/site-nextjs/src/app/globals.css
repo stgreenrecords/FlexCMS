@@ -2,32 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-  --font-headline: "Times New Roman", Georgia, serif;
-  --font-label: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+/* Captured design package font declarations (Design/tut-usa assets). */
+@import url('/tut-usa/assets/styles/09f32f8567d38b3a-css2.css');
 
-  --color-background: #f5f1e8;
-  --color-foreground: #171717;
-  --color-primary: #0e5a61;
-  --color-on-primary: #f7f5ef;
-  --color-primary-fixed: #14727b;
-  --color-secondary: #6b7280;
-  --color-on-secondary: #ffffff;
-  --color-surface: #fffdf8;
-  --color-surface-variant: #ece6d8;
-  --color-surface-container: #f3efe4;
-  --color-surface-container-low: #faf7f0;
-  --color-surface-container-high: #e8e0d2;
-  --color-surface-container-highest: #d9cfbf;
-  --color-on-surface: #171717;
-  --color-on-surface-variant: #4b5563;
-  --color-outline: #b6ac9c;
-  --color-outline-variant: #cfc5b6;
-  --color-error: #b3261e;
-  --color-on-error: #ffffff;
-  --color-error-container: #f9dedc;
-  --color-on-error-container: #410e0b;
+:root {
+  --font-body: 'Manrope', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-headline: 'Newsreader', Georgia, serif;
+  --font-label: 'Manrope', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  --color-background: #070d1f;
+  --color-foreground: #dfe4ff;
+  --color-primary: #c6c6c7;
+  --color-on-primary: #3f4041;
+  --color-primary-fixed: #e2e2e2;
+  --color-secondary: #8f9fb7;
+  --color-on-secondary: #102134;
+  --color-surface: #070d1f;
+  --color-surface-variant: #0a2257;
+  --color-surface-container: #0a1839;
+  --color-surface-container-low: #09122b;
+  --color-surface-container-high: #0b1d48;
+  --color-surface-container-highest: #0a2257;
+  --color-on-surface: #dfe4ff;
+  --color-on-surface-variant: #96a9e6;
+  --color-outline: #6073ad;
+  --color-outline-variant: #32457c;
+  --color-error: #ee7d77;
+  --color-on-error: #490106;
+  --color-error-container: #7f2927;
+  --color-on-error-container: #ff9993;
 }
 
 * {

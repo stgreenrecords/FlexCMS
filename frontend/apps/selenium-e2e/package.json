@@ -1,0 +1,35 @@
+{
+  "name": "@flexcms/selenium-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "capture:tut-assets": "pnpm build && node dist/src/capture/runTutAssetCapture.js",
+    "capture:tut-assets:headed": "cross-env HEADLESS=false pnpm capture:tut-assets",
+    "generate:traceability": "ts-node src/capture/generateTraceabilitySkeletons.ts",
+    "test": "pnpm build && mocha",
+    "test:smoke": "pnpm build && mocha --grep @smoke",
+    "test:admin": "pnpm build && mocha --grep \"REB-13 admin authoring and round-trip suite\"",
+    "test:headed": "cross-env HEADLESS=false pnpm build && cross-env HEADLESS=false mocha",
+    "test:debug": "cross-env HEADLESS=false SLOWMO=250 pnpm build && cross-env HEADLESS=false SLOWMO=250 mocha --grep @smoke",
+    "test:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/selenium-results.xml",
+    "clean": "rimraf dist reports test-results"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.0",
+    "@types/selenium-webdriver": "^4.1.21",
+    "chai": "^4.4.1",
+    "chromedriver": "^124.0.0",
+    "cross-env": "^7.0.3",
+    "mocha": "^10.4.0",
+    "mocha-junit-reporter": "^2.2.1",
+    "rimraf": "^5.0.5",
+    "selenium-webdriver": "^4.20.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.4.5"
+  }
+}
+
+

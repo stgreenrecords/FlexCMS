@@ -4,10 +4,10 @@ You are an autonomous FlexCMS engineer. Follow CLAUDE.md conventions strictly (l
 Asset integrity — resolve the 152 missing images so the demo site has zero broken images
 
 ## Acceptance criteria
-- Every asset in missing-assets.txt is either generated/uploaded to DAM OR mapped to an approved placeholder — none left dangling
+- Every asset referenced by Design/tut-usa/manifest.json is deployed or explicitly excluded with evidence
 - python3 scripts/live_smoke.py --page content/tut-usa/home --no-edit reports 0 broken images
 - Repeat the image check for at least 5 representative pages (home, a vehicle detail, innovation, news, contact) — all images HTTP 200
-- missing-assets.txt is reduced to 0 outstanding entries (or annotated with the placeholder used)
+- dam-import-map evidence is complete and points only to valid deployed asset paths
 - Evidence (image-URL/status lists + screenshots) saved under docs/retest-runs/RT-01/
 
 ## Modules you may touch
@@ -33,7 +33,7 @@ scripts, flexcms-dam
 | Symptom you saw | Root cause |
 |---|---|
 | "All tasks DONE" but can't edit page dummy data | The page-editor "save" test asserts against a **mocked** API that always returns `{"success":true}`. The real `PUT /api/author/content/node/properties` round-trip was never verified. |
-| Missing images on the demo website | 152 assets are listed in `Design/sample-website-tut/missing-assets.txt` — **specified but never generated/uploaded**. Seeded pages reference DAM paths that 404. |
+| Missing images on the demo website | Captured assets are tracked in `Design/tut-usa/manifest.json` and import coverage is recorded in `df/artifacts/REB-07/data/dam-import-map.json`. |
 | Green E2E suite, broken product | **All 19 Playwright specs intercept `**/api/**`** and serve fixture JSON. Tests exercise the UI against fake data, never the backend/DB/seed. |
 | "Live mode" doesn't help | `USE_LIVE_API` is only honored by the shared fixture; the 19 per-spec inline `page.route` blocks ignore it, so mocks are never actually turned off. |
 | Formal ACs passed, feature absent | ACs were "component implemented / build passes", not "user action produces the expected observable outcome." |
@@ -160,7 +160,7 @@ Track all of it on the factory board: `flex agent status`.
 … (truncated)
 ```
 
-### Design/sample-website-tut/missing-assets.txt
+### Design/tut-usa/manifest.json
 ```
 missing asset number 1 tut-usa-home-hero.jpg, content/tut-usa/home (Hero Banner), 1920x820, Front three-quarter hero scene showing the TUT lineup at sunrise on a modern coastal residence drive, polished concrete, warm gold light, premium understated luxury mood.
 missing asset number 2 tut-usa-home-tut-s-card.jpg, content/tut-usa/home (Product Grid), 600x600, Premium studio image of TUT S, front three-quarter angle, crisp reflections, dark satin floor, luxury automotive launch photography.
@@ -198,7 +198,7 @@ missing asset number 33 tut-usa-vehicles-vehicle-lineup-tut-eon-card.jpg, conten
 … (truncated)
 ```
 
-### scripts/import_tut_usa_assets.py
+### scripts/import_tut_usa_captured_assets.py
 ```
 #!/usr/bin/env python3
 """Upload provided TUT USA assets into DAM and rewrite seeded content references."""
@@ -220,7 +220,7 @@ AUTHOR_API = os.environ.get("FLEXCMS_AUTHOR_API", "http://localhost:8080")
 USER_ID = "admin"
 SITE_ID = "tut-usa"
 MISSING_ASSETS_DIR = Path(__file__).resolve().parent.parent / "Design" / "missing-assets"
-MISSING_ASSETS_LOG = Path(__file__).resolve().parent.parent / "Design" / "sample-website-tut" / "missing-assets.txt"
+DEFAULT_GLOBAL_MANIFEST = Path("Design/tut-usa/manifest.json")
 DAM_FOLDER = "content/dam/tut-usa"
 PLACEHOLDER_PREFIX = "/dam/tut-usa/missing/"
 

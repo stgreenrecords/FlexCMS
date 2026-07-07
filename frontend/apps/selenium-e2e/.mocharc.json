@@ -1,0 +1,7 @@
+{
+  "spec": "dist/src/cases/**/*.spec.js",
+  "timeout": 60000,
+  "reporter": "spec",
+  "exit": true
+}
+

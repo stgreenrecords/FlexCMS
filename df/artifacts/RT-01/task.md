@@ -16,15 +16,15 @@
 
 ## Read first
 - `docs/RETEST_PLAN.md`
-- `Design/sample-website-tut/missing-assets.txt`
-- `scripts/import_tut_usa_assets.py`
+- `Design/tut-usa/manifest.json`
+- `scripts/import_tut_usa_captured_assets.py`
 - `scripts/seed_tut_usa_website.py`
 
 ## Acceptance criteria
-- Every asset in missing-assets.txt is either generated/uploaded to DAM OR mapped to an approved placeholder — none left dangling
+- Every asset referenced by `Design/tut-usa/manifest.json` is available in deployed public paths (or intentionally excluded with evidence)
 - python3 scripts/live_smoke.py --page content/tut-usa/home --no-edit reports 0 broken images
 - Repeat the image check for at least 5 representative pages (home, a vehicle detail, innovation, news, contact) — all images HTTP 200
-- missing-assets.txt is reduced to 0 outstanding entries (or annotated with the placeholder used)
+- `df/artifacts/REB-07/data/dam-import-map.json` shows deterministic coverage for imported assets and any intentional exclusions
 - Evidence (image-URL/status lists + screenshots) saved under docs/retest-runs/RT-01/
 
 ## Evidence requirements

@@ -20,7 +20,7 @@ Replace the current runtime backlog with a structured rebuild program that turns
 | `Design/sample-website-tut/template-libs/{slug}/screen.png` | Visual reference for screenshot/visual checks. |
 | `Design/sample-website-tut/component-libs/{slug}/code.html` | Component-library reference implementation and remote asset references. |
 | `Design/sample-website-tut/component-libs/{slug}/screen.png` | Component visual reference. |
-| `Design/assets/`, `Design/missing-assets/` | Existing/local image sources and generated replacements. |
+| `Design/assets/` | Existing/local image sources and generated replacements. |
 | `docs/TEST_DATA_SPECIFICATION.md` | Existing test-data/component contract context. |
 
 ## 3. Folder and artifact storage standard

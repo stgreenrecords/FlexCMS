@@ -227,6 +227,18 @@ function Start-Publish {
 function Start-Admin {
     Write-Banner "Admin UI  (Next.js)  :3000"
     $adminDir = Join-Path (Join-Path $FrontendDir "apps") "admin"
+    $adminBuildCache = Join-Path $adminDir ".next"
+    try {
+        $listeners = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction Stop
+        foreach ($listener in $listeners) {
+            Stop-Process -Id $listener.OwningProcess -Force -ErrorAction SilentlyContinue
+        }
+    } catch {
+        # Port may be free or command unavailable in restricted shells; continue startup.
+    }
+    if (Test-Path $adminBuildCache) {
+        Remove-Item -Recurse -Force $adminBuildCache -ErrorAction SilentlyContinue
+    }
     Launch-InWindow "FlexCMS Admin :3000" $FrontendDir `
         "pnpm install --silent 2>&1 | Out-Null; Set-Location '$adminDir'; pnpm dev" `
         "admin"
@@ -242,6 +254,77 @@ function Start-Site {
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
 }
 
+function Get-PythonExe {
+    if (Get-Command python3 -ErrorAction SilentlyContinue) { return "python3" }
+    if (Get-Command python -ErrorAction SilentlyContinue) { return "python" }
+    return $null
+}
+
+function Run-FullStackSeed {
+    if ($env:FLEXCMS_AUTO_SEED -eq "0") {
+        Write-Host "    Skipping auto-seed (FLEXCMS_AUTO_SEED=0)." -ForegroundColor DarkGray
+        return
+    }
+
+    $pythonExe = Get-PythonExe
+    if (-not $pythonExe) {
+        Write-Host "    Skipping auto-seed: python interpreter not found." -ForegroundColor Yellow
+        return
+    }
+
+    & $pythonExe -c "import psycopg2" *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "    Installing missing python dependency: psycopg2-binary..." -ForegroundColor DarkGray
+        & $pythonExe -m pip install --user psycopg2-binary
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "    Could not install psycopg2-binary automatically; reset may be skipped." -ForegroundColor Yellow
+        }
+    }
+
+    Write-Host "    Waiting for Author API before auto-seed..." -ForegroundColor DarkGray
+    $apiUp = $false
+    for ($i = 0; $i -lt 45; $i++) {
+        try {
+            $null = Invoke-WebRequest "http://localhost:8080/actuator/health" -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+            $apiUp = $true
+            break
+        } catch {
+            Start-Sleep 2
+        }
+    }
+    if (-not $apiUp) {
+        Write-Host "    Skipping auto-seed: Author API not healthy on :8080." -ForegroundColor Yellow
+        return
+    }
+
+    Push-Location $RootDir
+    try {
+        Write-Host "    Running local pre-seed reset for deterministic TUT-USA data..." -ForegroundColor DarkGray
+        & $pythonExe scripts/reset_tut_usa_seed.py --apply --confirm-reset-tut-usa --environment local
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "    Pre-seed reset failed; continuing with seed attempt." -ForegroundColor Yellow
+        }
+
+        Write-Host "    Auto-seeding TUT-USA content..." -ForegroundColor Yellow
+        & $pythonExe scripts/seed_tut_usa_website.py
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "    Auto-seed failed (content). Run manually: python3 scripts/seed_tut_usa_website.py" -ForegroundColor Yellow
+            return
+        }
+
+        Write-Host "    Auto-deploying TUT-USA assets (captured pipeline)..." -ForegroundColor Yellow
+        & $pythonExe scripts/import_tut_usa_captured_assets.py
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "    Auto asset deploy failed. Run manually: python3 scripts/import_tut_usa_captured_assets.py" -ForegroundColor Yellow
+            return
+        }
+
+        Write-Host "    Auto-seed complete (content + assets)." -ForegroundColor Green
+    } finally {
+        Pop-Location
+    }
+}
+
 # ─── Commands ─────────────────────────────────────────────────────────────────
 
 switch ($Command) {
@@ -254,6 +337,8 @@ switch ($Command) {
         }
 
         $services = Resolve-Services $ServiceArgs
+        $fullStack = @("infra", "author", "publish", "admin", "site") | ForEach-Object { $_ -in $services } | Where-Object { -not $_ } | Measure-Object | Select-Object -ExpandProperty Count
+        $isFullStack = ($fullStack -eq 0)
 
         Write-Banner "FlexCMS -- Starting: $($services -join ' + ')"
 
@@ -295,7 +380,12 @@ switch ($Command) {
 
         # 3) Author (skip if compile failed)
         if ("author" -in $services) {
-            if ($backendOk) { Start-Author }
+            if ($backendOk) {
+                Start-Author
+                if ($isFullStack) {
+                    Run-FullStackSeed
+                }
+            }
             else { Write-Host "    Skipping Author — backend compile failed" -ForegroundColor Yellow }
         }
 

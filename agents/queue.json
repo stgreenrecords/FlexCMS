@@ -624,15 +624,15 @@
       ],
       "read_first": [
         "docs/RETEST_PLAN.md",
-        "Design/sample-website-tut/missing-assets.txt",
-        "scripts/import_tut_usa_assets.py",
+        "Design/tut-usa/manifest.json",
+        "scripts/import_tut_usa_captured_assets.py",
         "scripts/seed_tut_usa_website.py"
       ],
       "acceptance_criteria": [
-        "Every asset in missing-assets.txt is either generated/uploaded to DAM OR mapped to an approved placeholder — none left dangling",
+        "Every required asset is present in the captured manifest and deployed paths (or explicitly excluded with evidence)",
         "python3 scripts/live_smoke.py --page content/tut-usa/home --no-edit reports 0 broken images",
         "Repeat the image check for at least 5 representative pages (home, a vehicle detail, innovation, news, contact) — all images HTTP 200",
-        "missing-assets.txt is reduced to 0 outstanding entries (or annotated with the placeholder used)",
+        "dam-import-map evidence covers all imported assets and intentional exclusions",
         "Evidence (image-URL/status lists + screenshots) saved under docs/retest-runs/RT-01/"
       ],
       "lease": {

@@ -130,7 +130,7 @@ class ResetPlan:
             },
             "reseedCommands": [
                 "python3 scripts/seed_tut_usa_website.py",
-                "python3 scripts/import_tut_usa_assets.py",
+                "python3 scripts/import_tut_usa_captured_assets.py",
             ],
             "rollbackNotes": [
                 "Do not rewrite or delete existing Flyway migration history.",

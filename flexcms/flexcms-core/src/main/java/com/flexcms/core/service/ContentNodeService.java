@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
 import java.util.*;
@@ -32,6 +35,9 @@ public class ContentNodeService {
 
     @Autowired
     private RichTextSanitizer richTextSanitizer;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     /** Lazy to avoid circular dependency via Spring context. */
     @Autowired
@@ -104,13 +110,20 @@ public class ContentNodeService {
             throw ConflictException.lockedBy(node.getLockedBy());
         }
 
-        // Save version before update
-        versionRepository.save(ContentNodeVersion.fromNode(node));
-
         // Merge and sanitize properties
         Map<String, Object> merged = new HashMap<>(node.getProperties());
         merged.putAll(updates);
-        node.setProperties(sanitizeProperties(merged));
+        Map<String, Object> sanitized = sanitizeProperties(merged);
+
+        // No-op updates should not create duplicate snapshots.
+        if (Objects.equals(node.getProperties(), sanitized)) {
+            return node;
+        }
+
+        // Save version before applying actual changes.
+        versionRepository.save(ContentNodeVersion.fromNode(node));
+
+        node.setProperties(sanitized);
         node.setModifiedBy(userId);
 
         ContentNode saved = nodeRepository.save(node);
@@ -291,12 +304,11 @@ public class ContentNodeService {
      * Bulk status update (e.g. publish or archive multiple nodes at once).
      * Each path is processed independently — one failure does not abort others.
      */
-    @Transactional
     public BulkOperationResult bulkUpdateStatus(List<String> paths, NodeStatus status, String userId) {
         BulkOperationResult result = new BulkOperationResult();
         for (String path : paths) {
             try {
-                updateStatus(path, status, userId);
+                runInNewTransaction(() -> updateStatus(path, status, userId));
                 result.incrementSucceeded();
             } catch (Exception e) {
                 result.addError(path, e.getMessage());
@@ -309,12 +321,11 @@ public class ContentNodeService {
      * Bulk delete — deletes each path and its descendants.
      * Each path is processed independently.
      */
-    @Transactional
     public BulkOperationResult bulkDelete(List<String> paths, String userId) {
         BulkOperationResult result = new BulkOperationResult();
         for (String path : paths) {
             try {
-                delete(path, userId);
+                runInNewTransaction(() -> delete(path, userId));
                 result.incrementSucceeded();
             } catch (Exception e) {
                 result.addError(path, e.getMessage());
@@ -327,18 +338,23 @@ public class ContentNodeService {
      * Bulk move — moves each path to the same target parent.
      * Each path is processed independently.
      */
-    @Transactional
     public BulkOperationResult bulkMove(List<String> paths, String targetParentPath, String userId) {
         BulkOperationResult result = new BulkOperationResult();
         for (String path : paths) {
             try {
-                move(path, targetParentPath, userId);
+                runInNewTransaction(() -> move(path, targetParentPath, userId));
                 result.incrementSucceeded();
             } catch (Exception e) {
                 result.addError(path, e.getMessage());
             }
         }
         return result;
+    }
+
+    private void runInNewTransaction(Runnable action) {
+        TransactionTemplate tx = new TransactionTemplate(transactionManager);
+        tx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        tx.executeWithoutResult(status -> action.run());
     }
 
     // --- Private helpers ---

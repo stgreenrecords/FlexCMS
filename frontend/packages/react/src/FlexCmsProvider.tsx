@@ -10,6 +10,8 @@ import { FlexCmsClient, ComponentMapper, type FlexCmsConfig } from '@flexcms/sdk
 /** React component that renders a CMS component's data */
 export type FlexCmsRenderer = React.ComponentType<{
   data: Record<string, unknown>;
+  resourceType?: string;
+  name?: string;
   children?: ReactNode;
 }>;
 

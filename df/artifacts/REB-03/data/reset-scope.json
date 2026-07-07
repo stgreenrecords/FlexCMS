@@ -1,5 +1,5 @@
 {
-  "mode": "dry-run",
+  "mode": "apply",
   "environment": {
     "name": "local",
     "reason": "Explicit local environment requested."
@@ -70,7 +70,7 @@
     },
     "reseedCommands": [
       "python3 scripts/seed_tut_usa_website.py",
-      "python3 scripts/import_tut_usa_assets.py"
+      "python3 scripts/import_tut_usa_captured_assets.py"
     ],
     "rollbackNotes": [
       "Do not rewrite or delete existing Flyway migration history.",
@@ -80,38 +80,137 @@
   },
   "before": {
     "author": {
-      "status": "unavailable",
-      "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+      "currentSiteDescendants": 560,
+      "currentExperienceFragmentDescendants": 2,
+      "currentAssets": 0,
+      "currentDamFolders": 0,
+      "legacyContentRootsAndDescendants": 0,
+      "legacyExperienceFragmentMetadata": 0,
+      "legacyComponentDefinitions": 3,
+      "legacyTemplateDefinitions": 0,
+      "legacyAssets": 0,
+      "legacyDamFolders": 0,
+      "legacySites": 0,
+      "legacyDomainMappings": 0,
+      "preservedCurrentComponentDefinitions": 406,
+      "preservedCurrentTemplateDefinitions": 20
     },
     "pim": {
-      "status": "unavailable",
-      "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+      "legacySampleSchemas": 1,
+      "legacySampleCatalogs": 1,
+      "legacySampleProducts": 4
     },
     "deletePaths": {
-      "currentContentDeletePaths": [],
-      "currentExperienceFragmentDeletePaths": [],
+      "currentContentDeletePaths": [
+        "tut-usa/accessories",
+        "tut-usa/contact-and-concierge",
+        "tut-usa/home",
+        "tut-usa/innovation",
+        "tut-usa/learn",
+        "tut-usa/news-and-updates",
+        "tut-usa/offers-and-finance",
+        "tut-usa/owners",
+        "tut-usa/vehicles"
+      ],
+      "currentExperienceFragmentDeletePaths": [
+        "experience-fragments/tut-usa/global/footer/master/footer",
+        "experience-fragments/tut-usa/global/navigation/master/navigation"
+      ],
       "legacyContentDeletePaths": [],
       "currentAssetDeletePaths": [],
       "legacyAssetDeletePaths": []
     }
   },
   "actions": {
-    "executed": false,
+    "executed": true,
     "author": {
-      "counts": {
-        "skipped": true,
-        "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+      "currentContentDelete": {
+        "deleted": 11,
+        "paths": [
+          "tut-usa/accessories",
+          "tut-usa/contact-and-concierge",
+          "tut-usa/home",
+          "tut-usa/innovation",
+          "tut-usa/learn",
+          "tut-usa/news-and-updates",
+          "tut-usa/offers-and-finance",
+          "tut-usa/owners",
+          "tut-usa/vehicles",
+          "experience-fragments/tut-usa/global/footer/master/footer",
+          "experience-fragments/tut-usa/global/navigation/master/navigation"
+        ],
+        "result": {
+          "succeeded": 0,
+          "failed": 11,
+          "errors": [
+            "content.tut-usa.accessories: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.contact-and-concierge: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.home: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.innovation: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.learn: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.news-and-updates: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.offers-and-finance: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.owners: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.tut-usa.vehicles: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.experience-fragments.tut-usa.global.footer.master.footer: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]",
+            "content.experience-fragments.tut-usa.global.navigation.master.navigation: JDBC exception executing SQL [DELETE FROM content_nodes WHERE path::text LIKE ? || '%'] [No results were returned by the query.] [n/a]"
+          ],
+          "total": 11
+        }
+      },
+      "legacyContentDelete": {
+        "deleted": 0,
+        "paths": []
+      },
+      "currentAssetDelete": {
+        "deleted": 0,
+        "missing": 0,
+        "paths": [],
+        "missingPaths": []
+      },
+      "legacyAssetDelete": {
+        "deleted": 0,
+        "missing": 0,
+        "paths": [],
+        "missingPaths": []
+      },
+      "sqlCleanup": {
+        "legacyComponentDefinitions": 3,
+        "legacyTemplateDefinitions": 0,
+        "legacyExperienceFragmentMetadata": 0,
+        "legacyDomainMappings": 0,
+        "legacySites": 0,
+        "damFolders": 0
       }
     },
     "pim": {
-      "counts": {
+      "sqlCleanup": {
         "skipped": true,
-        "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+        "reason": "Run again with --include-legacy-pim to purge legacy PIM sample rows."
       }
     }
   },
   "after": {
-    "author": null,
-    "pim": null
+    "author": {
+      "currentSiteDescendants": 560,
+      "currentExperienceFragmentDescendants": 2,
+      "currentAssets": 0,
+      "currentDamFolders": 0,
+      "legacyContentRootsAndDescendants": 0,
+      "legacyExperienceFragmentMetadata": 0,
+      "legacyComponentDefinitions": 0,
+      "legacyTemplateDefinitions": 0,
+      "legacyAssets": 0,
+      "legacyDamFolders": 0,
+      "legacySites": 0,
+      "legacyDomainMappings": 0,
+      "preservedCurrentComponentDefinitions": 406,
+      "preservedCurrentTemplateDefinitions": 20
+    },
+    "pim": {
+      "legacySampleSchemas": 1,
+      "legacySampleCatalogs": 1,
+      "legacySampleProducts": 4
+    }
   }
 }

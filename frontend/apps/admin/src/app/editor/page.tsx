@@ -97,6 +97,8 @@ interface PropField {
   required?: boolean;
 }
 
+const TEMPLATE_DETACHED_FLAG = 'flexcmsTemplateDetached';
+
 // ---------------------------------------------------------------------------
 // JSON Schema → PropField[] converter
 // ---------------------------------------------------------------------------
@@ -106,7 +108,7 @@ function schemaToFields(schema: Record<string, unknown> | undefined): PropField[
   const properties = (schema['properties'] as Record<string, Record<string, unknown>>) ?? {};
   const required = (schema['required'] as string[]) ?? [];
   return Object.entries(properties)
-    .filter(([key]) => !key.startsWith('_') && key !== 'children')
+    .filter(([key]) => !key.startsWith('_') && key !== 'children' && key !== TEMPLATE_DETACHED_FLAG)
     .map(([key, propDef]) => {
       const title = String(propDef['title'] ?? labelFromKey(key));
       const description = propDef['description'] as string | undefined;
@@ -222,10 +224,13 @@ function buildEmbeddedTemplateComponents(
 
     if (index >= 0) {
       const existing = remaining.splice(index, 1)[0];
+      const isDetached = existing.props?.[TEMPLATE_DETACHED_FLAG] === true;
       merged.push({
         ...existing,
-        isLocked: true,
-        lockReason: `Embedded by template ${template.title ?? template.name}`,
+        isLocked: !isDetached,
+        lockReason: isDetached
+          ? undefined
+          : `Embedded by template ${template.title ?? template.name}`,
       });
       continue;
     }
@@ -282,8 +287,11 @@ function EditorInner() {
   const [savedAt, setSavedAt] = useState<string>('—');
   const [isDraft, setIsDraft] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDetachingInheritance, setIsDetachingInheritance] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [detachError, setDetachError] = useState<string | null>(null);
+  const [detachInfo, setDetachInfo] = useState<string | null>(null);
   // dnd-kit drag state
   const [activeDrag, setActiveDrag] = useState<{ type: 'canvas'; component: PageComponent } | { type: 'palette'; item: PaletteItem } | null>(null);
   // Insert-preview index: which canvas slot the palette item will land in
@@ -537,6 +545,68 @@ function EditorInner() {
         c.instanceId === selectedId ? { ...c, props: { ...item.defaultProps } } : c,
       ),
     );
+  }
+
+  async function handleCancelInheritance() {
+    if (!selectedComponent || !selectedComponent.isLocked) return;
+    if (!selectedComponent.nodePath) {
+      setDetachError('This template-embedded slot has no page node to detach. Add a local component instead.');
+      return;
+    }
+
+    setIsDetachingInheritance(true);
+    setDetachError(null);
+    setDetachInfo(null);
+
+    try {
+      const detachResponse = await fetch(
+        `${API_BASE}/api/author/livecopy?targetPath=${encodeURIComponent(selectedComponent.nodePath)}&deep=true`,
+        { method: 'DELETE' },
+      );
+
+      let detachWarning: string | null = null;
+      if (!detachResponse.ok) {
+        detachWarning = `Live copy detach returned ${detachResponse.status}. Local page override was still applied.`;
+      }
+
+      const updatedProps = {
+        ...selectedComponent.props,
+        [TEMPLATE_DETACHED_FLAG]: true,
+      };
+
+      const persistResponse = await fetch(`${API_BASE}/api/author/content/node/properties`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          path: selectedComponent.nodePath,
+          properties: updatedProps,
+          userId: 'admin',
+        }),
+      });
+
+      if (!persistResponse.ok) {
+        throw new Error(`Could not persist editable override (${persistResponse.status}).`);
+      }
+
+      setComponents((prev) =>
+        prev.map((component) =>
+          component.instanceId === selectedComponent.instanceId
+            ? {
+                ...component,
+                props: updatedProps,
+                isLocked: false,
+                lockReason: undefined,
+              }
+            : component,
+        ),
+      );
+
+      setDetachInfo(detachWarning ?? 'Inheritance canceled. This component is now editable on this page.');
+    } catch (error) {
+      setDetachError(error instanceof Error ? error.message : 'Failed to cancel inheritance.');
+    } finally {
+      setIsDetachingInheritance(false);
+    }
   }
 
   const canvasWidth = viewport === 'desktop' ? '100%' : viewport === 'tablet' ? '768px' : '390px';
@@ -932,15 +1002,40 @@ function EditorInner() {
                 {selectedComponent.lockReason ?? 'This component is locked by the assigned page template.'}
               </p>
             )}
+            {detachError && (
+              <p className="text-[11px] mt-2" style={{ color: '#ffb4ab' }}>
+                {detachError}
+              </p>
+            )}
+            {detachInfo && (
+              <p className="text-[11px] mt-2" style={{ color: '#8ad9b4' }}>
+                {detachInfo}
+              </p>
+            )}
           </div>
 
           {selectedComponent ? (
             <>
               <div className="flex-1 overflow-y-auto p-5 space-y-6">
                 {selectedComponent.isLocked ? (
-                  <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
-                    Template-embedded components are read-only here. Adjust the template definition instead of editing this page instance.
-                  </p>
+                  <div className="space-y-4">
+                    <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
+                      Template-embedded components are read-only until you cancel inheritance for this page.
+                    </p>
+                    <button
+                      onClick={handleCancelInheritance}
+                      disabled={isDetachingInheritance}
+                      data-testid="cancel-inheritance-button"
+                      className="w-full py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all"
+                      style={{
+                        background: 'rgba(176,198,255,0.18)',
+                        color: '#b0c6ff',
+                        opacity: isDetachingInheritance ? 0.65 : 1,
+                      }}
+                    >
+                      {isDetachingInheritance ? 'Canceling Inheritance…' : 'Cancel Inheritance and Edit'}
+                    </button>
+                  </div>
                 ) : selectedSchema.length === 0 ? (
                   <p className="text-xs" style={{ color: '#8d90a0' }}>
                     No editable properties for this component.

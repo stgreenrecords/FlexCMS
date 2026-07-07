@@ -14,7 +14,7 @@
 | Symptom you saw | Root cause |
 |---|---|
 | "All tasks DONE" but can't edit page dummy data | The page-editor "save" test asserts against a **mocked** API that always returns `{"success":true}`. The real `PUT /api/author/content/node/properties` round-trip was never verified. |
-| Missing images on the demo website | 152 assets are listed in `Design/sample-website-tut/missing-assets.txt` — **specified but never generated/uploaded**. Seeded pages reference DAM paths that 404. |
+| Missing images on the demo website | Captured assets are tracked in `Design/tut-usa/manifest.json`; deployment evidence is generated in `df/artifacts/REB-07/data/dam-import-map.json`. Broken references now indicate importer/runtime regressions, not missing prompt rows. |
 | Green E2E suite, broken product | **All 19 Playwright specs intercept `**/api/**`** and serve fixture JSON. Tests exercise the UI against fake data, never the backend/DB/seed. |
 | "Live mode" doesn't help | `USE_LIVE_API` is only honored by the shared fixture; the 19 per-spec inline `page.route` blocks ignore it, so mocks are never actually turned off. |
 | Formal ACs passed, feature absent | ACs were "component implemented / build passes", not "user action produces the expected observable outcome." |
@@ -139,5 +139,5 @@ Track all of it on the factory board: `flex agent status`.
 
 - **`validate` is no longer sufficient to close a task** — retest/feature tasks require live evidence (FACTORY.md §5 updated).
 - **CI gains a stack-up job** (RT-08) running `live_smoke.py` against a real backend + seed, so "green tests / broken product" is caught automatically.
-- **`missing-assets.txt` becomes a tracked backlog**, not a dumping ground — RT-01 drives it to zero.
+- **Captured asset manifests stay the source of truth** (`Design/tut-usa/manifest.json` + `df/artifacts/REB-07/data/dam-import-map.json`) for image integrity verification.
 

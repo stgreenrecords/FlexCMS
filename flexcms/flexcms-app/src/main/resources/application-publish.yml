@@ -1,6 +1,8 @@
 # Publish environment profile
 flexcms:
   runmode: publish
+  publish:
+    redirect-home-url: http://localhost:3001/
   features:
     authoring-ui: false
     workflows: false
@@ -26,4 +28,3 @@ spring:
 
 server:
   port: 8081
-

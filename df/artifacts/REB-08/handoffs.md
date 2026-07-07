@@ -1,5 +1,27 @@
 # REB-08 Handoffs
 
+## 2026-07-07 local - frontend-dev -> manual human QA/PO review
+
+- State: `READY_FOR_QA`
+- What was done:
+  - Implemented token/font shell foundation updates in `site-nextjs` (`globals.css`, `layout.tsx`).
+  - Updated React renderer contract to include optional node metadata (`resourceType`, `name`) without breaking existing renderers.
+  - Replaced stale/nonexistent renderer imports with a lean component map plus contract-aware fallback to stabilize build while REB-09 delivers grouped renderers.
+  - Ran frontend build validation and captured pass evidence after fixing initial stale-import failure.
+- Evidence:
+  - `df/artifacts/REB-08/frontend/summary.md`
+  - `frontend/apps/site-nextjs/src/app/globals.css`
+  - `frontend/apps/site-nextjs/src/app/layout.tsx`
+  - `frontend/apps/site-nextjs/src/components/component-map.tsx`
+  - `frontend/packages/react/src/FlexCmsProvider.tsx`
+  - `frontend/packages/react/src/FlexCmsComponent.tsx`
+- Next steps:
+  1. Manual human QA/PO review per `DEC-REB-005`.
+  2. If accepted, unblocks `REB-09` and `REB-11` implementation lanes.
+  3. If rejected, return to `frontend-dev` with specific defects and expected renderer scope.
+- Risks/blockers:
+  - Runtime fallback renderer intentionally indicates pending component implementations until REB-09 is completed.
+
 ## 2026-07-07 local - frontend-dev -> frontend-dev (continuation)
 
 - State: `DEV_IN_PROGRESS`

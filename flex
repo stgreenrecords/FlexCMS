@@ -173,15 +173,28 @@ start_backend_service() {
 start_author()  { start_backend_service "author,local"  "Author  (Content + DAM + PIM read-write)" "8080" "author"; }
 start_publish() { start_backend_service "publish,local" "Publish  (Content + DAM read-only)"       "8081" "publish"; }
 
+ensure_frontend_deps() {
+  echo -e "    ${C_YELLOW}Installing frontend dependencies...${C_RESET}"
+  set +e
+  (cd "$FRONTEND_DIR" && pnpm install 2>&1) | sed 's/^/    /'
+  local pnpm_exit=${PIPESTATUS[0]}
+  set -e
+  if [ "$pnpm_exit" -ne 0 ]; then
+    echo -e "    ${C_RED}Frontend dependency install failed (exit code $pnpm_exit).${C_RESET}"
+    echo -e "    ${C_YELLOW}Fix pnpm install errors above, then run: flex start local admin site${C_RESET}"
+    return 1
+  fi
+  return 0
+}
+
 start_admin() {
   ensure_log_dir
   local log_file="$LOG_DIR/admin.log"
   local admin_dir="$FRONTEND_DIR/apps/admin"
 
   banner "Admin UI  (Next.js)  :3000"
+  rm -rf "$admin_dir/.next"
   (
-    cd "$FRONTEND_DIR"
-    pnpm install --silent >/dev/null 2>&1 || true
     cd "$admin_dir"
     pnpm dev > "$log_file" 2>&1
   ) &
@@ -197,14 +210,111 @@ start_site() {
 
   banner "Sample Site  (Next.js)  :3001"
   (
-    cd "$FRONTEND_DIR"
-    pnpm install --silent >/dev/null 2>&1 || true
     cd "$site_dir"
     pnpm dev > "$log_file" 2>&1
   ) &
   local pid=$!
   save_pid "site" "$pid"
   echo -e "    ${C_DIM}PID $pid  |  Log: $log_file${C_RESET}"
+}
+
+run_fullstack_seed() {
+  if [ "${FLEXCMS_AUTO_SEED:-1}" = "0" ]; then
+    echo -e "    ${C_DIM}Skipping auto-seed (FLEXCMS_AUTO_SEED=0).${C_RESET}"
+    return
+  fi
+
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo -e "    ${C_YELLOW}Skipping auto-seed: python3 not found.${C_RESET}"
+    return
+  fi
+
+  if ! (cd "$ROOT_DIR" && python3 -c "import psycopg2" >/dev/null 2>&1); then
+    echo -e "    ${C_DIM}Installing missing python dependency: psycopg2-binary...${C_RESET}"
+    set +e
+    (cd "$ROOT_DIR" && python3 -m pip install --user psycopg2-binary 2>&1) | sed 's/^/    /'
+    local pip_exit=${PIPESTATUS[0]}
+    set -e
+    if [ "$pip_exit" -ne 0 ]; then
+      echo -e "    ${C_YELLOW}Could not install psycopg2-binary automatically; reset may be skipped.${C_RESET}"
+    fi
+  fi
+
+  echo -e "    ${C_DIM}Waiting for Author API before auto-seed...${C_RESET}"
+  local author_up=false
+  for _ in $(seq 1 45); do
+    if curl -sf --max-time 3 "http://localhost:8080/actuator/health" >/dev/null 2>&1; then
+      author_up=true
+      break
+    fi
+    sleep 2
+  done
+
+  if [ "$author_up" != true ]; then
+    echo -e "    ${C_YELLOW}Skipping auto-seed: Author API not healthy on :8080.${C_RESET}"
+    return
+  fi
+
+  echo -e "    ${C_DIM}Running local pre-seed reset for deterministic TUT-USA data...${C_RESET}"
+  set +e
+  (cd "$ROOT_DIR" && python3 scripts/reset_tut_usa_seed.py --apply --confirm-reset-tut-usa --environment local 2>&1) | sed 's/^/    /'
+  local reset_exit=${PIPESTATUS[0]}
+  set -e
+  if [ "$reset_exit" -ne 0 ]; then
+    echo -e "    ${C_YELLOW}Pre-seed reset failed; continuing with seed attempt.${C_RESET}"
+  fi
+
+  echo -e "    ${C_YELLOW}Auto-seeding TUT-USA content...${C_RESET}"
+  set +e
+  (cd "$ROOT_DIR" && python3 scripts/seed_tut_usa_website.py 2>&1) | sed 's/^/    /'
+  local seed_exit=${PIPESTATUS[0]}
+  set -e
+  if [ "$seed_exit" -ne 0 ]; then
+    echo -e "    ${C_YELLOW}Auto-seed failed (content). Run manually: python3 scripts/seed_tut_usa_website.py${C_RESET}"
+    return
+  fi
+
+  echo -e "    ${C_YELLOW}Auto-deploying TUT-USA assets (captured pipeline)...${C_RESET}"
+  set +e
+  (cd "$ROOT_DIR" && python3 scripts/import_tut_usa_captured_assets.py 2>&1) | sed 's/^/    /'
+  local assets_exit=${PIPESTATUS[0]}
+  set -e
+  if [ "$assets_exit" -ne 0 ]; then
+    echo -e "    ${C_YELLOW}Auto asset deploy failed. Run manually: python3 scripts/import_tut_usa_captured_assets.py${C_RESET}"
+    return
+  fi
+
+  echo -e "    ${C_GREEN}Auto-seed complete (content + assets).${C_RESET}"
+}
+
+stop_runtime_processes() {
+  # Stop tracked background processes from previous runs (without touching Docker infra).
+  if [ -f "$PID_FILE" ]; then
+    while IFS=: read -r label pid; do
+      if kill -0 "$pid" 2>/dev/null; then
+        kill "$pid" 2>/dev/null || true
+        sleep 1
+        kill -9 "$pid" 2>/dev/null || true
+      fi
+    done < "$PID_FILE"
+    rm -f "$PID_FILE"
+  fi
+
+  # Defensive cleanup in case processes were started outside this CLI.
+  pkill -f "spring-boot.*flexcms" 2>/dev/null || true
+  pkill -f "next dev.*admin" 2>/dev/null || true
+  pkill -f "next dev.*site-nextjs" 2>/dev/null || true
+
+  # Some Next.js processes run as `next-server` and won't match the patterns above.
+  for port in 3000 3001; do
+    local pids
+    pids=$(lsof -ti tcp:"$port" -sTCP:LISTEN 2>/dev/null || true)
+    if [ -n "$pids" ]; then
+      kill $pids 2>/dev/null || true
+      sleep 1
+      kill -9 $pids 2>/dev/null || true
+    fi
+  done
 }
 
 # ── Commands ─────────────────────────────────────────────────────────────────
@@ -220,8 +330,17 @@ cmd_start() {
 
   local services
   services="$(resolve_services "$@")"
+  local frontend_ok=true
+  local full_stack=false
+  if has_service "infra" "$services" && has_service "author" "$services" && has_service "publish" "$services" && has_service "admin" "$services" && has_service "site" "$services"; then
+    full_stack=true
+  fi
 
   banner "FlexCMS -- Starting: $(echo "$services" | tr ' ' ' + ')"
+
+  echo -e "    ${C_DIM}Stopping previous local app processes...${C_RESET}"
+  stop_runtime_processes
+  echo -e "    ${C_DIM}Previous local app processes stopped.${C_RESET}"
 
   # 1) Infra
   if has_service "infra" "$services"; then
@@ -257,6 +376,9 @@ cmd_start() {
   if has_service "author" "$services"; then
     if [ "$backend_ok" = true ]; then
       start_author
+      if [ "$full_stack" = true ]; then
+        run_fullstack_seed
+      fi
     else
       echo -e "    ${C_YELLOW}Skipping Author — backend compile failed${C_RESET}"
     fi
@@ -273,13 +395,28 @@ cmd_start() {
   fi
 
   # 5) Admin UI (always starts — no backend dependency)
-  if has_service "admin" "$services"; then
-    start_admin
+  if has_service "admin" "$services" || has_service "site" "$services"; then
+    if ! ensure_frontend_deps; then
+      frontend_ok=false
+    fi
   fi
 
-  # 6) Sample Site (always starts — no backend dependency)
+  # 5) Admin UI (skip if frontend install failed)
+  if has_service "admin" "$services"; then
+    if [ "$frontend_ok" = true ]; then
+      start_admin
+    else
+      echo -e "    ${C_YELLOW}Skipping Admin UI — frontend dependency install failed${C_RESET}"
+    fi
+  fi
+
+  # 6) Sample Site (skip if frontend install failed)
   if has_service "site" "$services"; then
-    start_site
+    if [ "$frontend_ok" = true ]; then
+      start_site
+    else
+      echo -e "    ${C_YELLOW}Skipping Sample Site — frontend dependency install failed${C_RESET}"
+    fi
   fi
 
   # Summary

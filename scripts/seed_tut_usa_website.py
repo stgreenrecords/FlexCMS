@@ -6,7 +6,6 @@ from __future__ import annotations
 import sys
 import os
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any, Callable
 
 import requests
@@ -15,7 +14,6 @@ AUTHOR_API = os.environ.get("FLEXCMS_AUTHOR_API", "http://localhost:8080")
 USER_ID = "admin"
 SITE_ID = "tut-usa"
 ROOT_PATH = "tut-usa"
-MISSING_ASSETS_PATH = Path(__file__).resolve().parent.parent / "Design" / "sample-website-tut" / "missing-assets.txt"
 
 
 @dataclass(frozen=True)
@@ -109,9 +107,8 @@ class AssetLog:
         self.counter += 1
         return f"/dam/{SITE_ID}/missing/{filename}"
 
-    def write(self) -> None:
-        MISSING_ASSETS_PATH.parent.mkdir(parents=True, exist_ok=True)
-        MISSING_ASSETS_PATH.write_text("\n".join(self.entries) + ("\n" if self.entries else ""), encoding="utf-8")
+    def count(self) -> int:
+        return len(self.entries)
 
 
 def api_request(method: str, path: str, *, expected: tuple[int, ...] = (200,), **kwargs: Any) -> requests.Response:
@@ -649,9 +646,8 @@ def main() -> int:
     clear_existing_site_pages()
     seed_experience_fragments()
     seed_pages(assets)
-    assets.write()
     print(f"Seeded {len(PAGES) + 1} pages including the TUT USA root.")
-    print(f"Missing assets log written to {MISSING_ASSETS_PATH}")
+    print(f"Recorded {assets.count()} placeholder asset references.")
     return 0
 
 

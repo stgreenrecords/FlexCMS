@@ -2,7 +2,7 @@
 
 import React from 'react';
 import type { ComponentNode } from '@flexcms/sdk';
-import { useFlexCms, type FlexCmsRenderer } from './FlexCmsProvider';
+import { useFlexCms } from './FlexCmsProvider';
 
 export interface FlexCmsComponentProps {
   /** The component node from the CMS page response */
@@ -49,6 +49,10 @@ export function FlexCmsComponent({ node, fallback }: FlexCmsComponentProps) {
       ))
     : undefined;
 
-  return <Renderer data={node.data}>{childElements}</Renderer>;
+  return (
+    <Renderer data={node.data} resourceType={node.resourceType} name={node.name}>
+      {childElements}
+    </Renderer>
+  );
 }
 

@@ -89,7 +89,7 @@ The reset tool requires all of the following:
 Planned deterministic reseed sequence after reset:
 
 1. `python3 scripts/seed_tut_usa_website.py`
-2. `python3 scripts/import_tut_usa_assets.py`
+2. `python3 scripts/import_tut_usa_captured_assets.py`
 
 The reset tool is designed so repeated reset + reseed runs remain deterministic and avoid duplicate mutable content/assets.
 

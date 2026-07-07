@@ -1,3 +1,41 @@
+## 2026-07-07 local - devops - REB-13
+
+- State: DEV_IN_PROGRESS
+- Action: Started REB-13 Selenium admin authoring/round-trip implementation; added editor/API helpers, admin suite specs, package command, and docs updates in selenium-e2e.
+- Evidence: `frontend/apps/selenium-e2e/src/cases/admin/authoring-roundtrip.spec.ts`, `frontend/apps/selenium-e2e/src/pages/EditorPage.ts`, `frontend/apps/selenium-e2e/src/pages/AuthorApiClient.ts`, `frontend/apps/selenium-e2e/package.json`, `frontend/apps/selenium-e2e/README.md`, `df/artifacts/REB-13/devops/summary.md`, `df/artifacts/REB-13/handoffs.md`; command `cd frontend/apps/selenium-e2e && pnpm test:admin` -> `2 passing`, `1 pending`
+- Result: PARTIAL
+- Next: Continue devops lane to make the edit-persist case deterministic and then move REB-13 to `READY_FOR_QA` with complete evidence.
+- Risks/blockers: Edit-persist test may skip when selected seeded layer does not expose editable controls; deterministic field targeting still needs hardening.
+
+## 2026-07-07 local - State change
+
+- Task: REB-13
+- From: READY_FOR_DEV
+- To: DEV_IN_PROGRESS
+- Role: devops
+- Reason: Human requested starting Selenium admin automation for edit/cancel-inheritance/publish flows.
+- Evidence: `df/runtime/board.md`, `df/artifacts/REB-13/devops/summary.md`, `df/artifacts/REB-13/handoffs.md`
+- Next: Continue REB-13 implementation and validation in devops lane.
+
+## 2026-07-07 local - frontend-dev - REB-08
+
+- State: READY_FOR_QA
+- Action: Completed frontend foundation updates for tokens/fonts/layout shell and renderer contract baseline; replaced stale `site-nextjs` component-map imports with a contract-aware fallback map and validated full frontend build.
+- Evidence: `frontend/apps/site-nextjs/src/app/globals.css`, `frontend/apps/site-nextjs/src/app/layout.tsx`, `frontend/apps/site-nextjs/src/components/component-map.tsx`, `frontend/packages/react/src/FlexCmsProvider.tsx`, `frontend/packages/react/src/FlexCmsComponent.tsx`, `df/artifacts/REB-08/frontend/summary.md`, `df/artifacts/REB-08/handoffs.md`; command `cd frontend && NUXT_TELEMETRY_DISABLED=1 pnpm build` PASS
+- Result: PASS
+- Next: Manual human QA/PO review per `DEC-REB-005`; route defects back to `frontend-dev` if review fails.
+- Risks/blockers: Unimplemented TUT resource types currently render through explicit fallback until REB-09 grouped renderers are delivered.
+
+## 2026-07-07 local - State change
+
+- Task: REB-08
+- From: DEV_IN_PROGRESS
+- To: READY_FOR_QA
+- Role: frontend-dev
+- Reason: AC1-AC5 implementation and validation evidence completed in frontend lane.
+- Evidence: `df/artifacts/REB-08/frontend/summary.md`, `df/artifacts/REB-08/handoffs.md`, `df/runtime/board.md`
+- Next: Manual human review/acceptance per `DEC-REB-005`
+
 ## 2026-07-07 local - frontend-dev - REB-08
 
 - State: DEV_IN_PROGRESS
@@ -386,4 +424,42 @@ Use `df/templates/activity-log-entry.md` for new entries.
 - Reason: Traceability matrix, fixture manifests, and 21 template + 14 component skeleton specs generated and validated.
 - Evidence: `df/artifacts/REB-06/devops/summary.md`, `df/artifacts/REB-06/handoffs.md`, `Design/tut-usa/generated/qa-traceability-matrix.csv`, `frontend/apps/selenium-e2e/src/cases/`
 - Next: Manual human review and accept/reject decision per `DEC-REB-005`
+
+## 2026-07-07 local - frontend-dev - REB-09
+
+- State: READY_FOR_QA
+- Action: Completed grouped TUT component renderer implementation in `site-nextjs`, registering all generated `tut-usa/*` resource types from contract artifacts and adding defensive rendering for optional/missing fields, empty lists, long copy, and image fallbacks.
+- Evidence: `frontend/apps/site-nextjs/src/components/tutGroupedRenderers.tsx`, `frontend/apps/site-nextjs/src/components/component-map.tsx`, `df/artifacts/REB-09/frontend/summary.md`, `df/artifacts/REB-09/handoffs.md`; command `cd frontend && NUXT_TELEMETRY_DISABLED=1 pnpm build` PASS
+- Result: PASS
+- Next: Manual human QA/PO review per `DEC-REB-005`; if accepted, route to `REB-10` implementation.
+- Risks/blockers: Grouped renderers are generic by contract; template-level fidelity refinements may be needed in `REB-10`.
+
+## 2026-07-07 local - State change
+
+- Task: REB-09
+- From: DEV_IN_PROGRESS
+- To: READY_FOR_QA
+- Role: frontend-dev
+- Reason: REB-09 AC1-AC5 implementation completed with frontend build validation evidence.
+- Evidence: `df/artifacts/REB-09/frontend/summary.md`, `df/artifacts/REB-09/handoffs.md`, `df/runtime/board.md`
+- Next: Manual human review/acceptance per `DEC-REB-005`
+
+## 2026-07-07 local - frontend-dev - REB-09
+
+- State: DEV_IN_PROGRESS
+- Action: Started REB-09 by explicit human request while QA/PO automated sessions remain disabled; captured implementation scope and evidence plan for grouped renderer delivery.
+- Evidence: `df/runtime/board.md`, `df/artifacts/REB-09/frontend/summary.md`, `df/runtime/decisions.md`
+- Result: IN PROGRESS
+- Next: Implement grouped TUT renderers, run frontend validation, and move task to `READY_FOR_QA` for manual review.
+- Risks/blockers: Dependency `REB-08` is still awaiting manual acceptance; work proceeds under explicit human override.
+
+## 2026-07-07 local - State change
+
+- Task: REB-09
+- From: READY_FOR_DEV
+- To: DEV_IN_PROGRESS
+- Role: frontend-dev
+- Reason: Human requested taking the next dev task now while QA/PO review is deferred to manual.
+- Evidence: `df/runtime/board.md`, `df/artifacts/REB-09/frontend/summary.md`, `df/runtime/decisions.md`
+- Next: Complete REB-09 acceptance criteria and move to `READY_FOR_QA` with validation evidence.
 

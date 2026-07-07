@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T08:15:14.361586+00:00",
+  "generatedAt": "2026-07-07T14:09:11.917507+00:00",
   "sourceManifest": "Design/tut-usa/manifest.json",
   "totals": {
     "uniqueLocalAssets": 182,
@@ -11,7 +11,7 @@
     },
     "copiedSiteNextjs": 182,
     "copiedAdmin": 182,
-    "damUploaded": 182,
+    "damUploaded": 0,
     "blockersSeen": {
       "disallowed": 72,
       "missing": 2
@@ -62,9 +62,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/01817351be3edfc1-cy9afjocx1hbuyalurk4397yjijfjpc.woff2",
-        "damContentUrl": "/api/author/assets/daef5287-a73c-4479-be5e-7ab7c9e7acac/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -100,9 +100,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/0a65822f4b1cb1a4-cy9xfjocx1hbuyalurk439vogqc9yfzcyg7orzalfygzbara.woff2",
-        "damContentUrl": "/api/author/assets/658e1ddd-a9e3-438b-a28c-c5b199941957/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -139,9 +139,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/19a83cc7ce02aab9-cy9xfjocx1hbuyalurk439vogqc9yfzcyg7orzalfyyzbara.woff2",
-        "damContentUrl": "/api/author/assets/cc1159c2-b9b6-4461-b2dd-274b18c9ce72/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -181,9 +181,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/2a69ec1c0fb79a46-cy9vfjocx1hbuyalurk49dlac06g1zgszbtobabnjyq5ayzc.woff2",
-        "damContentUrl": "/api/author/assets/9563892a-15cd-4f79-b84d-5b04b68fe283/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -215,9 +215,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/3b8eca75ceca3077-cy9kfjocx1hbuyalurk439vogqc9yfzcyg7orzalp4obnf7f.woff2",
-        "damContentUrl": "/api/author/assets/308cd607-bc5d-4aeb-ae34-c4e9444d4afe/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -261,9 +261,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/40af11327fe53081-xn7gyhe41ni1adirggsxsvfedn62zw.woff2",
-        "damContentUrl": "/api/author/assets/5ad36c60-94a7-4199-9712-0fb5275f4c79/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -295,9 +295,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/56febd06c694ba79-cy9kfjocx1hbuyalurk439vogqc9yfzcyg7orzalp4obnf7f.woff2",
-        "damContentUrl": "/api/author/assets/7e628409-ec6d-48b7-bd91-102e3660c00d/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -330,9 +330,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/68ef9a14f1462e22-cy9afjocx1hbuyalurk439hyjijfjpebzq.woff2",
-        "damContentUrl": "/api/author/assets/3499273e-4505-4ae1-a28c-c13939d28166/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -366,9 +366,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/750e9629f56ae719-cy9cfjocx1hbuyalurk439vcgihcbjwxzcpp.woff2",
-        "damContentUrl": "/api/author/assets/da511a11-2d6c-49cf-be33-0ec6af2b882a/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -412,9 +412,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/95a493061fe0a8d0-xn7gyhe41ni1adirggoxsvfedn62zw.woff2",
-        "damContentUrl": "/api/author/assets/c574851e-6267-4bf2-9044-f8d5ad66440b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -453,9 +453,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/a61f9c4ae3b99795-cy9vfjocx1hbuyalurk49dlac06g1zgszbtobabcjyq5ayzc.woff2",
-        "damContentUrl": "/api/author/assets/4bfd3731-52dd-4e15-941b-095d6e30d9c6/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -505,9 +505,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/a99fb127682b9af5-cy9cfjocx1hbuyalurk439vcjohcbjwxza.woff2",
-        "damContentUrl": "/api/author/assets/872472db-0f58-48db-9882-b904d1129bb6/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -539,9 +539,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/b7352f1eb41bd7c0-cy9kfjocx1hbuyalurk439vogqc9yfzcyg7orzalp4obnf7f.woff2",
-        "damContentUrl": "/api/author/assets/4e8c656f-2857-4077-a86c-b21d4a290ad2/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -585,9 +585,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/bab757f8a0a1bc04-xn7gyhe41ni1adirggixsvfedn62zw.woff2",
-        "damContentUrl": "/api/author/assets/a31f181a-a37d-448d-950a-0b684b08fada/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -649,9 +649,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/c74fc989683e63a5-kjepbvyx7bgnksruwt8ohrdqw4oeldpieeii9v6odmzbwg-r.woff2",
-        "damContentUrl": "/api/author/assets/0fec6c6c-601c-45ca-a466-90841df8b60a/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -684,9 +684,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/cbca001188852d51-cy9afjocx1hbuyalurk439dyjijfjpebzq.woff2",
-        "damContentUrl": "/api/author/assets/22d66665-c0bf-47c7-bdf6-c5f27679cc9b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -730,9 +730,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/ce093b341d9c1065-xn7gyhe41ni1adirggmxsvfedn62zw.woff2",
-        "damContentUrl": "/api/author/assets/426f0a52-6e22-40f0-8d0b-883b11696a74/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -766,9 +766,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/d5a170a88bdb4e21-cy9cfjocx1hbuyalurk439vcgyhcbjwxzcpp.woff2",
-        "damContentUrl": "/api/author/assets/71665bc3-b181-4d14-9e24-a24b9b8f1932/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -829,9 +829,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/e310b55a7fd9677f-xn7gyhe41ni1adirggexsvfedn4.woff2",
-        "damContentUrl": "/api/author/assets/b12bb7aa-35f1-4c6b-b1b2-abde1d137d3f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -875,9 +875,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/e8c0b39992f06b3d-xn7gyhe41ni1adirggqxsvfedn62zw.woff2",
-        "damContentUrl": "/api/author/assets/b8355331-f198-4cca-9a46-e081682f4efc/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -913,9 +913,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/ecc0a860ff459daa-cy9xfjocx1hbuyalurk439vogqc9yfzcyg7orzalfykzbara.woff2",
-        "damContentUrl": "/api/author/assets/76bae708-ac95-4de5-acfe-03db16f24d44/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -954,9 +954,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/fonts/fe52554ab1cd7dd9-cy9vfjocx1hbuyalurk49dlac06g1zgszbtobabdjyq5ayzc.woff2",
-        "damContentUrl": "/api/author/assets/05872fd3-65a5-4615-820a-3200009cc552/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -986,9 +986,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/02b2932f59db0cf8-ab6axudqjze3dqwk3mascd2fhfw6o-bd1xwf0veukzq8uuau.png",
-        "damContentUrl": "/api/author/assets/2577950d-b432-4970-bc69-edf05453560a/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1018,9 +1018,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/02f0b2fff7d736b0-ab6axubigqgcfve01l4lnh-3cfiap1-p9z5axpcgv4vr8slw.png",
-        "damContentUrl": "/api/author/assets/8737a63b-c4e3-4f36-aeea-d7e2a84a90c5/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1050,9 +1050,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/034a26b9bdb2038c-ab6axubjpmm2qevzuqlie-cfsuneztglv-5z0ur88dr9zapy.png",
-        "damContentUrl": "/api/author/assets/321bb7c3-4f94-4d8e-85d6-e25461bfc451/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1082,9 +1082,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/03926c22f07d2f5d-ab6axubylalpck1jjq5yehhwwmrd0gms4xdcw9m440vroizn.png",
-        "damContentUrl": "/api/author/assets/9a301954-b57a-4b68-8945-1d405cbf76f1/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1114,9 +1114,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/041874044e71ed8c-ab6axuc7uwse7pntb62azaftyuahly5qklvpsexzst6-58jn.png",
-        "damContentUrl": "/api/author/assets/e35d992e-8386-4e10-a2d6-a7433fa65832/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1146,9 +1146,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/07c5448a0e87b057-ab6axuaj0oosh81zpjjtczm79dig8ozplx-ldv9uyzx7qg-o.png",
-        "damContentUrl": "/api/author/assets/372398b8-786e-4de6-9ebc-2e91a4804bd2/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1178,9 +1178,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/080c9c8b025754f3-ab6axuc8hhfihbjejotsdkmufbixw7t-liyzmxv5cwsomelk.png",
-        "damContentUrl": "/api/author/assets/af4593d2-68a7-49fb-a1e3-006e466ba298/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1210,9 +1210,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/081d9ebeb7d44365-ab6axub2zueilqgewxddhqmchwoqvd3jstpuq3suhw-7ljjm.png",
-        "damContentUrl": "/api/author/assets/1a31183a-9a85-4ee6-9cc2-6c3446562e45/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1242,9 +1242,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/08364f8b5f1de63f-ab6axuafv06eai-ripim6l-40xzia1ob05lhzuv-fld6hkv7.png",
-        "damContentUrl": "/api/author/assets/f7d5cf90-af86-4d44-aca0-78ccc371cd04/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1274,9 +1274,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/0a2bf900ec4adaee-ab6axuaekcsam-vp7o6o7p1gdxvp6cz3c44bfpsxk3gu-69j.png",
-        "damContentUrl": "/api/author/assets/2844a4ed-2efd-4d3f-a46c-ea09e1966ee8/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1306,9 +1306,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/0bde289c91836ce3-ab6axubfk-odphe3y8vevdsnenei9nenyysfk-w7w8gbndc4.png",
-        "damContentUrl": "/api/author/assets/b44b152e-5a46-4015-b7de-bc8b81ec5838/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1338,9 +1338,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/0ea82ebc2040a443-ab6axubh7e8o8at5asczc-u1ccmteirdnfeialaniz6rwinc.png",
-        "damContentUrl": "/api/author/assets/4b63aa3d-09f9-4fa3-999c-e37ec35d8066/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1370,9 +1370,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/0ec1bd61f6099b07-ab6axudwqqqreexxlkx8zipfjoxundcgkgsrw5kauqzeqpy6.png",
-        "damContentUrl": "/api/author/assets/a36f3942-3e3b-46bb-b38b-fbc1e6cdbac2/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1402,9 +1402,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/10668bf90cd28f33-ab6axudlaxztmqys15bdmvhua0fifdtg4lhah3k1p6ii2yhc.png",
-        "damContentUrl": "/api/author/assets/36399940-9d04-432a-b79a-e5b52fb0f3ec/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1434,9 +1434,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/125b97b36cd576c7-ab6axuci2hlb3zm-lhpyl6lan4zbdsqyz-zpxssqece-lxre.png",
-        "damContentUrl": "/api/author/assets/22382446-b52e-4541-b48e-4bdf236f3af3/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1466,9 +1466,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/133b6f0bcb394a8e-ab6axudk0u93wzjrxytjobjvwt4yh74-ei8ertqq09utucq.png",
-        "damContentUrl": "/api/author/assets/dc7850de-c10e-4bf2-bc03-ad1b974c05f1/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1498,9 +1498,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/13d3400f47463eb7-ab6axuc8zfjdktmibjprvk91axkfhhldjux1won1ia6xag-5.png",
-        "damContentUrl": "/api/author/assets/ee1d253b-db67-4885-b839-805c412f357b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1530,9 +1530,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/14a9c1b9a6863031-ab6axuc-wwui-h-qm7tyjlidfvk6ht4ixlngbhguxypvz1tu.png",
-        "damContentUrl": "/api/author/assets/09bcbf27-96a3-4272-b216-bf9dc716e77f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1562,9 +1562,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/1808c70e752d53e9-ab6axudqejohnml8skwpdazbzjvqfvwvbrsagpjwhufz-xgw.png",
-        "damContentUrl": "/api/author/assets/7fb67e5d-ff62-4873-8178-cf95bfb00683/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1594,9 +1594,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/18701a62292ec061-ab6axuayfez5wqyzcloq8zehwv63yg4b1jgutsowye-y76xh.png",
-        "damContentUrl": "/api/author/assets/4b08bd2f-5fd9-4a46-9000-66ee7eb2116b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1626,9 +1626,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/1a304f52056b65a9-ab6axubnutjm94a7bwltmqfxgea0wjr7k8uivpzognpdliro.png",
-        "damContentUrl": "/api/author/assets/5096c100-b563-4452-aa7e-238a0254758d/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1658,9 +1658,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/1e6d642dd3ed41f6-ab6axudxt01q7pr8j453ll-x0fjdstuml5w14hvce2prbslk.png",
-        "damContentUrl": "/api/author/assets/d670ea60-f617-40b7-ba20-553e72dafec7/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1690,9 +1690,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/1f6541f87452fcb7-ab6axubhuv8uj9r9oq9zmionr4dubadmdzdmjxrduspif7mf.png",
-        "damContentUrl": "/api/author/assets/fc84cc08-95ec-440e-8911-271ef08bb670/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1722,9 +1722,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/2365fa9aadb384dd-ab6axuaxlgvnutq0inzl19vvkwuzjxxv7rw5zfg6bl-segss.png",
-        "damContentUrl": "/api/author/assets/f7e81593-0f0f-45ee-99b4-a5ad38d1f179/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1754,9 +1754,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/24e3caedb0d6fc41-ab6axubvaltcxysdt4hdv1uclfcbtlxyt7hia-2edanjuvwc.png",
-        "damContentUrl": "/api/author/assets/e61b6d65-4152-45b9-84a5-91a8fc67cd5d/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1786,9 +1786,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/2550c1ba309704a4-ab6axucfvyo2chzpjjvnde4g3-5greqz-hmmdkzzntxej1ba.png",
-        "damContentUrl": "/api/author/assets/a49575d1-bda4-44a6-9c70-c396ab7cafcf/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1818,9 +1818,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/2612255cc3ddefdc-ab6axuakl-atvf34hfdii9mzekguoxql5-osqoapxcplcucp.png",
-        "damContentUrl": "/api/author/assets/98b50c8c-a713-4b39-ba25-cbd1544324ee/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1850,9 +1850,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/277758a05d27b2c5-ab6axudq04mjx34by-xf6r4fvtjv-wntuasd2pm9ygalfbei.png",
-        "damContentUrl": "/api/author/assets/6d74f200-2945-4c64-b12a-239402ccbf41/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1882,9 +1882,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/284e51d3d025a79b-ab6axuc7zn1r-swe8srvwkdvumewh9z-tsvsqtk3cnoospu4.png",
-        "damContentUrl": "/api/author/assets/afb32c39-ff2c-4f2f-a06e-73b9b9d1868c/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1914,9 +1914,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/2b0a5ace3794750e-ab6axuax-vjp9woxbpiafp-rhct2rqkyxzbcqbqfaapvkpqp.png",
-        "damContentUrl": "/api/author/assets/35c3ebf3-ca21-48f0-9ecf-866f6762cf09/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1946,9 +1946,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/2c58edad3297e41f-ab6axucjzbzvlb2fvw-uuui-s8xga4zpl-nuy82jyhmbgw7u.png",
-        "damContentUrl": "/api/author/assets/35ff6ec2-46c3-456c-8bfb-627384f77905/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -1978,9 +1978,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/2e626b3b33081989-ab6axubd7-gn-oyesctdksnlx3el3tsqpwy-mah2a1uvwnb.png",
-        "damContentUrl": "/api/author/assets/791245e7-7f65-4a31-92aa-23e200154efa/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2010,9 +2010,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/2f665d5dcfe31b2e-ab6axucxhp9woco4m6ny8kzw2rsandgzs3hevv5hxuxakauf.png",
-        "damContentUrl": "/api/author/assets/1347fad0-d11e-47cc-8c75-ad66bcdda1cb/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2042,9 +2042,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/31c7c99846074e2b-ab6axuacipobh8nxpcleri8ts01v85y9awtkftgokzkmj3nq.png",
-        "damContentUrl": "/api/author/assets/fd3e12d8-12f0-476f-afa6-2ce3bc49fea7/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2074,9 +2074,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/352fe001d76db846-ab6axub9fwpxtm7r4jaamtjucdtnzmjckkhlenwhfjawfigj.png",
-        "damContentUrl": "/api/author/assets/7e04a12c-ba0f-4de2-bede-edf7ae188c7c/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2106,9 +2106,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/35d6d74bdcff19bc-ab6axuckg9kvuynw8-qqzv3ljjmqyrtfpq61owyazqiultgx.png",
-        "damContentUrl": "/api/author/assets/4990a6c9-35db-492d-9a3a-f3270d1bea23/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2138,9 +2138,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/36288a8a9aa0d96f-ab6axubhv0oogn4ar3ak8ictbzbyrb-3pcz9ufn-fbr557vw.png",
-        "damContentUrl": "/api/author/assets/c8f38beb-2f67-408c-9d71-3becdaacdad8/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2170,9 +2170,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/3b025024d48427d7-ab6axud1vdsz8zsjqyj3zezpoy8q33ppzxb7ni4a2ue-h7mp.png",
-        "damContentUrl": "/api/author/assets/dae53a1c-1a16-44dd-823f-b2a05cb9869f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2202,9 +2202,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/3c27e001edfef366-ab6axuddplbaq3crj-sopniyugyxlrugxz39-awfcrpqaik9.png",
-        "damContentUrl": "/api/author/assets/1eb29f59-4d6e-4c3d-9845-6ea7ad9a844f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2234,9 +2234,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/3dbb173ded1c28e9-ab6axuczxu8mwrei4lg25i8taljzbhwypnxy9-usibvvhois.png",
-        "damContentUrl": "/api/author/assets/292e0474-cf6c-453d-b418-e9c2e797aa6b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2266,9 +2266,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/3dc15528b561aeae-ab6axuakgvbecvl8yoqtttcvih4lstfew5hqxmwqty6z8b8z.png",
-        "damContentUrl": "/api/author/assets/9b547d88-ed3f-4a60-b9cc-45440ff9043b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2298,9 +2298,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/3e771b432244b606-ab6axuaw-tskijk59vz1cpljbh6bbyyz6f-0by8cuug5p6wv.png",
-        "damContentUrl": "/api/author/assets/5c2518ba-abcf-4400-a7f7-ff79af4924ff/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2330,9 +2330,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/42e72905774e0679-ab6axucybvxhu3lydm8tzbz-iqill4lme1wb5wqlgv1veofp.png",
-        "damContentUrl": "/api/author/assets/e5865fbb-69f7-4b00-8e0a-a36e76da9b04/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2362,9 +2362,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/441ebf1c40899a7f-ab6axub9hk3h8wzrfdc-artaimducwxfjzf-1vkuprsrsnd0.png",
-        "damContentUrl": "/api/author/assets/8866c5a3-1f1a-4b5e-a3c5-e3c0b7b5e0f8/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2394,9 +2394,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/46290043945d1ca5-ab6axud9uqrohb2xzhbf-ojzgidjz4t73itceq1luwx6-ucp.png",
-        "damContentUrl": "/api/author/assets/46b25453-5e4a-44c2-9d0d-e047ed3ead39/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2426,9 +2426,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/470c0e7bf93ddb30-ab6axubrfogrn4gly1kxytg6eunpnhh9ibdgjxqf9gytcrqq.png",
-        "damContentUrl": "/api/author/assets/35a88ea5-74ac-44c3-a9f1-5c587294874c/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2458,9 +2458,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/47d757579c50d90d-ab6axuasluybpgpmhfs-ugfjepvpygc-syarxstb3mlqthlx.png",
-        "damContentUrl": "/api/author/assets/cb7b2fbe-473a-46b9-a4c6-13fba1ae89f0/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2490,9 +2490,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/498dc07e29467b17-ab6axubz-t00xm-0ctytzhfzexew4abchrv-g6bxv6ewishk.png",
-        "damContentUrl": "/api/author/assets/34046cab-df49-438a-9c96-894b114fa587/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2522,9 +2522,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/4c6b13ba24733fe6-ab6axudom7rextoexnvtvhbzgjl6fcb9ugtkejlkwkqgwfe0.png",
-        "damContentUrl": "/api/author/assets/5345800d-4a60-4cf3-aca5-4274ede16106/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2554,9 +2554,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/4dec1199079e2cb6-ab6axuaebh7ff1zvlyh8yy0q2grvcjcronrw63krby7oxtxr.png",
-        "damContentUrl": "/api/author/assets/a6b8306e-3c87-47fd-8437-db41a0c55a35/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2586,9 +2586,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/4e00f48f778ba17f-ab6axuakwcry-rj03a3uhbhwylg4j5slw1r20nzfvkqhotby.png",
-        "damContentUrl": "/api/author/assets/83daaf04-2739-4323-8c04-add631e4c0cb/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2618,9 +2618,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/4ebe583ef1b27253-ab6axudvjwkcflc164mqlnoyfnwhteqojpewp8gxkrldbejy.png",
-        "damContentUrl": "/api/author/assets/40e5a622-cfd0-454d-b8e8-a9e9d7ddc83d/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2650,9 +2650,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/4ec917f2565a2f88-ab6axudnxz14gyzqthc1cb1bh67lmjoaynmr-qjfga4k8pho.png",
-        "damContentUrl": "/api/author/assets/1785a96d-c038-4c40-9547-106faa2ba96d/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2682,9 +2682,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/50b2797c47fd2d79-ab6axudd4clhdtwhsfmt3n06umko3dreexfw2dvrvq8gktjt.png",
-        "damContentUrl": "/api/author/assets/e0a07d3b-beab-44e0-9454-4d298c46db37/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2714,9 +2714,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/54e8de2eaa72e311-ab6axuck7lewy-y6aaq60dkkbajbr-icvdoaf4cftshxafzz.png",
-        "damContentUrl": "/api/author/assets/004b40a1-004b-4f76-b6d1-b307a51c27c4/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2746,9 +2746,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/57471f7431397a05-ab6axubdwlx5xs70gxkjrvojp7axpue8zbv9jrmbipjqifbw.png",
-        "damContentUrl": "/api/author/assets/4829ad4b-83a0-4e10-9acf-a113fd1f2376/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2778,9 +2778,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png",
-        "damContentUrl": "/api/author/assets/f17c3b7a-a23f-4687-badf-43154e1ab6d6/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2810,9 +2810,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/5bdcf8fcb7e88040-ab6axuazj-0bau96klaipz7jurqgowlepnbrgonkoljdgqf.png",
-        "damContentUrl": "/api/author/assets/1b31b839-6ad4-43b3-bf8b-b774c81b383f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2842,9 +2842,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/5c20fb04bf6ae187-ab6axuaxsxckuam-85os5gihse1pzwpyyy11oyha7gfcjxif.png",
-        "damContentUrl": "/api/author/assets/a997eb05-274e-455c-bd5f-c8433fbac974/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2874,9 +2874,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/5c971568da9b36ae-ab6axuc8pva1kxgwz0pxxhka151axnqd7hkchad-cqjha1rg.png",
-        "damContentUrl": "/api/author/assets/5291768c-82ab-4ff5-8ad9-d6047f8783e0/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2906,9 +2906,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/5e65915c79d646a0-ab6axua1xwbhmd3v9bez4dz8nbew8e7zxaqdf7wez-grnyty.png",
-        "damContentUrl": "/api/author/assets/52db3650-c394-49aa-b600-64702ec21d6e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2938,9 +2938,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/5eb9c10d6f139c1c-ab6axubc8tzpt6ua2vglbex6miba7stpdk0a4v0ccjmrp6qd.png",
-        "damContentUrl": "/api/author/assets/b982a42d-cfd6-47ae-a41c-000e855134b4/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -2970,9 +2970,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/600c85fd587db816-ab6axubunwqpfytomyauk-16fhta4girbove-bqyl2vdyqza.png",
-        "damContentUrl": "/api/author/assets/e8680cc7-6ab2-47fb-92ef-1c2d0229f238/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3002,9 +3002,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/60544cff6933ca48-ab6axud5tfmigqbhp2jdznsu92z4qvgjzfybmsanpb-tc3xk.png",
-        "damContentUrl": "/api/author/assets/5ca1335a-2730-4038-b468-02c690065ecf/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3034,9 +3034,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/61cdca4a9b426460-ab6axucuamgaxzao42c6cmj0yg0gdssnof5oow8vyojszxp.png",
-        "damContentUrl": "/api/author/assets/1eec4621-b2a3-4430-8df5-fa1eac4fe331/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3066,9 +3066,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/63d5e96776c3a4d1-ab6axucnxrs3jrkdgsko0ttxg2bu0t0yf-gswjaeialcm5y0.png",
-        "damContentUrl": "/api/author/assets/f53d965e-e771-43bb-808d-d6f592c7f443/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3098,9 +3098,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/63f70f29e8a7cd64-ab6axucsdxsjksn2vqd-6d2bgrb5lnvoar5wtpkotahr8trr.png",
-        "damContentUrl": "/api/author/assets/03d5288d-4597-47aa-9eb7-06ce331bfcfc/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3130,9 +3130,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/64e1a2f4d517a7f3-ab6axuafl6-4dfxjarns8xxpd6vo3rk1t7ja0nlakngmcj1j.png",
-        "damContentUrl": "/api/author/assets/8113bf25-fd3b-4c75-b3f3-e29369c844c2/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3162,9 +3162,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/6721a78634fae956-ab6axucql0plslnfpyow5hetu4gs-hbahjh4qwobmsqy9rcg.png",
-        "damContentUrl": "/api/author/assets/a3f8ed80-ed22-4051-b1d2-5eaac3b41f45/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3194,9 +3194,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/67809f5174c29101-ab6axucrxv0n78dvts6lcrjdtk0zqfy9ok305lqxqzvlgbtx.png",
-        "damContentUrl": "/api/author/assets/f1261a45-917c-4ede-a421-c1552be65e1d/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3226,9 +3226,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/68d71d1e83b47d66-ab6axublcnavgytx3fdtbatncwoh4mmgfpjhstjpjjeachsh.png",
-        "damContentUrl": "/api/author/assets/7789534c-bdde-45be-913a-faba9fa59795/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3258,9 +3258,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/6b0a1f6d91a14b7b-ab6axucfpdtzjh2g4mmgkau6rsuzl67odtjwhbyyojsm-8h.png",
-        "damContentUrl": "/api/author/assets/e89cb975-fbe3-4255-bcb6-97993859a5cd/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3290,9 +3290,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/6bf1bd6abae3a70a-ab6axuarwh4kavbslfkimkv7swzojap8oidviezqahv1eiv7.png",
-        "damContentUrl": "/api/author/assets/f2120c98-8679-4247-afcd-46df13177ee8/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3322,9 +3322,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/7010fdb8ad060cdb-ab6axuahohfrzjnlzscm6zgymlcquwmqxuega3btf18wbkob.png",
-        "damContentUrl": "/api/author/assets/7b770d77-bc98-435d-bcdd-6be7b593501e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3354,9 +3354,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/712bb07f92e8e410-ab6axub4tnne08kp1daravr1betyf2r0wbtnqs7zovki-p3w.png",
-        "damContentUrl": "/api/author/assets/55ed64e6-2d3e-49f8-9149-3bc45844151c/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3386,9 +3386,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/72c3694277f3f041-ab6axuaui9kripju4chbjchw9c9quop6det41nx1ofjtkpmk.png",
-        "damContentUrl": "/api/author/assets/d471719c-bb73-4500-a408-be1f7cd29001/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3418,9 +3418,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/745a48367d30f08c-ab6axualrgeuj1pkguxz-qev-nfiundadh-qg6npp9j-u6ev.png",
-        "damContentUrl": "/api/author/assets/ac3487ac-c2ce-40f6-8f67-72f06e4cf06a/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3450,9 +3450,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/7464465e71ecafd6-ab6axud0ww-2nge0msjvaxbget-4jrep1iblv6rqrultgybn.png",
-        "damContentUrl": "/api/author/assets/81219e39-95a6-4a90-bfd5-21f4542d9bbb/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3482,9 +3482,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/75445a65e0c8cba9-ab6axubguxk1lc7ye5fyy2ulgkhwfzslaj6gb0vw6lgky3ox.png",
-        "damContentUrl": "/api/author/assets/2d08c02c-37ef-41ec-9250-a4ece2d703ab/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3514,9 +3514,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/79d0f04266369d6b-ab6axuaduret0-fqqdu4qq7blbbqso0tnb4qtutbfb3mflzk.png",
-        "damContentUrl": "/api/author/assets/31a5d2b8-3b61-4957-a7ce-6d10b3c7a2d7/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3546,9 +3546,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/7aefcd46c64bfdab-ab6axubd0opf80g22lzjbezic5b6piahdkurfvcewg0ebaau.png",
-        "damContentUrl": "/api/author/assets/31324d9a-b7e0-4219-a0ae-c9a0a6d4cd6c/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3578,9 +3578,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/7beb0eddd52b3ced-ab6axud-rhf1sd760bysh3yyxkwghwd61i47op5-cunqylyk.png",
-        "damContentUrl": "/api/author/assets/11c11b64-5742-48a4-955c-02ad2754579d/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3610,9 +3610,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/7c12b5be18db1e78-ab6axuazxmn5np-gqvb9nr-choij-hjta6cwvh7vdgrp58on.png",
-        "damContentUrl": "/api/author/assets/aca36413-f25c-4b09-892f-447be4c74f78/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3642,9 +3642,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/7fe9043f442ddf62-ab6axucpd3pmecx4x8v5qbdz6272dtxho1itevux7vp3sjse.png",
-        "damContentUrl": "/api/author/assets/12ea5a97-0629-425b-a196-4fcca151e3a1/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3674,9 +3674,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/822b33a7b725c7a7-ab6axuagzxiag3e8byo1z0h7kkyzarb931kz2auqhvtzr266.png",
-        "damContentUrl": "/api/author/assets/63d4e964-f60b-4167-b38f-b3eb2c3dfe6b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3706,9 +3706,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/828b912c5226d5ea-ab6axucji0yewgvu90k1ou8sf4-1smeeualxdpv189zackok.png",
-        "damContentUrl": "/api/author/assets/64ee8ee7-8cb4-4d4c-ae25-60ae918a8c76/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3738,9 +3738,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/84ee013ff39346d2-ab6axuc5g5qo-k2bfbg4loonizhgupilorcpj5yrfdxilw1d.png",
-        "damContentUrl": "/api/author/assets/fd6d7a21-3dec-47e3-b160-2011ec92380f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3770,9 +3770,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/87afa1040123aad4-ab6axudn-ivudb9oueognfrcamvtchi0sdggawhgx-bgvsf1.png",
-        "damContentUrl": "/api/author/assets/f357a07c-d6bc-4165-aec9-56f3a2896c07/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3802,9 +3802,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/880017d7ef65f00b-ab6axuaraza2ay0u33f3dybgyspum3oxjiwdzdu3ohn7tsrx.png",
-        "damContentUrl": "/api/author/assets/fed8ed88-319d-4af2-b04e-495c7b01bee0/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3834,9 +3834,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/88cd9daece31c6f0-ab6axubmwofwbbnpfwmyntolmvhh7t-8c8b4r-sxnu2wfqhr.png",
-        "damContentUrl": "/api/author/assets/cc365b99-1726-405f-a63d-7d6e993e591e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3866,9 +3866,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/8a1510a14482d57b-ab6axudv3il8m7nlqvlhckqideue983g8rw2guy8tlhq3h7z.png",
-        "damContentUrl": "/api/author/assets/22dfe5ec-e348-4751-9eeb-f2780bfa674f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3898,9 +3898,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/8aad29034db0c5fb-ab6axua5uegmu9h83mug6osuy-italebfkduqxp7ktrxpswi.png",
-        "damContentUrl": "/api/author/assets/fd36f516-8a8e-4c73-af5e-a5fb8598816b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3930,9 +3930,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/8afea20155df5a03-ab6axucmnc0ohxalj-7jefqe2ejtuw1ulcu-xltzqnfsa4tb.png",
-        "damContentUrl": "/api/author/assets/1cf91ef1-fc18-4216-bcda-36a1ed1cf8de/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3962,9 +3962,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/8c44875aa2c1f780-ab6axuc6kuyyffioa6-8oguszbwxyskp8zet6tjsgxyeengc.png",
-        "damContentUrl": "/api/author/assets/9a7b8799-9fff-4ea8-9f09-77c3627749c3/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -3994,9 +3994,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/8f073fe1ac86f3a8-ab6axuaxm4mtba1afffonq-9b10wjj-stl-vdezkg-cdrhdg.png",
-        "damContentUrl": "/api/author/assets/646bf449-ab9c-41cc-ab12-ac9a670606c2/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4026,9 +4026,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/909fe8740bf963d8-ab6axubpeeozdgom2srgxbjhbpwsvvcam6try92jj9oidojm.png",
-        "damContentUrl": "/api/author/assets/5070a63f-996c-46e2-b0ee-346ae582b415/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4058,9 +4058,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/90dabd1ed53d6b76-ab6axuci8winagyaub1cz4iemoeesjcr9t2tos02cjr1np8x.png",
-        "damContentUrl": "/api/author/assets/d3733361-9051-406e-b127-ebfca05fd4d5/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4090,9 +4090,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/92642b66e225dfb3-ab6axucltt8sof7tvisb5dqll-lixbjdsj-zwvdrbgmiud2q.png",
-        "damContentUrl": "/api/author/assets/9cbd7602-225a-4fc6-8c22-6c57d5db3643/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4122,9 +4122,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/934884f0cb17a439-ab6axubma48ftct09fdxadtz5uwsqjzd-3rylcfwokuzqcpi.png",
-        "damContentUrl": "/api/author/assets/6c2a8c27-d342-4fd8-94b2-5e603d5427e8/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4154,9 +4154,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/9a020ad32268401a-ab6axubfgc-wyaztauv4kog5s-hr-zkv1l7t1vzvdpvhm-jz.png",
-        "damContentUrl": "/api/author/assets/ce874494-2e65-4baf-981f-895d6349eb8e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4186,9 +4186,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/9ae1f9dec86da830-ab6axub7le6z9sr2lpzg-cxat8idvdqnmhxsww-ktuwzt829.png",
-        "damContentUrl": "/api/author/assets/bbfddb0f-d770-4beb-806e-b1bb7241c45c/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4218,9 +4218,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/9cfb587e4cfa7d01-ab6axubsux039cjoxapt8pkomkltxd11whlr4h4n0g4qieor.png",
-        "damContentUrl": "/api/author/assets/e4dc1785-0360-4df9-b545-49c38c2c2f44/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4250,9 +4250,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/9d17a92994db8273-ab6axubprcfb0gdfsprksmkbljtac8lkaqm-p5gyse-qb1je.png",
-        "damContentUrl": "/api/author/assets/f3b65b8a-eaf4-4d51-8efc-fb8463b46516/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4282,9 +4282,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/9d84a97831374971-ab6axubksg2aaqlia18au3ogfk6etvksrioyokhrjerl-f64.png",
-        "damContentUrl": "/api/author/assets/4a6faa7a-0764-4c2c-b04b-afaf06326abd/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4314,9 +4314,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/9de0abaea3a536f8-ab6axuafw0wabuqw1v8zg-og5ze7qp6qzuxhyocveind-she.png",
-        "damContentUrl": "/api/author/assets/c8f2bf7d-35f3-47b0-9cfc-8c5ddc31c69a/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4346,9 +4346,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/9e05dc592ccd7330-ab6axuc-tzj5vt-s5nhifphrjjp2mbe47oyntowoaik584rb.png",
-        "damContentUrl": "/api/author/assets/0fc2d97f-47a8-4c06-a931-22d797344303/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4378,9 +4378,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/a2a9b69a338ee939-ab6axubrg4z7vggdrw78-w-cwgkxjjjef-kvghygxjawufyp.png",
-        "damContentUrl": "/api/author/assets/59ad932e-1a8e-405a-9984-aa18f2e19316/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4410,9 +4410,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/a39a671c9b6c8e9c-ab6axucm3lchlreepc4lchpzlhr8vrjvbjpnajklqixvbpmv.png",
-        "damContentUrl": "/api/author/assets/c3e0f45f-5cfe-4560-9ce6-65a3457fa69a/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4442,9 +4442,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b052a6b8933f82d6-ab6axuasgs7binnys6jhugt7kdwhzvsgnus-dlkbfwg6l80b.png",
-        "damContentUrl": "/api/author/assets/06e06985-2555-4014-a198-14bbc4e6d6be/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4474,9 +4474,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b1e5b920327b54c4-ab6axudnz-mkkxe8mbcs6imacdkptx-x-nv8pnrdhvpt-cnr.png",
-        "damContentUrl": "/api/author/assets/6edf822a-e12a-41c9-a4da-bd181e5f28ac/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4506,9 +4506,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b259ab8b45a0f14d-ab6axucj2nurpirxaszmcvmmnadklwaadx-hycdouzpn0-tm.png",
-        "damContentUrl": "/api/author/assets/760f9166-ad4a-49ee-8864-e65ce97581b5/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4538,9 +4538,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b392d70d0f7515e9-ab6axudxqbjb8drp7ljvuwb1fwj9wh1-fpfnxuoanndzx048.png",
-        "damContentUrl": "/api/author/assets/c78cbba1-8655-4b99-a3af-5d13147fce8b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4570,9 +4570,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b481d7a6dfe22d80-ab6axubxqvge1gypidnxjlkty0z7wppm6tjdor6yvye80uhl.png",
-        "damContentUrl": "/api/author/assets/29d756d4-75cf-4bfd-9886-8b91d087d94e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4602,9 +4602,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b514b07ada93aeb2-ab6axuaznwu2woxlg0xbfr9ydonrhkvheoxkyjhxrrkv5n-u.png",
-        "damContentUrl": "/api/author/assets/967f81f5-e6c9-4f38-bb01-6242fbd7ca34/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4634,9 +4634,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b7279298202f70b4-ab6axucsemmqqjentsyldxndutbpyjcda4dlpwpkm6jyszjp.png",
-        "damContentUrl": "/api/author/assets/80d28878-9aaf-44fa-8048-3e6c08056633/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4666,9 +4666,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b899f961c725573f-ab6axucklha38it-y8aq9xtklpbvarungks8ew43e0aevsei.png",
-        "damContentUrl": "/api/author/assets/35155638-f038-4532-97b2-6cf0a63f430f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4698,9 +4698,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/b915ba1b32f7e244-ab6axublgo7tovdovjjaoualksswb6vrv5qlrvq6in3byqbi.png",
-        "damContentUrl": "/api/author/assets/918b02c0-6924-4b04-955c-671a2f728cb1/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4730,9 +4730,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/ba58d1cbc235ef30-ab6axuclcjwqgwdwvwbtevnjpo98yg2jx32l8-4kkyoat2eq.png",
-        "damContentUrl": "/api/author/assets/edbbc0cf-f6e2-4033-9369-6835e69307de/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4762,9 +4762,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/ba914c760eadc51d-ab6axuarkjipiqbfua0hltdl3rjtcvhvy-5lktktfllzd-vj.png",
-        "damContentUrl": "/api/author/assets/81a80745-040a-433c-8f7f-98d55288a790/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4794,9 +4794,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/bb5df7af3726ef07-ab6axud5ykrwb4egm2omeuempah-grmeqdpp-vknqgy-imtf.png",
-        "damContentUrl": "/api/author/assets/e70b2927-4251-4592-9b15-d5d0c0c16790/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4826,9 +4826,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/bd001a2fa46e14f4-ab6axuckwj59m6u6jte5wkryo8zilij2qn3rsi885nivrhht.png",
-        "damContentUrl": "/api/author/assets/dcb8e1d9-205d-4e13-a9fc-af8b59ecc998/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4858,9 +4858,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/be5b9279525794ed-ab6axubk1uuchydi2pjlrm1k2ni4uwqmi4xv89zofsexysfe.png",
-        "damContentUrl": "/api/author/assets/76c2159d-b6ed-4366-a539-cb221c89cceb/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4890,9 +4890,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/c01ad9d18ad8fe78-ab6axudsag26ykfv8m3q036e-ljsb3-ian5ccrbmky0dwudl.png",
-        "damContentUrl": "/api/author/assets/6bd076c7-de8a-4c0e-a690-bbecfb9e170b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4922,9 +4922,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/c17a0b8af6fd767c-ab6axudm16s0ewxjsldslxn-h5ub4xxvt39yta4b0ovyh9sq.png",
-        "damContentUrl": "/api/author/assets/e21a2c83-6ad6-4ec2-8d35-2447d65c826f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4954,9 +4954,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/c4272581dbc48b61-ab6axucyv2xxrr98lkbziqqeunuj1ayihlfildtym4gd5edq.png",
-        "damContentUrl": "/api/author/assets/2cfac26e-5f29-4a23-997c-b72ae43acef3/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -4986,9 +4986,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/c540dfe7bda84c4c-ab6axub4p4uqsg91-xmy-7ifmnwjvwsaq9erqedwfeb3v7e6.png",
-        "damContentUrl": "/api/author/assets/0e2c79c0-963d-4497-a6a5-4c24e44c8ef7/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5018,9 +5018,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/c67ad07103b1b599-ab6axua6awn3codhluko-cinznw-27vrhipikzvxdey4t-cb.png",
-        "damContentUrl": "/api/author/assets/fdd8e164-b975-4cce-a1e8-dd65b2bb1082/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5050,9 +5050,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/cd8e6833585dfb56-ab6axudzuhyk2ukt2lt2pgijy5vi-goe1dqxbe-0dm9nyawg.png",
-        "damContentUrl": "/api/author/assets/f494cd2b-08cc-4118-9225-f80182d4d52b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5082,9 +5082,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/cf648b5bc2b5f3de-ab6axuabteixl6fdeqxlkxap9btoaxrs2ndqqqmqogzsxacr.png",
-        "damContentUrl": "/api/author/assets/d0745c3d-76e3-4c6c-bc0c-fdcd815391f0/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5114,9 +5114,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/d640d4cf4fc0316f-ab6axudhuskmweo1-spvzeiveydrgiiprjj-u8ncwxkqwevf.png",
-        "damContentUrl": "/api/author/assets/f3aaab21-75de-4369-8ba8-0b72a4ad732b/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5146,9 +5146,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/d6421be9a635d14a-ab6axuc9ymekh1vnsvxbdbs78ebbosd7o5jq5qxgoj9jx47d.png",
-        "damContentUrl": "/api/author/assets/132d71d5-4035-4e5e-89c7-ba7fcd338562/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5178,9 +5178,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/d6c88264b69b600a-ab6axudtdtppweciqyg61o1wmx4b6kprn14ka2kzpav86mls.png",
-        "damContentUrl": "/api/author/assets/e163fbbd-73e3-412c-8a7b-0df660b4c105/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5210,9 +5210,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/d969d553d80b55eb-ab6axucp15-vksvqgz3rfq1q4fw151iniqlwbxlypc7zfmvx.png",
-        "damContentUrl": "/api/author/assets/d6020217-92e0-46f2-a8b5-76981ef3407c/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5242,9 +5242,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/de7c6711e5ce0bb9-ab6axucn7ejdmdyeeuti0q6bo-oaenc7guwi9fwduuvfk4cz.png",
-        "damContentUrl": "/api/author/assets/e73bc1c8-b2e4-42a1-9c0b-58bc8659eea8/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5274,9 +5274,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/e45f7c62e7decee6-ab6axud6woywrvi6e1kcvmwox0q7dd-fvzppvfjj1dhnkkwe.png",
-        "damContentUrl": "/api/author/assets/49a872d2-b45d-4f84-8833-8542e744e28a/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5306,9 +5306,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/e4b2786f7c8ea68e-ab6axudx3d94fnudxsgfe10xn7phw1ptbwmn0xpg7vvcw1bi.png",
-        "damContentUrl": "/api/author/assets/dff935d8-35ca-4fc7-b15a-0464db1af6fa/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5338,9 +5338,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/e57454fdc5433765-ab6axuc3niqdnfj7782pgi83sungrtxjhgzouxa2kzm3himh.png",
-        "damContentUrl": "/api/author/assets/205b71c1-29ee-4fd7-aca2-a922485d2e5e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5370,9 +5370,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/e8594941e3d98ee1-ab6axucoaqd0ayubib05jzyrt4jbgizw1nge9eunhoxtcnmo.png",
-        "damContentUrl": "/api/author/assets/78c3931c-c3c6-47b9-a07e-f7d6054327fa/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5402,9 +5402,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/ea4d836273430313-ab6axub-9axpy46gbnoi6z7goft3ghx4qdv2z0rq9k6u57sz.png",
-        "damContentUrl": "/api/author/assets/a6425d76-c3cb-45ac-9449-0ed5c8e3039f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5434,9 +5434,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/ed703060becd0116-ab6axuadts0mckbg1in5m6jbznyqsnivd8oyrvpj6xzz5gur.png",
-        "damContentUrl": "/api/author/assets/d20581a0-af8e-45fb-ad4d-b2644aced809/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5466,9 +5466,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/f2ca67b9c3a127a7-ab6axub0egyuoi4oyb7d79oznb7taf9gie1g4ia4x9gqnmo6.png",
-        "damContentUrl": "/api/author/assets/7ee89e32-4a96-4202-9be7-0d712bc3f53e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5498,9 +5498,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/f2f491107ae786c0-ab6axuancichsfbldeulqccdabgztlfiml6n1sklcp6tfbc6.png",
-        "damContentUrl": "/api/author/assets/21452981-955d-420c-8639-09a931730aad/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5530,9 +5530,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/f90606b31e36e755-ab6axubr3hyoyu-uxy37kcmr0ndnhqjz-zecopjbmc74lwfr.png",
-        "damContentUrl": "/api/author/assets/7667d7b9-8a19-4eb3-9a6f-5a2ddb1f5076/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5562,9 +5562,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/fa60afbd2180f0d7-ab6axudbsg0ydxvnejmhq0spcq33dhc5wfnwqrmlwovscapo.png",
-        "damContentUrl": "/api/author/assets/8c0106bd-2b80-494d-958a-6f4d2ca62e15/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5594,9 +5594,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/images/fbb995ba96404a3b-ab6axucbiu9w-hv65csc36sbeaoiwjfr-j6bfiulte-oqrns.png",
-        "damContentUrl": "/api/author/assets/ec76170f-58d2-46df-a502-7b7038f80f6e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": []
     },
@@ -5628,9 +5628,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/09f32f8567d38b3a-css2.css",
-        "damContentUrl": "/api/author/assets/770cca6b-8e78-4b5a-9ff0-23abcaf4e257/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=09f32f8567d38b3a6437aeab7bc04f342a34210b318fd59c452041d506f9dea1 actual=8d3c2d84fb5de34a6eb795f13912117a84e60dc5c6ae3874fc7b6efb83a7ef1f"
@@ -5663,9 +5663,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/1ee27a40c472d833-css2.css",
-        "damContentUrl": "/api/author/assets/2e94d6e9-c9a9-4a55-8cd3-ff27460192d4/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=1ee27a40c472d833944dcaf0b89fe90f60fd95f3ea3293ab7228b52dc3fe3488 actual=a7c9ad75f238c3c16b0f934d6621616b311429b09cc9f6e293a659231577448d"
@@ -5729,9 +5729,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/20d5f7497afda7a5-css2.css",
-        "damContentUrl": "/api/author/assets/7cab7ef6-0606-467a-98fe-d4b2f7961b5e/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=20d5f7497afda7a574c0225008677ec6044ceaec0ff9f02b00183be9aac47db3 actual=b37f1f6e00adbf278461dc8a24bfea67537103ad37e3d3f23e25c37d2fbbdb2e"
@@ -5763,9 +5763,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/449e08a607d64349-css2.css",
-        "damContentUrl": "/api/author/assets/1e358e36-b2bd-44a5-b634-a14b46c7c953/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=449e08a607d64349795df0b18f90ea1ebbf13d48637ab13411d39405ca3f0487 actual=1df86dcfa11db597d7a68340d74708dc08263562e40abb28c52a692da6540828"
@@ -5797,9 +5797,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/44da1bd352fb305f-css2.css",
-        "damContentUrl": "/api/author/assets/443ae03d-b0d5-40c5-8d04-e38c6e5afc72/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=44da1bd352fb305f91f85bf97a6a1265225bcfef9c19dfc2d95d14078a3b1bee actual=15d68a40498515a150fba4a7c1a34c8b06e5f7e7b5c453b63dce4dfea0f7ff75"
@@ -5832,9 +5832,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/57d91f5fc0f7e56d-css2.css",
-        "damContentUrl": "/api/author/assets/d771d05f-7bbc-4821-bded-eb677479d59f/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=57d91f5fc0f7e56dbd4bfebedc6ae2ba3f0a7438a8006c383981829263c67084 actual=df6837945151de24a4f5d2d944bff5e62a7108759a542233517417acfcf82acb"
@@ -5866,9 +5866,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/694bc8792f0bef68-css2.css",
-        "damContentUrl": "/api/author/assets/5d1347eb-c949-40ec-8c51-89db5f886b49/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=694bc8792f0bef68734ed9934e14470e2c3dbf1a25e5d95ab792490ec011f2ed actual=c65af586adc02fba1c240584a251ee092b7c8d3a70df11e02942a3b58527640b"
@@ -5900,9 +5900,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/69a282e9bd4f9a1e-css2.css",
-        "damContentUrl": "/api/author/assets/8b9ba8fa-06de-4110-945f-011111acd5ed/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=69a282e9bd4f9a1e2bb6bdb5f1713eaed84dbae16498631ad40306398f32ccbc actual=f69ccef8de0ecbbbc3a5886a56257ad698d3eb2c5bf7ce59375e20c06ee1e326"
@@ -5934,9 +5934,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/7c2477fbdc6d022e-css2.css",
-        "damContentUrl": "/api/author/assets/adb5b1d1-4032-4847-b5ea-619b5fcfebfd/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=7c2477fbdc6d022e8dfbcc8605ff88c85e1a39f9560a41be809d76ce477b0d4f actual=63b238c403371cf70f244cc6af88c6a134fe046b29741f13e92b668e331be491"
@@ -5968,9 +5968,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/bcd4209578f4b4e9-css2.css",
-        "damContentUrl": "/api/author/assets/0fda7ec9-2d65-45d2-b7dd-552ca50471b2/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=bcd4209578f4b4e98d3ea3bc2991d1d92629d37989253595b842a9c1eaff9c6f actual=8f77c1142acca920302e9efc65381b7b1b1456b610767ce88503e600ae278c75"
@@ -6006,9 +6006,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/d0c2f8c5258361af-css2.css",
-        "damContentUrl": "/api/author/assets/fb214576-06c5-4927-a66a-31d970506491/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=d0c2f8c5258361af006c9ee1dc927a625e1165a5ec6bc96f9086c1a5c749aa7b actual=f6a825102435bf9354ae4ca936f6672660c4f9d5b86af89adeb1c3e575a96b99"
@@ -6040,9 +6040,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/d950b8eba9c3d232-css2.css",
-        "damContentUrl": "/api/author/assets/83f03930-5d9d-4051-a6e0-00a65d5dda37/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=d950b8eba9c3d232c741d029ce693939bdd19da76975adfc3ef3c0f54cde3ac6 actual=51752e3906796fd1a26635529f8df58cfb814f3ff97adc117631f1288dd0c886"
@@ -6074,9 +6074,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/df4acdfe01738ebc-css2.css",
-        "damContentUrl": "/api/author/assets/526a4ef7-25dc-4c23-96ae-bfc970e5b4f6/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=df4acdfe01738ebc24e6db940829961763108e623b60646a8541e10bf29be4e2 actual=e519c2a0697d20b778e547327f26bcc44a2917025588ccd31a257eda78c59ab9"
@@ -6108,9 +6108,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/e6f43f8101bb780c-css2.css",
-        "damContentUrl": "/api/author/assets/3b82351b-e809-4389-91ab-ba62be556b04/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=e6f43f8101bb780c108bf0900330d3e48a0aeb9e03830daaed55f8c5dc892dfa actual=d7634e66f61f31bf5d47a088e400fbcdcea4d18635609c6c5753894840c57627"
@@ -6153,9 +6153,9 @@
         }
       },
       "dam": {
-        "status": "uploaded",
-        "damAssetPath": "content/dam/tut-usa/styles/fa10b0ed22cfc7e9-css2.css",
-        "damContentUrl": "/api/author/assets/81fb5132-bb1f-46ad-8495-04750d297bdc/content"
+        "status": "not-uploaded",
+        "damAssetPath": null,
+        "damContentUrl": null
       },
       "integrityWarnings": [
         "sha mismatch manifest=fa10b0ed22cfc7e9a37801372e79abb05716064134becf09250c070b0f4bfc84 actual=c2d95eafdbb7013eea68e52cd60b4f239bc457465c2e9e9be1ba2c708cd0797c"

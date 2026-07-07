@@ -12,9 +12,13 @@ import { normalizePageAssetUrls } from '../lib/normalizeAssetUrls';
 export default async function CmsPage({ params }: { params: { slug?: string[] } }) {
   const defaultSite = process.env.FLEXCMS_DEFAULT_SITE ?? 'tut-usa';
   const defaultLocale = process.env.FLEXCMS_DEFAULT_LOCALE ?? 'en';
-  const path = params.slug ? `/${params.slug.join('/')}` : `/${defaultSite}/${defaultLocale}/home`;
+  const path = params.slug ? `/${params.slug.join('/')}` : `/${defaultSite}/home`;
 
-  const apiUrl = process.env.FLEXCMS_API_URL ?? 'http://localhost:8080';
+  const apiUrl =
+    process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
+    process.env.NEXT_PUBLIC_FLEXCMS_API ??
+    process.env.FLEXCMS_API_URL ??
+    'http://localhost:8080';
   const publicApiUrl =
     process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
     process.env.NEXT_PUBLIC_FLEXCMS_API ??
