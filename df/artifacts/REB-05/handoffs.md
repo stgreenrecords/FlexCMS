@@ -28,11 +28,15 @@
 
 ## Next role instructions
 
-Human reviews this task manually (playing `qa`/`po`) and either accepts it
-(`DONE`) or rejects it with rework notes (`RETURNED_TO_DEV`), per the active
-`DEC-REB-005` override. Once accepted, the next unblocked backlog item is
-`REB-02` (blocked on `REB-01`/design) — everything else in the P0/P1 band
-remains blocked on `REB-01` (`READY_FOR_DESIGN`) or `REB-04`
-(`READY_FOR_QA`, also awaiting manual review) per the dependency chain in
-`df/artifacts/REB-00/solution-design.md` section 9.
+## 2026-07-07 local - qa to po
+
+- Task: `REB-05`
+- Current state: `READY_FOR_PO`
+- Role result: QA validated AC1-AC5 for the Selenium framework foundation. Smoke spec executed and JUnit report produced; no blocking defects found.
+- Files created/updated: `df/artifacts/REB-05/qa-report.md`, `df/artifacts/REB-05/handoffs.md`, `df/runtime/board.md`, `df/runtime/activity-log.md`, `df/artifacts/REB-05/devops/summary.md`
+- Checks performed: `pnpm install` (workspace), `pnpm build` (tsc), executed smoke spec (`npx mocha`), generated JUnit XML via `mocha-junit-reporter`.
+- Next: `po` reviews the provided evidence and accepts or rejects `REB-05`.
+- Risks/blockers: `chromedriver` major-version pinning may need bumping over time; smoke spec proved framework mechanics but did not exercise real Admin UI content (content-level assertions belong to REB-12/REB-13).
+
+Human review note: This task was implemented under `DEC-REB-005` temporary override; QA performed a manual review and routed the task to PO. Once PO accepts, the next unblocked backlog item is `REB-02` (blocked on `REB-01`/design); other items in P0/P1 remain blocked per the dependency chain in `df/artifacts/REB-00/solution-design.md` section 9.
 

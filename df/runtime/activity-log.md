@@ -200,6 +200,16 @@ Append-only chronological log of factory actions.
 
 Use `df/templates/activity-log-entry.md` for new entries.
 
+## 2026-07-07 local - qa - REB-05
+
+- State: READY_FOR_QA -> READY_FOR_PO
+- Action: Verified Selenium framework foundation (`frontend/apps/selenium-e2e`): ran `pnpm build`, executed the smoke spec, and validated generated JUnit reports and artifacts against acceptance criteria AC1-AC5 as documented by DevOps.
+- Evidence: `df/artifacts/REB-05/devops/summary.md`, `df/artifacts/REB-05/qa-report.md`, `df/runtime/board.md`
+- Result: PASS
+- Next: po reviews evidence and accepts/rejects `REB-05`
+- Risks/blockers: `chromedriver` major-version pinning may need bumping over time; the smoke spec proved framework mechanics but did not exercise real Admin UI content (content-level assertions belong to REB-12/REB-13).
+
+
 
 ## 2026-05-29 15:25 - devops - TASK-001
 
