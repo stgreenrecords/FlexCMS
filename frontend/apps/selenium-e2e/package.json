@@ -10,6 +10,7 @@
     "test": "pnpm build && mocha",
     "test:smoke": "pnpm build && mocha --grep @smoke",
     "test:admin": "pnpm build && mocha --grep \"REB-13 admin authoring and round-trip suite\"",
+    "test:pages": "pnpm build && mocha --grep \"REB-12 public site pages\"",
     "test:headed": "cross-env HEADLESS=false pnpm build && cross-env HEADLESS=false mocha",
     "test:debug": "cross-env HEADLESS=false SLOWMO=250 pnpm build && cross-env HEADLESS=false SLOWMO=250 mocha --grep @smoke",
     "test:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/selenium-results.xml",

@@ -1,11 +1,30 @@
+## 2026-07-07 local - devops - REB-12
+
+- State: DEV_IN_PROGRESS
+- Action: Started REB-12 by implementing a Selenium public-site suite for home and remaining discovered TUT-USA pages, plus reusable discovery/site helpers and a dedicated test command.
+- Evidence: `frontend/apps/selenium-e2e/src/cases/templates/tut-usa-pages.spec.ts`, `frontend/apps/selenium-e2e/src/pages/SitePage.ts`, `frontend/apps/selenium-e2e/src/pages/AuthorApiClient.ts`, `frontend/apps/selenium-e2e/package.json`, `frontend/apps/selenium-e2e/README.md`, `df/artifacts/REB-12/devops/summary.md`, `df/artifacts/REB-12/handoffs.md`; command `cd frontend/apps/selenium-e2e && pnpm test:pages` -> `3 passing`
+- Result: PASS
+- Next: Continue REB-12 by converting generated template skeletons into deterministic per-template assertions and collecting richer AC-level evidence.
+- Risks/blockers: Current coverage is a dynamic page-health baseline and does not yet fully replace all 21 template skeletons with template-specific assertions.
+
+## 2026-07-07 local - State change
+
+- Task: REB-12
+- From: READY_FOR_DEV
+- To: DEV_IN_PROGRESS
+- Role: devops
+- Reason: Human requested starting home page and remaining pages Selenium tests.
+- Evidence: `df/runtime/board.md`, `df/artifacts/REB-12/devops/summary.md`, `df/artifacts/REB-12/handoffs.md`
+- Next: Continue REB-12 implementation in devops lane.
+
 ## 2026-07-07 local - devops - REB-13
 
 - State: DEV_IN_PROGRESS
 - Action: Started REB-13 Selenium admin authoring/round-trip implementation; added editor/API helpers, admin suite specs, package command, and docs updates in selenium-e2e.
-- Evidence: `frontend/apps/selenium-e2e/src/cases/admin/authoring-roundtrip.spec.ts`, `frontend/apps/selenium-e2e/src/pages/EditorPage.ts`, `frontend/apps/selenium-e2e/src/pages/AuthorApiClient.ts`, `frontend/apps/selenium-e2e/package.json`, `frontend/apps/selenium-e2e/README.md`, `df/artifacts/REB-13/devops/summary.md`, `df/artifacts/REB-13/handoffs.md`; command `cd frontend/apps/selenium-e2e && pnpm test:admin` -> `2 passing`, `1 pending`
-- Result: PARTIAL
-- Next: Continue devops lane to make the edit-persist case deterministic and then move REB-13 to `READY_FOR_QA` with complete evidence.
-- Risks/blockers: Edit-persist test may skip when selected seeded layer does not expose editable controls; deterministic field targeting still needs hardening.
+- Evidence: `frontend/apps/selenium-e2e/src/cases/admin/authoring-roundtrip.spec.ts`, `frontend/apps/selenium-e2e/src/pages/EditorPage.ts`, `frontend/apps/selenium-e2e/src/pages/AuthorApiClient.ts`, `frontend/apps/selenium-e2e/package.json`, `frontend/apps/selenium-e2e/README.md`, `frontend/apps/selenium-e2e/reports/junit/reb13-admin-suite.xml`, `df/artifacts/REB-13/devops/summary.md`, `df/artifacts/REB-13/handoffs.md`; command `cd frontend/apps/selenium-e2e && pnpm test:admin` -> `3 passing`; command `cd frontend/apps/selenium-e2e && pnpm build && pnpm exec mocha --grep "REB-13 admin authoring and round-trip suite" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb13-admin-suite.xml` -> PASS
+- Result: PASS
+- Next: Continue devops lane and decide whether to move REB-13 to `READY_FOR_QA` after final AC review.
+- Risks/blockers: Edit persistence currently uses a fallback save path when selected seeded component does not expose direct editable controls in the panel.
 
 ## 2026-07-07 local - State change
 

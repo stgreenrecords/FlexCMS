@@ -7,7 +7,7 @@ interface AuthorNode {
 }
 
 interface ContentListResponse {
-  content?: Array<{ path?: string; resourceType?: string }>;
+  content?: Array<{ path?: string; resourceType?: string; properties?: Record<string, unknown> }>;
 }
 
 export class AuthorApiClient {
@@ -39,6 +39,31 @@ export class AuthorApiClient {
     }
 
     return `/${pageNode.path.replace(/\./g, '/')}`;
+  }
+
+  async discoverAllTutUsaPagePaths(): Promise<string[]> {
+    const listRes = await fetch(`${this.apiBase}/author/content/list?page=0&size=2000`);
+    if (!listRes.ok) {
+      throw new Error(`Failed to list content nodes (${listRes.status})`);
+    }
+
+    const payload = (await listRes.json()) as ContentListResponse;
+    const paths = (payload.content ?? [])
+      .filter((item) => {
+        if (!item.path || !item.resourceType) return false;
+        if (!item.path.startsWith('content.tut-usa')) return false;
+        if (item.resourceType !== 'flexcms/page' && item.resourceType !== 'flexcms/site-root') return false;
+        const template = item.properties?.['template'];
+        return typeof template === 'string' && template.length > 0;
+      })
+      .map((item) => `/${String(item.path).replace(/\./g, '/')}`)
+      .sort((a, b) => a.localeCompare(b));
+
+    const unique = Array.from(new Set(paths));
+    if (unique.length === 0) {
+      throw new Error('No seeded TUT-USA pages discovered for public-site Selenium tests.');
+    }
+    return unique;
   }
 
   async getPageNode(contentPath: string): Promise<AuthorNode> {

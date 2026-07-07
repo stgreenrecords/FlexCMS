@@ -75,6 +75,9 @@ pnpm test:smoke
 # REB-13 admin authoring and round-trip suite
 pnpm test:admin
 
+# REB-12 public-site pages suite (home + remaining discovered pages)
+pnpm test:pages
+
 # Headed (visible) browser — useful for local debugging
 pnpm test:headed
 

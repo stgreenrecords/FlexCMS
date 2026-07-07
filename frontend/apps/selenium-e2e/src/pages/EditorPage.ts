@@ -43,14 +43,18 @@ export class EditorPage {
 
   async hasLockedLayer(): Promise<boolean> {
     await this.openLayersTab();
-    const lockedLayers = await this.driver.findElements(By.xpath("(//button[.//span[normalize-space()='Locked']])"));
+    const lockedLayers = await this.driver.findElements(
+      By.xpath("//p[normalize-space()='Page Layers']/following-sibling::button[.//span[normalize-space()='Locked']]"),
+    );
     return lockedLayers.length > 0;
   }
 
   async selectLayerByText(labelText: string): Promise<void> {
     await this.openLayersTab();
     const normalized = labelText.toLowerCase();
-    const candidates = await this.driver.findElements(By.xpath("//button[.//span]"));
+    const candidates = await this.driver.findElements(
+      By.xpath("//p[normalize-space()='Page Layers']/following-sibling::button"),
+    );
     for (const candidate of candidates) {
       const text = (await candidate.getText()).toLowerCase();
       if (text.includes(normalized)) {
