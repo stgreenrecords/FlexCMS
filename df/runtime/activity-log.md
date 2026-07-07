@@ -546,3 +546,85 @@ Use `df/templates/activity-log-entry.md` for new entries.
 - Evidence: `df/runtime/board.md`, `df/artifacts/REB-09/frontend/summary.md`, `df/runtime/decisions.md`
 - Next: Complete REB-09 acceptance criteria and move to `READY_FOR_QA` with validation evidence.
 
+## 2026-07-07 local - sa - DFCA-01
+
+- State: ARCHITECTURE_IN_PROGRESS -> READY_FOR_DEV
+- Action: Created a P0 Dark Factory orchestration-change task to replace primary local GitHub Copilot CLI coding delegation with GitHub Copilot Cloud Agent tasks launched and managed through the GitHub REST API. Produced acceptance criteria, target architecture, security/rollback guidance, and devops implementation handoff.
+- Evidence: `df/artifacts/DFCA-01/task.md`, `df/artifacts/DFCA-01/solution-design.md`, `df/artifacts/DFCA-01/handoffs.md`, `df/runtime/board.md`, `df/runtime/decisions.md`, `df/runtime/risks.md`; inspected `df/agent-router/start-factory.bash`, `df/agent-router/run-role-session.bash`, `df/agent-router/README.md`, `agents/df-gh-agent.py`, and `agents/config.json`.
+- Result: PASS
+- Next: `devops` implements `DFCA-01` as an opt-in cloud-agent runner/client with dry-run/mock tests, CI/check polling, sanitized evidence, and documented preview API configuration.
+- Risks/blockers: Public-preview GitHub API schema may change; live validation requires paid Copilot Cloud Agent API access and appropriate GitHub token permissions.
+
+## 2026-07-07 local - State change
+
+- Task: DFCA-01
+- From: OPEN
+- To: READY_FOR_DEV
+- Role: sa
+- Reason: Human explicitly requested the architecture change; SA refined the request, recorded the accepted decision, designed the target approach, and routed implementation to the DevOps lane.
+- Evidence: `df/artifacts/DFCA-01/task.md`, `df/artifacts/DFCA-01/solution-design.md`, `df/artifacts/DFCA-01/handoffs.md`, `df/runtime/board.md`, `df/runtime/decisions.md`
+- Next: devops implementation session for Copilot Cloud Agent REST orchestration.
+
+## 2026-07-07 local - devops - DFCA-01
+
+- State: DEV_IN_PROGRESS -> READY_FOR_QA
+- Action: Implemented the opt-in Copilot Cloud Agent REST orchestration runner/client, executable wrapper, `run-role-session.bash` integration, no-network dry-run status/report artifacts, unit tests, configuration documentation, and rollback guidance.
+- Evidence: `df/agent-router/copilot_cloud_agent.py`, `df/agent-router/copilot-cloud-agent.py`, `df/agent-router/test_copilot_cloud_agent.py`, `df/agent-router/run-role-session.bash`, `df/agent-router/README.md`, `.df-factory.env.example`, `df/artifacts/DFCA-01/devops/summary.md`, `df/artifacts/DFCA-01/cloud-agent-status.json`, `df/artifacts/DFCA-01/cloud-agent-report.md`, `df/artifacts/DFCA-01/handoffs.md`; commands `python3 -m unittest df/agent-router/test_copilot_cloud_agent.py` PASS (10 tests), `python3 -m unittest discover -s df/agent-router -p '*test*.py'` PASS (10 tests), `bash -n df/agent-router/start-factory.bash && bash -n df/agent-router/run-role-session.bash` PASS, `python3 -m py_compile df/agent-router/copilot_cloud_agent.py df/agent-router/copilot-cloud-agent.py` PASS, direct and wrapper dry-run invocations PASS, existing router regression scripts PASS.
+- Result: PASS
+- Next: `qa` verifies DFCA-01 local implementation, dry-run/mock evidence, docs, redaction behavior, and live-validation caveats.
+- Risks/blockers: Live GitHub Copilot Cloud Agent API launch was not executed because it requires paid Copilot Cloud Agent API access and a token with current public-preview permissions; endpoint/header/schema remain configurable due preview volatility.
+
+## 2026-07-07 local - State change
+
+- Task: DFCA-01
+- From: DEV_IN_PROGRESS
+- To: READY_FOR_QA
+- Role: devops
+- Reason: DevOps implementation and deterministic validation are complete; live cloud launch is documented as environment-dependent.
+- Evidence: `df/artifacts/DFCA-01/devops/summary.md`, `df/artifacts/DFCA-01/handoffs.md`, `df/artifacts/DFCA-01/cloud-agent-status.json`, `df/artifacts/DFCA-01/cloud-agent-report.md`, `df/runtime/board.md`
+- Next: qa verification of DFCA-01.
+
+## 2026-07-07 local - Policy change - factory-wide
+
+- Task: N/A (process/orchestration change)
+- Action: Per human instruction, did not execute QA and disabled automated `po` role routing until further notice. Updated router state-role mapping so PO-owned states are non-actionable to automation, added a PO-role disabled banner, documented the active override, and recorded `DEC-DFCA-002`.
+- Evidence: `df/agent-router/state-role-map.bash`, `df/roles/po.md`, `df/03-orchestration-rules.md`, `df/runtime/decisions.md`, `df/runtime/board.md`
+- Result: PASS
+- Next: QA, if desired, must be performed by a separate QA session or human reviewer; product acceptance remains human-only/manual until a later decision re-enables `po`.
+- Risks/blockers: Tasks in `READY_FOR_PO`, `PO_REVIEW`, `PO_REJECTED`, or `REFINEMENT_QUESTIONS` will not advance automatically while PO is disabled.
+
+
+## 2026-07-07 18:17 local - qa - DFCA-01
+
+- State: READY_FOR_QA -> BLOCKED
+- Action: Launched/polled GitHub Copilot Cloud Agent REST orchestration path; recorded sanitized cloud-task, branch/PR, and CI evidence.
+- Evidence: `df/artifacts/DFCA-01/cloud-agent-status.json`, `df/artifacts/DFCA-01/cloud-agent-report.md`, `df/artifacts/DFCA-01/handoffs.md`
+- Result: FAIL
+- Next: Fix Copilot Cloud Agent runner/API failure: GitHub API POST https://api.github.com/repos/stgreenrecords/FlexCMS/copilot/coding-agent/tasks failed with HTTP 404: {
+  "message": "Not Found",
+  "documentation_url": "https://docs.github.com/rest",
+  "status": "404"
+}
+- Risks/blockers: GitHub API POST https://api.github.com/repos/stgreenrecords/FlexCMS/copilot/coding-agent/tasks failed with HTTP 404: {
+  "message": "Not Found",
+  "documentation_url": "https://docs.github.com/rest",
+  "status": "404"
+}
+
+## 2026-07-07 18:20 local - qa - DFCA-01
+
+- State: READY_FOR_QA -> BLOCKED
+- Action: Launched/polled GitHub Copilot Cloud Agent REST orchestration path; recorded sanitized cloud-task, branch/PR, and CI evidence.
+- Evidence: `df/artifacts/DFCA-01/cloud-agent-status.json`, `df/artifacts/DFCA-01/cloud-agent-report.md`, `df/artifacts/DFCA-01/handoffs.md`
+- Result: FAIL
+- Next: Fix Copilot Cloud Agent runner/API failure: GitHub API POST https://api.github.com/agents/repos/stgreenrecords/FlexCMS/tasks failed with HTTP 400: {"documentation_url":"https://docs.github.com/rest","message":"model not found or not enabled for user"}
+- Risks/blockers: GitHub API POST https://api.github.com/agents/repos/stgreenrecords/FlexCMS/tasks failed with HTTP 400: {"documentation_url":"https://docs.github.com/rest","message":"model not found or not enabled for user"}
+
+## 2026-07-07 18:30 local - qa - DFCA-01
+
+- State: READY_FOR_QA -> BLOCKED
+- Action: Launched/polled GitHub Copilot Cloud Agent REST orchestration path; recorded sanitized cloud-task, branch/PR, and CI evidence.
+- Evidence: `df/artifacts/DFCA-01/cloud-agent-status.json`, `df/artifacts/DFCA-01/cloud-agent-report.md`, `df/artifacts/DFCA-01/handoffs.md`
+- Result: FAIL
+- Next: Cloud agent blocked: cloud=timed_out ci=not_checked
+- Risks/blockers: cloud=timed_out ci=not_checked

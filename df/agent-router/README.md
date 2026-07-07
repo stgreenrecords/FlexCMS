@@ -37,6 +37,8 @@ For human-facing start, monitoring, and troubleshooting instructions, see
   router-side board mutation + lock helpers.
 - `render-subboards.bash` — derives the five lane sub-boards from `board.md`.
 - `worktree-manager.bash` — per-task git worktree isolation for delivery lanes.
+- `copilot-cloud-agent.py` / `copilot_cloud_agent.py` — opt-in GitHub
+  Copilot Cloud Agent REST runner for one role-session.
 
 ## Git worktree isolation (delivery lanes)
 
@@ -148,6 +150,60 @@ session, the router stops with a stall error to avoid an infinite loop.
 
 `DF_AGENT_CMD` is intentionally tool-neutral: point it at any AI agent CLI, script,
 or wrapper that can read the prompt and act on the repository.
+
+### Copilot Cloud Agent REST runner
+
+Use this when you want The Factory to keep local control of planning, state,
+evidence, CI monitoring, and review decisions, but delegate coding work to
+GitHub Copilot Cloud Agent tasks instead of the local Copilot CLI.
+
+```bash
+DF_AGENT_CMD='./df/agent-router/copilot-cloud-agent.py'
+DF_COPILOT_CLOUD_DRY_RUN='true'
+./start factory --adapter auto --task-id DFCA-01
+```
+
+Or through the generic local runner wrapper:
+
+```bash
+DF_AGENT_CMD='./df/agent-router/run-role-session.bash'
+DF_AGENT_RUNNER='copilot-cloud'
+DF_COPILOT_CLOUD_DRY_RUN='true'
+./start factory --adapter auto --task-id DFCA-01
+```
+
+The GitHub Copilot Cloud Agent task API is public preview. Before live use,
+verify the current official GitHub endpoint, preview headers, token permissions,
+and request/response schema. The runner centralizes these values so preview
+changes do not spread through the router.
+
+| Variable | Purpose |
+|---|---|
+| `DF_COPILOT_CLOUD_DRY_RUN` | `true` writes sanitized request/status/report artifacts without network calls. |
+| `DF_COPILOT_CLOUD_DRY_RUN_ADVANCE` | `true` lets dry-run mode update the board for adapter-contract tests; keep `false` for normal planning dry-runs. |
+| `DF_GITHUB_TOKEN` / `GITHUB_TOKEN` / `GH_TOKEN` | Token for GitHub REST API calls. Values are redacted from artifacts/logs. |
+| `DF_GITHUB_OWNER` / `DF_GITHUB_REPO` | Repository override when owner/repo cannot be inferred from the git remote. |
+| `DF_COPILOT_AGENT_CREATE_ENDPOINT` | Create-task endpoint template. Default: `/agents/repos/{owner}/{repo}/tasks`; override if GitHub changes the public-preview path. |
+| `DF_COPILOT_AGENT_API_BASE` | API base URL. Default: `https://api.github.com`. |
+| `DF_COPILOT_AGENT_API_VERSION` | `X-GitHub-Api-Version` header. Default: `2022-11-28`. |
+| `DF_COPILOT_AGENT_ACCEPT` | `Accept` header. Default: `application/vnd.github+json`; set preview media type if GitHub requires one. |
+| `DF_COPILOT_AGENT_EXTRA_HEADERS` | Optional JSON object of extra headers for preview APIs. Do not put secrets here unless necessary; they are redacted in reports. |
+| `DF_COPILOT_AGENT_MODEL` | Default cloud-agent model. |
+| `DF_COPILOT_AGENT_MODEL_<ROLE>` | Role-specific model override, e.g. `DF_COPILOT_AGENT_MODEL_BACKEND_DEV`. |
+| `DF_COPILOT_AGENT_BASE_BRANCH` | Base branch for cloud work. Defaults to current git branch, then `main`. |
+| `DF_COPILOT_AGENT_CREATE_PR` | Whether task payload asks the cloud agent to create a PR. Default: `true`. |
+| `DF_COPILOT_AGENT_POLL_SECONDS` | Cloud task polling interval. Default: `15`. |
+| `DF_COPILOT_AGENT_TIMEOUT_SECONDS` | Cloud task timeout. Default: `3600`. |
+| `DF_COPILOT_AGENT_REQUIRE_CI` | If `true`, missing checks fail the role-session; otherwise missing checks are recorded but not blocking. |
+
+Evidence is written under `df/artifacts/{task-id}/`:
+
+- `cloud-agent-status.json` — sanitized machine-readable request/task/PR/CI state;
+- `cloud-agent-report.md` — append-only human-readable run evidence;
+- `handoffs.md` and `df/runtime/activity-log.md` — standard Dark Factory handoff/runtime evidence.
+
+Rollback is simple: set `DF_AGENT_CMD` back to `./df/agent-router/run-role-session.bash`
+with `DF_AGENT_RUNNER='copilot'`, or use `--adapter manual`.
 
 ## Stop conditions
 

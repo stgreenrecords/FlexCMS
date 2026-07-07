@@ -9,11 +9,13 @@ df_role_for_state() {
   case "$1" in
     OPEN|INTAKE|REFINEMENT_IN_PROGRESS) echo "sa" ;;
     REFINED|NEEDS_ARCHITECTURE|ARCHITECTURE_REVIEW|ARCHITECTURE_IN_PROGRESS) echo "sa" ;;
-    REFINEMENT_QUESTIONS) echo "po" ;;
+    # PO automation is disabled by human decision until further notice.
+    # Product/refinement decisions remain human-owned and are not auto-routed.
+    REFINEMENT_QUESTIONS) echo "" ;;
     READY_FOR_DESIGN|DESIGN_IN_PROGRESS) echo "designer" ;;
     READY_FOR_DEV|DEV_IN_PROGRESS|RETURNED_TO_DEV) echo "delivery" ;;
     READY_FOR_QA|QA_IN_PROGRESS|QA_FAILED) echo "qa" ;;
-    READY_FOR_PO|PO_REVIEW|PO_REJECTED) echo "po" ;;
+    READY_FOR_PO|PO_REVIEW|PO_REJECTED) echo "" ;;
     DONE|NO_TASKS|BLOCKED) echo "" ;;
     *) echo "" ;;
   esac
@@ -22,6 +24,7 @@ df_role_for_state() {
 # df_state_is_actionable STATE -> exit 0 if a role can act on it now.
 df_state_is_actionable() {
   case "$1" in
+    REFINEMENT_QUESTIONS|READY_FOR_PO|PO_REVIEW|PO_REJECTED) return 1 ;;
     DONE|NO_TASKS|BLOCKED|"") return 1 ;;
     *) return 0 ;;
   esac

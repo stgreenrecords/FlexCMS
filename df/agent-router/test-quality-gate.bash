@@ -6,7 +6,8 @@
 #   1. a FAILING gate overrides a delivery lane's READY_FOR_QA claim and routes
 #      the task back to RETURNED_TO_DEV;
 #   2. repeated failures hit the rework cap and force the task to BLOCKED;
-#   3. a PASSING gate lets the task flow through to DONE untouched;
+#   3. a PASSING gate lets the task flow through to READY_FOR_PO; automated PO
+#      is disabled by policy, so the router must not auto-complete DONE;
 #   4. an unset gate is skipped (with a warning) and does not block flow.
 set -euo pipefail
 
@@ -79,20 +80,20 @@ printf '%s' "$out" | grep -Fq "Forcing BLOCKED" \
   || fail "expected force-BLOCKED at rework cap"
 [ "$(final_state)" = "BLOCKED" ] || fail "expected final state BLOCKED, got '$(final_state)'"
 
-# 3: passing gate lets the task flow all the way to DONE.
+# 3: passing gate lets the task flow to READY_FOR_PO; PO is human/manual-only.
 reset_board
 out="$(DF_GATE_CMD='exit 0' DF_MAX_REWORK=3 run_router)"
 printf '%s' "$out" | grep -Fq "quality gate PASSED for task='TASK-002'" \
   || fail "expected gate pass log"
 printf '%s' "$out" | grep -Fq "quality gate FAILED" \
   && fail "did not expect any gate failure on the passing path"
-[ "$(final_state)" = "DONE" ] || fail "expected final state DONE, got '$(final_state)'"
+[ "$(final_state)" = "READY_FOR_PO" ] || fail "expected final state READY_FOR_PO, got '$(final_state)'"
 
 # 4: unset gate is skipped with a warning and does not block flow.
 reset_board
 out="$(DF_MAX_REWORK=3 run_router)"
 printf '%s' "$out" | grep -Fq "DF_GATE_CMD is not set" \
   || fail "expected disabled-gate warning"
-[ "$(final_state)" = "DONE" ] || fail "expected final state DONE with gate disabled, got '$(final_state)'"
+[ "$(final_state)" = "READY_FOR_PO" ] || fail "expected final state READY_FOR_PO with gate disabled, got '$(final_state)'"
 
-printf 'PASS: quality gate override, rework cap, pass-through, and disabled-gate behave as expected.\n'
+printf 'PASS: quality gate override, rework cap, pass-through to READY_FOR_PO, and disabled-gate behave as expected.\n'

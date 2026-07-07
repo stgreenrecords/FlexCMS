@@ -52,3 +52,25 @@ Use `df/templates/decision-record.md` for new decision records.
   - Remove temporary-disable notices from role docs and orchestration rules.
 - Consequences: Backlogged tasks waiting in QA/PO states can move forward through QA and PO sessions again; tasks may reach `DONE` through the standard workflow.
 
+## 2026-07-07 local - DEC-DFCA-001 - Use Copilot Cloud Agent REST tasks as the target coding delegation path
+
+- Status: Accepted (human, 2026-07-07)
+- Context: The current Dark Factory automation can invoke the local GitHub Copilot CLI through `df/agent-router/run-role-session.bash`, but the human cannot use premium models there and requested a new architecture where the local factory loop launches/manages GitHub Copilot Cloud Agent tasks through the GitHub REST API.
+- Decision:
+  - Keep The Factory router as the task planner, state-machine authority, evidence recorder, CI/test monitor, review loop, and merge/next-task decision point.
+  - Delegate coding role-session work to GitHub Copilot Cloud Agent tasks via the official public-preview GitHub REST API instead of making the local Copilot CLI the primary path.
+  - Require the implementation to support prompt, task id, role, base branch, model choice, optional PR creation, lifecycle polling, CI/check monitoring, and sanitized evidence artifacts.
+  - Keep `manual` and legacy local CLI/model adapters available as explicit fallback/rollback modes during initial rollout.
+- Consequences: `DFCA-01` is routed to `devops` to implement an opt-in cloud-agent runner/client, dry-run tests, configuration docs, and reconciliation behavior. Public-preview API volatility and token-permission risk must be documented and isolated in the GitHub API client layer.
+
+## 2026-07-07 local - DEC-DFCA-002 - Disable automated `po` role sessions until further notice
+
+- Status: Accepted (human, 2026-07-07)
+- Context: The human explicitly instructed the agent not to play QA and requested removing the PO role or at least disabling it until further notice.
+- Decision:
+  - Automated agents must not execute the `po` role until a later human decision reverses this record.
+  - The router must not auto-select `po` for `REFINEMENT_QUESTIONS`, `READY_FOR_PO`, `PO_REVIEW`, or `PO_REJECTED`.
+  - Tasks in PO-owned states wait for explicit human product direction; agents must not move tasks to `DONE` as product acceptance.
+  - This decision does not authorize the current implementation session to perform QA. QA remains a separate role/session or human activity.
+- Consequences: Work can still move through delivery and into `READY_FOR_QA`, but product acceptance is manual/human-only while this decision is active. `DEC-REB-006` is superseded only for the `po` role; automated QA routing is not changed by this decision.
+

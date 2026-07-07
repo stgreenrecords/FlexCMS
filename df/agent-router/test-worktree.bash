@@ -85,7 +85,7 @@ run_router() { ( cd "$REPO" && DF_AGENT_CMD="$REPO/fake-agent.bash" DF_FACTORY_M
 
 fail() { printf 'FAIL: %s\n' "$1" >&2; exit 1; }
 
-# 1: passing gate -> code built in a worktree, integrated to main, reaches DONE.
+# 1: passing gate -> code built in a worktree, integrated to main, reaches READY_FOR_PO.
 new_repo
 out="$(DF_GATE_CMD='test -f src/feature-TASK-002.txt' DF_MAX_REWORK=3 run_router)"
 printf '%s' "$out" | grep -Fq "isolated worktree for task='TASK-002'" \
@@ -94,7 +94,7 @@ printf '%s' "$out" | grep -Fq "integrated worktree for task='TASK-002' into main
   || fail "expected integration into main on gate pass"
 [ -f "$REPO/src/feature-TASK-002.txt" ] \
   || fail "expected the worktree's code file to be integrated into the main tree"
-[ "$(final_state)" = "DONE" ] || fail "expected final state DONE, got '$(final_state)'"
+[ "$(final_state)" = "READY_FOR_PO" ] || fail "expected final state READY_FOR_PO, got '$(final_state)'"
 [ -d "$REPO/.df-worktrees/TASK-002" ] \
   && fail "expected the worktree to be removed after successful integration"
 

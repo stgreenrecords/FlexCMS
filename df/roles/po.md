@@ -1,5 +1,15 @@
 # Role: Product Owner (`po`)
 
+> **DISABLED UNTIL FURTHER NOTICE — 2026-07-07 human decision.**
+>
+> Automated agents must not execute the `po` role, must not move tasks to
+> `DONE`, and must not perform product acceptance. Tasks in `READY_FOR_PO`,
+> `PO_REVIEW`, `PO_REJECTED`, or `REFINEMENT_QUESTIONS` wait for explicit human
+> product direction unless a later decision record re-enables this role.
+>
+> QA remains a separate role; the current implementation session must not play
+> QA either.
+
 
 ## Mission
 

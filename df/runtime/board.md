@@ -4,6 +4,7 @@ This is the live task queue. Agents must update it when task state changes.
 
 | Priority | Task ID | Title | Type | State | Owner role | Blocked? | Last updated | Next action |
 |---|---|---|---|---|---|---|---|---|
+| P0 | DFCA-01 | Replace local Copilot CLI with Copilot Cloud Agent REST orchestration | Task | BLOCKED | qa | No | 2026-07-07 local | Cloud agent blocked: cloud=timed_out ci=not_checked |
 | P0 | REB-00 | Rebuild backlog reset and delivery architecture | Task | DONE | po | No | 2026-07-07 local | Accepted by PO; designer starts REB-01 next |
 | P0 | REB-01 | Normalize TUT design packages and approve storage map | Task | READY_FOR_PO | po | No | 2026-07-07 local | PO reviews QA report and accepts/rejects `REB-01` |
 | P0 | REB-02 | Build Selenium browser asset-capture pipeline for remote template resources | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA reviews capture outputs/manifests under `Design/tut-usa/` and REB-02 artifacts |
@@ -59,5 +60,7 @@ This is the live task queue. Agents must update it when task state changes.
 - 2026-07-07 local: DevOps started REB-12 (`DEV_IN_PROGRESS`) by adding a public-site home+rest pages suite `frontend/apps/selenium-e2e/src/cases/templates/tut-usa-pages.spec.ts` with dynamic seeded-page discovery, route render checks, and image-health assertions; validated with `pnpm test:pages` PASS.
 - 2026-07-07 local: SA added prioritized authoring E2E automation backlog `REB-17` through `REB-25`. Coverage maps current authoring surfaces and requires page creation tests to verify create + publish + authoring availability, and publishing tests to verify publish-environment visibility.
 - 2026-07-07 local: Human requested E2E editing coverage for each sample-site UI component. SA added `REB-26` requiring one generated editing scenario or explicit blocker row for every active component in `Design/tut-usa/generated/component-contracts.json` (currently 406 components across 14 groups).
+- 2026-07-07 local: Human requested changing Dark Factory from local GitHub Copilot CLI execution to GitHub Copilot Cloud Agent tasks launched through the GitHub REST API so premium model choices can be used. SA created `DFCA-01`, recorded `DEC-DFCA-001`, and routed implementation to `devops`.
+- 2026-07-07 local: Human instructed this agent not to play QA and requested disabling/removing PO. Recorded `DEC-DFCA-002`; automated `po` routing is disabled until further notice, while QA remains a separate non-current role/session.
 
 

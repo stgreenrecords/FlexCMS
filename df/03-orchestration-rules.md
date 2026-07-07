@@ -57,6 +57,19 @@ Sort actionable tasks by:
 - UI-facing frontend work must have design input first.
 - Multi-lane work should be split into child tasks whenever practical.
 
+## Active override - PO role disabled
+
+Per human decision on 2026-07-07, automated `po` role sessions are disabled
+until further notice. The router must not auto-select `po` for
+`REFINEMENT_QUESTIONS`, `READY_FOR_PO`, `PO_REVIEW`, or `PO_REJECTED` states.
+Those states wait for explicit human product direction or a later decision record
+that re-enables the role. No agent may move a task to `DONE` as PO acceptance
+while this override is active.
+
+This override does not authorize the current implementation session to execute
+QA. QA remains separate and must be performed in a distinct QA session or by a
+human reviewer.
+
 
 ## Handoff rules
 

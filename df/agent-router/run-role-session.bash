@@ -219,6 +219,9 @@ run_with_runner() {
   shift
 
   case "$runner" in
+    copilot-cloud|copilot_cloud)
+      exec python3 "$SCRIPT_DIR/copilot-cloud-agent.py" "$@"
+      ;;
     copilot)
       run_copilot
       ;;
@@ -245,7 +248,9 @@ What to do:
 
 Example .df-factory.env:
   DF_AGENT_CMD='./df/agent-router/run-role-session.bash'
-  DF_AGENT_RUNNER='copilot'
+  DF_AGENT_RUNNER='copilot-cloud'
+  DF_COPILOT_AGENT_MODEL='gpt-5'
+  DF_COPILOT_CLOUD_DRY_RUN='true'
   DF_AGENT_MODEL='gpt-5.4'
   DF_AGENT_MODE='autopilot'
   DF_AGENT_IGNORE_TOKEN='true'

@@ -7,4 +7,4 @@ Lists rows whose Owner role is `data-engineer` (READY_FOR_DEV / DEV_IN_PROGRESS 
 
 | Priority | Task ID | Title | State | Owner role | Blocked? | Last updated | Next action |
 |---|---|---|---|---|---|---|---|
-| P1 | REB-07 | Import captured assets into DAM/public frontend asset pipeline | READY_FOR_QA | data-engineer | No (manual review queue per DEC-REB-005) | 2026-07-07 local | Awaiting manual human review; importer/map/checksum/rollback artifacts generated |
+| - | - | No data-engineer tasks | NO_TASKS | data-engineer | No | 2026-07-07 18:33 local | Await routing from SA |
