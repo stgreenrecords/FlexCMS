@@ -8,7 +8,6 @@ import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ContentNodeVersionRepository;
 import com.flexcms.core.util.RichTextSanitizer;
-import com.flexcms.core.service.AuditService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class ContentNodeServiceTest {
@@ -215,6 +215,53 @@ class ContentNodeServiceTest {
         assertThatCode(() ->
                 contentNodeService.updateProperties("content.corporate.en.home", Map.of(), "user1"))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    void updateProperties_skipsSnapshotInsert_whenVersionAlreadyExists() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        node.setVersion(2L);
+        node.setProperties(new HashMap<>(Map.of("existing", "value")));
+
+        ContentNodeVersion existingVersion = new ContentNodeVersion();
+        existingVersion.setNodeId(node.getId());
+        existingVersion.setVersionNumber(2L);
+
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
+        when(versionRepository.findByNodeIdAndVersionNumber(node.getId(), 2L)).thenReturn(Optional.of(existingVersion));
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        contentNodeService.updateProperties("content.corporate.en.home", Map.of("newKey", "newValue"), "user1");
+
+        verify(versionRepository, never()).save(any(ContentNodeVersion.class));
+    }
+
+    @Test
+    void restoreVersion_skipsSnapshotInsert_whenCurrentVersionAlreadyExists() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        node.setVersion(3L);
+        node.setProperties(new HashMap<>(Map.of("current", "state")));
+
+        ContentNodeVersion targetVersion = new ContentNodeVersion();
+        targetVersion.setNodeId(node.getId());
+        targetVersion.setVersionNumber(2L);
+        targetVersion.setProperties(new HashMap<>(Map.of("restored", "value")));
+        targetVersion.setResourceType("flexcms/page");
+
+        ContentNodeVersion existingCurrentSnapshot = new ContentNodeVersion();
+        existingCurrentSnapshot.setNodeId(node.getId());
+        existingCurrentSnapshot.setVersionNumber(3L);
+
+        when(versionRepository.findByNodeIdAndVersionNumber(node.getId(), 2L)).thenReturn(Optional.of(targetVersion));
+        when(nodeRepository.findById(node.getId())).thenReturn(Optional.of(node));
+        when(versionRepository.findByNodeIdAndVersionNumber(node.getId(), 3L)).thenReturn(Optional.of(existingCurrentSnapshot));
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        ContentNode restored = contentNodeService.restoreVersion(node.getId(), 2L, "user1");
+
+        verify(versionRepository, never()).save(any(ContentNodeVersion.class));
+        assertThat(restored.getProperties()).containsEntry("restored", "value");
+        assertThat(restored.getModifiedBy()).isEqualTo("user1");
     }
 
     // --- move ---

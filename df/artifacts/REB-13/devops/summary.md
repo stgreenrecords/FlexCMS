@@ -32,16 +32,30 @@
   - publish + author API + GraphQL + rendered-site round-trip checks.
 - Added script `test:admin` in `frontend/apps/selenium-e2e/package.json`.
 - Updated `frontend/apps/selenium-e2e/README.md` with REB-13 suite documentation and command.
+- Strengthened `frontend/apps/selenium-e2e/src/cases/admin/authoring-roundtrip.spec.ts` and `frontend/apps/selenium-e2e/src/pages/EditorPage.ts` to:
+  - fail on cancel-inheritance error messages instead of treating them as pass,
+  - assert authoring controls are present,
+  - verify navigation controls route correctly (preview tab, content/experience-fragment links).
+- Fixed backend snapshot collision in `flexcms/flexcms-core/src/main/java/com/flexcms/core/service/ContentNodeService.java` by skipping version snapshot inserts when `(node_id, version_number)` already exists.
 
 ## Validation evidence
 
 - Command: `cd frontend/apps/selenium-e2e && pnpm test:admin`
-  - Result: `3 passing`, `0 failing`, `0 pending`.
+  - Previous result: `3 passing`, `0 failing`, `0 pending`.
+  - After strengthening authoring button + cancel-inheritance assertions: `2 passing`, `2 failing`.
+  - After backend fix + service restart: `4 passing`, `0 failing`.
 - Command: `cd frontend/apps/selenium-e2e && pnpm build && pnpm exec mocha --grep "REB-13 admin authoring and round-trip suite" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb13-admin-suite.xml`
   - Result: PASS, JUnit report written to `frontend/apps/selenium-e2e/reports/junit/reb13-admin-suite.xml`.
 
+- Backend log correlation:
+  - `tail -n 220 .dev-logs/author.log` shows `ConstraintViolationException` from unique key `content_node_versions_node_id_version_number_key` during property persistence.
+
+- Backend/unit-test evidence:
+  - Command: `cd flexcms && mvn test -pl flexcms-core -am -Dtest=ContentNodeServiceTest -Dsurefire.failIfNoSpecifiedTests=false`
+  - Result: environment failure unrelated to this change (`Mockito/ByteBuddy` does not support local Java 26 runtime).
+
 ## Current risks / follow-ups
 
-- Edit persistence uses a fallback save-path when seeded metadata schema does not expose editable controls in the UI; this keeps the suite deterministic but should be tightened after REB-11 finalizes authoring field schemas.
+- Core regression unit tests are currently blocked in this environment by Java 26 + Mockito ByteBuddy compatibility; rerun on supported JDK (e.g., project Java 21) in CI/local gate.
 
 

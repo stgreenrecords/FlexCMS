@@ -1,10 +1,5 @@
 # Role: Product Owner (`po`)
 
-> ⚠️ **TEMPORARILY DISABLED** — per `DEC-REB-005` in `df/runtime/decisions.md`,
-> no agent session may execute this role until the human reverses the
-> decision. Tasks in `READY_FOR_PO`/`PO_REVIEW`/`REFINEMENT_QUESTIONS` wait for
-> manual human review/answers. See `df/03-orchestration-rules.md` for the
-> active override.
 
 ## Mission
 

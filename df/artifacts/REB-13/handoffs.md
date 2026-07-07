@@ -16,14 +16,19 @@
   - `df/artifacts/REB-13/devops/summary.md`
 - Checks:
   - `cd frontend/apps/selenium-e2e && pnpm test:admin`
-  - Outcome: `3 passing`, `0 failing`, `0 pending`
+  - Previous outcome: `3 passing`, `0 failing`, `0 pending`
+  - Current outcome after strict assertions: `2 passing`, `2 failing`
+  - Failure: `Cancel inheritance failed: Could not persist editable override (500).`
+  - Outcome after backend fix + restart: `4 passing`, `0 failing`
   - `cd frontend/apps/selenium-e2e && pnpm build && pnpm exec mocha --grep "REB-13 admin authoring and round-trip suite" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb13-admin-suite.xml`
   - Outcome: PASS, JUnit report `frontend/apps/selenium-e2e/reports/junit/reb13-admin-suite.xml`
+  - `cd /Users/Viachaslau_Karnaushanka/IdeaProjects/FlexCMS && tail -n 220 .dev-logs/author.log`
+  - Outcome: backend `ConstraintViolationException` on `content_node_versions_node_id_version_number_key` during update-properties persistence.
 - Next role/action:
-  1. Continue devops lane and harden deterministic editable-field test data/selector strategy.
-  2. Re-run REB-13 suite until edit case consistently executes (not pending) on seeded local env.
-  3. Once stable, move task to `READY_FOR_QA` with full evidence.
+  1. Keep strict authoring button presence/navigation and cancel-inheritance failure checks enabled as regression guard.
+  2. Re-run backend unit tests on supported JDK (project Java 21) because local Java 26 fails Mockito/ByteBuddy instrumentation.
+  3. Continue REB-13 evidence gathering for READY_FOR_QA transition.
 - Risks/blockers:
-  - Edit persistence currently uses a fallback save-path if no editable field is rendered for the selected seeded component; revisit once REB-11 schema coverage is final.
+  - Local `ContentNodeServiceTest` execution is blocked by Java 26 runtime compatibility with Mockito/ByteBuddy, not by business logic correctness.
 
 

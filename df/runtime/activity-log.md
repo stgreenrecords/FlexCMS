@@ -1,3 +1,67 @@
+## 2026-07-07 local - qa - REB-01
+
+- State: QA_IN_PROGRESS -> READY_FOR_PO
+- Action: Verified REB-01 design-normalization artifacts against AC1-AC5, recorded QA evidence, and found no blocking defects.
+- Evidence: `df/artifacts/REB-01/qa-report.md`, `df/artifacts/REB-01/handoffs.md`, `Design/tut-usa/README.md`, `df/artifacts/REB-01/design/inventory.md`, `df/artifacts/REB-01/design/summary.md`; command output confirmed `template_dirs=21`, `component_dirs=14`.
+- Result: PASS
+- Next: `po` reviews REB-01 and accepts/rejects.
+- Risks/blockers: `tut_sovereign` design evidence gap and remote asset/font licensing constraints remain open for downstream tasks.
+
+## 2026-07-07 local - State change
+
+- Task: REB-01
+- From: READY_FOR_QA
+- To: READY_FOR_PO
+- Role: qa
+- Reason: QA validated all acceptance criteria and recorded passing evidence in `qa-report.md`.
+- Evidence: `df/artifacts/REB-01/qa-report.md`, `df/artifacts/REB-01/handoffs.md`, `df/runtime/board.md`
+- Next: po acceptance review
+
+## 2026-07-07 local - Policy change - factory-wide
+
+- Task: N/A (process/orchestration change)
+- Action: Recorded `DEC-REB-006` per explicit human request to re-enable automated `qa` and `po` sessions; removed the temporary override from orchestration rules and removed disable banners from QA/PO role definitions.
+- Evidence: `df/runtime/decisions.md` (`DEC-REB-006`), `df/03-orchestration-rules.md`, `df/roles/qa.md`, `df/roles/po.md`, `df/runtime/board.md`
+- Result: PASS
+- Next: Run the next single-role session as `qa` for the highest-priority `READY_FOR_QA` task (`REB-01`) and continue normal QA -> PO flow.
+- Risks/blockers: Backlog contains multiple queued `READY_FOR_QA` tasks; prioritize strictly by board order and business priority to avoid review thrash.
+
+## 2026-07-07 local - sa - REB-26
+
+- State: READY_FOR_DEV
+- Action: Added exhaustive per-UI-component sample-site editing backlog in response to human follow-up. `REB-26` requires one generated Selenium editing scenario or explicit blocker/unsupported matrix row for every active component in `Design/tut-usa/generated/component-contracts.json`.
+- Evidence: `df/artifacts/REB-26/task.md`, `df/artifacts/REB-17/task.md`, `df/artifacts/REB-19/task.md`, `df/artifacts/REB-25/task.md`, `df/artifacts/REB-17/handoffs.md`, `df/runtime/board.md`; inventory command reported `components=406`, `groups=14`, `asset_fields=91`, `rich_text_fields=25`, `reference_fields=30`.
+- Result: PASS
+- Next: DevOps implements `REB-26` after `REB-19` establishes reusable field-type editing helpers, or earlier only with explicit human dependency override.
+- Risks/blockers: Exhaustive scope is large and should be sharded by component group while preserving a complete per-component evidence matrix; publish checks still require configured publish environment.
+
+## 2026-07-07 local - sa - REB-17
+
+- State: READY_FOR_QA
+- Action: Mapped current authoring functionality and added a prioritized Selenium authoring E2E automation backlog (`REB-18` through `REB-25`) covering content/page creation, editor/component authoring, publishing/workflow/scheduling/bulk operations, DAM, experience fragments/live copy, PIM, secondary admin routes, and cross-cutting hardening.
+- Evidence: `df/artifacts/REB-17/task.md`, `df/artifacts/REB-17/handoffs.md`, `df/artifacts/REB-18/task.md`, `df/artifacts/REB-19/task.md`, `df/artifacts/REB-20/task.md`, `df/artifacts/REB-21/task.md`, `df/artifacts/REB-22/task.md`, `df/artifacts/REB-23/task.md`, `df/artifacts/REB-24/task.md`, `df/artifacts/REB-25/task.md`, `df/runtime/board.md`.
+- Result: PASS
+- Next: Manual human QA reviews `REB-17` per `DEC-REB-005`; DevOps implements `REB-18`-`REB-25` when dependencies are satisfied or explicitly overridden by the human.
+- Risks/blockers: Some admin UI actions may be partially wired; publish-environment checks require a running/configured publish service and must not fall back to author-only verification.
+
+## 2026-07-07 local - devops - REB-13
+
+- State: DEV_IN_PROGRESS
+- Action: Fixed backend duplicate version-snapshot collision and revalidated strict Selenium authoring checks (button presence/navigation + cancel inheritance/edit/publish flows).
+- Evidence: `flexcms/flexcms-core/src/main/java/com/flexcms/core/service/ContentNodeService.java`, `flexcms/flexcms-core/src/test/java/com/flexcms/core/service/ContentNodeServiceTest.java`, `frontend/apps/selenium-e2e/src/pages/EditorPage.ts`, `frontend/apps/selenium-e2e/src/cases/admin/authoring-roundtrip.spec.ts`, `df/artifacts/REB-13/devops/summary.md`, `df/artifacts/REB-13/handoffs.md`; command `cd /Users/Viachaslau_Karnaushanka/IdeaProjects/FlexCMS && ./flex start local all` -> backend rebuild/restart PASS; command `cd frontend/apps/selenium-e2e && pnpm test:admin` -> `4 passing`, `0 failing`.
+- Result: PASS
+- Next: Continue REB-13 toward READY_FOR_QA, and rerun core unit tests on supported JDK (Java 21) due local Java 26 Mockito/ByteBuddy limits.
+- Risks/blockers: Local `ContentNodeServiceTest` run fails in this shell because Mockito inline instrumentation does not support Java 26.
+
+## 2026-07-07 local - devops - REB-13
+
+- State: DEV_IN_PROGRESS
+- Action: Tightened Selenium admin suite to assert authoring button presence/navigation and fail on cancel-inheritance error messages; reproduced user-reported cancel-inheritance/edit defect.
+- Evidence: `frontend/apps/selenium-e2e/src/cases/admin/authoring-roundtrip.spec.ts`, `frontend/apps/selenium-e2e/src/pages/EditorPage.ts`, `df/artifacts/REB-13/devops/summary.md`, `df/artifacts/REB-13/handoffs.md`; command `cd frontend/apps/selenium-e2e && pnpm test:admin` -> `2 passing`, `2 failing` with `Could not persist editable override (500)`; command `cd /Users/Viachaslau_Karnaushanka/IdeaProjects/FlexCMS && tail -n 220 .dev-logs/author.log` shows `ConstraintViolationException` on `content_node_versions_node_id_version_number_key`.
+- Result: FAIL
+- Next: Backend/devops fix for duplicate content-node version inserts, then rerun strict admin suite.
+- Risks/blockers: Authoring cancel-inheritance/edit flows are currently blocked by backend 500s.
+
 ## 2026-07-07 local - devops - REB-12
 
 - State: DEV_IN_PROGRESS

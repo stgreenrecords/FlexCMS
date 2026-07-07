@@ -609,6 +609,97 @@ function EditorInner() {
     }
   }
 
+  async function handleCancelInheritanceForAll() {
+    if (isDetachingInheritance || isSaving) return;
+
+    const lockedComponents = components.filter((component) => component.isLocked);
+    if (lockedComponents.length === 0) {
+      setDetachInfo('No locked components found on this page.');
+      setDetachError(null);
+      return;
+    }
+
+    setIsDetachingInheritance(true);
+    setDetachError(null);
+    setDetachInfo(null);
+
+    let succeeded = 0;
+    const warnings: string[] = [];
+    const failed: string[] = [];
+    const unlockedInstanceIds = new Set<string>();
+    const updatedPropsById = new Map<string, Record<string, unknown>>();
+
+    for (const component of lockedComponents) {
+      if (!component.nodePath) {
+        warnings.push(`${component.label}: no page node to detach.`);
+        continue;
+      }
+
+      try {
+        const detachResponse = await fetch(
+          `${API_BASE}/api/author/livecopy?targetPath=${encodeURIComponent(component.nodePath)}&deep=true`,
+          { method: 'DELETE' },
+        );
+        if (!detachResponse.ok) {
+          warnings.push(`${component.label}: live copy detach returned ${detachResponse.status}.`);
+        }
+
+        const updatedProps: Record<string, unknown> = {
+          ...component.props,
+          [TEMPLATE_DETACHED_FLAG]: true,
+        };
+
+        const persistResponse = await fetch(`${API_BASE}/api/author/content/node/properties`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: component.nodePath,
+            properties: updatedProps,
+            userId: 'admin',
+          }),
+        });
+
+        if (!persistResponse.ok) {
+          throw new Error(`persist returned ${persistResponse.status}`);
+        }
+
+        succeeded += 1;
+        unlockedInstanceIds.add(component.instanceId);
+        updatedPropsById.set(component.instanceId, updatedProps);
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : 'unknown error';
+        failed.push(`${component.label}: ${detail}`);
+      }
+    }
+
+    if (unlockedInstanceIds.size > 0) {
+      setComponents((prev) =>
+        prev.map((component) =>
+          unlockedInstanceIds.has(component.instanceId)
+            ? {
+                ...component,
+                props: updatedPropsById.get(component.instanceId) ?? component.props,
+                isLocked: false,
+                lockReason: undefined,
+              }
+            : component,
+        ),
+      );
+    }
+
+    const infoParts = [`Inheritance canceled for ${succeeded}/${lockedComponents.length} locked components.`];
+    if (warnings.length > 0) {
+      infoParts.push(`Warnings: ${warnings.slice(0, 3).join(' | ')}`);
+    }
+    setDetachInfo(infoParts.join(' '));
+
+    if (failed.length > 0) {
+      setDetachError(`Failed: ${failed.slice(0, 3).join(' | ')}`);
+    }
+
+    setIsDetachingInheritance(false);
+  }
+
   const canvasWidth = viewport === 'desktop' ? '100%' : viewport === 'tablet' ? '768px' : '390px';
 
   // ── Loading / error states ────────────────────────────────────────────────
@@ -709,6 +800,21 @@ function EditorInner() {
             <IconButton title="Settings"><GearIcon /></IconButton>
           </div>
 
+          <button
+            onClick={handleCancelInheritanceForAll}
+            disabled={isSaving || isDetachingInheritance || !components.some((component) => component.isLocked)}
+            className="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
+            data-testid="cancel-inheritance-all-button"
+            style={{
+              color: '#b0c6ff',
+              background: 'transparent',
+              opacity: isSaving || isDetachingInheritance || !components.some((component) => component.isLocked) ? 0.45 : 1,
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+          >
+            {isDetachingInheritance ? 'Canceling…' : 'Cancel All Inheritance'}
+          </button>
           <button
             onClick={handleSave}
             disabled={isSaving}

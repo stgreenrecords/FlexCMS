@@ -28,17 +28,40 @@ describe('REB-13 admin authoring and round-trip suite @smoke', function () {
 
   attachFailureScreenshot(() => driver);
 
+  it('shows expected authoring controls and routes navigation buttons correctly', async () => {
+    if (!driver) throw new Error('driver was not initialized');
+
+    await editorPage.open(targetPath);
+
+    expect(await editorPage.hasButtonByText('Save')).to.equal(true);
+    expect(await editorPage.hasButtonByText('Publish')).to.equal(true);
+    expect(await editorPage.hasCancelAllInheritanceButton()).to.equal(true);
+    expect(await editorPage.hasButtonByText('Components')).to.equal(true);
+    expect(await editorPage.hasButtonByText('Layers')).to.equal(true);
+    expect(await editorPage.hasButtonByText('Assets')).to.equal(true);
+
+    expect(await editorPage.hasIconButtonByTitle('Undo')).to.equal(true);
+    expect(await editorPage.hasIconButtonByTitle('Redo')).to.equal(true);
+    expect(await editorPage.hasIconButtonByTitle('Preview')).to.equal(true);
+    expect(await editorPage.hasIconButtonByTitle('Settings')).to.equal(true);
+
+    expect(await editorPage.hasLinkByHrefContains('/content')).to.equal(true);
+    expect(await editorPage.hasLinkByHrefContains('/content/experience-fragments/tut-usa/global/navigation')).to.equal(true);
+    expect(await editorPage.hasLinkByHrefContains('/content/experience-fragments/tut-usa/global/footer')).to.equal(true);
+
+    const previewUrl = await editorPage.clickPreviewAndReadNewTabUrl();
+    expect(previewUrl).to.include('/preview?path=');
+  });
+
   it('edits a page property and persists it after refresh', async () => {
     if (!driver) throw new Error('driver was not initialized');
 
     await editorPage.open(targetPath);
+    await editorPage.cancelInheritanceForAll();
     await editorPage.selectLayerByText('page metadata');
 
-    const detached = await editorPage.cancelInheritanceIfVisible();
-    if (detached) {
-      await editorPage.clickSave();
-      await editorPage.waitForAnySaveTimestamp();
-    }
+    await editorPage.clickSave();
+    await editorPage.waitForAnySaveTimestamp();
 
     const hasEditableFields = await editorPage.hasEditablePropertyField();
     if (!hasEditableFields) {
@@ -57,20 +80,14 @@ describe('REB-13 admin authoring and round-trip suite @smoke', function () {
     expect(actualValue).to.equal(expectedValue);
   });
 
-  it('cancels inheritance for a locked component', async function () {
+  it('cancels inheritance for all locked components without backend/UI error', async () => {
     if (!driver) throw new Error('driver was not initialized');
 
     await editorPage.open(targetPath);
     const hasLockedLayer = await editorPage.hasLockedLayer();
-    if (!hasLockedLayer) {
-      this.skip();
-      return;
-    }
+    expect(hasLockedLayer).to.equal(true);
 
-    await editorPage.selectFirstLockedLayer();
-
-    const canceled = await editorPage.cancelInheritanceIfVisible();
-    expect(canceled).to.equal(true);
+    await editorPage.cancelInheritanceForAll();
   });
 
   it('publishes the page and verifies author + GraphQL + rendered site round-trip', async () => {

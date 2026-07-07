@@ -57,24 +57,6 @@ Sort actionable tasks by:
 - UI-facing frontend work must have design input first.
 - Multi-lane work should be split into child tasks whenever practical.
 
-## ⚠️ Active override: `qa` and `po` roles temporarily disabled
-
-Per `df/runtime/decisions.md` (`DEC-REB-005`), the human has temporarily disabled
-the automated `qa` and `po` role sessions and will play both roles personally.
-While this override is active:
-
-- Do not select `qa` or `po` as the responsible role for any task, even when the
-  task state is `READY_FOR_QA`, `QA_IN_PROGRESS`, `READY_FOR_PO`, or `PO_REVIEW`.
-- Delivery lanes still move completed work to `READY_FOR_QA` and still run their
-  own build/test validation before doing so — this override removes the
-  automated review session only, not the delivery lane's own verification duty.
-- Skip past tasks in `READY_FOR_QA`/`QA_IN_PROGRESS`/`READY_FOR_PO`/`PO_REVIEW`
-  when picking the next actionable task; treat them as awaiting human action,
-  not as `NO_TASKS`/`BLOCKED`.
-- Never move a task to `DONE` on behalf of `qa`/`po` while this override is
-  active — only the human may do that.
-- Remove this section and add a new decision record when the human re-enables
-  the roles.
 
 ## Handoff rules
 

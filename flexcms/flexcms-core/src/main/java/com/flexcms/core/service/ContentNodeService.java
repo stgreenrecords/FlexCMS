@@ -121,7 +121,7 @@ public class ContentNodeService {
         }
 
         // Save version before applying actual changes.
-        versionRepository.save(ContentNodeVersion.fromNode(node));
+        saveVersionSnapshotIfMissing(node);
 
         node.setProperties(sanitized);
         node.setModifiedBy(userId);
@@ -259,7 +259,7 @@ public class ContentNodeService {
                 .orElseThrow(() -> NotFoundException.forId("ContentNode", nodeId));
 
         // Save current state as a version
-        versionRepository.save(ContentNodeVersion.fromNode(node));
+        saveVersionSnapshotIfMissing(node);
 
         // Restore
         node.setProperties(new HashMap<>(version.getProperties()));
@@ -393,6 +393,20 @@ public class ContentNodeService {
             childData.add(child);
         }
         node.setChildren(childData);
+    }
+
+    private void saveVersionSnapshotIfMissing(ContentNode node) {
+        if (node.getId() == null || node.getVersion() == null) {
+            versionRepository.save(ContentNodeVersion.fromNode(node));
+            return;
+        }
+
+        Optional<ContentNodeVersion> existing = versionRepository
+                .findByNodeIdAndVersionNumber(node.getId(), node.getVersion());
+        boolean alreadyExists = existing != null && existing.isPresent();
+        if (!alreadyExists) {
+            versionRepository.save(ContentNodeVersion.fromNode(node));
+        }
     }
 
     /**

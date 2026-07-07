@@ -1,9 +1,5 @@
 # Role: Quality Engineer (`qa`)
 
-> ⚠️ **TEMPORARILY DISABLED** — per `DEC-REB-005` in `df/runtime/decisions.md`,
-> no agent session may execute this role until the human reverses the
-> decision. Tasks in `READY_FOR_QA`/`QA_IN_PROGRESS` wait for manual human
-> review. See `df/03-orchestration-rules.md` for the active override.
 
 ## Mission
 

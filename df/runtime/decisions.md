@@ -41,3 +41,14 @@ Use `df/templates/decision-record.md` for new decision records.
   - Tasks that reach `READY_FOR_QA`, `QA_IN_PROGRESS`, `READY_FOR_PO`, or `PO_REVIEW` must sit and wait; the human will review and transition them (to `QA_FAILED`/`RETURNED_TO_DEV` or `READY_FOR_PO`/`DONE`) manually, outside an automated role session.
   - The router/orchestrator must not auto-select `qa` or `po` as the "responsible role" for a task while this override is active; see `df/03-orchestration-rules.md`.
 - Consequences: Delivery can proceed continuously without waiting for an automated QA/PO session, but nothing reaches `DONE` without explicit human review. Re-enable by adding a new decision record and removing the override note in `df/03-orchestration-rules.md`.
+
+## 2026-07-07 local - DEC-REB-006 - Re-enable automated `qa` and `po` role sessions
+
+- Status: Accepted (human, 2026-07-07)
+- Context: The human requested to re-enable QA and PO so Dark Factory can resume normal automated review/acceptance routing.
+- Decision:
+  - Reverse `DEC-REB-005` and allow agent sessions to execute `qa` and `po` roles again.
+  - Restore normal routing for tasks in `READY_FOR_QA`, `QA_IN_PROGRESS`, `READY_FOR_PO`, and `PO_REVIEW`.
+  - Remove temporary-disable notices from role docs and orchestration rules.
+- Consequences: Backlogged tasks waiting in QA/PO states can move forward through QA and PO sessions again; tasks may reach `DONE` through the standard workflow.
+
