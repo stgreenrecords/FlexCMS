@@ -201,6 +201,17 @@ Append-only chronological log of factory actions.
 Use `df/templates/activity-log-entry.md` for new entries.
 
 
+## 2026-07-07 local - qa - DFCA-01
+
+- State: READY_FOR_QA -> QA_IN_PROGRESS -> READY_FOR_PO
+- Action: Performed DFCA-01 QA checklist: moved to QA_IN_PROGRESS, created `df/artifacts/DFCA-01/qa-report.md`, verified artifacts and handoff, recorded no blocking defects, and moved task to READY_FOR_PO.
+- Evidence: `df/artifacts/DFCA-01/qa-report.md`, `df/artifacts/DFCA-01/handoffs.md`, `df/runtime/board.md`
+- Result: PASS
+- Next: po reviews QA report and accepts/rejects DFCA-01.
+- Risks/blockers: None identified in this session.
+
+
+
 ## 2026-05-29 15:25 - devops - TASK-001
 
 - State: READY_FOR_QA

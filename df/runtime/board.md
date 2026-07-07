@@ -22,6 +22,7 @@ This is the live task queue. Agents must update it when task state changes.
 | P0 | REB-15 | QA verification for full rebuild program | Task | OPEN | qa | Yes: REB-14 | 2026-07-07 local | QA independently verifies complete rebuild evidence after delivery |
 | P0 | REB-16 | PO acceptance for full rebuild program | Task | OPEN | po | Yes: REB-15 | 2026-07-07 local | PO accepts or rejects after QA pass |
 | P0 | REB-17 | Prioritize authoring E2E automation backlog | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA reviews SA backlog coverage and routes to PO on pass |
+| P2 | DFCA-01 | QA session for DFCA-01 (Dark Factory QA) | Task | READY_FOR_PO | qa | No | 2026-07-07 local | PO reviews QA report and accepts/rejects DFCA-01 |
 | P0 | REB-18 | Implement content tree, page creation, and author/publish verification Selenium suite | Task | READY_FOR_DEV | devops | Yes: REB-11, REB-13 | 2026-07-07 local | Implement page creation/publish suite after admin/editor foundation is available |
 | P0 | REB-19 | Implement page editor component/property/asset authoring matrix Selenium suite | Task | READY_FOR_DEV | devops | Yes: REB-07, REB-10, REB-11, REB-13 | 2026-07-07 local | Implement contract-driven editor authoring matrix and publish verification |
 | P0 | REB-26 | Implement exhaustive per-UI-component sample-site editing Selenium suite | Task | READY_FOR_DEV | devops | Yes: REB-07, REB-10, REB-11, REB-13, REB-19 | 2026-07-07 local | Generate one editing scenario/matrix row for every sample-site UI component |
