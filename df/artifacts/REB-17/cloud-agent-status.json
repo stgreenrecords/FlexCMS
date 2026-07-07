@@ -1,0 +1,108 @@
+{
+  "branch": null,
+  "ci": {
+    "check_runs": [],
+    "state": "not_checked",
+    "statuses": [],
+    "summary": "No branch or SHA returned by cloud task."
+  },
+  "cloud_task_id": "dcbda962-b162-49e7-aef5-38ca21d49281",
+  "dry_run": false,
+  "html_url": "https://github.com/stgreenrecords/FlexCMS/tasks/dcbda962-b162-49e7-aef5-38ca21d49281",
+  "last_polled_at": "2026-07-07 18:50 local",
+  "next_action": "Cloud QA role completed; PO review is next.",
+  "next_owner": "po",
+  "next_state": "READY_FOR_PO",
+  "note": "cloud task completed",
+  "pr_number": null,
+  "pr_url": null,
+  "raw": {
+    "archived_at": null,
+    "artifacts": [
+      {
+        "provider": "github",
+        "type": "pull"
+      },
+      {
+        "provider": "github",
+        "type": "branch"
+      }
+    ],
+    "created_at": "2026-07-07T16:47:03.228242926Z",
+    "creator": {
+      "id": 13693971
+    },
+    "creator_type": "user",
+    "html_url": "https://github.com/stgreenrecords/FlexCMS/tasks/dcbda962-b162-49e7-aef5-38ca21d49281",
+    "id": "dcbda962-b162-49e7-aef5-38ca21d49281",
+    "name": "Executing QA checklist for task REB-17",
+    "owner": {
+      "id": 13693971
+    },
+    "repository": {
+      "id": 1190953635
+    },
+    "session_count": 1,
+    "sessions": [
+      {
+        "base_ref": "main",
+        "completed_at": "2026-07-07T16:50:10.677171714Z",
+        "created_at": "2026-07-07T16:47:07.076310873Z",
+        "head_ref": "copilot/reb-17-qa-session",
+        "id": "8a5cbf4a-626e-4bab-a3b4-7d4cad9411c5",
+        "model": "sweagent-capi:gpt-5-mini",
+        "name": "Executing QA checklist for task REB-17",
+        "owner": {
+          "id": 13693971
+        },
+        "prompt": "Repository: stgreenrecords/FlexCMS\nRole: qa\nTask: REB-17\nState: READY_FOR_QA\nDark Factory role: qa\nDark Factory task: REB-17\nCurrent state: READY_FOR_QA\nBase branch: main\n\nExecute exactly one Dark Factory role session. Preserve role isolation: delivery work may move to READY_FOR_QA, but must not perform QA or PO acceptance. Update task artifacts and handoff evidence in the branch or PR.\n\n# The Factory role-session\n\nYou are running as a single role for ONE task, then you must stop.\n\n- Role: qa\n- Task: REB-17\n- Current state: READY_FOR_QA\n\n## Required reading\n\n1. df/00-start-here.md\n2. df/01-operating-model.md\n3. df/02-state-machine.md\n4. df/03-orchestration-rules.md\n5. df/04-documentation-standards.md\n6. df/roles/qa.md (if it exists for this lane)\n7. df/runtime/ current files\n\n## Mandatory outcomes\n\n- Execute only the qa checklist for task REB-17.\n- Update df/runtime/board.md with the new task state.\n- Append an entry to df/runtime/activity-log.md.\n- Write a handoff note naming the next role and next action.\n- Do not switch roles or self-approve within this session.\n\n## Shared-file lock (parallel sessions may be running)\n\nOther role-sessions may be writing to df/runtime/ at the same time.\nBefore editing any file under df/runtime/ acquire the mutex by\nrunning: while ! mkdir df/runtime/.lock 2>/dev/null; do sleep 1; done\nRelease with: rmdir df/runtime/.lock\nHold the lock only while you are writing. Re-read the file inside\nthe critical section so concurrent edits are not lost.\n\n## Dependencies discipline (sa role only)\n\nIf you are the sa role: when you create or split tasks, you MUST\npopulate the '## Dependencies' section of each child task.md with\neither 'none' or the explicit list of TASK-IDs it depends on. The\nrouter uses that list to decide which tasks can run in parallel.\n",
+        "repository": {
+          "id": 1190953635
+        },
+        "state": "completed",
+        "task_id": "dcbda962-b162-49e7-aef5-38ca21d49281",
+        "updated_at": "2026-07-07T16:50:10.677173065Z",
+        "usage": {
+          "credits": 4787275000,
+          "type": "ai_credits"
+        },
+        "user": {
+          "id": 13693971
+        }
+      }
+    ],
+    "state": "completed",
+    "updated_at": "2026-07-07T16:50:10.880770744Z",
+    "url": "https://api.github.com/agents/repos/stgreenrecords/FlexCMS/tasks/dcbda962-b162-49e7-aef5-38ca21d49281",
+    "user_collaborators": [
+      {
+        "id": 13693971
+      }
+    ]
+  },
+  "request": {
+    "base_branch": "main",
+    "base_ref": "main",
+    "branch_name": "df/cloud/REB-17/qa",
+    "create_pull_request": true,
+    "metadata": {
+      "role": "qa",
+      "source": "dark-factory",
+      "state": "READY_FOR_QA",
+      "task_id": "REB-17"
+    },
+    "model": "gpt-5-mini",
+    "problem_statement": "Repository: stgreenrecords/FlexCMS\nRole: qa\nTask: REB-17\nState: READY_FOR_QA\nDark Factory role: qa\nDark Factory task: REB-17\nCurrent state: READY_FOR_QA\nBase branch: main\n\nExecute exactly one Dark Factory role session. Preserve role isolation: delivery work may move to READY_FOR_QA, but must not perform QA or PO acceptance. Update task artifacts and handoff evidence in the branch or PR.\n\n# The Factory role-session\n\nYou are running as a single role for ONE task, then you must stop.\n\n- Role: qa\n- Task: REB-17\n- Current state: READY_FOR_QA\n\n## Required reading\n\n1. df/00-start-here.md\n2. df/01-operating-model.md\n3. df/02-state-machine.md\n4. df/03-orchestration-rules.md\n5. df/04-documentation-standards.md\n6. df/roles/qa.md (if it exists for this lane)\n7. df/runtime/ current files\n\n## Mandatory outcomes\n\n- Execute only the qa checklist for task REB-17.\n- Update df/runtime/board.md with the new task state.\n- Append an entry to df/runtime/activity-log.md.\n- Write a handoff note naming the next role and next action.\n- Do not switch roles or self-approve within this session.\n\n## Shared-file lock (parallel sessions may be running)\n\nOther role-sessions may be writing to df/runtime/ at the same time.\nBefore editing any file under df/runtime/ acquire the mutex by\nrunning: while ! mkdir df/runtime/.lock 2>/dev/null; do sleep 1; done\nRelease with: rmdir df/runtime/.lock\nHold the lock only while you are writing. Re-read the file inside\nthe critical section so concurrent edits are not lost.\n\n## Dependencies discipline (sa role only)\n\nIf you are the sa role: when you create or split tasks, you MUST\npopulate the '## Dependencies' section of each child task.md with\neither 'none' or the explicit list of TASK-IDs it depends on. The\nrouter uses that list to decide which tasks can run in parallel.\n",
+    "prompt": "Repository: stgreenrecords/FlexCMS\nRole: qa\nTask: REB-17\nState: READY_FOR_QA\nDark Factory role: qa\nDark Factory task: REB-17\nCurrent state: READY_FOR_QA\nBase branch: main\n\nExecute exactly one Dark Factory role session. Preserve role isolation: delivery work may move to READY_FOR_QA, but must not perform QA or PO acceptance. Update task artifacts and handoff evidence in the branch or PR.\n\n# The Factory role-session\n\nYou are running as a single role for ONE task, then you must stop.\n\n- Role: qa\n- Task: REB-17\n- Current state: READY_FOR_QA\n\n## Required reading\n\n1. df/00-start-here.md\n2. df/01-operating-model.md\n3. df/02-state-machine.md\n4. df/03-orchestration-rules.md\n5. df/04-documentation-standards.md\n6. df/roles/qa.md (if it exists for this lane)\n7. df/runtime/ current files\n\n## Mandatory outcomes\n\n- Execute only the qa checklist for task REB-17.\n- Update df/runtime/board.md with the new task state.\n- Append an entry to df/runtime/activity-log.md.\n- Write a handoff note naming the next role and next action.\n- Do not switch roles or self-approve within this session.\n\n## Shared-file lock (parallel sessions may be running)\n\nOther role-sessions may be writing to df/runtime/ at the same time.\nBefore editing any file under df/runtime/ acquire the mutex by\nrunning: while ! mkdir df/runtime/.lock 2>/dev/null; do sleep 1; done\nRelease with: rmdir df/runtime/.lock\nHold the lock only while you are writing. Re-read the file inside\nthe critical section so concurrent edits are not lost.\n\n## Dependencies discipline (sa role only)\n\nIf you are the sa role: when you create or split tasks, you MUST\npopulate the '## Dependencies' section of each child task.md with\neither 'none' or the explicit list of TASK-IDs it depends on. The\nrouter uses that list to decide which tasks can run in parallel.\n",
+    "pull_request": {
+      "body": "## Dark Factory task\n\n- Task: `REB-17`\n- Role: `qa`\n- Base branch: `main`\n\n## Required evidence\n\nUpdate `df/artifacts/REB-17/` with implementation summary, test evidence, risks, and rollback notes.\n\n## QA/PO guardrail\n\nThis cloud task must not self-approve QA or PO acceptance.\n",
+      "draft": false,
+      "title": "DF REB-17: qa role session"
+    },
+    "target_branch": "df/cloud/REB-17/qa",
+    "title": "DF REB-17: qa role session"
+  },
+  "status": "completed",
+  "status_url": "https://api.github.com/agents/repos/stgreenrecords/FlexCMS/tasks/dcbda962-b162-49e7-aef5-38ca21d49281",
+  "success": true
+}

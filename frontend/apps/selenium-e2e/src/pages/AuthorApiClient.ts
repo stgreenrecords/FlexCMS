@@ -10,6 +10,11 @@ interface ContentListResponse {
   content?: Array<{ path?: string; resourceType?: string; properties?: Record<string, unknown> }>;
 }
 
+export interface DiscoveredTutUsaPage {
+  path: string;
+  template: string;
+}
+
 export class AuthorApiClient {
   private readonly env = loadEnv();
   private readonly apiBase = this.env.authorApiUrl;
@@ -42,24 +47,36 @@ export class AuthorApiClient {
   }
 
   async discoverAllTutUsaPagePaths(): Promise<string[]> {
+    const pages = await this.discoverAllTutUsaPages();
+    return pages.map((page) => page.path);
+  }
+
+  async discoverAllTutUsaPages(): Promise<DiscoveredTutUsaPage[]> {
     const listRes = await fetch(`${this.apiBase}/author/content/list?page=0&size=2000`);
     if (!listRes.ok) {
       throw new Error(`Failed to list content nodes (${listRes.status})`);
     }
 
     const payload = (await listRes.json()) as ContentListResponse;
-    const paths = (payload.content ?? [])
+    const pages = (payload.content ?? [])
       .filter((item) => {
         if (!item.path || !item.resourceType) return false;
         if (!item.path.startsWith('content.tut-usa')) return false;
         if (item.resourceType !== 'flexcms/page' && item.resourceType !== 'flexcms/site-root') return false;
-        const template = item.properties?.['template'];
-        return typeof template === 'string' && template.length > 0;
+        return true;
       })
-      .map((item) => `/${String(item.path).replace(/\./g, '/')}`)
-      .sort((a, b) => a.localeCompare(b));
+      .map((item) => ({
+        path: `/${String(item.path).replace(/\./g, '/')}`,
+        template: typeof item.properties?.['template'] === 'string' ? String(item.properties['template']) : '',
+      }))
+      .sort((a, b) => a.path.localeCompare(b.path));
 
-    const unique = Array.from(new Set(paths));
+    const uniqueByPath = new Map<string, DiscoveredTutUsaPage>();
+    for (const page of pages) {
+      uniqueByPath.set(page.path, page);
+    }
+
+    const unique = Array.from(uniqueByPath.values());
     if (unique.length === 0) {
       throw new Error('No seeded TUT-USA pages discovered for public-site Selenium tests.');
     }

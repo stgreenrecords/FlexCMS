@@ -34,7 +34,7 @@ provenance notes.
 Downstream rebuild tasks build on top of this foundation:
 
 - `REB-06` generates `src/fixtures/template-manifest.ts` /
-  `component-manifest.ts` and a traceability matrix from the contracts in
+  `component-manifest.ts` / `template-seed-map.ts` and a traceability matrix from the contracts in
   `design/tut-usa/generated/`.
 - `REB-12` adds public-site template/component Selenium suites under
   `src/cases/templates/` and `src/cases/components/`.
@@ -77,6 +77,9 @@ pnpm test:admin
 
 # REB-12 public-site pages suite (home + remaining discovered pages)
 pnpm test:pages
+
+# REB-12 template-by-template coverage suite (TPL-01..TPL-21)
+pnpm test:templates
 
 # Headed (visible) browser — useful for local debugging
 pnpm test:headed
@@ -133,4 +136,7 @@ manifests as blockers/provenance evidence instead of being silently discarded.
   can select them.
 - Screenshots on failure are automatic; call `captureScreenshot(driver, name)`
   directly for additional on-demand evidence.
+- For REB-12 evidence, store command outputs plus `reports/junit/selenium-results.xml`
+  from `pnpm test:ci`; include failed-spec screenshot files from
+  `reports/screenshots/` and reference the affected template case ids.
 

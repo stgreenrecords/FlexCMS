@@ -15,7 +15,7 @@ This is the live task queue. Agents must update it when task state changes.
 | P1 | REB-07 | Import captured assets into DAM/public frontend asset pipeline | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA validates importer/map/checksum/rollback artifacts |
 | P1 | REB-08 | Rebuild frontend tokens, fonts, layout shell, and renderer foundation | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA validates frontend foundation and build evidence |
 | P1 | REB-09 | Implement TUT grouped component renderers | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA validates grouped renderer coverage and build evidence |
-| P1 | REB-10 | Implement all 21 TUT page templates and page routes | Task | READY_FOR_DEV | frontend-dev | Yes: REB-07, REB-09 | 2026-07-07 local | Implement template routes/layouts using headless JSON |
+| P1 | REB-10 | Implement all 21 TUT page templates and page routes | Task | READY_FOR_QA | qa | Yes: REB-07, REB-09 | 2026-07-07 local | QA validates template rendering and responsiveness |
 | P1 | REB-11 | Reimplement admin authoring/editor flows for new components/templates | Task | READY_FOR_DEV | frontend-dev | Yes: REB-04, REB-08 | 2026-07-07 local | Rebuild admin authoring/editor UX for generated contracts |
 | P1 | REB-12 | Implement Selenium public-site template/component suites | Task | DEV_IN_PROGRESS | devops | Yes: REB-06, REB-10 | 2026-07-07 local | Continue converting skeletons to deterministic per-template assertions |
 | P1 | REB-13 | Implement Selenium admin authoring and round-trip suites | Task | DEV_IN_PROGRESS | devops | Yes: REB-06, REB-11 | 2026-07-07 local | Continue REB-13 suite hardening; make edit case deterministic and finalize evidence |

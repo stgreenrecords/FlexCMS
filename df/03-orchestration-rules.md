@@ -4,6 +4,26 @@
 
 Keep delivery moving after a human starts the factory, while preserving role separation and evidence quality.
 
+## Working tree state — do not interrupt the human about pre-existing changes
+
+The repository working tree is normally **dirty**: earlier sessions leave
+untracked artifacts under `df/artifacts/`, modified boards under `df/runtime/`,
+and in-progress delivery files. This is expected, not a problem.
+
+- **Do NOT stop to ask the human about uncommitted or untracked ("unregistered")
+  changes you did not make.** Treat a dirty working tree as the normal starting
+  state and proceed with the task.
+- Never treat pre-existing changes as a blocker, and never offer to revert,
+  clean, stash, or `git checkout` them.
+- Only concern yourself with the files **your current task** touches. Leave every
+  other modified or untracked file exactly as you found it.
+- Commit or push **only** when the human explicitly asks (per repo rules). Until
+  then, adding files to the working tree without committing is fine and needs no
+  confirmation.
+- The one exception: if a file *your task must edit* already has unrelated
+  uncommitted changes and editing it could clobber them, note that in your handoff
+  and work carefully — but still do not block the whole session on it.
+
 ## Main loop
 
 ```text
