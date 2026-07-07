@@ -44,6 +44,16 @@
 - Next: Manual human QA reviews `REB-17` per `DEC-REB-005`; DevOps implements `REB-18`-`REB-25` when dependencies are satisfied or explicitly overridden by the human.
 - Risks/blockers: Some admin UI actions may be partially wired; publish-environment checks require a running/configured publish service and must not fall back to author-only verification.
 
+## 2026-07-07 local - qa - REB-17
+
+- State: READY_FOR_QA -> READY_FOR_PO
+- Action: QA reviewed the SA-provided prioritized authoring E2E automation backlog (`REB-17`) and validated acceptance checks for coverage completeness, dependency mapping, and traceability. No blocking defects were found.
+- Evidence: `df/artifacts/REB-17/task.md`, `df/artifacts/REB-17/handoffs.md`, `df/artifacts/REB-17/qa-report.md`, `df/runtime/board.md`.
+- Result: PASS
+- Next: `po` reviews `REB-17` and accepts/rejects.
+- Risks/blockers: Publish-environment checks remain a PO responsibility during acceptance and may require a configured publish deployment to fully verify.
+
+
 ## 2026-07-07 local - devops - REB-13
 
 - State: DEV_IN_PROGRESS
