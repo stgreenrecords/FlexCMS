@@ -33,7 +33,19 @@
       "Bash(node -e \"const d=require\\(''c:/Users/Viach/IdeaProjects/FlexCMS/frontend/apps/site-nextjs/package.json''\\); console.log\\(d.name, JSON.stringify\\(d.scripts\\)\\)\")",
       "Bash(aws route53:*)",
       "Read(//dev/**)",
-      "Bash(aws iam:*)"
+      "Bash(aws iam:*)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Read(//Users/Viachaslau_Karnaushanka/.copilot/**)",
+      "Bash(gh extension *)",
+      "Read(//Users/Viachaslau_Karnaushanka/.nvm/versions/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(npm ls *)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(npm install *)",
+      "Bash(python3 -c \"import ast; ast.parse\\(open\\('agents/df-gh-agent.py'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
+      "Bash(python3 -)",
+      "Bash(gh models *)"
     ]
   }
 }

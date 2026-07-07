@@ -558,6 +558,31 @@ switch ($Command) {
         Write-Host ""
     }
 
+    "agent" {
+        $sub = if ($args.Count -gt 1) { $args[1] } else { "run" }
+        $agentArgs = @()
+        for ($i = 2; $i -lt $args.Count; $i++) { $agentArgs += $args[$i] }
+        $startFactory = Join-Path $RootDir "call-start-factory.bash"
+        $factory = Join-Path (Join-Path $RootDir "agents") "factory.py"
+
+        switch ($sub) {
+            "run" { bash $startFactory @agentArgs }
+            "plan" { bash $startFactory --dry-run @agentArgs }
+            "dry-run" { bash $startFactory --dry-run @agentArgs }
+            "manual" { bash $startFactory --adapter manual @agentArgs }
+            { $_ -in @("board", "status") } { Get-Content (Join-Path (Join-Path $RootDir "df/runtime") "board.md") }
+            "validate" { python3 $factory validate }
+            "legacy" {
+                if (-not (Test-Path $factory)) {
+                    Write-Host "  Legacy Agent Factory not found: $factory" -ForegroundColor Red
+                    exit 1
+                }
+                python3 $factory @agentArgs
+            }
+            default { bash $startFactory $sub @agentArgs }
+        }
+    }
+
     "reset" {
         Write-Banner "Resetting all data (volumes will be deleted)"
         Ensure-Env
@@ -581,6 +606,7 @@ switch ($Command) {
     flex status                        Health-check all
     flex logs  <service>               Tail service log
     flex seed                          Upload DAM assets for TUT sample site
+    flex agent <cmd> [...]             Dark Factory router (see df/00-start-here.md)
     flex reset                         Wipe all data & volumes
 
   SERVICES (pick any combination)

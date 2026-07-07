@@ -1,0 +1,479 @@
+{
+  "kind": "components",
+  "slug": "component_library_corporate_investor",
+  "title": "TUT | Corporate, Investor & Governance",
+  "sourceHtml": "Design/sample-website-tut/component-libs/component_library_corporate_investor/code.html",
+  "sourceScreenshot": "Design/sample-website-tut/component-libs/component_library_corporate_investor/screen.png",
+  "normalizedHtml": "Design/tut-usa/components/component_library_corporate_investor/normalized.html",
+  "screenshotEvidence": "Design/tut-usa/components/component_library_corporate_investor/capture-evidence.png",
+  "manifestPath": "Design/tut-usa/components/component_library_corporate_investor/assets-manifest.json",
+  "status": "captured_with_blockers",
+  "resourceSummary": {
+    "disallowed": 3,
+    "script": 1,
+    "downloaded": 16,
+    "stylesheet": 2,
+    "font": 13,
+    "other": 2,
+    "image": 1
+  },
+  "resources": [
+    {
+      "sourceUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "finalUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "category": "script",
+      "status": "disallowed",
+      "discoveryHints": [
+        "script"
+      ],
+      "sources": [
+        "script[src]",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from cdn.tailwindcss.com; script resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "Remote script left as blocker/provenance evidence; normalized output does not vendor third-party runtime scripts."
+    },
+    {
+      "sourceUrl": "https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&family=Newsreader:ital,wght@0,400;0,600;1,400;1,600&display=swap",
+      "finalUrl": "https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;800&family=Newsreader:ital,wght@0,400;0,600;1,400;1,600&display=swap",
+      "category": "stylesheet",
+      "status": "downloaded",
+      "discoveryHints": [
+        "stylesheet",
+        "link"
+      ],
+      "sources": [
+        "link[rel=stylesheet]",
+        "performance"
+      ],
+      "contentType": "text/css",
+      "localPath": "Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css",
+      "byteSize": 13468,
+      "sha256": "e6f43f8101bb780c108bf0900330d3e48a0aeb9e03830daaed55f8c5dc892dfa",
+      "provenanceNote": "Captured from fonts.googleapis.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "finalUrl": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "category": "stylesheet",
+      "status": "downloaded",
+      "discoveryHints": [
+        "stylesheet",
+        "link"
+      ],
+      "sources": [
+        "link[rel=stylesheet]",
+        "performance"
+      ],
+      "contentType": "text/css",
+      "localPath": "Design/tut-usa/assets/styles/20d5f7497afda7a5-css2.css",
+      "byteSize": 627,
+      "sha256": "20d5f7497afda7a574c0225008677ec6044ceaec0ff9f02b00183be9aac47db3",
+      "provenanceNote": "Captured from fonts.googleapis.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/e310b55a7fd9677f-xn7gyhe41ni1adirggexsvfedn4.woff2",
+      "byteSize": 24576,
+      "sha256": "e310b55a7fd9677f5e3555e6c6c4d064fa1f1d24393f0ddbe217cea12a8c432f",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggixSvfedN62Zw.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggixSvfedN62Zw.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/bab757f8a0a1bc04-xn7gyhe41ni1adirggixsvfedn62zw.woff2",
+      "byteSize": 8492,
+      "sha256": "bab757f8a0a1bc04055ee98cb5777f3254aab11f6d222366e1f40a36f390506a",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggmxSvfedN62Zw.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggmxSvfedN62Zw.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/ce093b341d9c1065-xn7gyhe41ni1adirggmxsvfedn62zw.woff2",
+      "byteSize": 15240,
+      "sha256": "ce093b341d9c10658ee1eaa85c5f8042ff3307bc6ccfc5f405616eb437f0009e",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggOxSvfedN62Zw.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggOxSvfedN62Zw.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/95a493061fe0a8d0-xn7gyhe41ni1adirggoxsvfedn62zw.woff2",
+      "byteSize": 14544,
+      "sha256": "95a493061fe0a8d0d027c2892747134ba747141112d3be4d5022e70ab7d3a1a6",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggqxSvfedN62Zw.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggqxSvfedN62Zw.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/e8c0b39992f06b3d-xn7gyhe41ni1adirggqxsvfedn62zw.woff2",
+      "byteSize": 2592,
+      "sha256": "e8c0b39992f06b3dc9a9834494088014859f363bf6ca8792b6bb07e17c7965f3",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggSxSvfedN62Zw.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggSxSvfedN62Zw.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/40af11327fe53081-xn7gyhe41ni1adirggsxsvfedn62zw.woff2",
+      "byteSize": 9360,
+      "sha256": "40af11327fe5308166c6cb5787808b042db6da889abf602f0a4876c49675d87e",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/materialsymbolsoutlined/v357/kJEPBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzBwG-RpA6RzaxHMPdY40KH8nGzv3fzfVJO1USv9ls.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/materialsymbolsoutlined/v357/kJEPBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzBwG-RpA6RzaxHMPdY40KH8nGzv3fzfVJO1USv9ls.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/20d5f7497afda7a5-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/c74fc989683e63a5-kjepbvyx7bgnksruwt8ohrdqw4oeldpieeii9v6odmzbwg-r.woff2",
+      "byteSize": 1124804,
+      "sha256": "c74fc989683e63a580652f9a120eb305d390875f335411f78ea6d8a0dc619aaf",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9VfjOCX1hbuyalUrK49dLac06G1ZGsZBtoBAbCJYQ5ayZCzn4.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9VfjOCX1hbuyalUrK49dLac06G1ZGsZBtoBAbCJYQ5ayZCzn4.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/57d91f5fc0f7e56d-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/a61f9c4ae3b99795-cy9vfjocx1hbuyalurk49dlac06g1zgszbtobabcjyq5ayzc.woff2",
+      "byteSize": 11852,
+      "sha256": "a61f9c4ae3b99795bd673ff0204b8f4e9adad39931e1da9470f216099771db34",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9VfjOCX1hbuyalUrK49dLac06G1ZGsZBtoBAbDJYQ5ayZCzn4.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9VfjOCX1hbuyalUrK49dLac06G1ZGsZBtoBAbDJYQ5ayZCzn4.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/57d91f5fc0f7e56d-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/fe52554ab1cd7dd9-cy9vfjocx1hbuyalurk49dlac06g1zgszbtobabdjyq5ayzc.woff2",
+      "byteSize": 36328,
+      "sha256": "fe52554ab1cd7dd9704db81572f45ef0eb122679c35bbbbc728baf701033b727",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9VfjOCX1hbuyalUrK49dLac06G1ZGsZBtoBAbNJYQ5ayZC.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9VfjOCX1hbuyalUrK49dLac06G1ZGsZBtoBAbNJYQ5ayZC.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/57d91f5fc0f7e56d-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/2a69ec1c0fb79a46-cy9vfjocx1hbuyalurk49dlac06g1zgszbtobabnjyq5ayzc.woff2",
+      "byteSize": 58152,
+      "sha256": "2a69ec1c0fb79a464de0e19957cdb3a65b5f626d85fffd164f9de557d3a64878",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9XfjOCX1hbuyalUrK439vogqC9yFZCYg7oRZaLFYgzbARA_n8IsQ.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9XfjOCX1hbuyalUrK439vogqC9yFZCYg7oRZaLFYgzbARA_n8IsQ.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/57d91f5fc0f7e56d-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/0a65822f4b1cb1a4-cy9xfjocx1hbuyalurk439vogqc9yfzcyg7orzalfygzbara.woff2",
+      "byteSize": 39708,
+      "sha256": "0a65822f4b1cb1a4500f3940406efda5839c1b34160a87af0a65b4d5b0a36c3b",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9XfjOCX1hbuyalUrK439vogqC9yFZCYg7oRZaLFYkzbARA_n8IsQ.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9XfjOCX1hbuyalUrK439vogqC9yFZCYg7oRZaLFYkzbARA_n8IsQ.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/57d91f5fc0f7e56d-css2.css",
+        "stylesheet:Design/tut-usa/assets/styles/e6f43f8101bb780c-css2.css"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/ecc0a860ff459daa-cy9xfjocx1hbuyalurk439vogqc9yfzcyg7orzalfykzbara.woff2",
+      "byteSize": 12024,
+      "sha256": "ecc0a860ff459daa2983d2778a97feffcb56a766608a9a865454c30ebdae1ac5",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9XfjOCX1hbuyalUrK439vogqC9yFZCYg7oRZaLFYYzbARA_n8.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9XfjOCX1hbuyalUrK439vogqC9yFZCYg7oRZaLFYYzbARA_n8.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/57d91f5fc0f7e56d-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/19a83cc7ce02aab9-cy9xfjocx1hbuyalurk439vogqc9yfzcyg7orzalfyyzbara.woff2",
+      "byteSize": 64500,
+      "sha256": "19a83cc7ce02aab990c0f5fb8bd8f12f2f8e4f56430d5a3459521cabd852a51c",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAt917oQXaSWOSxF1stBcs5HOQLi26l8llzAoQIacX7PCpjnZRIkpWpFz72p5M5YffzQxnTG8Vme8jm0LD4KrAsUmVF61P4zwnF-PSJ-f5eSmzIjjbmv3KDutRPfp6E1gQNtNBxMXvw8EJ93pQaSETvgtA2RwszGLYhWy0qKoAvYiKSofq1WFPEbTMUxtz9BMtj3ahgztC45DwLUGj4GSNMngyQsmHeyDln2mpjC6ymRdgEpJq0kfubxvn9xpz7bAixKbIJSBqkTRjv",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAt917oQXaSWOSxF1stBcs5HOQLi26l8llzAoQIacX7PCpjnZRIkpWpFz72p5M5YffzQxnTG8Vme8jm0LD4KrAsUmVF61P4zwnF-PSJ-f5eSmzIjjbmv3KDutRPfp6E1gQNtNBxMXvw8EJ93pQaSETvgtA2RwszGLYhWy0qKoAvYiKSofq1WFPEbTMUxtz9BMtj3ahgztC45DwLUGj4GSNMngyQsmHeyDln2mpjC6ymRdgEpJq0kfubxvn9xpz7bAixKbIJSBqkTRjv",
+      "category": "other",
+      "status": "disallowed",
+      "discoveryHints": [
+        "style",
+        "css"
+      ],
+      "sources": [
+        "inline-style",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from lh3.googleusercontent.com; other resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "URL classified as non-static or unsupported for local capture."
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCdg-Y-LJcxPe9WSrH85OF8K7jNLwSk1ZhtKENntV-ecFu-ziOgRSZu-eQ_xgwyTf6FdZSpWY00xDWDsWjXqUFH14IOQTseMxRK7XSLArz03cVUq8U5laUhgHErr5eFOGoV3e0O2__okk8ty0MiilaLwjPWdl1jHDp7anaaB2T2ADA9ZmZA1FsLAZ503_5Ue77JbwlIwFroOMhv55Z67MW__NVwIeDSMwT45xe4WfISzvcFF7pE91A_N9XOMogxJGyOKuOMoPrvQtsg",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCdg-Y-LJcxPe9WSrH85OF8K7jNLwSk1ZhtKENntV-ecFu-ziOgRSZu-eQ_xgwyTf6FdZSpWY00xDWDsWjXqUFH14IOQTseMxRK7XSLArz03cVUq8U5laUhgHErr5eFOGoV3e0O2__okk8ty0MiilaLwjPWdl1jHDp7anaaB2T2ADA9ZmZA1FsLAZ503_5Ue77JbwlIwFroOMhv55Z67MW__NVwIeDSMwT45xe4WfISzvcFF7pE91A_N9XOMogxJGyOKuOMoPrvQtsg",
+      "category": "other",
+      "status": "disallowed",
+      "discoveryHints": [
+        "style",
+        "css"
+      ],
+      "sources": [
+        "inline-style",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from lh3.googleusercontent.com; other resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "URL classified as non-static or unsupported for local capture."
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCKWJ59M6U6JTe5WKrYO8zilIJ2qN3RSI885nIVrhHTawbTmh5j-cYBRgrm02xC8XVGx0UCIPsrYpwROzxfFfdLwxUxHMw_-ASIGuqRxQtb8Jy0xVHIcVJ621rmULFW1t7HhPhccX-Br-XkR0QSsdeLMmNSh93VShvrSNmRvYQUZiZ-4B0gHW3NNr2DfTggf34ofGduN7TvnguOxdfRiWCu2q1jDwyh3frXaoXSNC0FsnLV97u5u0vigj9wohFwNcRHJK_Po9QS_A71",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCKWJ59M6U6JTe5WKrYO8zilIJ2qN3RSI885nIVrhHTawbTmh5j-cYBRgrm02xC8XVGx0UCIPsrYpwROzxfFfdLwxUxHMw_-ASIGuqRxQtb8Jy0xVHIcVJ621rmULFW1t7HhPhccX-Br-XkR0QSsdeLMmNSh93VShvrSNmRvYQUZiZ-4B0gHW3NNr2DfTggf34ofGduN7TvnguOxdfRiWCu2q1jDwyh3frXaoXSNC0FsnLV97u5u0vigj9wohFwNcRHJK_Po9QS_A71",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/bd001a2fa46e14f4-ab6axuckwj59m6u6jte5wkryo8zilij2qn3rsi885nivrhht.png",
+      "byteSize": 326954,
+      "sha256": "bd001a2fa46e14f425a5fa8ca5db4cc1ee72caa28d0b16ffd8ad09972bc1e98d",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    }
+  ],
+  "blockers": [
+    {
+      "sourceUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "finalUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "category": "script",
+      "status": "disallowed",
+      "discoveryHints": [
+        "script"
+      ],
+      "sources": [
+        "script[src]",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from cdn.tailwindcss.com; script resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "Remote script left as blocker/provenance evidence; normalized output does not vendor third-party runtime scripts."
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAt917oQXaSWOSxF1stBcs5HOQLi26l8llzAoQIacX7PCpjnZRIkpWpFz72p5M5YffzQxnTG8Vme8jm0LD4KrAsUmVF61P4zwnF-PSJ-f5eSmzIjjbmv3KDutRPfp6E1gQNtNBxMXvw8EJ93pQaSETvgtA2RwszGLYhWy0qKoAvYiKSofq1WFPEbTMUxtz9BMtj3ahgztC45DwLUGj4GSNMngyQsmHeyDln2mpjC6ymRdgEpJq0kfubxvn9xpz7bAixKbIJSBqkTRjv",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAt917oQXaSWOSxF1stBcs5HOQLi26l8llzAoQIacX7PCpjnZRIkpWpFz72p5M5YffzQxnTG8Vme8jm0LD4KrAsUmVF61P4zwnF-PSJ-f5eSmzIjjbmv3KDutRPfp6E1gQNtNBxMXvw8EJ93pQaSETvgtA2RwszGLYhWy0qKoAvYiKSofq1WFPEbTMUxtz9BMtj3ahgztC45DwLUGj4GSNMngyQsmHeyDln2mpjC6ymRdgEpJq0kfubxvn9xpz7bAixKbIJSBqkTRjv",
+      "category": "other",
+      "status": "disallowed",
+      "discoveryHints": [
+        "style",
+        "css"
+      ],
+      "sources": [
+        "inline-style",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from lh3.googleusercontent.com; other resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "URL classified as non-static or unsupported for local capture."
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCdg-Y-LJcxPe9WSrH85OF8K7jNLwSk1ZhtKENntV-ecFu-ziOgRSZu-eQ_xgwyTf6FdZSpWY00xDWDsWjXqUFH14IOQTseMxRK7XSLArz03cVUq8U5laUhgHErr5eFOGoV3e0O2__okk8ty0MiilaLwjPWdl1jHDp7anaaB2T2ADA9ZmZA1FsLAZ503_5Ue77JbwlIwFroOMhv55Z67MW__NVwIeDSMwT45xe4WfISzvcFF7pE91A_N9XOMogxJGyOKuOMoPrvQtsg",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCdg-Y-LJcxPe9WSrH85OF8K7jNLwSk1ZhtKENntV-ecFu-ziOgRSZu-eQ_xgwyTf6FdZSpWY00xDWDsWjXqUFH14IOQTseMxRK7XSLArz03cVUq8U5laUhgHErr5eFOGoV3e0O2__okk8ty0MiilaLwjPWdl1jHDp7anaaB2T2ADA9ZmZA1FsLAZ503_5Ue77JbwlIwFroOMhv55Z67MW__NVwIeDSMwT45xe4WfISzvcFF7pE91A_N9XOMogxJGyOKuOMoPrvQtsg",
+      "category": "other",
+      "status": "disallowed",
+      "discoveryHints": [
+        "style",
+        "css"
+      ],
+      "sources": [
+        "inline-style",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from lh3.googleusercontent.com; other resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "URL classified as non-static or unsupported for local capture."
+    }
+  ]
+}

@@ -1,0 +1,1426 @@
+{
+  "version": 1,
+  "updated": "2026-07-06",
+  "config": {
+    "lease_ttl_minutes": 240,
+    "wip_limits": {
+      "build": 4,
+      "test": 4,
+      "review": 4
+    },
+    "priority_order": [
+      "P0",
+      "P1",
+      "P2",
+      "P3",
+      "TA"
+    ],
+    "stations": [
+      "backlog",
+      "ready",
+      "build",
+      "test",
+      "review",
+      "done",
+      "blocked",
+      "rework"
+    ],
+    "in_flight_stations": [
+      "build",
+      "test",
+      "review"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "TA-00",
+      "title": "Foundation & Instrumentation — admin-e2e package, Playwright config, data-testid, fixtures, POMs",
+      "priority": "TA",
+      "station": "done",
+      "depends_on": [],
+      "modules": [
+        "apps/admin-e2e",
+        "apps/admin",
+        "packages/ui"
+      ],
+      "read_first": [
+        "docs/UI_TEST_AUTOMATION_PLAN.md"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "TA-01",
+      "title": "Phase 1 Critical — dashboard, content-tree, page-editor, DAM, workflows",
+      "priority": "TA",
+      "station": "done",
+      "depends_on": [
+        "TA-00"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/UI_TEST_AUTOMATION_PLAN.md"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "TA-02",
+      "title": "Phase 2 High — sites, PIM catalog/editor/import/schema",
+      "priority": "TA",
+      "station": "done",
+      "depends_on": [
+        "TA-01"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/UI_TEST_AUTOMATION_PLAN.md"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "TA-03",
+      "title": "Phase 3 Medium — preview, XF, translations, error states, accessibility",
+      "priority": "TA",
+      "station": "done",
+      "depends_on": [
+        "TA-02"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/UI_TEST_AUTOMATION_PLAN.md"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-04-06",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "TA-04",
+      "title": "Phase 4 Visual Regression + hardening",
+      "priority": "TA",
+      "station": "done",
+      "depends_on": [
+        "TA-03"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/UI_TEST_AUTOMATION_PLAN.md"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-04-07",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-01",
+      "title": "Foundation: clean old TUT content + TUT USA site skeleton + XF paths",
+      "priority": "P0",
+      "station": "done",
+      "depends_on": [],
+      "modules": [
+        "flexcms-app",
+        "flexcms-core"
+      ],
+      "read_first": [
+        "docs/EXPERIENCE_FRAGMENTS.md"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-02",
+      "title": "Backend: register all 406 component definitions (Flyway V16)",
+      "priority": "P0",
+      "station": "done",
+      "depends_on": [
+        "E-01"
+      ],
+      "modules": [
+        "flexcms-app"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-06",
+      "title": "Frontend renderers: Navigation & Discovery + XF locking (27 components)",
+      "priority": "P0",
+      "station": "done",
+      "depends_on": [
+        "E-01",
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs",
+        "apps/admin"
+      ],
+      "read_first": [
+        "docs/EXPERIENCE_FRAGMENTS.md"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-03",
+      "title": "Frontend renderers: Layout & Page Structure (32 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-04",
+      "title": "Frontend renderers: Editorial & Article Content (68 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-05",
+      "title": "Frontend renderers: Media, Visual Storytelling & Assets (33 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-07",
+      "title": "Frontend renderers: CTAs, Promotions & Campaigns (43 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-08",
+      "title": "Frontend renderers: Forms, Data Capture & Consent (42 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-09",
+      "title": "Frontend renderers: Commerce, Catalog & Merchandising (30 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-10",
+      "title": "Frontend renderers: Account, Portal & Transactional (24 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-11",
+      "title": "Frontend renderers: Events, Booking & Hospitality (24 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-12",
+      "title": "Frontend renderers: Community, Social Proof & Engagement (30 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-13",
+      "title": "Frontend renderers: Corporate/Investor + Education + Location (48 components)",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-14",
+      "title": "Backend + Frontend: 20 Page Templates",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [
+        "E-02"
+      ],
+      "modules": [
+        "flexcms-app",
+        "flexcms-core",
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "E-15",
+      "title": "Content tree: 61 pages with contextual dummy data + missing assets log",
+      "priority": "P1",
+      "station": "done",
+      "depends_on": [],
+      "modules": [
+        "scripts",
+        "flexcms-app"
+      ],
+      "read_first": [
+        "docs/list-ofcomponents-tempaltes-and-page-trees.txt"
+      ],
+      "acceptance_criteria": [],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-03-29",
+          "event": "migrated:done"
+        }
+      ]
+    },
+    {
+      "id": "RT-00",
+      "title": "Live test harness — make USE_LIVE_API truly disable ALL mocks + add stack-up Playwright project",
+      "priority": "P0",
+      "station": "build",
+      "depends_on": [],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "frontend/apps/admin-e2e/src/fixtures/api-mocks.ts",
+        "frontend/apps/admin-e2e/src/fixtures/base.fixture.ts",
+        "frontend/apps/admin-e2e/playwright.config.ts"
+      ],
+      "acceptance_criteria": [
+        "Every per-spec inline page.route('**/api/**') block is gated on USE_LIVE_API so it is skipped in live mode (currently only base.fixture honors it — 19 specs ignore it)",
+        "A 'live' Playwright project exists that starts admin + real Author backend and runs with mocks OFF",
+        "PROOF the harness catches breakage: with the backend stopped, the live project FAILS (attach trace showing the failure); with it running + seeded, it passes",
+        "Fix the dead 'tutGbEnChildren' reference in api-mocks.ts (undefined import)",
+        "Evidence saved under docs/retest-runs/RT-00/"
+      ],
+      "lease": {
+        "agent": "w1",
+        "since": "2026-07-06T17:57:41+00:00",
+        "expires": "2026-07-06T21:57:41+00:00"
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:ready"
+        },
+        {
+          "ts": "2026-07-06T17:57:41+00:00",
+          "event": "dispatched->build @w1"
+        }
+      ]
+    },
+    {
+      "id": "RT-01",
+      "title": "Asset integrity — resolve the 152 missing images so the demo site has zero broken images",
+      "priority": "P0",
+      "station": "blocked",
+      "depends_on": [],
+      "modules": [
+        "scripts",
+        "flexcms-dam"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "Design/sample-website-tut/missing-assets.txt",
+        "scripts/import_tut_usa_assets.py",
+        "scripts/seed_tut_usa_website.py"
+      ],
+      "acceptance_criteria": [
+        "Every asset in missing-assets.txt is either generated/uploaded to DAM OR mapped to an approved placeholder — none left dangling",
+        "python3 scripts/live_smoke.py --page content/tut-usa/home --no-edit reports 0 broken images",
+        "Repeat the image check for at least 5 representative pages (home, a vehicle detail, innovation, news, contact) — all images HTTP 200",
+        "missing-assets.txt is reduced to 0 outstanding entries (or annotated with the placeholder used)",
+        "Evidence (image-URL/status lists + screenshots) saved under docs/retest-runs/RT-01/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:ready"
+        },
+        {
+          "ts": "2026-07-06T19:01:13+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:01:14+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:14+00:00",
+          "event": "run:dispatch->build @w2"
+        },
+        {
+          "ts": "2026-07-06T19:01:16+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:16+00:00",
+          "event": "run:dispatch->build @w3"
+        },
+        {
+          "ts": "2026-07-06T19:01:17+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:17+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:01:18+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:18+00:00",
+          "event": "run:dispatch->build @w2"
+        },
+        {
+          "ts": "2026-07-06T19:01:19+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:19+00:00",
+          "event": "run:dispatch->build @w3"
+        },
+        {
+          "ts": "2026-07-06T19:01:20+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:20+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:01:21+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:21+00:00",
+          "event": "run:dispatch->build @w2"
+        },
+        {
+          "ts": "2026-07-06T19:01:23+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:23+00:00",
+          "event": "run:dispatch->build @w3"
+        },
+        {
+          "ts": "2026-07-06T19:01:24+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:24+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:01:25+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:25+00:00",
+          "event": "run:dispatch->build @w2"
+        },
+        {
+          "ts": "2026-07-06T19:01:26+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:26+00:00",
+          "event": "run:dispatch->build @w3"
+        },
+        {
+          "ts": "2026-07-06T19:01:27+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:27+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:01:28+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:28+00:00",
+          "event": "run:dispatch->build @w2"
+        },
+        {
+          "ts": "2026-07-06T19:01:29+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:29+00:00",
+          "event": "run:dispatch->build @w3"
+        },
+        {
+          "ts": "2026-07-06T19:01:30+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:30+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:01:31+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:31+00:00",
+          "event": "run:dispatch->build @w2"
+        },
+        {
+          "ts": "2026-07-06T19:01:32+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:32+00:00",
+          "event": "run:dispatch->build @w3"
+        },
+        {
+          "ts": "2026-07-06T19:01:33+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:33+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:01:34+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:01:34+00:00",
+          "event": "run:dispatch->build @w2"
+        },
+        {
+          "ts": "2026-07-06T19:01:35+00:00",
+          "event": "run:model-error->rework"
+        },
+        {
+          "ts": "2026-07-06T19:03:49+00:00",
+          "event": "run:dispatch->build @w1"
+        },
+        {
+          "ts": "2026-07-06T19:03:50+00:00",
+          "event": "run:model-error-413->blocked"
+        }
+      ],
+      "block_reason": "Prompt payload too large for provider; reduce context or prompt limits"
+    },
+    {
+      "id": "RT-02",
+      "title": "Page-edit round-trip — author edits dummy data in editor, it persists, headless reflects it, site renders it",
+      "priority": "P0",
+      "station": "ready",
+      "depends_on": [
+        "RT-00"
+      ],
+      "modules": [
+        "apps/admin-e2e",
+        "apps/admin"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "scripts/live_smoke.py",
+        "frontend/apps/admin/src/app/editor/page.tsx",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "SMOKE: python3 scripts/live_smoke.py --page content/tut-usa/home passes the page-edit round-trip check (edit persists and reverts)",
+        "FIELD TYPES: for a page with mixed components, edit and SAVE every schema-driven field type — text, textarea/rich-text, enum/select, boolean/toggle, number (UI-024→028) — and confirm each new value persists",
+        "PERSISTENCE: after save, GET /api/author/content/node?path=... shows the edited value in properties JSONB, AND GET /api/content/v1/pages/... returns the same edited value (not the mock {\"success\":true})",
+        "RENDER: reload the demo site page and confirm the edited dummy data actually appears in the rendered markup",
+        "STRUCTURE EDITS: add a component from the palette, reorder two components (drag), and delete a component (UI-032/033/034) — each change persists across reload",
+        "PUBLISH: Publish from the editor (UI-031) sets status PUBLISHED via the real API",
+        "LOCKED CASES (negative): template-embedded components and XF Navigation/Footer slots CANNOT be edited/moved/deleted from the canvas",
+        "ALL of the above run with mocks OFF (USE_LIVE_API) against the seeded backend — a stopped backend must make the journey FAIL",
+        "If any edit path is broken, file BUG-xx in 'ready' with the failing transcript and fix the CODE (not the test)",
+        "Playwright trace + API transcripts (before/after) saved under docs/retest-runs/RT-02/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:ready"
+        },
+        {
+          "ts": "2026-07-06",
+          "event": "expanded edit-surface ACs: field types, structure edits, publish, locked cases, render reflection"
+        }
+      ]
+    },
+    {
+      "id": "RT-03",
+      "title": "Live API/DB retest — Content, Author CRUD, Headless REST, GraphQL against real stack + seed",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [],
+      "modules": [
+        "flexcms-core",
+        "flexcms-author",
+        "flexcms-headless"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "Execute QA_TEST_PLAN Critical cases for CMS-*, AUTH-*, HEAD-*, GQL-* LIVE (not mocked)",
+        "Each executed case has a saved request+response transcript; state-changing cases include before/after SQL",
+        "0 Critical failures; every failure filed as BUG-xx in 'ready'",
+        "Evidence saved under docs/retest-runs/RT-03/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "RT-04",
+      "title": "Demo site end-to-end render — all 61 pages render with components + images",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "RT-00",
+        "RT-01"
+      ],
+      "modules": [
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "scripts/live_smoke.py",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "All 61 seeded pages return HTTP 200 from site-nextjs and render their expected components (TUT-016→030, SDK-010→019 executed live)",
+        "live_smoke image check passes for every page (0 broken images across the site)",
+        "No React hydration errors in console on the sampled pages",
+        "Per-page screenshots + a site-wide broken-image report (should be empty) saved under docs/retest-runs/RT-04/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "RT-05",
+      "title": "DAM + PIM live retest — upload/renditions/asset ops + catalogs/products/import/schema",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "RT-00"
+      ],
+      "modules": [
+        "flexcms-dam",
+        "flexcms-pim",
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "DAM-* and PIM-* Critical/High cases executed LIVE (real MinIO + flexcms_pim)",
+        "Admin DAM browser + PIM pages (UI-038→079) exercised with mocks OFF",
+        "0 Critical failures; failures filed as BUG-xx; evidence under docs/retest-runs/RT-05/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "RT-06",
+      "title": "Workflow + replication + cache/CDN live retest (publish pipeline)",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [],
+      "modules": [
+        "flexcms-author",
+        "flexcms-replication",
+        "flexcms-cache"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "WF-*, REP-*, CACHE-* Critical cases executed LIVE with both Author (8080) and Publish (8081) running",
+        "Prove a page published on Author appears on Publish and is cache-invalidated (RabbitMQ message + Publish GET evidence)",
+        "0 Critical failures; failures filed as BUG-xx; evidence under docs/retest-runs/RT-06/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "RT-07",
+      "title": "Admin UI journeys in LIVE mode — tree, DAM, PIM, sites, preview, workflows",
+      "priority": "P2",
+      "station": "backlog",
+      "depends_on": [
+        "RT-00"
+      ],
+      "modules": [
+        "apps/admin",
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "Re-run UI-001→105 with USE_LIVE_API on (mocks OFF) against the seeded backend",
+        "Every 'No mock data' case (UI-019/051/061/068/086/095) verified for real via network inspection",
+        "Traces for failed/edge journeys saved under docs/retest-runs/RT-07/; failures filed as BUG-xx"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "RT-08",
+      "title": "Evidence gate — wire live_smoke.py into CI stack-up job + factory validate usage",
+      "priority": "P2",
+      "station": "backlog",
+      "depends_on": [
+        "RT-00"
+      ],
+      "modules": [
+        ".github/workflows",
+        "scripts"
+      ],
+      "read_first": [
+        "docs/RETEST_PLAN.md",
+        "scripts/live_smoke.py",
+        ".github/workflows/ci.yml"
+      ],
+      "acceptance_criteria": [
+        "A CI job starts Postgres/Redis/RabbitMQ/MinIO + Author + admin/site, seeds data, and runs scripts/live_smoke.py",
+        "The job FAILS the build on any broken image or failed edit round-trip (prove with a deliberate red run)",
+        "docs/RETEST_PLAN.md §5 and FACTORY.md Definition of Done reference the gate",
+        "Evidence (CI run link/log) under docs/retest-runs/RT-08/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-00",
+      "title": "Test framework foundation — live fixture (mocks OFF), typed API client, POM base, config projects, reporting",
+      "priority": "P0",
+      "station": "ready",
+      "depends_on": [
+        "RT-00"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/RETEST_PLAN.md",
+        "frontend/apps/admin-e2e/playwright.config.ts",
+        "frontend/apps/admin-e2e/src/pages/BasePage.ts"
+      ],
+      "acceptance_criteria": [
+        "src/fixtures/live.fixture.ts: real backend, mocks OFF, seed baseline ensured in beforeAll; a stopped backend makes tests FAIL",
+        "src/fixtures/api.ts: typed API client (create/get/update/delete node, publish, upload asset, PIM ops) used to arrange state and assert backend truth",
+        "BasePage + POM conventions documented; specs use only POM methods + data-testid constants (no raw selectors)",
+        "playwright.config.ts exposes projects: chromium/firefox/webkit + a 'live' project; reporters = HTML + JUnit XML + trace-on-failure",
+        "Directory layout matches docs/TEST_FRAMEWORK.md §3 (tests/api, tests/admin, tests/site, tests/visual)",
+        "One end-to-end reference spec proves the stack: create page via API -> open editor -> edit field -> save -> assert via API + UI (mocks OFF)",
+        "Evidence (trace + report) saved under docs/retest-runs/TF-00/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:ready"
+        }
+      ]
+    },
+    {
+      "id": "TF-01",
+      "title": "L2 API functional suite — CMS / Author CRUD / Headless REST / GraphQL (live, tagged by QA case ID)",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "TF-00"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "Automated API tests for every Critical+High case: CMS-*, AUTH-*, HEAD-*, GQL-* — run live against seeded backend",
+        "Each test tagged with its QA case ID (e.g. @AUTH-001) for traceability",
+        "State-changing tests arrange + clean their own qa-test-* data (idempotent)",
+        "Negative cases covered (404/400/409, invalid status, XSS sanitization) with real error-body assertions",
+        "0 failures on green stack; suite runs in CI via the stack-up job",
+        "Evidence under docs/retest-runs/TF-01/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-02",
+      "title": "L3 UI POM buildout — Page Objects + live specs for all 18 admin screens",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "TF-00"
+      ],
+      "modules": [
+        "apps/admin-e2e",
+        "apps/admin"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/QA_TEST_PLAN.md",
+        "frontend/apps/admin/src/app"
+      ],
+      "acceptance_criteria": [
+        "A Page Object class per admin screen: dashboard, content tree, editor, DAM browser+detail, PIM catalog/product/import/schema, sites, workflows, preview, components, XF, translations, login",
+        "Live specs (mocks OFF) covering UI-001→105 with real backend; each tagged @UI-xxx",
+        "Every 'No mock data' case (UI-019/051/061/068/086/095) verified via real network calls",
+        "data-testid added to any element a POM needs but that lacks one",
+        "0 failures on green stack; traces saved for edge cases under docs/retest-runs/TF-02/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-03",
+      "title": "L4 demo-site functional + render coverage — all 61 pages, SDK & TUT cases",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "TF-02",
+        "RT-01"
+      ],
+      "modules": [
+        "apps/admin-e2e",
+        "apps/site-nextjs"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/QA_TEST_PLAN.md",
+        "scripts/live_smoke.py"
+      ],
+      "acceptance_criteria": [
+        "Automated tests render all 61 seeded pages and assert expected components present (TUT-016→030, SDK-010→019)",
+        "Image integrity assertion on every page — 0 broken images (reuse live_smoke logic)",
+        "Navigation/footer (XF) render on pages; product components show PIM data",
+        "No console/hydration errors on sampled pages",
+        "0 failures; evidence + screenshots under docs/retest-runs/TF-03/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-04",
+      "title": "DAM + PIM full functional coverage (API + UI, live)",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "TF-02"
+      ],
+      "modules": [
+        "apps/admin-e2e",
+        "flexcms-dam",
+        "flexcms-pim"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "DAM-* automated: upload (jpeg/png/pdf), renditions generated, list/get/delete, negative cases — real MinIO",
+        "PIM-* automated: schemas, catalogs, products CRUD, variants, carryforward, import (CSV/XLSX/JSON), search — real flexcms_pim DB",
+        "UI-038→079 admin DAM + PIM journeys automated live",
+        "Each test tagged @DAM-xxx / @PIM-xxx / @UI-xxx",
+        "0 failures; evidence under docs/retest-runs/TF-04/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-05",
+      "title": "Workflow / replication / cache / CDN / search live coverage",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "TF-01"
+      ],
+      "modules": [
+        "apps/admin-e2e",
+        "flexcms-author",
+        "flexcms-replication"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "WF-* automated: full standard-publish flow (submit/approve/reject/publish/cancel) with real status transitions",
+        "REP-* automated: publish on Author (8080) appears on Publish (8081); replication log asserted",
+        "CACHE-*/ES-* automated: cache invalidation on publish; content searchable after publish",
+        "Requires both Author + Publish running in the test stack",
+        "0 failures; evidence under docs/retest-runs/TF-05/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-06",
+      "title": "Cross-cutting coverage — security, error handling, accessibility (axe), CORS/rate-limit, perf smoke",
+      "priority": "P2",
+      "station": "backlog",
+      "depends_on": [
+        "TF-01",
+        "TF-02"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "SEC-* / ERR-* / INJ-* automated: auth bypass (local), RFC7807 error bodies, SQL-injection/XSS/path-traversal negative cases",
+        "A11Y-001→008 automated with @axe-core/playwright on all admin pages (0 critical/serious WCAG violations)",
+        "CORS-* and RATE-* automated where applicable",
+        "PERF smoke: key page render under threshold; assert no obvious N+1 via response timing",
+        "Tagged @SEC/@ERR/@A11Y/@PERF; evidence under docs/retest-runs/TF-06/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-07",
+      "title": "L5 visual regression — screens x viewport (desktop/tablet/mobile) x theme, vs Design/UI refs",
+      "priority": "P2",
+      "station": "backlog",
+      "depends_on": [
+        "TF-02"
+      ],
+      "modules": [
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "Design/UI/stitch_flexcms_admin_ui_requirements_summary"
+      ],
+      "acceptance_criteria": [
+        "Baseline snapshots for every admin screen at desktop/tablet/mobile, in light + dark theme",
+        "Snapshots compared on re-run (stable, animations disabled); diffs surfaced in the report",
+        "Design-reference cross-check: each screen visually compared against its Design/UI/<page>/screen.png; deviations filed as BUG-xx",
+        "No broken images / overflow / missing sections on any captured screen",
+        "Baselines + diffs saved under docs/retest-runs/TF-07/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-08",
+      "title": "Reporting + CI stack-up gate + JUnit artifacts + test tagging",
+      "priority": "P1",
+      "station": "backlog",
+      "depends_on": [
+        "TF-01",
+        "TF-02"
+      ],
+      "modules": [
+        ".github/workflows",
+        "apps/admin-e2e"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        ".github/workflows/ci.yml",
+        ".github/workflows/e2e.yml"
+      ],
+      "acceptance_criteria": [
+        "CI job spins up full stack (Postgres/Redis/RabbitMQ/MinIO + Author + Publish + admin + site) and seeds data",
+        "Runs L2 API + L3 UI + L4 site + live_smoke.py; publishes HTML report + JUnit XML + traces as artifacts",
+        "Build FAILS on any test failure or broken image (prove with a deliberate red run)",
+        "Tags wired (@smoke/@regression/@visual/@a11y) so selective runs work",
+        "Evidence (CI run) under docs/retest-runs/TF-08/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    },
+    {
+      "id": "TF-09",
+      "title": "Traceability matrix + coverage gate (QA case ID -> test; fail CI on uncovered Critical/High)",
+      "priority": "P2",
+      "station": "backlog",
+      "depends_on": [
+        "TF-08"
+      ],
+      "modules": [
+        "apps/admin-e2e",
+        "scripts"
+      ],
+      "read_first": [
+        "docs/TEST_FRAMEWORK.md",
+        "docs/QA_TEST_PLAN.md"
+      ],
+      "acceptance_criteria": [
+        "A generated matrix maps every QA_TEST_PLAN case ID to the automated test(s) tagged with it",
+        "A coverage script fails CI if any Critical or High case has no linked passing test",
+        "Report shows overall coverage %; target = 100% Critical+High automated",
+        "Matrix published as a CI artifact and committed to docs/retest-runs/TF-09/"
+      ],
+      "lease": {
+        "agent": null,
+        "since": null,
+        "expires": null
+      },
+      "history": [
+        {
+          "ts": "2026-07-06",
+          "event": "created:backlog"
+        }
+      ]
+    }
+  ]
+}

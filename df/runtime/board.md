@@ -1,0 +1,44 @@
+# The Factory Runtime Board
+
+This is the live task queue. Agents must update it when task state changes.
+
+| Priority | Task ID | Title | Type | State | Owner role | Blocked? | Last updated | Next action |
+|---|---|---|---|---|---|---|---|---|
+| P0 | REB-00 | Rebuild backlog reset and delivery architecture | Task | DONE | po | No | 2026-07-07 local | Accepted by PO; designer starts REB-01 next |
+| P0 | REB-01 | Normalize TUT design packages and approve storage map | Task | READY_FOR_QA | qa | No | 2026-07-07 local | Awaiting manual human QA/PO review per DEC-REB-005 |
+| P0 | REB-02 | Build Selenium browser asset-capture pipeline for remote template resources | Task | READY_FOR_QA | devops | No | 2026-07-07 local | Awaiting manual human QA/PO review per DEC-REB-005; capture outputs and manifests generated under Design/tut-usa |
+| P0 | REB-03 | Reset existing TUT/demo seed data safely and create idempotent reseed plan | Task | READY_FOR_QA | qa | No | 2026-07-07 local | Awaiting manual human QA/PO review per DEC-REB-005; reset plan/tooling and dry-run scope artifacts are in df/artifacts/REB-03/data |
+| P0 | REB-04 | Generate component/template/page-tree contracts from inventory | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA verifies generated contracts/page tree and backend evidence |
+| P0 | REB-05 | Add Selenium framework foundation and reporting package | Task | READY_FOR_QA | devops | No (REB-00 is DONE) | 2026-07-07 local | Awaiting manual human QA/PO review (DEC-REB-005) |
+| P1 | REB-06 | Produce Selenium traceability matrix and generated test-case skeletons | Task | READY_FOR_QA | devops | No (manual review queue per DEC-REB-005) | 2026-07-07 local | Awaiting manual human review; matrix + 21 template and 14 component skeleton specs generated |
+| P1 | REB-07 | Import captured assets into DAM/public frontend asset pipeline | Task | READY_FOR_QA | data-engineer | No (manual review queue per DEC-REB-005) | 2026-07-07 local | Awaiting manual human review; importer/map/checksum/rollback artifacts generated |
+| P1 | REB-08 | Rebuild frontend tokens, fonts, layout shell, and renderer foundation | Task | DEV_IN_PROGRESS | frontend-dev | No (manual review deferred per DEC-REB-005; using REB-01/REB-04 produced outputs) | 2026-07-07 local | Implement tokens/fonts/layout shell + renderer foundation |
+| P1 | REB-09 | Implement TUT grouped component renderers | Task | READY_FOR_DEV | frontend-dev | Yes: REB-08 | 2026-07-07 local | Implement grouped component renderers |
+| P1 | REB-10 | Implement all 21 TUT page templates and page routes | Task | READY_FOR_DEV | frontend-dev | Yes: REB-07, REB-09 | 2026-07-07 local | Implement template routes/layouts using headless JSON |
+| P1 | REB-11 | Reimplement admin authoring/editor flows for new components/templates | Task | READY_FOR_DEV | frontend-dev | Yes: REB-04, REB-08 | 2026-07-07 local | Rebuild admin authoring/editor UX for generated contracts |
+| P1 | REB-12 | Implement Selenium public-site template/component suites | Task | READY_FOR_DEV | devops | Yes: REB-06, REB-10 | 2026-07-07 local | Implement Selenium public-site automation |
+| P1 | REB-13 | Implement Selenium admin authoring and round-trip suites | Task | READY_FOR_DEV | devops | Yes: REB-06, REB-11 | 2026-07-07 local | Implement Selenium admin and live round-trip automation |
+| P2 | REB-14 | Wire Selenium gates into CI/local validation and retain artifacts | Task | READY_FOR_DEV | devops | Yes: REB-12, REB-13 | 2026-07-07 local | Add Selenium CI/local gates and artifact retention |
+| P0 | REB-15 | QA verification for full rebuild program | Task | OPEN | qa | Yes: REB-14 | 2026-07-07 local | QA independently verifies complete rebuild evidence after delivery |
+| P0 | REB-16 | PO acceptance for full rebuild program | Task | OPEN | po | Yes: REB-15 | 2026-07-07 local | PO accepts or rejects after QA pass |
+
+## Queue notes
+
+- 2026-07-07 local: Human requested a completely new backlog replacing the previous RT/TF queue. Previous board archived at `df/artifacts/REB-00/archived-board-before-reset.md` before replacement.
+- Active rebuild source artifact: `df/artifacts/REB-00/solution-design.md`.
+- Child task artifacts exist under `df/artifacts/REB-01/` through `df/artifacts/REB-16/` with dependencies and acceptance criteria.
+- Existing Playwright tests are retained until Selenium replacement coverage is implemented, QA-passed, and PO-accepted.
+- 2026-07-07 local: PO accepted REB-00 (`df/artifacts/REB-00/po-review.md`). REB-01 is now unblocked; all other tasks remain blocked per their documented dependency chain.
+- 2026-07-07 local: Human clarified TUT design is already provided and no designer-side action is needed for generating REB-04 contracts/page-tree. REB-04 proceeded in backend-dev lane and is ready for QA.
+- 2026-07-07 local: Human decision `DEC-REB-005` — `qa` and `po` automated role sessions are temporarily disabled; the human will play both roles manually. See `df/03-orchestration-rules.md` (active override section) and `df/runtime/decisions.md`. Tasks in `READY_FOR_QA`/`QA_IN_PROGRESS`/`READY_FOR_PO`/`PO_REVIEW` now wait for human action instead of an automated role session.
+- 2026-07-07 local: Corrected stale `Blocked?` flag on REB-05 — its only dependency, REB-00, is `DONE`, so REB-05 is unblocked. Implemented the Selenium framework foundation (`frontend/apps/selenium-e2e`) end-to-end: install, `tsc` build, and a passing `@smoke` spec with JUnit-report evidence recorded in `df/artifacts/REB-05/devops/summary.md`. REB-05 is now `READY_FOR_QA` and awaits manual human review per `DEC-REB-005`.
+- 2026-07-07 local: Designer completed REB-01 design normalization artifacts (`Design/tut-usa/README.md`, `df/artifacts/REB-01/design/inventory.md`, `df/artifacts/REB-01/design/summary.md`) and handed off storage-map/inventory scope to DevOps (`df/artifacts/REB-01/handoffs.md`).
+- 2026-07-07 local: DevOps reviewed REB-01 storage-map/inventory artifacts, recorded approval evidence in `df/artifacts/REB-01/devops/summary.md`, and moved REB-01 to `READY_FOR_QA` for manual human review per `DEC-REB-005`.
+- 2026-07-07 local: DevOps implemented REB-02 in `frontend/apps/selenium-e2e`, ran the browser-first capture pipeline, and generated `Design/tut-usa/manifest.json`, per-page manifests, normalized HTML, screenshots, and captured assets. REB-02 is now `READY_FOR_QA` for manual human review per `DEC-REB-005`.
+- 2026-07-07 local: Data-engineer implemented `scripts/reset_tut_usa_seed.py` plus unit coverage in `scripts/tests/test_reset_tut_usa_seed.py`, generated `df/artifacts/REB-03/data/reset-scope.json`, and documented the reset/reseed plan in `df/artifacts/REB-03/data/`. REB-03 is now `READY_FOR_QA` for manual human review per `DEC-REB-005`. Live DB row counts were designed into the tool but not captured in this shell because `psycopg2` is not installed.
+- 2026-07-07 local: Human requested starting a new dev task while QA/PO remain disabled and manual review comes later. REB-06 was explicitly started (`DEV_IN_PROGRESS`) using REB-02/04/05 outputs already produced in `READY_FOR_QA`; human acceptance of those upstream tasks will happen later per `DEC-REB-005`.
+- 2026-07-07 local: DevOps completed REB-06 by generating `Design/tut-usa/generated/qa-traceability-matrix.csv`, fixture manifests, and Selenium skeleton specs for 21 templates + 14 component groups (including skipped `tut_sovereign` rows marked `skeleton-no-capture`). Task moved to `READY_FOR_QA` for manual human review per `DEC-REB-005`.
+- 2026-07-07 local: Human requested starting another new dev task while QA/PO remain disabled and manual review comes later. REB-07 was explicitly started (`DEV_IN_PROGRESS`) using produced outputs from REB-02 and REB-03 in `READY_FOR_QA`; manual acceptance of upstream tasks remains deferred per `DEC-REB-005`.
+- 2026-07-07 local: Data-engineer completed REB-07 by implementing `scripts/import_tut_usa_captured_assets.py`, copying 182 captured assets into site/admin public roots, and generating `df/artifacts/REB-07/data/dam-import-map.json` plus checksum/rollback/validation evidence. Task moved to `READY_FOR_QA` for manual human review per `DEC-REB-005`.
+- 2026-07-07 local: Human requested starting the next implementation task. REB-08 was explicitly started (`DEV_IN_PROGRESS`) in the `frontend-dev` lane while QA/PO remain manual-only per `DEC-REB-005`; implementation uses approved design artifacts from REB-01 and generated contracts from REB-04 pending manual acceptance.
+

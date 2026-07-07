@@ -1,0 +1,589 @@
+{
+  "generatedAt": "2026-07-07T07:02:00.045Z",
+  "runner": "frontend/apps/selenium-e2e/src/capture/runTutAssetCapture.ts",
+  "pages": [
+    {
+      "kind": "templates",
+      "slug": "accessories_lifestyle_collection_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/accessories_lifestyle_collection_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/accessories_lifestyle_collection_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/accessories_lifestyle_collection_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 20,
+        "stylesheet": 2,
+        "font": 10,
+        "image": 8
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "book_a_test_drive_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/book_a_test_drive_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/book_a_test_drive_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/book_a_test_drive_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 18,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 3
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "brand_story_about_tut_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/brand_story_about_tut_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/brand_story_about_tut_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/brand_story_about_tut_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 24,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 9
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "build_configure_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/build_configure_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/build_configure_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/build_configure_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 19,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 4
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "compare_models_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/compare_models_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/compare_models_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/compare_models_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 9,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 3
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "contact_concierge_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/contact_concierge_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/contact_concierge_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/contact_concierge_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 18,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 3
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "dealer_showroom_locator_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/dealer_showroom_locator_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/dealer_showroom_locator_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/dealer_showroom_locator_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 17,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 2
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "global_home_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/global_home_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/global_home_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/global_home_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 23,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 8
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "innovation_feature_detail_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/innovation_feature_detail_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/innovation_feature_detail_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/innovation_feature_detail_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 15,
+        "stylesheet": 2,
+        "font": 13
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "innovation_hub_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/innovation_hub_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/innovation_hub_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/innovation_hub_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 11,
+        "stylesheet": 2,
+        "font": 3,
+        "image": 6
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "learning_education_hub_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/learning_education_hub_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/learning_education_hub_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/learning_education_hub_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 12,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 6
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "model_overview_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/model_overview_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/model_overview_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/model_overview_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 23,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 8
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "news_press_article_detail_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/news_press_article_detail_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/news_press_article_detail_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/news_press_article_detail_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 10,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 4
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "news_updates_landing_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/news_updates_landing_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/news_updates_landing_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/news_updates_landing_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 10,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 4
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "offers_financing_leasing_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/offers_financing_leasing_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/offers_financing_leasing_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/offers_financing_leasing_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 7,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 1
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "owner_manual_technical_documentation_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/owner_manual_technical_documentation_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/owner_manual_technical_documentation_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/owner_manual_technical_documentation_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 7,
+        "stylesheet": 2,
+        "font": 3,
+        "image": 2
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "owners_hub_landing_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/owners_hub_landing_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/owners_hub_landing_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/owners_hub_landing_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 19,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 4
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "safety_charging_ownership_how_to_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/safety_charging_ownership_how_to_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/safety_charging_ownership_how_to_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/safety_charging_ownership_how_to_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 13,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 7
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "service_maintenance_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/service_maintenance_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/service_maintenance_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/service_maintenance_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 9,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 3
+      }
+    },
+    {
+      "kind": "templates",
+      "slug": "vehicle_model_detail_page",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/templates/vehicle_model_detail_page/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/templates/vehicle_model_detail_page/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/templates/vehicle_model_detail_page/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 20,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 5
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_account_transactional",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_account_transactional/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_account_transactional/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_account_transactional/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 16,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 1
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_commerce_merchandising",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_commerce_merchandising/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_commerce_merchandising/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_commerce_merchandising/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 13,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 7
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_community_engagement",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_community_engagement/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_community_engagement/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_community_engagement/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 18,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 12
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_corporate_investor",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_corporate_investor/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_corporate_investor/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_corporate_investor/capture-evidence.png",
+      "blockerCount": 3,
+      "resourceSummary": {
+        "disallowed": 3,
+        "script": 1,
+        "downloaded": 16,
+        "stylesheet": 2,
+        "font": 13,
+        "other": 2,
+        "image": 1
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_ctas_promotions",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_ctas_promotions/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_ctas_promotions/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_ctas_promotions/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 9,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 3
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_editorial_article_content",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_editorial_article_content/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_editorial_article_content/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_editorial_article_content/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 8,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 2
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_education_learning",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_education_learning/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_education_learning/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_education_learning/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 19,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 4
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_events_booking",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_events_booking/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_events_booking/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_events_booking/capture-evidence.png",
+      "blockerCount": 2,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "missing": 1,
+        "stylesheet": 2,
+        "downloaded": 6,
+        "font": 1,
+        "image": 4
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_forms_consent",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_forms_consent/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_forms_consent/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_forms_consent/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 7,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 1
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_layout_page_structure",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_layout_page_structure/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_layout_page_structure/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_layout_page_structure/capture-evidence.png",
+      "blockerCount": 2,
+      "resourceSummary": {
+        "disallowed": 2,
+        "script": 1,
+        "downloaded": 9,
+        "stylesheet": 2,
+        "font": 4,
+        "other": 1,
+        "image": 3
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_location_presence",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_location_presence/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_location_presence/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_location_presence/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 14,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 8
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_media_assets",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_media_assets/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_media_assets/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_media_assets/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 12,
+        "stylesheet": 2,
+        "font": 4,
+        "image": 6
+      }
+    },
+    {
+      "kind": "components",
+      "slug": "component_library_navigation_discovery",
+      "status": "captured_with_blockers",
+      "manifestPath": "Design/tut-usa/components/component_library_navigation_discovery/assets-manifest.json",
+      "normalizedHtml": "Design/tut-usa/components/component_library_navigation_discovery/normalized.html",
+      "screenshotEvidence": "Design/tut-usa/components/component_library_navigation_discovery/capture-evidence.png",
+      "blockerCount": 1,
+      "resourceSummary": {
+        "disallowed": 1,
+        "script": 1,
+        "downloaded": 18,
+        "stylesheet": 2,
+        "font": 13,
+        "image": 3
+      }
+    }
+  ],
+  "skippedFolders": [
+    {
+      "kind": "templates",
+      "slug": "tut_sovereign",
+      "reason": "No code.html present in source folder; skipped by capture runner."
+    },
+    {
+      "kind": "components",
+      "slug": "tut_sovereign",
+      "reason": "No code.html present in source folder; skipped by capture runner."
+    }
+  ],
+  "totals": {
+    "pages": 33,
+    "downloaded": 469,
+    "disallowed": 36,
+    "missing": 1,
+    "error": 0,
+    "blockers": 37
+  }
+}

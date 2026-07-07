@@ -160,6 +160,9 @@ test.describe('Content Tree Page @smoke @regression', () => {
   });
 
   test('UI-015: skeleton rows shown during loading', async ({ page }) => {
+    // Requires a deterministic mocked delay to observe the loading skeleton;
+    // not reproducible/deterministic against a live backend.
+    test.skip(!!process.env['USE_LIVE_API'], 'Requires mocked API delay; not applicable in live mode');
     // Override with a slow response so skeleton is visible before data arrives
     await page.route('**/api/author/content/children*', async (route) => {
       await new Promise((r) => setTimeout(r, 2000));

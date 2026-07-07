@@ -1,0 +1,34 @@
+# RT-01 - Asset integrity — resolve the 152 missing images so the demo site has zero broken images
+
+## Summary
+
+- Priority: P0
+- Current state: RETURNED_TO_DEV
+- Owner role: data-engineer
+- Legacy station: blocked
+
+## Dependencies
+- none
+
+## Modules / scope
+- `scripts`
+- `flexcms-dam`
+
+## Read first
+- `docs/RETEST_PLAN.md`
+- `Design/sample-website-tut/missing-assets.txt`
+- `scripts/import_tut_usa_assets.py`
+- `scripts/seed_tut_usa_website.py`
+
+## Acceptance criteria
+- Every asset in missing-assets.txt is either generated/uploaded to DAM OR mapped to an approved placeholder — none left dangling
+- python3 scripts/live_smoke.py --page content/tut-usa/home --no-edit reports 0 broken images
+- Repeat the image check for at least 5 representative pages (home, a vehicle detail, innovation, news, contact) — all images HTTP 200
+- missing-assets.txt is reduced to 0 outstanding entries (or annotated with the placeholder used)
+- Evidence (image-URL/status lists + screenshots) saved under docs/retest-runs/RT-01/
+
+## Evidence requirements
+
+- Record exact commands, environment, and results.
+- Attach logs/screenshots/traces under this artifact folder when relevant.
+- QA must independently verify; PO must accept before DONE.

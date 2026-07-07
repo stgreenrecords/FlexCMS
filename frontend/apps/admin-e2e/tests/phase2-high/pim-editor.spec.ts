@@ -106,21 +106,20 @@ test.describe('PIM Product Editor @regression', () => {
   });
 
   test('UI-058: "Publish" button sends PUT with PUBLISHED status', async ({ page }) => {
-    let capturedBody: Record<string, unknown> = {};
-    const publishRequest = new Promise<void>((resolve) => {
-      void page.route('**/api/pim/v1/products/TUT-SUV-2026/status', async (route) => {
-        if (route.request().method() === 'PUT') {
-          capturedBody = JSON.parse(route.request().postData() ?? '{}') as Record<string, unknown>;
-        }
-        await route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' });
-        resolve();
-      });
-    });
+    // Observe the outgoing request instead of intercepting it, so this works
+    // unmodified in live mode (request reaches the real backend) and in
+    // mocked mode (the shared beforeEach mock still fulfills the route).
+    const publishRequest = page.waitForRequest(
+      (req) =>
+        req.url().includes('/api/pim/v1/products/TUT-SUV-2026/status') &&
+        req.method() === 'PUT',
+    );
     await page.goto(`/pim/${CATALOG_ID}/${PRODUCT_ID}`);
     await expect(page.getByText(/SKU:\s*TUT-SUV-2026/)).toBeVisible({ timeout: 10_000 });
     // Click "Publish" — locator by button text content (button has icon + 'Publish' text)
     await page.locator('button').filter({ hasText: 'Publish' }).last().click();
-    await publishRequest;
+    const req = await publishRequest;
+    const capturedBody = JSON.parse(req.postData() ?? '{}') as Record<string, unknown>;
     expect(capturedBody['status']).toBe('PUBLISHED');
   });
 

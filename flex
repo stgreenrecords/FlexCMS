@@ -396,6 +396,71 @@ cmd_logs() {
   fi
 }
 
+cmd_agent() {
+  # Primary: Dark Factory router. Legacy queue dispatcher is available via
+  # `flex agent legacy <cmd>` for migration/troubleshooting only.
+  local sub="${1:-run}"
+  case "$sub" in
+    run)
+      shift || true
+      exec "${BASH:-bash}" "$ROOT_DIR/call-start-factory.bash" "$@"
+      ;;
+    plan|dry-run)
+      shift || true
+      exec "${BASH:-bash}" "$ROOT_DIR/call-start-factory.bash" --dry-run "$@"
+      ;;
+    manual)
+      shift || true
+      exec "${BASH:-bash}" "$ROOT_DIR/call-start-factory.bash" --adapter manual "$@"
+      ;;
+    board|status)
+      cat "$ROOT_DIR/df/runtime/board.md"
+      ;;
+    validate)
+      local factory="$ROOT_DIR/agents/factory.py"
+      if [ ! -f "$factory" ]; then
+        echo -e "  ${C_RED}Validation helper not found: $factory${C_RESET}"
+        exit 1
+      fi
+      python3 "$factory" validate
+      ;;
+    legacy)
+      shift || true
+      local factory="$ROOT_DIR/agents/factory.py"
+      if [ ! -f "$factory" ]; then
+        echo -e "  ${C_RED}Legacy Agent Factory not found: $factory${C_RESET}"
+        exit 1
+      fi
+      python3 "$factory" "$@"
+      ;;
+    help|-h|--help)
+      cat <<'EOF'
+
+  flex agent -- Dark Factory shortcuts
+  ------------------------------------
+
+  USAGE
+    flex agent run [router-options]       Start Dark Factory router (default)
+    flex agent plan [router-options]      Dry-run next role-session
+    flex agent manual [router-options]    Prepare one manual role prompt
+    flex agent board                      Print df/runtime/board.md
+    flex agent validate                   Run deterministic FlexCMS gate
+    flex agent legacy <cmd> [...]         Legacy agents/factory.py dispatcher
+
+  EXAMPLES
+    flex agent plan
+    flex agent run --adapter manual
+    flex agent run --max-iterations 20 --max-parallel 1
+    flex agent legacy status
+
+EOF
+      ;;
+    *)
+      exec "${BASH:-bash}" "$ROOT_DIR/call-start-factory.bash" "$@"
+      ;;
+  esac
+}
+
 cmd_reset() {
   banner "Resetting all data (volumes will be deleted)"
   ensure_env
@@ -416,6 +481,7 @@ cmd_help() {
     flex stop  local                   Stop everything
     flex status                        Health-check all
     flex logs  <service>               Tail service log
+    flex agent <cmd> [...]             Dark Factory router (see df/00-start-here.md)
     flex reset                         Wipe all data & volumes
 
   SERVICES (pick any combination)
@@ -442,6 +508,8 @@ cmd_help() {
     flex stop local                      Stop all services
     flex logs author                     Tail Author backend log
     flex status                          Check what's running
+    flex agent plan                      Preview next Dark Factory role-session
+    flex agent run                       Run the autonomous Dark Factory router
 
 EOF
 }
@@ -453,6 +521,7 @@ case "${1:-help}" in
   stop)   cmd_stop ;;
   status) cmd_status ;;
   logs)   shift; cmd_logs "$@" ;;
+  agent)  shift; cmd_agent "$@" ;;
   reset)  cmd_reset ;;
   *)      cmd_help ;;
 esac

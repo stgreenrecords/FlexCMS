@@ -92,18 +92,12 @@ test.describe('Workflow Inbox @smoke @regression', () => {
   });
 
   test('UI-084: comment text is included in the approve request body', async ({ page }) => {
-    // Register a higher-priority route to capture the advance request body
-    let capturedComment = '__not_captured__';
-    const advanceSettled = new Promise<void>((resolve) => {
-      void page.route('**/api/author/workflow/advance', async (route) => {
-        if (route.request().method() === 'POST') {
-          const body = JSON.parse(route.request().postData() ?? '{}') as Record<string, unknown>;
-          capturedComment = (body.comment as string) ?? '';
-        }
-        await route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' });
-        resolve();
-      });
-    });
+    // Observe the outgoing request instead of intercepting it, so this works
+    // unmodified in live mode (request reaches the real backend) and in
+    // mocked mode (the shared beforeEach mock still fulfills the route).
+    const advanceRequest = page.waitForRequest(
+      (req) => req.url().includes('/api/author/workflow/advance') && req.method() === 'POST',
+    );
 
     await page.goto('/workflows');
     // wf-001 is auto-selected on load — the detail panel and textarea are immediately visible
@@ -119,11 +113,9 @@ test.describe('Workflow Inbox @smoke @regression', () => {
     await expect(textarea).toHaveValue('LGTM - approved with no issues');
     await page.getByRole('button', { name: 'Approve Workflow' }).click();
 
-    await advanceSettled;
-    expect(capturedComment).toBe('LGTM - approved with no issues');
-
-    await advanceSettled;
-    expect(capturedComment).toBe('LGTM - approved with no issues');
+    const req = await advanceRequest;
+    const body = JSON.parse(req.postData() ?? '{}') as Record<string, unknown>;
+    expect(body.comment).toBe('LGTM - approved with no issues');
   });
 
   test('UI-085: tab buttons for pending/approved/rejected are present', async ({ page }) => {

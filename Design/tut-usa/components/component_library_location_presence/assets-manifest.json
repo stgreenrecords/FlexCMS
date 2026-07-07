@@ -1,0 +1,349 @@
+{
+  "kind": "components",
+  "slug": "component_library_location_presence",
+  "title": "TUT USA | Location & Physical Presence",
+  "sourceHtml": "Design/sample-website-tut/component-libs/component_library_location_presence/code.html",
+  "sourceScreenshot": "Design/sample-website-tut/component-libs/component_library_location_presence/screen.png",
+  "normalizedHtml": "Design/tut-usa/components/component_library_location_presence/normalized.html",
+  "screenshotEvidence": "Design/tut-usa/components/component_library_location_presence/capture-evidence.png",
+  "manifestPath": "Design/tut-usa/components/component_library_location_presence/assets-manifest.json",
+  "status": "captured_with_blockers",
+  "resourceSummary": {
+    "disallowed": 1,
+    "script": 1,
+    "downloaded": 14,
+    "stylesheet": 2,
+    "font": 4,
+    "image": 8
+  },
+  "resources": [
+    {
+      "sourceUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "finalUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "category": "script",
+      "status": "disallowed",
+      "discoveryHints": [
+        "script"
+      ],
+      "sources": [
+        "script[src]",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from cdn.tailwindcss.com; script resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "Remote script left as blocker/provenance evidence; normalized output does not vendor third-party runtime scripts."
+    },
+    {
+      "sourceUrl": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "finalUrl": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "category": "stylesheet",
+      "status": "downloaded",
+      "discoveryHints": [
+        "stylesheet",
+        "link"
+      ],
+      "sources": [
+        "link[rel=stylesheet]",
+        "performance"
+      ],
+      "contentType": "text/css",
+      "localPath": "Design/tut-usa/assets/styles/20d5f7497afda7a5-css2.css",
+      "byteSize": 627,
+      "sha256": "20d5f7497afda7a574c0225008677ec6044ceaec0ff9f02b00183be9aac47db3",
+      "provenanceNote": "Captured from fonts.googleapis.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap",
+      "finalUrl": "https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Manrope:wght@200..800&display=swap",
+      "category": "stylesheet",
+      "status": "downloaded",
+      "discoveryHints": [
+        "stylesheet",
+        "link"
+      ],
+      "sources": [
+        "link[rel=stylesheet]",
+        "performance"
+      ],
+      "contentType": "text/css",
+      "localPath": "Design/tut-usa/assets/styles/fa10b0ed22cfc7e9-css2.css",
+      "byteSize": 4604,
+      "sha256": "fa10b0ed22cfc7e9a37801372e79abb05716064134becf09250c070b0f4bfc84",
+      "provenanceNote": "Captured from fonts.googleapis.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/manrope/v20/xn7gYHE41ni1AdIRggexSvfedN4.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/e310b55a7fd9677f-xn7gyhe41ni1adirggexsvfedn4.woff2",
+      "byteSize": 24576,
+      "sha256": "e310b55a7fd9677f5e3555e6c6c4d064fa1f1d24393f0ddbe217cea12a8c432f",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/materialsymbolsoutlined/v357/kJEPBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzBwG-RpA6RzaxHMPdY40KH8nGzv3fzfVJO1USv9ls.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/materialsymbolsoutlined/v357/kJEPBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzBwG-RpA6RzaxHMPdY40KH8nGzv3fzfVJO1USv9ls.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/20d5f7497afda7a5-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/c74fc989683e63a5-kjepbvyx7bgnksruwt8ohrdqw4oeldpieeii9v6odmzbwg-r.woff2",
+      "byteSize": 1124804,
+      "sha256": "c74fc989683e63a580652f9a120eb305d390875f335411f78ea6d8a0dc619aaf",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9AfjOCX1hbuyalUrK4397yjIJFJpc.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9AfjOCX1hbuyalUrK4397yjIJFJpc.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/d0c2f8c5258361af-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/01817351be3edfc1-cy9afjocx1hbuyalurk4397yjijfjpc.woff2",
+      "byteSize": 131848,
+      "sha256": "01817351be3edfc1714fe6d60ddea6a22a169a5ebd033b50c7f9495e5d9c386a",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9CfjOCX1hbuyalUrK439vCjohCBJWxZA.woff2",
+      "finalUrl": "https://fonts.gstatic.com/s/newsreader/v26/cY9CfjOCX1hbuyalUrK439vCjohCBJWxZA.woff2",
+      "category": "font",
+      "status": "downloaded",
+      "discoveryHints": [
+        "style",
+        "css-url",
+        "font",
+        "css"
+      ],
+      "sources": [
+        "stylesheet:Design/tut-usa/assets/styles/7c2477fbdc6d022e-css2.css",
+        "performance"
+      ],
+      "contentType": "font/woff2",
+      "localPath": "Design/tut-usa/assets/fonts/a99fb127682b9af5-cy9cfjocx1hbuyalurk439vcjohcbjwxza.woff2",
+      "byteSize": 147060,
+      "sha256": "a99fb127682b9af538780d21420037452197b0d37dfd273eb108f8a3665d5501",
+      "provenanceNote": "Captured from fonts.gstatic.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAdurET0-FQqdu4Qq7BLBbqSO0TNB4QTUtbfb3MFLzKpfR994PpbxbktuIJRYqOMuhXbp7PecFQ76-5_YFj_D3PflpfDMpS2oq-itsziArjIcRXJq_IpZrSDZKTVJNC2TQROHmlS2_3ouCfS1UmXc9OhPG43S_97CpBYU2JmIMB4bEZz3uHu6GSGWM85VQUg4kxuDJ6Ut3YewKYMyvfFwiel5BNbHKXhY3s2WjxrBRnJAUYRM4Am2yUVY9L5lKY_QdXiYbh41cSXrPM",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAdurET0-FQqdu4Qq7BLBbqSO0TNB4QTUtbfb3MFLzKpfR994PpbxbktuIJRYqOMuhXbp7PecFQ76-5_YFj_D3PflpfDMpS2oq-itsziArjIcRXJq_IpZrSDZKTVJNC2TQROHmlS2_3ouCfS1UmXc9OhPG43S_97CpBYU2JmIMB4bEZz3uHu6GSGWM85VQUg4kxuDJ6Ut3YewKYMyvfFwiel5BNbHKXhY3s2WjxrBRnJAUYRM4Am2yUVY9L5lKY_QdXiYbh41cSXrPM",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/79d0f04266369d6b-ab6axuaduret0-fqqdu4qq7blbbqso0tnb4qtutbfb3mflzk.png",
+      "byteSize": 395923,
+      "sha256": "79d0f04266369d6bbdc7508643fd38ac09e8e7b8311648553651abb397cbc403",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAkGVbeCVl8YoQtTtcviH4lSTFEw5hqxMwQTY6z8b8ZOSS_--h-fohIm9C7zoYU_vSlFBlWPY26p69GwmEZVhpR1LH2i1-Jy8e3RFhKq9WBpDXckX_A0TdxrJ-k3w7bh5_Ifw9eOobNnd1Qw1Gt_Y8EBUERu9dCy9McamfE3LeAbz2D0CHitmAK_GpL5CcFXcPlGr_-jSlTox1qTzV1FmeafkRvkrwW1KfaRei3260e0OPWucFAFzBP4v_zoWbvUctsJxiuHN3s5Fz7",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAkGVbeCVl8YoQtTtcviH4lSTFEw5hqxMwQTY6z8b8ZOSS_--h-fohIm9C7zoYU_vSlFBlWPY26p69GwmEZVhpR1LH2i1-Jy8e3RFhKq9WBpDXckX_A0TdxrJ-k3w7bh5_Ifw9eOobNnd1Qw1Gt_Y8EBUERu9dCy9McamfE3LeAbz2D0CHitmAK_GpL5CcFXcPlGr_-jSlTox1qTzV1FmeafkRvkrwW1KfaRei3260e0OPWucFAFzBP4v_zoWbvUctsJxiuHN3s5Fz7",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/3dc15528b561aeae-ab6axuakgvbecvl8yoqtttcvih4lstfew5hqxmwqty6z8b8z.png",
+      "byteSize": 354619,
+      "sha256": "3dc15528b561aeae90df00cdc5020790ba15eea4e693e2910e3008d25994ff68",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAXsXcKuaM_85OS5giHSE1PzWpyyY11OYHA7GfCjxIFrdyze5S2jrscS8PrFK8O6VosRohRnKlqWVXnyrBslEYOsUf4r0ezXm9wtaK8Km8jmrxBSKCPV2uM1gGbF2w5V4kFyCUhlpgp4n5hnyj4M4Z1x5q-JT2VWPtnKDXygiTemm5LV5Sa_ize6qTqaJtfn6PQOrTBV2J7P3ULToJrEQjd1f7cqeSBV4kB4GZ5EPDmL64wiHXlcqcxEeVMIlpCHVXEOtb3tCJaE9VC",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuAXsXcKuaM_85OS5giHSE1PzWpyyY11OYHA7GfCjxIFrdyze5S2jrscS8PrFK8O6VosRohRnKlqWVXnyrBslEYOsUf4r0ezXm9wtaK8Km8jmrxBSKCPV2uM1gGbF2w5V4kFyCUhlpgp4n5hnyj4M4Z1x5q-JT2VWPtnKDXygiTemm5LV5Sa_ize6qTqaJtfn6PQOrTBV2J7P3ULToJrEQjd1f7cqeSBV4kB4GZ5EPDmL64wiHXlcqcxEeVMIlpCHVXEOtb3tCJaE9VC",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/5c20fb04bf6ae187-ab6axuaxsxckuam-85os5gihse1pzwpyyy11oyha7gfcjxif.png",
+      "byteSize": 426735,
+      "sha256": "5c20fb04bf6ae187ab4bbc459be4d2e418e89628d3618604660ab54187f636e1",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBC8tzPT6ua2VGLBEx6mIbA7STPDK0a4v0cCJmRp6qdgCQ8Bm_IgUHKcwRlWZZ8PFYe8hE27OpSaD_TdwsbqBh1dEGyrgcJpQQyixzkVqcAojUnQEb7eG-DX8pzdnh8EiSCt8GW5ZoQ6ZEMuV3YAD-bxdVj3U_GN2M7i-PYEsv8KBth5ttFk46E-WaVG964P7_nSWDovX11NnAXWWfAIaNg2rEB7iVLWgfVVtovK1ZGcRDkU-OcahXKvQYfoVsESPUYvKbuava-JKJ9",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBC8tzPT6ua2VGLBEx6mIbA7STPDK0a4v0cCJmRp6qdgCQ8Bm_IgUHKcwRlWZZ8PFYe8hE27OpSaD_TdwsbqBh1dEGyrgcJpQQyixzkVqcAojUnQEb7eG-DX8pzdnh8EiSCt8GW5ZoQ6ZEMuV3YAD-bxdVj3U_GN2M7i-PYEsv8KBth5ttFk46E-WaVG964P7_nSWDovX11NnAXWWfAIaNg2rEB7iVLWgfVVtovK1ZGcRDkU-OcahXKvQYfoVsESPUYvKbuava-JKJ9",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/5eb9c10d6f139c1c-ab6axubc8tzpt6ua2vglbex6miba7stpdk0a4v0ccjmrp6qd.png",
+      "byteSize": 610176,
+      "sha256": "5eb9c10d6f139c1c3e8a101ce9df41a233dd433da843f7f4626f42090ca4ed27",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBrFoGrN4GLY1kXytG6EunPNhh9iBDGjXqF9GytCRqQDSOmNlykVRsIoVjyxqnkcjIp5iL5NW9BbXM3WXRD-Fv138xuL39_hoy5cLZCnPkYkMtVPNm5936y31X7UPhHQOI2mny4tU6DkQjGCFiZbx9_5rBZXV7SbMvRGC97uEYeLIU1TU3IZfRgFppGAAIsl36PwHbgEMCuA9zbJn3pg-9MKkG54wFKb8ruFSdfiI4OYrAJAzRGDBx9VTeUJUyRVZu7TjP54dy2bezc",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuBrFoGrN4GLY1kXytG6EunPNhh9iBDGjXqF9GytCRqQDSOmNlykVRsIoVjyxqnkcjIp5iL5NW9BbXM3WXRD-Fv138xuL39_hoy5cLZCnPkYkMtVPNm5936y31X7UPhHQOI2mny4tU6DkQjGCFiZbx9_5rBZXV7SbMvRGC97uEYeLIU1TU3IZfRgFppGAAIsl36PwHbgEMCuA9zbJn3pg-9MKkG54wFKb8ruFSdfiI4OYrAJAzRGDBx9VTeUJUyRVZu7TjP54dy2bezc",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/470c0e7bf93ddb30-ab6axubrfogrn4gly1kxytg6eunpnhh9ibdgjxqf9gytcrqq.png",
+      "byteSize": 396926,
+      "sha256": "470c0e7bf93ddb301c504147ac8ef054a1f638eee71ca9cdd5dafb12a80653c0",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCFvYO2ChZpjjVNde4g3-5gREqz_HMmDKzzntXEj1BAzECdxqni7Zm5DRxmp9d3JVt6g3Ctc3E3FW_qwodTdZ63brZA3l0VFZO7hABTpKuwv0-4w1vM0oX3vCNqT8mIb-G4nSgFY0ZY_vbwb2RP371hKmmmfm_nDaLu1-pv2whhakAXHaAgXfLIWUgaq9sLh_YLb30SV3XcdLNI0pkMVDRiH38MP4MfUhnJ5M9_iCDl0-HS-3JUBMDLM9ZkjeYuENS--qY5lrB3kPjw",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuCFvYO2ChZpjjVNde4g3-5gREqz_HMmDKzzntXEj1BAzECdxqni7Zm5DRxmp9d3JVt6g3Ctc3E3FW_qwodTdZ63brZA3l0VFZO7hABTpKuwv0-4w1vM0oX3vCNqT8mIb-G4nSgFY0ZY_vbwb2RP371hKmmmfm_nDaLu1-pv2whhakAXHaAgXfLIWUgaq9sLh_YLb30SV3XcdLNI0pkMVDRiH38MP4MfUhnJ5M9_iCDl0-HS-3JUBMDLM9ZkjeYuENS--qY5lrB3kPjw",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/2550c1ba309704a4-ab6axucfvyo2chzpjjvnde4g3-5greqz-hmmdkzzntxej1ba.png",
+      "byteSize": 372345,
+      "sha256": "2550c1ba309704a428908bb81ecb815bb27a38d44cda30e425da9f0cfa4b3558",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuD_RHF1sd760BysH3YYxKwGhWd61I47oP5-cuNqylYkfS5dTHYrv2AzyPjd-jI3W0UtNjnaKUCC_DX9NLL8dZjUpD9eJVND0Uxh9_Me7UO83XDid6-r4hMk98k58nci7PQa_MmhAlqqE599qE9VEr68XdcEsUGIvTE9RkQVy_O0XWYmJqiIcD2pfEnybO4RriKmjIaGz7zk6z1Obseanca68PYZ6Wawyb6IhntsRjQHLkpglWFOrn6Gt7AAbeITFvG6usMvAo0T5n69",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuD_RHF1sd760BysH3YYxKwGhWd61I47oP5-cuNqylYkfS5dTHYrv2AzyPjd-jI3W0UtNjnaKUCC_DX9NLL8dZjUpD9eJVND0Uxh9_Me7UO83XDid6-r4hMk98k58nci7PQa_MmhAlqqE599qE9VEr68XdcEsUGIvTE9RkQVy_O0XWYmJqiIcD2pfEnybO4RriKmjIaGz7zk6z1Obseanca68PYZ6Wawyb6IhntsRjQHLkpglWFOrn6Gt7AAbeITFvG6usMvAo0T5n69",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/7beb0eddd52b3ced-ab6axud-rhf1sd760bysh3yyxkwghwd61i47op5-cunqylyk.png",
+      "byteSize": 353500,
+      "sha256": "7beb0eddd52b3ced6b0518280f58d357966180cb47c06c424bf3f9103b2eb63c",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    },
+    {
+      "sourceUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuDVJWkCFLc164mqlnoyfNWhTeqOJpEwp8GxkrlDBeJyBeSvr7Ar7F434aOJcB5dlvI5W-UWLvI524rvLca7W4PsGQdEWfTWcYvNI12vgb1YPO9Dl6ggQiE2BcWAsMAqZb30CSma_6cFwkAuS_XgXfSUo6MqaAkj8R5vHsqJXIpUt2pCN7R7cAP2b7OuFAu8qHr_vuPKMYmPiowAh32kSjzxnv-XLT9CmBmYnYwk8RC7WkhkHGTpfIWLAwmT0pFXpjd2Y-E_gt-mzokm",
+      "finalUrl": "https://lh3.googleusercontent.com/aida-public/AB6AXuDVJWkCFLc164mqlnoyfNWhTeqOJpEwp8GxkrlDBeJyBeSvr7Ar7F434aOJcB5dlvI5W-UWLvI524rvLca7W4PsGQdEWfTWcYvNI12vgb1YPO9Dl6ggQiE2BcWAsMAqZb30CSma_6cFwkAuS_XgXfSUo6MqaAkj8R5vHsqJXIpUt2pCN7R7cAP2b7OuFAu8qHr_vuPKMYmPiowAh32kSjzxnv-XLT9CmBmYnYwk8RC7WkhkHGTpfIWLAwmT0pFXpjd2Y-E_gt-mzokm",
+      "category": "image",
+      "status": "downloaded",
+      "discoveryHints": [
+        "image",
+        "img"
+      ],
+      "sources": [
+        "img[src]",
+        "performance"
+      ],
+      "contentType": "image/png",
+      "localPath": "Design/tut-usa/assets/images/4ebe583ef1b27253-ab6axudvjwkcflc164mqlnoyfnwhteqojpewp8gxkrldbejy.png",
+      "byteSize": 381041,
+      "sha256": "4ebe583ef1b27253e5fa35d66f37b0d6dbf7f63d3c6311f839be4f279f114e5c",
+      "provenanceNote": "Captured from lh3.googleusercontent.com; license/provenance requires human review if redistribution policy is unclear.",
+      "notes": null
+    }
+  ],
+  "blockers": [
+    {
+      "sourceUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "finalUrl": "https://cdn.tailwindcss.com/?plugins=forms,container-queries",
+      "category": "script",
+      "status": "disallowed",
+      "discoveryHints": [
+        "script"
+      ],
+      "sources": [
+        "script[src]",
+        "performance"
+      ],
+      "contentType": null,
+      "localPath": null,
+      "byteSize": null,
+      "sha256": null,
+      "provenanceNote": "Provenance-only reference from cdn.tailwindcss.com; script resources are not downloaded in REB-02 when they are not static assets.",
+      "notes": "Remote script left as blocker/provenance evidence; normalized output does not vendor third-party runtime scripts."
+    }
+  ]
+}

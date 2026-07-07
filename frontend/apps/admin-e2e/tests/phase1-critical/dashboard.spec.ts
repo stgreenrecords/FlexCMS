@@ -55,6 +55,9 @@ test.describe('Dashboard Page @smoke @regression', () => {
   });
 
   test('UI-004: loading state is shown while API responds', async ({ page }) => {
+    // Requires a deterministic mocked delay to observe the loading state;
+    // not reproducible/deterministic against a live backend.
+    test.skip(!!process.env['USE_LIVE_API'], 'Requires mocked API delay; not applicable in live mode');
     await page.route('**/api/author/content/list*', async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 3000));
       await route.fulfill({

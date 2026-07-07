@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./start factory [router-options]
+  ./start [router-options]
+
+Examples:
+  ./start factory
+  ./start factory --dry-run
+  ./start --task-id LNFS-010
+
+Tip:
+  Add this repository root to your PATH to run `start factory` without `./`.
+EOF
+}
+
+if [ $# -eq 0 ]; then
+  exec "${BASH:-bash}" "$SCRIPT_DIR/call-start-factory.bash"
+fi
+
+case "$1" in
+  factory)
+    shift
+    exec "${BASH:-bash}" "$SCRIPT_DIR/call-start-factory.bash" "$@"
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    exec "${BASH:-bash}" "$SCRIPT_DIR/call-start-factory.bash" "$@"
+    ;;
+esac
+

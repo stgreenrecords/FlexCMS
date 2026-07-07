@@ -8,6 +8,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚙️ Dark Factory workflow (current workflow — read first)
+
+> **Dark Factory is the active SDLC source of truth.** Before any task work, follow
+> `df/00-start-here.md` and the rest of the boot sequence in `df/`.
+>
+> - **Process spec:** `df/00-start-here.md`, `df/01-operating-model.md`,
+>   `df/02-state-machine.md`, `df/03-orchestration-rules.md`,
+>   `df/04-documentation-standards.md`
+> - **Role behavior:** `df/roles/{sa,designer,backend-dev,frontend-dev,devops,data-engineer,qa,po}.md`
+> - **Runtime source of truth:** `df/runtime/board.md`
+> - **Task evidence:** `df/artifacts/{task-id}/`
+> - **Project business context:** `docs/FLEXCMS_BUSINESS_CONTEXT.md`
+>
+> One session executes exactly one role. A task is not complete until QA passes it
+> and PO accepts it. The old Kyle/Erik boards and the `agents/queue.json` dispatcher
+> are legacy references only unless a human explicitly asks for legacy migration or
+> troubleshooting.
+
 ## Project Identity
 
 FlexCMS is an enterprise headless CMS with three independent pillars: **Content (CMS)**, **Digital Assets (DAM)**, and **Products (PIM)**. Backend is Spring Boot 3.3 + Java 21 + PostgreSQL 16 (ltree + JSONB). Frontend is a TypeScript pnpm monorepo (Turborepo) with Next.js 14 and a `@flexcms/ui` design system (Radix + Tailwind + CVA). **The backend NEVER generates HTML — it returns JSON only. All rendering is done by the frontend.**
@@ -36,7 +54,11 @@ If the correct approach takes longer to implement — write it anyway. Shortcuts
 
 ---
 
-## Two-Agent Workflow
+## Historical Two-Agent Workflow — legacy reference only
+
+> This section is retained to preserve old project history. It is **not active** for
+> new work. Do not ask whether a task is for Kyle or Erik; route through Dark Factory
+> states and roles instead.
 
 This project uses two named agents: **Kyle** and **Erik**. Every task and every command must be attributed to one of them.
 
@@ -54,8 +76,8 @@ This project uses two named agents: **Kyle** and **Erik**. Every task and every 
 | `kyle continue` / `erik continue` | Resume the most recent PAUSED task on that agent's board |
 | `kyle finish` / `erik finish` | Complete or pause the current task on that agent's board |
 
-> **MANDATORY: If the user asks to implement, add, or work on a task WITHOUT specifying "kyle" or "erik",
-> you MUST ask "Is this for Kyle or Erik?" before taking ANY action. Do not guess. Do not proceed.**
+> **Legacy only:** Do not use this Kyle/Erik routing rule for new work. New work is routed by
+> Dark Factory task state and owner role in `df/runtime/board.md`.
 
 ### Adding a New Task
 

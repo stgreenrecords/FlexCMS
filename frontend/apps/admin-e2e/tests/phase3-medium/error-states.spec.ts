@@ -7,7 +7,12 @@
 import { test, expect } from '@playwright/test';
 
 // ── Tests ──────────────────────────────────────────────────────────────────
+// All tests in this suite inject synthetic API failures (aborted requests,
+// 500/401/503 responses, artificial delays) via page.route(). These scenarios
+// are not deterministically reproducible against a live backend, so the whole
+// suite is skipped when USE_LIVE_API is set.
 test.describe('Admin UI Error States @regression', () => {
+  test.skip(!!process.env['USE_LIVE_API'], 'Error-injection scenarios require a mocked API; not applicable in live mode');
 
   // ── UIERR-001: API unreachable ──────────────────────────────────────────
   test('UIERR-001: content page shows error state when API is unreachable', async ({ page }) => {

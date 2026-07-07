@@ -19,7 +19,9 @@
 9. [AI Agent Onboarding Guide](#9-ai-agent-onboarding-guide)
 
 ### Additional Documentation
-- **[`WORK_BOARD.md`](WORK_BOARD.md)** — Task coordination board (read before any implementation)
+- **[`df/00-start-here.md`](df/00-start-here.md)** — Dark Factory boot sequence for all AI agent work
+- **[`df/runtime/board.md`](df/runtime/board.md)** — Active Dark Factory task board
+- **[`docs/FLEXCMS_BUSINESS_CONTEXT.md`](docs/FLEXCMS_BUSINESS_CONTEXT.md)** — FlexCMS product, architecture, and engineering guardrails for agents
 - **[`docs/CLIENT_OPERATIONS_GUIDE.md`](docs/CLIENT_OPERATIONS_GUIDE.md)** — How to build real websites using FlexCMS + PIM + DAM
 - **[`docs/PROGRESS_ASSESSMENT.md`](docs/PROGRESS_ASSESSMENT.md)** — Current progress vs. roadmap evaluation
 - **[`docs/TEST_DATA_SPECIFICATION.md`](docs/TEST_DATA_SPECIFICATION.md)** — TUT luxury cars sample website data spec

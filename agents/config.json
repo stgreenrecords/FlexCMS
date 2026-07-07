@@ -1,0 +1,58 @@
+{
+  "model": "GPT-5.3-Codex",
+  "review_model": "GPT-5.3-Codex",
+  "provider": "github-models",
+  "gh_command": ["gh", "models", "run", "{model}"],
+  "preferred_model_ids": ["openai/gpt-5", "openai/gpt-4.1", "openai/gpt-4o"],
+  "model_aliases": {
+    "GPT-5": "openai/gpt-5",
+    "GPT-5 mini": "openai/gpt-5-mini",
+    "GPT-5.3-Codex": "openai/gpt-5",
+    "GPT-5.4": "openai/gpt-5",
+    "GPT-5.4 mini": "openai/gpt-5-mini",
+    "GPT-5.5": "openai/gpt-5"
+  },
+  "available_models": [
+    { "name": "Claude Opus 4.8",             "context": "264K", "reasoning": "medium", "tier": "auto" },
+    { "name": "Gemini 3.5 Flash",            "context": "264K",                        "tier": "auto" },
+    { "name": "GPT-5.5",                     "context": "400K", "reasoning": "medium", "tier": "auto" },
+    { "name": "Claude Haiku 4.5",            "context": "200K" },
+    { "name": "Claude Opus 4.5",             "context": "200K" },
+    { "name": "Claude Opus 4.6",             "context": "264K", "reasoning": "medium" },
+    { "name": "Claude Opus 4.7",             "context": "264K", "reasoning": "medium" },
+    { "name": "Claude Opus 4.8 (fast mode)", "context": "264K", "reasoning": "medium" },
+    { "name": "Claude Sonnet 4.5",           "context": "200K" },
+    { "name": "Claude Sonnet 4.6",           "context": "264K", "reasoning": "medium" },
+    { "name": "Claude Sonnet 5",             "context": "264K", "reasoning": "medium" },
+    { "name": "Gemini 2.5 Pro",              "context": "192K" },
+    { "name": "Gemini 3 Flash (Preview)",    "context": "192K" },
+    { "name": "Gemini 3.1 Pro (Preview)",    "context": "264K" },
+    { "name": "GPT-5 mini",                  "context": "192K", "reasoning": "medium" },
+    { "name": "GPT-5.3-Codex",               "context": "400K", "reasoning": "medium" },
+    { "name": "GPT-5.4",                     "context": "400K", "reasoning": "medium" },
+    { "name": "GPT-5.4 mini",                "context": "400K", "reasoning": "medium" },
+    { "name": "MAI-Code-1-Flash",            "context": "256K", "reasoning": "medium" }
+  ],
+  "worker_pool": ["w1", "w2", "w3"],
+  "loop": {
+    "max_iterations": 20,
+    "stop_when_idle": true,
+    "sleep_seconds": 2
+  },
+  "autonomy": {
+    "enabled": true,
+    "apply_edits": true,
+    "auto_validate": true,
+    "auto_review": true,
+    "auto_commit": false
+  },
+  "prompt": {
+    "system": "You are an autonomous FlexCMS engineer. Follow CLAUDE.md conventions strictly (layer separation, DTOs, no FetchType.EAGER, named exports, CSS tokens). Implement ONLY the assigned task and satisfy every acceptance criterion. Return file changes using this exact protocol: for each changed/created file emit a line '### FILE: <relative/path>' followed by a fenced code block containing the FULL new file contents. Do not include prose outside those blocks.",
+    "review_system": "You are a senior reviewer. Check the diff against the acceptance criteria. Respond with 'APPROVE' on the first line if all criteria are met, otherwise 'REJECT' followed by a short list of what is missing.",
+    "include_read_first": true,
+    "max_file_bytes": 8000,
+    "max_prompt_bytes": 50000,
+    "max_read_first_files": 3
+  }
+}
+

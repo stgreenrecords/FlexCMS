@@ -1,7 +1,49 @@
-# AGENTS.md — FlexCMS AI Agent Quick Reference
+# AGENTS.md — FlexCMS Dark Factory Agent Reference
 
-> Read **`CLAUDE.md`** and **`WORK_BOARD.md`** first — they are the primary source of truth.
-> This file is a compressed reference for AI coding agents to get productive immediately.
+> **Primary workflow: Dark Factory.** Run the SDLC exactly as defined in `df/`.
+> `DF-master/` is the reusable upstream example only; this repository's active
+> runtime is `df/runtime/` and task evidence lives in `df/artifacts/{task-id}/`.
+>
+> The old `WORK_BOARD_*.md`, Kyle/Erik flow, and `agents/queue.json` dispatcher are
+> historical/legacy unless a human explicitly asks for legacy inspection. For new
+> work, use Dark Factory role states, role files, runtime board, evidence, QA gate,
+> and PO acceptance.
+
+## Dark Factory boot sequence — mandatory
+
+Before starting or continuing work, read in this order:
+
+1. `df/00-start-here.md`
+2. `df/01-operating-model.md`
+3. `df/02-state-machine.md`
+4. `df/03-orchestration-rules.md`
+5. `df/04-documentation-standards.md`
+6. the responsible role file in `df/roles/`
+7. `df/runtime/board.md` plus relevant subboards
+8. `docs/FLEXCMS_BUSINESS_CONTEXT.md` for product-specific rules
+
+## Required behavior
+
+- Execute exactly **one Dark Factory role per session**.
+- Update runtime evidence on every meaningful action.
+- Write task artifacts under `df/artifacts/{task-id}/`.
+- Do not finish work unless `qa` has passed it and `po` has accepted it.
+- If work is rejected, return it to the responsible role/lane with evidence and defects.
+- Preserve user work and prefer minimal, reversible changes.
+
+## Dark Factory commands
+
+```bash
+./start factory --dry-run              # show the next role-session plan
+./start factory --adapter manual       # prepare one role-session prompt
+./start factory                        # autonomous router; requires DF_AGENT_CMD
+./flex agent run                       # FlexCMS shortcut to Dark Factory router
+./flex agent validate                  # deterministic FlexCMS build/test gate
+./flex agent legacy status             # inspect the old agents/queue.json dispatcher
+```
+
+Legacy implementation details for the old dispatcher are in `agents/FACTORY.md`.
+Use them only for migration/troubleshooting, not as the active SDLC source.
 
 ---
 
@@ -22,10 +64,11 @@ Three pillars share the Spring Boot monorepo: **CMS** (content tree), **DAM** (a
 
 ## Before Any Implementation
 
-1. `cat WORK_BOARD.md` — check §2 Module Lock Table, §3 Task Status, §5 Handoff Notes
-2. Lock modules in §2 before editing any file
-3. Read §4 Context Packet for your task (lists exact files to read first)
-4. **Never start coding before reading the current source** — another agent may have changed it
+1. Complete the Dark Factory boot sequence and identify the responsible role from `df/runtime/board.md`.
+2. Read the role file in `df/roles/` and the task artifact under `df/artifacts/{task-id}/`.
+3. For delivery lanes, use the router/worktree isolation when available; do not hand-edit legacy module locks.
+4. **Never start coding before reading the current source** — another role-session may have changed it.
+5. Record evidence and handoff notes in `df/runtime/` and `df/artifacts/{task-id}/` before ending the role session.
 
 ---
 
@@ -49,7 +92,7 @@ cd flexcms && docker build -t flexcms-app:local-test .
 ```
 
 **If ANY step fails → fix it locally. Do NOT push broken code.**
-If you cannot fix after 3 attempts → PAUSE the task (WORK_BOARD.md §3 → 🟠 PAUSED) with a Handoff Note describing the error.
+If you cannot fix after 3 attempts → move the task to the appropriate Dark Factory blocked/rework state and document the exact blocker in `df/runtime/activity-log.md` plus `df/artifacts/{task-id}/handoffs.md`.
 
 Commit format: `feat(P2-01): description` or `fix(BUG-03): description`
 

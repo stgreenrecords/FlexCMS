@@ -1,0 +1,117 @@
+{
+  "mode": "dry-run",
+  "environment": {
+    "name": "local",
+    "reason": "Explicit local environment requested."
+  },
+  "safety": {
+    "confirmationFlag": true,
+    "nonLocalOverride": false
+  },
+  "plan": {
+    "preserved": {
+      "currentComponentDefinitions": {
+        "selector": "component_definitions.resource_type LIKE 'tut-usa/%'",
+        "reason": "Migration-owned via V16; kept intact so reseed does not depend on replaying Flyway history."
+      },
+      "currentTemplateDefinitions": {
+        "selector": "template_definitions.allowed_sites contains 'tut-usa' OR page_properties.siteId='tut-usa'",
+        "reason": "Migration-owned via V17; preserved to avoid mutating template registry outside Flyway."
+      },
+      "currentPimSampleData": {
+        "selector": "product_schemas/catalogs/products for the legacy TUT sample catalog",
+        "reason": "Preserved by default until a dedicated TUT-USA PIM reseed replaces the legacy sample records."
+      }
+    },
+    "resetTargets": {
+      "currentMutableContent": {
+        "selector": [
+          "content_nodes.parent_path = 'content.tut-usa'",
+          "content_nodes.parent_path = 'content.experience-fragments.tut-usa.global.navigation.master'",
+          "content_nodes.parent_path = 'content.experience-fragments.tut-usa.global.footer.master'"
+        ],
+        "execution": "DELETE via Author bulk content API on top-level deterministic paths"
+      },
+      "currentDamAssets": {
+        "selector": [
+          "assets.site_id = 'tut-usa'",
+          "assets.path LIKE '%dam/tut-usa%'",
+          "dam_folders.site_id = 'tut-usa'"
+        ],
+        "execution": "DELETE via Author asset API, then deterministic DAM folder cleanup in SQL"
+      },
+      "legacyDemoContentAndMetadata": {
+        "selector": [
+          "legacy site roots content.tut-gb/de/fr/ca",
+          "legacy XF roots content.experience-fragments.tut-gb/de/fr/ca",
+          "experience_fragment_metadata.site_id in legacy TUT sites",
+          "domain_mappings.site_id in legacy TUT sites",
+          "sites.site_id in legacy TUT sites",
+          "component_definitions.resource_type LIKE 'tut/%'"
+        ],
+        "execution": "DELETE via Author bulk content API for content roots; SQL cleanup for metadata, domains, sites, legacy definitions"
+      },
+      "legacyPimSampleData": {
+        "selector": {
+          "schema": [
+            "Luxury Vehicle v2026",
+            "1.0"
+          ],
+          "catalog": "TUT 2026 Model Lineup",
+          "products": [
+            "TUT-SOVEREIGN-2026",
+            "TUT-VANGUARD-2026",
+            "TUT-ECLIPSE-2026",
+            "TUT-APEX-2026"
+          ]
+        },
+        "execution": "Optional SQL cleanup enabled only with --include-legacy-pim"
+      }
+    },
+    "reseedCommands": [
+      "python3 scripts/seed_tut_usa_website.py",
+      "python3 scripts/import_tut_usa_assets.py"
+    ],
+    "rollbackNotes": [
+      "Do not rewrite or delete existing Flyway migration history.",
+      "If reset was applied accidentally, restore the affected database from backup/snapshot before reseeding.",
+      "Current TUT-USA component/template definitions are preserved specifically to keep rollback surface small."
+    ]
+  },
+  "before": {
+    "author": {
+      "status": "unavailable",
+      "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+    },
+    "pim": {
+      "status": "unavailable",
+      "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+    },
+    "deletePaths": {
+      "currentContentDeletePaths": [],
+      "currentExperienceFragmentDeletePaths": [],
+      "legacyContentDeletePaths": [],
+      "currentAssetDeletePaths": [],
+      "legacyAssetDeletePaths": []
+    }
+  },
+  "actions": {
+    "executed": false,
+    "author": {
+      "counts": {
+        "skipped": true,
+        "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+      }
+    },
+    "pim": {
+      "counts": {
+        "skipped": true,
+        "reason": "psycopg2 is not installed in the current shell, so dry-run DB counts were not collected."
+      }
+    }
+  },
+  "after": {
+    "author": null,
+    "pim": null
+  }
+}
