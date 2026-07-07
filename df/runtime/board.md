@@ -10,7 +10,7 @@ This is the live task queue. Agents must update it when task state changes.
 | P0 | REB-02 | Build Selenium browser asset-capture pipeline for remote template resources | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA reviews capture outputs/manifests under `Design/tut-usa/` and REB-02 artifacts |
 | P0 | REB-03 | Reset existing TUT/demo seed data safely and create idempotent reseed plan | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA verifies reset plan/tooling and dry-run scope in `df/artifacts/REB-03/data` |
 | P0 | REB-04 | Generate component/template/page-tree contracts from inventory | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA verifies generated contracts/page tree and backend evidence |
-| P0 | REB-05 | Add Selenium framework foundation and reporting package | Task | READY_FOR_QA | qa | No (REB-00 is DONE) | 2026-07-07 local | QA validates Selenium framework setup, smoke coverage, and evidence |
+| P0 | REB-05 | Add Selenium framework foundation and reporting package | Task | READY_FOR_PO | po | No | 2026-07-07 local | Cloud QA role completed; PO review is next. |
 | P1 | REB-06 | Produce Selenium traceability matrix and generated test-case skeletons | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA validates matrix completeness and skeleton generation evidence |
 | P1 | REB-07 | Import captured assets into DAM/public frontend asset pipeline | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA validates importer/map/checksum/rollback artifacts |
 | P1 | REB-08 | Rebuild frontend tokens, fonts, layout shell, and renderer foundation | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA validates frontend foundation and build evidence |
@@ -22,7 +22,7 @@ This is the live task queue. Agents must update it when task state changes.
 | P2 | REB-14 | Wire Selenium gates into CI/local validation and retain artifacts | Task | READY_FOR_DEV | devops | Yes: REB-12, REB-13 | 2026-07-07 local | Add Selenium CI/local gates and artifact retention |
 | P0 | REB-15 | QA verification for full rebuild program | Task | OPEN | qa | Yes: REB-14 | 2026-07-07 local | QA independently verifies complete rebuild evidence after delivery |
 | P0 | REB-16 | PO acceptance for full rebuild program | Task | OPEN | po | Yes: REB-15 | 2026-07-07 local | PO accepts or rejects after QA pass |
-| P0 | REB-17 | Prioritize authoring E2E automation backlog | Task | READY_FOR_QA | qa | No | 2026-07-07 local | QA reviews SA backlog coverage and routes to PO on pass |
+| P0 | REB-17 | Prioritize authoring E2E automation backlog | Task | READY_FOR_PO | po | No | 2026-07-07 local | Cloud QA role completed; PO review is next. |
 | P0 | REB-18 | Implement content tree, page creation, and author/publish verification Selenium suite | Task | READY_FOR_DEV | devops | Yes: REB-11, REB-13 | 2026-07-07 local | Implement page creation/publish suite after admin/editor foundation is available |
 | P0 | REB-19 | Implement page editor component/property/asset authoring matrix Selenium suite | Task | READY_FOR_DEV | devops | Yes: REB-07, REB-10, REB-11, REB-13 | 2026-07-07 local | Implement contract-driven editor authoring matrix and publish verification |
 | P0 | REB-26 | Implement exhaustive per-UI-component sample-site editing Selenium suite | Task | READY_FOR_DEV | devops | Yes: REB-07, REB-10, REB-11, REB-13, REB-19 | 2026-07-07 local | Generate one editing scenario/matrix row for every sample-site UI component |

@@ -36,3 +36,39 @@ remains blocked on `REB-01` (`READY_FOR_DESIGN`) or `REB-04`
 (`READY_FOR_QA`, also awaiting manual review) per the dependency chain in
 `df/artifacts/REB-00/solution-design.md` section 9.
 
+
+## qa -> qa
+
+- Timestamp: 2026-07-07 18:46 local
+- Task: REB-05
+- From state: READY_FOR_QA
+- To state: READY_FOR_PO
+- Lane: devops
+- Summary: Implemented/used the Copilot Cloud Agent REST orchestration runner and recorded sanitized cloud status evidence.
+
+## Evidence
+
+- `df/agent-router/copilot-cloud-agent.py`
+- `df/agent-router/copilot_cloud_agent.py`
+- `df/artifacts/REB-05/cloud-agent-status.json`
+- `df/artifacts/REB-05/cloud-agent-report.md`
+
+## Tests/checks
+
+| Check | Command/source | Result | Notes |
+|---|---|---|---|
+| Cloud agent REST runner | `python3 -m unittest df/agent-router/test_copilot_cloud_agent.py` | PASS | Deterministic unit tests; no live network required. |
+
+## Known risks
+
+- GitHub Copilot Cloud Agent API is public preview; verify endpoint/header values before live use.
+- Live validation requires a paid Copilot plan and token permissions for the target repository.
+
+## Next role instructions
+
+- QA should inspect the runner, tests, docs, and generated dry-run/status artifacts.
+- Live cloud-agent validation should be run only with a valid token and confirmed current GitHub API endpoint.
+
+## Blockers
+
+- None for dry-run/mock validation. Live validation remains environment-dependent.

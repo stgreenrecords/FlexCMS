@@ -628,3 +628,21 @@ Use `df/templates/activity-log-entry.md` for new entries.
 - Result: FAIL
 - Next: Cloud agent blocked: cloud=timed_out ci=not_checked
 - Risks/blockers: cloud=timed_out ci=not_checked
+
+## 2026-07-07 18:46 local - qa - REB-05
+
+- State: READY_FOR_QA -> READY_FOR_PO
+- Action: Launched/polled GitHub Copilot Cloud Agent REST orchestration path; recorded sanitized cloud-task, branch/PR, and CI evidence.
+- Evidence: `df/artifacts/REB-05/cloud-agent-status.json`, `df/artifacts/REB-05/cloud-agent-report.md`, `df/artifacts/REB-05/handoffs.md`
+- Result: PASS
+- Next: Cloud QA role completed; PO review is next.
+- Risks/blockers: cloud task completed
+
+## 2026-07-07 18:50 local - qa - REB-17
+
+- State: READY_FOR_QA -> READY_FOR_PO
+- Action: Launched/polled GitHub Copilot Cloud Agent REST orchestration path; recorded sanitized cloud-task, branch/PR, and CI evidence.
+- Evidence: `df/artifacts/REB-17/cloud-agent-status.json`, `df/artifacts/REB-17/cloud-agent-report.md`, `df/artifacts/REB-17/handoffs.md`
+- Result: PASS
+- Next: Cloud QA role completed; PO review is next.
+- Risks/blockers: cloud task completed

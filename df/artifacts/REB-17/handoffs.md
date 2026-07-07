@@ -43,3 +43,39 @@ testing# REB-17 Handoffs
   - Manual human QA reviews `REB-17` planning artifact per `DEC-REB-005`.
   - DevOps can implement `REB-18`–`REB-26` when dependencies are satisfied or when the human explicitly authorizes proceeding under the same manual-review override used for current rebuild tasks.
 
+
+## qa -> qa
+
+- Timestamp: 2026-07-07 18:50 local
+- Task: REB-17
+- From state: READY_FOR_QA
+- To state: READY_FOR_PO
+- Lane: devops
+- Summary: Implemented/used the Copilot Cloud Agent REST orchestration runner and recorded sanitized cloud status evidence.
+
+## Evidence
+
+- `df/agent-router/copilot-cloud-agent.py`
+- `df/agent-router/copilot_cloud_agent.py`
+- `df/artifacts/REB-17/cloud-agent-status.json`
+- `df/artifacts/REB-17/cloud-agent-report.md`
+
+## Tests/checks
+
+| Check | Command/source | Result | Notes |
+|---|---|---|---|
+| Cloud agent REST runner | `python3 -m unittest df/agent-router/test_copilot_cloud_agent.py` | PASS | Deterministic unit tests; no live network required. |
+
+## Known risks
+
+- GitHub Copilot Cloud Agent API is public preview; verify endpoint/header values before live use.
+- Live validation requires a paid Copilot plan and token permissions for the target repository.
+
+## Next role instructions
+
+- QA should inspect the runner, tests, docs, and generated dry-run/status artifacts.
+- Live cloud-agent validation should be run only with a valid token and confirmed current GitHub API endpoint.
+
+## Blockers
+
+- None for dry-run/mock validation. Live validation remains environment-dependent.
