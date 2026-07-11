@@ -43,7 +43,11 @@ Downstream rebuild tasks build on top of this foundation:
 - Current REB-13 implementation: `src/cases/admin/authoring-roundtrip.spec.ts`
   covers inheritance cancel, publish, and author API + GraphQL + rendered-site
   round-trip assertions for seeded TUT-USA content.
-- `REB-14` wires this package into CI/local validation gates.
+- REB-18 adds `src/cases/admin/content-tree-lifecycle.spec.ts` for content-tree
+  navigation/search/selection/action-link checks plus create+publish lifecycle
+  assertions (author and publish environment verification).
+- `REB-14` wires this package into CI/local validation gates and retained
+  artifact bundles.
 
 ## Prerequisites
 
@@ -75,6 +79,9 @@ pnpm test:smoke
 # REB-13 admin authoring and round-trip suite
 pnpm test:admin
 
+# REB-18 content tree + page lifecycle suite
+pnpm test:reb18
+
 # REB-12 public-site pages suite (home + remaining discovered pages)
 pnpm test:pages
 
@@ -89,14 +96,52 @@ pnpm test:debug
 
 # CI-style run: JUnit XML report emitted to reports/junit/selenium-results.xml
 pnpm test:ci
+
+# REB-12 template-only CI run: JUnit XML report emitted to reports/junit/reb12-template-results.xml
+pnpm test:templates:ci
+
+# REB-14 dedicated CI suites
+pnpm test:smoke:ci
+pnpm test:admin:ci
+pnpm test:reb18:ci
+pnpm test:full:ci
+
+# REB-14 CI/local validation gates with artifact retention + traceability coverage checks
+pnpm ci:gate:smoke
+pnpm ci:gate:full
 ```
+
+## REB-14 gate outputs (artifact retention)
+
+- `pnpm ci:gate:smoke` and `pnpm ci:gate:full` write command logs to
+  `reports/logs/{smoke|full}/`.
+- The same gates retain publish-ready artifacts in
+  `reports/retained/{smoke|full}/`:
+  - `junit/*.xml`
+  - `screenshots/**`
+  - `logs/*.log`
+  - `summary.json` (counts + paths + timestamp)
+- `ci:gate:full` fails on:
+  - any suite failure in templates/admin/content-tree/full runs
+  - uncovered `critical`/`high` traceability rows configured in
+    `config/traceability-priority.json`
+
+## Selenium and Playwright coexistence
+
+- Selenium (`frontend/apps/selenium-e2e`) is the active rebuild gate.
+- Playwright (`frontend/apps/admin-e2e`) remains as a legacy safety net until the
+  backlog explicitly retires it.
+- CI/local can run both; a Selenium gate failure blocks delivery regardless of
+  Playwright status.
 
 ## Environment variables
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `ADMIN_URL` | `http://localhost:3000` | Admin UI base URL |
+| `ADMIN_URL_FALLBACKS` | `http://localhost:3100` (when `ADMIN_URL` is default) | Comma-separated fallback admin base URLs tried when editor readiness fails on `ADMIN_URL` |
 | `SITE_URL` | `http://localhost:3001` | Reference site base URL |
+| `PUBLISH_URL` | `http://localhost:8081` | Publish service base URL used for publish-environment assertions |
 | `AUTHOR_API_URL` | `http://localhost:8080/api` | Author API base URL |
 | `AUTHOR_HEALTH_URL` | `http://localhost:8080/actuator/health` | Author readiness probe |
 | `HEADLESS` | `true` | Set to `false` for a visible browser |
@@ -136,7 +181,10 @@ manifests as blockers/provenance evidence instead of being silently discarded.
   can select them.
 - Screenshots on failure are automatic; call `captureScreenshot(driver, name)`
   directly for additional on-demand evidence.
-- For REB-12 evidence, store command outputs plus `reports/junit/selenium-results.xml`
-  from `pnpm test:ci`; include failed-spec screenshot files from
+- For REB-12 evidence, store command outputs plus `reports/junit/reb12-template-results.xml`
+  from `pnpm test:templates:ci`; include failed-spec screenshot files from
   `reports/screenshots/` and reference the affected template case ids.
+- REB-12 template suite also writes `reports/reb12-template-status.json`
+  (`pass`/`pending`/`fail` with reason per `TPL-*`) for deterministic blocker
+  reporting.
 

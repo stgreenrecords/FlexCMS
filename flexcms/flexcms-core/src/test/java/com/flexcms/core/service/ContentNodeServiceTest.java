@@ -15,6 +15,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.SimpleTransactionStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +51,9 @@ class ContentNodeServiceTest {
     @Mock
     private AuditService auditService;
 
+    @Mock
+    private PlatformTransactionManager transactionManager;
+
     @InjectMocks
     private ContentNodeService contentNodeService;
 
@@ -59,6 +64,9 @@ class ContentNodeServiceTest {
         org.mockito.Mockito.lenient()
                 .when(richTextSanitizer.sanitizeIfHtml(org.mockito.ArgumentMatchers.anyString()))
                 .thenAnswer(inv -> inv.getArgument(0));
+        org.mockito.Mockito.lenient()
+                .when(transactionManager.getTransaction(any()))
+                .thenReturn(new SimpleTransactionStatus());
     }
 
     private ContentNode buildNode(String path, String name) {
@@ -210,7 +218,6 @@ class ContentNodeServiceTest {
         ContentNode node = buildNode("content.corporate.en.home", "home");
         node.setLockedBy("user1");
         when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
-        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         assertThatCode(() ->
                 contentNodeService.updateProperties("content.corporate.en.home", Map.of(), "user1"))

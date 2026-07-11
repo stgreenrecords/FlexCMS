@@ -30,7 +30,9 @@ export const templateSeedMap: TemplateSeedMapEntry[] = [
   {
     "caseId": "TPL-03",
     "slug": "brand_story_about_tut_page",
-    "seededUrlPaths": []
+    "seededUrlPaths": [
+      "/tut-usa/innovation"
+    ]
   },
   {
     "caseId": "TPL-04",

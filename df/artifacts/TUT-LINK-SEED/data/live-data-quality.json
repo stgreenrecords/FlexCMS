@@ -1,0 +1,19 @@
+{
+  "authorApi": "http://localhost:8080",
+  "duplicateInventoryPaths": [],
+  "generatedComponentCount": 515,
+  "generatedLinkCountByType": {
+    "external": 11,
+    "internal": 412
+  },
+  "generatedPageCountIncludingRoot": 65,
+  "inventoryNodeCount": 619,
+  "malformedPersistedV18Links": [],
+  "missingOwnedPaths": [],
+  "nullRequiredFields": [],
+  "ownedExpectedNodeCount": 582,
+  "pagesWithMissingRequiredProperties": [],
+  "result": "PASS",
+  "unpublishedOwnedPaths": [],
+  "unresolvedInternalDestinations": 0
+}

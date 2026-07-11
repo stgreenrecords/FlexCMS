@@ -2,6 +2,10 @@ import { FlexCmsClient } from '@flexcms/sdk';
 import { CmsPageClient } from './CmsPageClient';
 import { normalizePageAssetUrls } from '../lib/normalizeAssetUrls';
 
+// Public CMS pages must always render latest author/publish payloads.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * Catch-all page route — fetches CMS content server-side via @flexcms/sdk
  * and passes the data to a client component for rendering.

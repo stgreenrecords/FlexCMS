@@ -33,17 +33,18 @@ describe('REB-13 admin authoring and round-trip suite @smoke', function () {
 
     await editorPage.open(targetPath);
 
-    expect(await editorPage.hasButtonByText('Save')).to.equal(true);
-    expect(await editorPage.hasButtonByText('Publish')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-save-button')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-publish-button')).to.equal(true);
     expect(await editorPage.hasCancelAllInheritanceButton()).to.equal(true);
-    expect(await editorPage.hasButtonByText('Components')).to.equal(true);
-    expect(await editorPage.hasButtonByText('Layers')).to.equal(true);
-    expect(await editorPage.hasButtonByText('Assets')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-left-tab-components')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-left-tab-layers')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-left-tab-assets')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-breadcrumb')).to.equal(true);
 
-    expect(await editorPage.hasIconButtonByTitle('Undo')).to.equal(true);
-    expect(await editorPage.hasIconButtonByTitle('Redo')).to.equal(true);
-    expect(await editorPage.hasIconButtonByTitle('Preview')).to.equal(true);
-    expect(await editorPage.hasIconButtonByTitle('Settings')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-undo-button')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-redo-button')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-preview-button')).to.equal(true);
+    expect(await editorPage.hasElementByTestId('editor-settings-button')).to.equal(true);
 
     expect(await editorPage.hasLinkByHrefContains('/content')).to.equal(true);
     expect(await editorPage.hasLinkByHrefContains('/content/experience-fragments/tut-usa/global/navigation')).to.equal(true);

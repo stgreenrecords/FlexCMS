@@ -7,4 +7,4 @@ Lists rows whose Owner role is `designer` (READY_FOR_DESIGN / DESIGN_IN_PROGRESS
 
 | Priority | Task ID | Title | State | Owner role | Blocked? | Last updated | Next action |
 |---|---|---|---|---|---|---|---|
-| - | - | No designer tasks | NO_TASKS | designer | No | 2026-07-07 18:50 local | Await routing from SA |
+| - | - | No designer tasks | NO_TASKS | designer | No | 2026-07-11 21:47 local | Await routing from SA |

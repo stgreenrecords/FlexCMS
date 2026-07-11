@@ -1,14 +1,18 @@
 # Role: Product Owner (`po`)
 
-> **DISABLED UNTIL FURTHER NOTICE — 2026-07-07 human decision.**
+> **PERMANENTLY DISABLED IN ALL OPERATING MODES — 2026-07-08 human decision.**
 >
-> Automated agents must not execute the `po` role, must not move tasks to
-> `DONE`, and must not perform product acceptance. Tasks in `READY_FOR_PO`,
-> `PO_REVIEW`, `PO_REJECTED`, or `REFINEMENT_QUESTIONS` wait for explicit human
-> product direction unless a later decision record re-enables this role.
+> No agent, in Mode A (autonomous) or Mode B (interactive), may select, execute,
+> or simulate the `po` role or perform automated product acceptance. The states
+> `READY_FOR_PO`, `PO_REVIEW`, and `PO_REJECTED` are retired and must never be
+> entered. Any task in `REFINEMENT_QUESTIONS` waits for explicit human product
+> direction — agents do not answer product questions; they move the task to
+> `BLOCKED` instead.
 >
-> QA remains a separate role; the current implementation session must not play
-> QA either.
+> QA is likewise permanently disabled: the delivery developer owns verification
+> end to end and carries a task to `DONE` only after the developer testing bar is
+> met (see `df/03-orchestration-rules.md`). The rest of this file is retained for
+> historical reference only and is **not active**.
 
 
 ## Mission

@@ -13,7 +13,9 @@ export const StandardPageTemplate = ({ pageData }: TemplateProps) => {
   return (
     <>
       {!hasNavigation && Navigation && <Navigation data={{}} />}
-      <FlexCmsPage pageData={pageData} />
+      <main className="mx-auto w-full max-w-[1280px] px-4 py-4 sm:px-6 lg:px-8">
+        <FlexCmsPage pageData={pageData} />
+      </main>
       {!hasFooter && Footer && <Footer data={{}} />}
     </>
   );

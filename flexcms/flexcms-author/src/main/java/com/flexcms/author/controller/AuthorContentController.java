@@ -219,13 +219,25 @@ public class AuthorContentController {
         // Trigger replication for each successfully published path
         req.paths().forEach(path -> {
             try {
-                replicationAgent.replicate(toContentPath(path),
-                        ReplicationEvent.ReplicationAction.ACTIVATE, req.userId());
+                String contentPath = toContentPath(path);
+                ContentNode node = nodeService.getByPath(contentPath)
+                        .orElseThrow(() -> NotFoundException.forPath(contentPath));
+
+                if (isTreeReplicationCandidate(node)) {
+                    replicationAgent.replicateTree(contentPath, req.userId());
+                } else {
+                    replicationAgent.replicate(contentPath,
+                            ReplicationEvent.ReplicationAction.ACTIVATE, req.userId());
+                }
             } catch (Exception e) {
                 result.addError(path, "replication failed: " + e.getMessage());
             }
         });
         return ResponseEntity.ok(result);
+    }
+
+    private boolean isTreeReplicationCandidate(ContentNode node) {
+        return "flexcms/page".equals(node.getResourceType()) || "flexcms/site-root".equals(node.getResourceType());
     }
 
     @Operation(summary = "Bulk delete", description = "Deletes all listed content paths and their descendants.")

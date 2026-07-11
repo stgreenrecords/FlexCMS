@@ -7,10 +7,9 @@ Lists rows whose Owner role is `devops` (READY_FOR_DEV / DEV_IN_PROGRESS / RETUR
 
 | Priority | Task ID | Title | State | Owner role | Blocked? | Last updated | Next action |
 |---|---|---|---|---|---|---|---|
-| P1 | REB-12 | Implement Selenium public-site template/component suites | DEV_IN_PROGRESS | devops | Yes: REB-06, REB-10 | 2026-07-07 local | Continue converting skeletons to deterministic per-template assertions |
-| P1 | REB-13 | Implement Selenium admin authoring and round-trip suites | DEV_IN_PROGRESS | devops | Yes: REB-06, REB-11 | 2026-07-07 local | Continue REB-13 suite hardening; make edit case deterministic and finalize evidence |
-| P2 | REB-14 | Wire Selenium gates into CI/local validation and retain artifacts | READY_FOR_DEV | devops | Yes: REB-12, REB-13 | 2026-07-07 local | Add Selenium CI/local gates and artifact retention |
-| P0 | REB-18 | Implement content tree, page creation, and author/publish verification Selenium suite | READY_FOR_DEV | devops | Yes: REB-11, REB-13 | 2026-07-07 local | Implement page creation/publish suite after admin/editor foundation is available |
+| P1 | REB-12 | Implement Selenium public-site template/component suites | DONE | devops | Yes: REB-06, REB-10 | 2026-07-09 local | Completed end-to-end: reseed + discovery fix + renderer/asset rewrites; REB-12 suite now `21 passing`, `0 pending`, `0 failing` |
+| P1 | REB-13 | Implement Selenium admin authoring and round-trip suites | DONE | devops | Yes: REB-06, REB-11 | 2026-07-10 local | Completed with passing admin round-trip Selenium suite + JUnit artifact refresh; proceed to REB-14 |
+| P2 | REB-14 | Wire Selenium gates into CI/local validation and retain artifacts | DONE | devops | No | 2026-07-11 local | Completed with passing Selenium smoke/full gates, retained artifacts, and critical/high traceability enforcement |
 | P0 | REB-19 | Implement page editor component/property/asset authoring matrix Selenium suite | READY_FOR_DEV | devops | Yes: REB-07, REB-10, REB-11, REB-13 | 2026-07-07 local | Implement contract-driven editor authoring matrix and publish verification |
 | P0 | REB-26 | Implement exhaustive per-UI-component sample-site editing Selenium suite | READY_FOR_DEV | devops | Yes: REB-07, REB-10, REB-11, REB-13, REB-19 | 2026-07-07 local | Generate one editing scenario/matrix row for every sample-site UI component |
 | P0 | REB-20 | Implement publishing, workflow, scheduling, and bulk operation Selenium/API E2E suite | READY_FOR_DEV | devops | Yes: REB-11, REB-13, REB-18 | 2026-07-07 local | Implement workflow/publish/bulk/schedule E2E with publish-environment checks |

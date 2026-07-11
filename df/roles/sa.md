@@ -73,7 +73,10 @@ For small isolated changes, SA may record `Architecture not required` with a rea
 12. Set the task's **Owner role** on `df/runtime/board.md` to the chosen lane
     when moving to `READY_FOR_DESIGN` or `READY_FOR_DEV`. The lane sub-boards are
     auto-generated from that Owner column — do not hand-edit them.
-13. Move the task to `READY_FOR_DESIGN`, `READY_FOR_DEV`, `READY_FOR_QA`, or `BLOCKED`.
+13. Move the task to `READY_FOR_DESIGN`, `READY_FOR_DEV`, or `BLOCKED`. For
+    docs/process-only SA work with no delivery lane, validate it and move directly
+    to `DONE` — QA and PO are disabled, so never route to `READY_FOR_QA` or
+    `READY_FOR_PO`.
 
 ## Parallelization and dependencies
 

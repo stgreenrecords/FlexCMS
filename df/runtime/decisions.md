@@ -74,3 +74,16 @@ Use `df/templates/decision-record.md` for new decision records.
   - This decision does not authorize the current implementation session to perform QA. QA remains a separate role/session or human activity.
 - Consequences: Work can still move through delivery and into `READY_FOR_QA`, but product acceptance is manual/human-only while this decision is active. `DEC-REB-006` is superseded only for the `po` role; automated QA routing is not changed by this decision.
 
+## 2026-07-08 local - DEC-DF-007 - Permanently disable QA and PO in all modes; developer owns 100% test coverage
+
+- Status: Accepted (human, 2026-07-08)
+- Context: The human requested that the `qa` and `po` roles be permanently disabled for every operating mode, and that the delivery developer own verification end to end — designing test scenarios and writing, running, and fixing unit and Selenium automated tests to 100% coverage before reporting any work complete.
+- Decision:
+  - Supersede `DEC-REB-005`, `DEC-REB-006`, and `DEC-DFCA-002`. The `qa` and `po` roles are **permanently disabled in Mode A (autonomous) and Mode B (interactive)**. No agent may select, execute, or simulate them.
+  - Retire the states `READY_FOR_QA`, `QA_IN_PROGRESS`, `QA_FAILED`, `READY_FOR_PO`, `PO_REVIEW`, and `PO_REJECTED`. No task may enter them.
+  - The delivery lane is the terminal owner: it moves work directly from `DEV_IN_PROGRESS` to `DONE` after meeting the developer testing bar.
+  - **Developer testing bar:** any new/changed functionality must be 100% covered, run, and fixed by the developer using unit tests and Selenium automation. The developer designs the test scenarios, writes the tests, runs them, and fixes until green. A task may not be reported complete until (1) 100% of the functionality is developed and a full application build runs with zero errors, (2) test scenarios covering 100% of the functionality are recorded in the task artifact folder, and (3) the unit/automated tests are implemented and run with 0 errors and the full build is 100% working. Do not write tests whose only purpose is to cover another test.
+  - Unanswered product questions (`REFINEMENT_QUESTIONS`) go to a human via `BLOCKED`; agents do not answer them.
+  - The router's objective gate now runs on the `DEV_IN_PROGRESS -> DONE` transition; a failing gate routes the task to `RETURNED_TO_DEV`.
+- Consequences: No separate QA or PO stage exists. Delivery developers carry full verification responsibility and cannot report done without a green build and full test coverage. Reversing this requires a new decision record and restoring the retired states/roles across `df/00-start-here.md`, `df/01-operating-model.md`, `df/02-state-machine.md`, `df/03-orchestration-rules.md`, and the role files.
+

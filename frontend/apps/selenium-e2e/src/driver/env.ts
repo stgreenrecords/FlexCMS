@@ -7,7 +7,9 @@
 
 export interface SeleniumEnv {
   adminUrl: string;
+  adminUrlFallbacks: string[];
   siteUrl: string;
+  publishUrl: string;
   authorApiUrl: string;
   authorHealthUrl: string;
   headless: boolean;
@@ -29,11 +31,27 @@ function toInt(value: string | undefined, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function parseCsv(value: string | undefined): string[] {
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
 export function loadEnv(): SeleniumEnv {
   const isCi = toBool(process.env['CI'], false);
+  const adminUrl = process.env['ADMIN_URL'] ?? 'http://localhost:3000';
+  const adminUrlFallbacks = process.env['ADMIN_URL_FALLBACKS']
+    ? parseCsv(process.env['ADMIN_URL_FALLBACKS'])
+    : adminUrl === 'http://localhost:3000'
+      ? ['http://localhost:3100']
+      : [];
   return {
-    adminUrl: process.env['ADMIN_URL'] ?? 'http://localhost:3000',
+    adminUrl,
+    adminUrlFallbacks,
     siteUrl: process.env['SITE_URL'] ?? 'http://localhost:3001',
+    publishUrl: process.env['PUBLISH_URL'] ?? 'http://localhost:8081',
     authorApiUrl: process.env['AUTHOR_API_URL'] ?? 'http://localhost:8080/api',
     authorHealthUrl: process.env['AUTHOR_HEALTH_URL'] ?? 'http://localhost:8080/actuator/health',
     headless: toBool(process.env['HEADLESS'], isCi ? true : true),

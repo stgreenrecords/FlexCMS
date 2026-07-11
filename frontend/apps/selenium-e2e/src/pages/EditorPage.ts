@@ -4,18 +4,47 @@ import { waitForClickable, waitForPageReady, waitForVisible } from '../driver/wa
 
 export class EditorPage {
   private readonly env = loadEnv();
+  private resolvedAdminUrl: string;
 
-  constructor(private readonly driver: WebDriver) {}
+  constructor(private readonly driver: WebDriver) {
+    this.resolvedAdminUrl = this.env.adminUrl;
+  }
+
+  private getAdminUrlCandidates(): string[] {
+    const candidates = [this.resolvedAdminUrl, this.env.adminUrl, ...this.env.adminUrlFallbacks];
+    return [...new Set(candidates.filter((item) => item.length > 0))];
+  }
 
   async open(contentPath: string): Promise<void> {
-    await this.driver.get(`${this.env.adminUrl}/editor?path=${encodeURIComponent(contentPath)}`);
-    await waitForPageReady(this.driver);
-    await waitForVisible(this.driver, By.xpath("//button[normalize-space()='Save']"));
+    const pagePath = `/editor?path=${encodeURIComponent(contentPath)}`;
+    const candidates = this.getAdminUrlCandidates();
+    let lastError: unknown;
+    for (const baseUrl of candidates) {
+      try {
+        await this.driver.get(`${baseUrl}${pagePath}`);
+        await waitForPageReady(this.driver);
+        await this.driver.wait(until.elementLocated(By.css('[data-testid="editor-save-button"]')), this.env.explicitWaitMs);
+        await waitForVisible(this.driver, By.css('[data-testid="editor-save-button"]'));
+        this.resolvedAdminUrl = baseUrl;
+        return;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    throw new Error(
+      `Editor did not become ready for ADMIN_URL candidates (${candidates.join(', ')}): ${String(lastError)}`,
+    );
   }
 
   async clickPublish(): Promise<void> {
-    const publishButton = await waitForClickable(this.driver, By.xpath("//button[normalize-space()='Publish']"));
+    const publishButton = await waitForClickable(this.driver, By.css('[data-testid="editor-publish-button"]'));
     await publishButton.click();
+  }
+
+  async hasElementByTestId(testId: string): Promise<boolean> {
+    const elements = await this.driver.findElements(By.css(`[data-testid="${testId}"]`));
+    return elements.length > 0;
   }
 
   async hasButtonByText(text: string): Promise<boolean> {
@@ -39,7 +68,7 @@ export class EditorPage {
   }
 
   async clickSave(): Promise<void> {
-    const saveButton = await waitForClickable(this.driver, By.xpath("//button[normalize-space()='Save' or normalize-space()='Saving…']"));
+    const saveButton = await waitForClickable(this.driver, By.css('[data-testid="editor-save-button"]'));
     await saveButton.click();
   }
 
@@ -48,7 +77,7 @@ export class EditorPage {
   }
 
   async openLayersTab(): Promise<void> {
-    const layersTab = await waitForClickable(this.driver, By.xpath("//button[normalize-space()='Layers']"));
+    const layersTab = await waitForClickable(this.driver, By.css('[data-testid="editor-left-tab-layers"]'));
     await layersTab.click();
   }
 
@@ -83,9 +112,7 @@ export class EditorPage {
   }
 
   async hasEditablePropertyField(): Promise<boolean> {
-    const fields = await this.driver.findElements(
-      By.xpath("(//aside//*[self::input or self::textarea or self::select][not(@disabled)])"),
-    );
+    const fields = await this.driver.findElements(By.css('aside [data-testid^="editor-property-"][data-testid$="-input"]'));
     return fields.length > 0;
   }
 
@@ -132,7 +159,7 @@ export class EditorPage {
 
   async clickPreviewAndReadNewTabUrl(): Promise<string> {
     const before = await this.driver.getAllWindowHandles();
-    const previewBtn = await waitForClickable(this.driver, By.css('button[title="Preview"]'));
+    const previewBtn = await waitForClickable(this.driver, By.css('[data-testid="editor-preview-button"]'));
     await previewBtn.click();
 
     await this.driver.wait(async () => (await this.driver.getAllWindowHandles()).length > before.length, 10000);
@@ -149,38 +176,57 @@ export class EditorPage {
   }
 
   async updateFirstEditableTextField(suffix: string): Promise<string> {
-    const field = await waitForVisible(
-      this.driver,
-      By.xpath("(//aside//*[self::input or self::textarea or self::select][not(@disabled)])[1]"),
-    );
-
-    const tagName = (await field.getTagName()).toLowerCase();
-    if (tagName === 'select') {
-      const option = await waitForVisible(this.driver, By.xpath("(//aside//select[not(@disabled)])[1]/option[last()]"));
-      const optionValue = (await option.getAttribute('value')) ?? '';
-      await field.sendKeys(optionValue);
-      return optionValue;
+    const fields = await this.driver.findElements(By.css('aside [data-testid^="editor-property-"][data-testid$="-input"]'));
+    if (fields.length === 0) {
+      throw new Error('No editable property input found in the editor sidebar.');
     }
 
-    const previousValue = (await field.getAttribute('value')) ?? '';
-    const nextValue = `${previousValue} ${suffix}`.trim();
-    await field.clear();
-    await field.sendKeys(nextValue);
-    return nextValue;
+    for (const field of fields) {
+      const isDisabled = (await field.getAttribute('disabled')) !== null || (await field.getAttribute('aria-disabled')) === 'true';
+      if (isDisabled) {
+        continue;
+      }
+
+      const tagName = (await field.getTagName()).toLowerCase();
+      if (tagName === 'input' || tagName === 'textarea') {
+        const previousValue = (await field.getAttribute('value')) ?? '';
+        const nextValue = `${previousValue} ${suffix}`.trim();
+        await field.clear();
+        await field.sendKeys(nextValue);
+        return nextValue;
+      }
+
+      if (tagName === 'button') {
+        await field.click();
+        const options = await this.driver.findElements(By.css('div[role="option"]'));
+        if (options.length > 0) {
+          const option = options[options.length - 1];
+          const optionValue = (await option.getText()).trim();
+          await option.click();
+          return optionValue;
+        }
+      }
+    }
+
+    throw new Error('No writable property field could be updated.');
   }
 
   async readFirstEditableTextFieldValue(): Promise<string> {
     const field = await waitForVisible(
       this.driver,
-      By.xpath("(//aside//*[self::input or self::textarea or self::select][not(@disabled)])[1]"),
+      By.css('aside [data-testid^="editor-property-"][data-testid$="-input"]'),
     );
-    return (await field.getAttribute('value')) ?? '';
+    const tagName = (await field.getTagName()).toLowerCase();
+    if (tagName === 'input' || tagName === 'textarea') {
+      return (await field.getAttribute('value')) ?? '';
+    }
+    return (await field.getText()).trim();
   }
 
   async refreshAndWait(): Promise<void> {
     await this.driver.navigate().refresh();
     await waitForPageReady(this.driver);
-    await waitForVisible(this.driver, By.xpath("//button[normalize-space()='Save']"));
+    await waitForVisible(this.driver, By.css('[data-testid="editor-save-button"]'));
   }
 
   async waitForAnySaveTimestamp(): Promise<void> {

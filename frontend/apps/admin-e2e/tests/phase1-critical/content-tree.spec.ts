@@ -190,6 +190,25 @@ test.describe('Content Tree Page @smoke @regression', () => {
     await expect(page.getByRole('link', { name: 'Preview', exact: true })).toBeVisible();
   });
 
+  test('UI-016b: double-clicking a page opens its publish URL in a new tab', async ({ page }) => {
+    await page.goto('/content');
+    await expect(rowByName(page, 'tut-usa')).toBeVisible();
+    await rowByName(page, 'tut-usa').click();
+    await expect(rowByName(page, 'en')).toBeVisible();
+    await rowByName(page, 'en').click();
+    await expect(rowByName(page, 'home')).toBeVisible();
+
+    const expectedUrl = 'http://localhost:3001/content/tut-usa/en/home';
+    const [publishTab] = await Promise.all([
+      page.waitForEvent('popup'),
+      rowByName(page, 'home').dblclick(),
+    ]);
+
+    await expect(publishTab).toHaveURL(expectedUrl);
+    await expect(rowByName(page, 'home')).toBeVisible();
+    await expect(page.getByText('This folder is empty.')).not.toBeVisible();
+  });
+
   test('UI-019: all data is fetched from API, no hardcoded content', async ({ page }) => {
     const apiCalls: string[] = [];
     page.on('request', (req) => { if (req.url().includes('/api/')) apiCalls.push(req.url()); });

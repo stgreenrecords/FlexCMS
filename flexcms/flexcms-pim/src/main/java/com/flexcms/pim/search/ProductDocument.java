@@ -16,7 +16,7 @@ import java.util.Map;
  * string-valued attributes to support full-text search without knowing the schema
  * in advance.</p>
  */
-@Document(indexName = "flexcms-products")
+@Document(indexName = "flexcms-products", createIndex = false)
 public class ProductDocument {
 
     @Id

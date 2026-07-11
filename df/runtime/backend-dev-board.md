@@ -7,4 +7,4 @@ Lists rows whose Owner role is `backend-dev` (READY_FOR_DEV / DEV_IN_PROGRESS / 
 
 | Priority | Task ID | Title | State | Owner role | Blocked? | Last updated | Next action |
 |---|---|---|---|---|---|---|---|
-| - | - | No backend-dev tasks | NO_TASKS | backend-dev | No | 2026-07-07 18:50 local | Await routing from SA |
+| P0 | TUT-LINK-CONTRACTS | Correct TUT-USA component link contracts | DONE | backend-dev | No | 2026-07-11 21:21 CEST | Completed: V18 contracts, migration/public-registry tests, PostgreSQL execution, all Maven gates, and Docker image/runtime validation pass |

@@ -1,0 +1,21 @@
+[
+  {
+    "traceabilityId": "TPL-08",
+    "priority": "critical",
+    "junitFile": "reb12-template-results.xml",
+    "nameIncludes": "TPL-08"
+  },
+  {
+    "traceabilityId": "REB-13",
+    "priority": "critical",
+    "junitFile": "reb13-admin-suite.xml",
+    "nameIncludes": "REB-13 admin authoring and round-trip suite"
+  },
+  {
+    "traceabilityId": "REB-18",
+    "priority": "high",
+    "junitFile": "reb18-suite.xml",
+    "nameIncludes": "REB-18 content tree and page lifecycle suite"
+  }
+]
+

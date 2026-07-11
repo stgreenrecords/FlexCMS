@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 import java.time.Instant;
 import java.util.Map;
 
-@Document(indexName = "flexcms-content")
+@Document(indexName = "flexcms-content", createIndex = false)
 @Setting(settingPath = "/elasticsearch/settings.json")
 public class ContentNodeDocument {
 

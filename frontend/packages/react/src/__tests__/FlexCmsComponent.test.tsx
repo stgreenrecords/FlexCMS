@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { FlexCmsProvider, type FlexCmsRenderer } from '../FlexCmsProvider';
 import { FlexCmsComponent } from '../FlexCmsComponent';
@@ -67,6 +67,20 @@ describe('FlexCmsComponent', () => {
     expect(screen.getByTestId('hero')).toBeInTheDocument();
     expect(screen.getByTestId('text')).toBeInTheDocument();
     expect(screen.getByTestId('text').textContent).toBe('Child text');
+  });
+
+  it('does not render page references or their nested page content', () => {
+    renderWithMapper(
+      <FlexCmsComponent
+        node={node('vehicles-lineup', 'flexcms/page', { 'jcr:title': 'Vehicle Lineup' }, [
+          node('lineup-content', 'myapp/text', { content: 'Nested page content' }),
+        ])}
+      />,
+      { 'flexcms/page': HeroRenderer, 'myapp/text': TextRenderer }
+    );
+
+    expect(screen.queryByTestId('hero')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('text')).not.toBeInTheDocument();
   });
 
   it('returns null for unknown resourceType in production', () => {

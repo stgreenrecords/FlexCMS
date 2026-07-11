@@ -2,18 +2,20 @@
 
 ## Roles
 
-The Factory uses eight required roles.
+The Factory uses six active roles. The `qa` and `po` roles are **permanently
+disabled in every operating mode** (human decision 2026-07-08) and must never be
+selected, executed, or simulated — see `df/03-orchestration-rules.md`.
 
 | Role | Short name | Purpose |
 |---|---|---|
 | Solution Architect | `sa` | Refines tasks, defines acceptance criteria, and guards solution design quality. |
 | Designer | `designer` | Produces UI/UX design packages before visible frontend changes. |
-| Backend Developer | `backend-dev` | Implements backend services, APIs, persistence, migrations, and backend tests. |
-| Frontend Developer | `frontend-dev` | Implements client applications, UI behavior, accessibility, and frontend tests. |
-| DevOps Engineer | `devops` | Implements CI/CD, automation, runtime packaging, infrastructure, and environment tooling. |
-| Data Engineer | `data-engineer` | Produces datasets, fixtures, imports, source maps, and data-quality evidence. |
-| Quality Engineer | `qa` | Verifies work independently through tests and structured quality checks. |
-| Product Owner | `po` | Validates business outcome and accepts or rejects the result. |
+| Backend Developer | `backend-dev` | Implements backend services, APIs, persistence, migrations, and full backend test coverage. |
+| Frontend Developer | `frontend-dev` | Implements client applications, UI behavior, accessibility, and full frontend/Selenium test coverage. |
+| DevOps Engineer | `devops` | Implements CI/CD, automation, runtime packaging, infrastructure, and environment tooling with tests. |
+| Data Engineer | `data-engineer` | Produces datasets, fixtures, imports, source maps, and data-quality evidence with tests. |
+| ~~Quality Engineer~~ | ~~`qa`~~ | **DISABLED.** Verification is now owned end to end by the delivery developer. |
+| ~~Product Owner~~ | ~~`po`~~ | **DISABLED.** No automated product acceptance; open product questions go to a human via `BLOCKED`. |
 
 ## Role ownership
 
@@ -40,22 +42,21 @@ once. Role isolation is preserved: every session still runs exactly one role.
 OPEN
   -> INTAKE
   -> REFINEMENT_IN_PROGRESS
-  -> REFINEMENT_QUESTIONS
   -> REFINED
   -> NEEDS_ARCHITECTURE
   -> READY_FOR_DESIGN (if UI design is required)
   -> DESIGN_IN_PROGRESS
   -> READY_FOR_DEV
   -> DEV_IN_PROGRESS
-  -> READY_FOR_QA
-  -> QA_IN_PROGRESS
-  -> READY_FOR_PO
-  -> PO_REVIEW
-  -> DONE
+  -> DONE   (delivery lane, after the developer testing bar is met)
 ```
 
+QA and PO are disabled, so there is no `READY_FOR_QA`/`QA_*`/`READY_FOR_PO`/`PO_*`
+stage. The delivery lane carries the task to `DONE` itself once the developer
+testing bar in `df/03-orchestration-rules.md` is fully satisfied.
+
 Small, well-defined tasks may skip refinement or architecture when the skip reason is documented.
-Documentation/process-only changes may move from `ARCHITECTURE_IN_PROGRESS` directly to `READY_FOR_QA` when no delivery lane is required.
+Documentation/process-only changes may move from `ARCHITECTURE_IN_PROGRESS` directly to `DONE` when no delivery lane is required and the change is validated.
 
 ## Delivery lane routing
 
@@ -93,11 +94,18 @@ Every role session must leave behind a start/finish trail, evidence, and a hando
 
 ## Definition of done
 
-A task is done only when:
+With QA and PO disabled, the delivery developer owns the full bar. A task is done
+only when:
 
 - implementation or documentation is complete;
-- relevant tests/checks passed or limits are documented;
-- QA approved the task;
-- PO accepted the task; and
+- 100% of the new/changed functionality is covered by unit tests and/or Selenium
+  automation that the developer designed, wrote, ran, and fixed;
+- the full application build runs with **zero errors** and all those tests pass
+  with **0 failures**;
+- test scenarios covering 100% of the functionality are recorded in the task's
+  artifact folder; and
 - runtime files are updated.
+
+If any part of this bar cannot be met, the task is not done — it stays
+`DEV_IN_PROGRESS` or moves to `BLOCKED` with the exact failure recorded.
 

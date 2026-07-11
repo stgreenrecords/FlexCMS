@@ -7,4 +7,4 @@ Lists rows whose Owner role is `data-engineer` (READY_FOR_DEV / DEV_IN_PROGRESS 
 
 | Priority | Task ID | Title | State | Owner role | Blocked? | Last updated | Next action |
 |---|---|---|---|---|---|---|---|
-| - | - | No data-engineer tasks | NO_TASKS | data-engineer | No | 2026-07-07 18:50 local | Await routing from SA |
+| P0 | TUT-LINK-SEED | Rebuild and validate the TUT-USA seeded link graph | DEV_IN_PROGRESS | data-engineer | No | 2026-07-11 21:47 CEST | Implement explicit link graph, pre-write validation/tests, then capture two idempotent live reseeds and quality metrics |

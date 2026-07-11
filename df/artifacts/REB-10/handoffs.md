@@ -1,3 +1,36 @@
+## 2026-07-11 local - screenshot regression audit
+
+- State: `DONE` (shared renderer hardening recorded)
+- Finding: template selection was correct; generic component fallbacks below the template wrappers caused the repeated metadata/debug presentation.
+- Evidence: `frontend/apps/site-nextjs/src/components/tutPriorityRenderers.tsx`, `frontend/apps/site-nextjs/src/components/component-map.tsx`, `df/artifacts/REB-10/frontend/summary.md`.
+- Validation: site tests `12 passing`, site build PASS, and live `/tut-usa/vehicles` rendered without `Renderer pending` or `data-flexcms-unimplemented` markers after restart.
+- Next: continue visual parity work through dedicated renderers for remaining high-priority component contracts.
+
+## 2026-07-08 local - frontend-dev -> next delivery task routing
+
+- Task: `REB-10`
+- State: `DONE`
+- What was done:
+  - Reconciled REB-10 from retired QA state to developer-owned completion flow.
+  - Replaced brittle hardcoded template keys with generated-contract-driven template routing.
+  - Added compatibility aliases for prior naming variants.
+  - Added unit coverage for template registration and wrapper behavior (navigation/footer injection).
+  - Added responsive layout wrappers for home/standard templates.
+- Evidence:
+  - `frontend/apps/site-nextjs/src/components/templates/template-map.tsx`
+  - `frontend/apps/site-nextjs/src/components/templates/GlobalHomePageTemplate.tsx`
+  - `frontend/apps/site-nextjs/src/components/templates/StandardPageTemplate.tsx`
+  - `frontend/apps/site-nextjs/src/components/templates/__tests__/template-map.test.tsx`
+  - `df/artifacts/REB-10/frontend/summary.md`
+  - commands:
+	- `cd frontend && pnpm --filter @flexcms/site-nextjs test` PASS
+	- `cd frontend && NUXT_TELEMETRY_DISABLED=1 pnpm build` PASS
+- Next steps:
+  1. Route to the next actionable delivery task on the board (likely `REB-11` reconciliation or downstream Selenium tasks blocked by `REB-10`).
+  2. Use the template-map tests as regression coverage for future template-name contract updates.
+- Risks/blockers:
+  - Template visual parity still needs seeded-runtime visual checks; this session covered routing logic, wrapper behavior, and compile/test integrity.
+
 ## Handoff from `frontend-dev` to `qa`
 
 - **Task:** REB-10: Implement all 21 TUT page templates and page routes

@@ -5,8 +5,11 @@ from __future__ import annotations
 
 import sys
 import os
+import re
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any, Callable
+from urllib.parse import urlsplit
 
 import requests
 
@@ -14,6 +17,7 @@ AUTHOR_API = os.environ.get("FLEXCMS_AUTHOR_API", "http://localhost:8080")
 USER_ID = "admin"
 SITE_ID = "tut-usa"
 ROOT_PATH = "tut-usa"
+TUT_IMAGE_FALLBACK = "/tut-usa/assets/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png"
 
 
 @dataclass(frozen=True)
@@ -66,6 +70,38 @@ class PageSpec:
     meta: dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class LinkReference:
+    source: str
+    field_path: str
+    url: str
+
+
+@dataclass(frozen=True)
+class ValidationReport:
+    page_count: int
+    component_count: int
+    link_counts: dict[str, int]
+    unresolved_internal_destinations: int = 0
+
+
+@dataclass(frozen=True)
+class SeedGraph:
+    page_components: dict[str, list[dict[str, Any]]]
+    experience_fragments: dict[str, dict[str, Any]]
+    assets: "AssetLog"
+
+
+class SeedGraphValidationError(ValueError):
+    """Raised before any API access when generated seed data is unsafe."""
+
+
+URL_FIELD_NAMES = {"url", "maplink", "appointmenturl", "shareurl"}
+SAFE_EXTERNAL_SCHEMES = {"http", "https"}
+SAFE_SPECIAL_SCHEMES = {"mailto", "tel"}
+CONTROL_CHARACTER_PATTERN = re.compile(r"[\x00-\x1f\x7f]")
+
+
 MODELS: dict[str, ModelData] = {
     "tut-s": ModelData("tut-s", "TUT S", "tut-s", "Sedans", 129900, 420, 602, "612 lb-ft", "3.6 sec", "Dual-motor intelligent AWD", "The flagship sedan tuned for quiet authority and uncompromising pace.", "TUT S pairs a long-wheelbase executive cabin with rapid electric response, adaptive air suspension, and an interior trimmed for coast-to-coast comfort.", "Executives and owners who want limousine calm without giving up immediate performance.", ["Graphite Silver", "Onyx Black", "Satin Pearl", "Midnight Blue"], ["Executive rear comfort package", "Active rear steering", "Panoramic electrochromic roof"]),
     "tut-e": ModelData("tut-e", "TUT E", "tut-e", "Sedans", 93900, 388, 482, "528 lb-ft", "4.4 sec", "Rear-biased dual-motor AWD", "The executive sedan that makes every daily mile feel deliberately crafted.", "TUT E balances elegant proportions, confident electric torque, and a technology suite designed for buyers moving up from established German sport sedans.", "Drivers who want a refined daily luxury sedan with modern EV packaging and easy long-range usability.", ["Arctic White", "Graphite Silver", "Forest Stone", "Deep Burgundy"], ["Highway pilot assist", "19-speaker studio audio", "Heated comfort seating"]),
@@ -103,9 +139,9 @@ class AssetLog:
         self.counter = 1
 
     def image(self, page_path: str, component_title: str, filename: str, resolution: str, description: str) -> str:
-        self.entries.append(f"missing asset number {self.counter} {filename}, content/{page_path} ({component_title}), {resolution}, {description}")
+        self.entries.append(f"fallback asset number {self.counter} {filename}, content/{page_path} ({component_title}), {resolution}, {description}")
         self.counter += 1
-        return f"/dam/{SITE_ID}/missing/{filename}"
+        return TUT_IMAGE_FALLBACK
 
     def count(self) -> int:
         return len(self.entries)
@@ -191,9 +227,9 @@ def page_metadata(spec: PageSpec) -> dict[str, Any]:
     return component("page-metadata", "tut-usa/layout-page-structure/page-metadata", {"pageTitle": spec.title, "slug": spec.path.split("/")[-1], "template": spec.template, "tags": [SITE_ID, spec.kind, *spec.meta.get("tags", [])], "publishDate": spec.meta.get("publishDate", "2026-03-29")})
 
 
-def link(path: str) -> dict[str, str]:
+def link(path: str, *, open_in_new_tab: bool = False) -> dict[str, Any]:
     title = PAGE_INDEX[path].title
-    return {"label": title, "url": "/" + path}
+    return {"label": title, "url": "/" + path, "openInNewTab": open_in_new_tab}
 
 
 def breadcrumb_items(path: str) -> list[dict[str, str]]:
@@ -243,7 +279,7 @@ def home_components(spec: PageSpec, assets: AssetLog) -> list[dict[str, Any]]:
         component("hero-banner", "tut-usa/calls-to-action-promotions-campaigns/hero-banner", {"eyebrow": "TUT USA", "headline": "Luxury electric touring, resolved for real life.", "subheadline": "Explore the sedan, SUV, and flagship EV range with trusted specs, design stories, and concierge-led conversion paths.", "backgroundImage": assets.image(spec.path, "Hero Banner", "tut-usa-home-hero.jpg", "1920x820", "Front three-quarter hero scene showing the TUT lineup at sunrise on a modern coastal residence drive, polished concrete, warm gold light, premium understated luxury mood."), "primaryCta": {"label": "Explore Vehicles", "url": "/tut-usa/vehicles"}, "secondaryCta": {"label": "Book a Test Drive", "url": "/tut-usa/offers-and-finance/book-a-test-drive"}}),
         component("product-grid", "tut-usa/commerce-catalog-merchandising/product-grid", {"title": "Highlighted Vehicles", "products": model_cards(["tut-s", "tut-x", "tut-eon"], assets, spec.path), "columns": 3, "enableSorting": False}),
         component("feature-list", "tut-usa/editorial-article-content/feature-list", {"title": "Why TUT USA feels different", "features": [{"title": "Product storytelling", "description": "Every top-tier page translates engineering into buyer-relevant outcomes.", "icon": ""}, {"title": "High-touch retail", "description": "Dealer locator, concierge contact, and appointment pathways stay visible without becoming aggressive.", "icon": ""}, {"title": "Ownership clarity", "description": "Manuals, service, charging, and support content are structured to feel dependable under pressure.", "icon": ""}], "iconStyle": "none"}),
-        component("featured-content", "tut-usa/calls-to-action-promotions-campaigns/featured-content", {"title": "Featured stories", "items": ["Electrification systems that preserve confidence at highway speeds.", "Monterey design preview: materials, interfaces, and quiet luxury.", "Owners hub: service, manuals, warranty, and EV guidance in one place."], "layout": "grid"}),
+        component("featured-content", "tut-usa/calls-to-action-promotions-campaigns/featured-content", {"title": "Featured stories", "items": [link("tut-usa/innovation/electrification"), link("tut-usa/news-and-updates/event-coverage-article"), link("tut-usa/owners")], "layout": "grid"}),
         component("latest-news", "tut-usa/editorial-article-content/latest-news", {"title": "Latest updates", "source": "TUT Newsroom", "count": 3, "showDates": True}),
         component("dealer-locator", "tut-usa/location-local-physical-presence/dealer-locator", {"title": "Find a nearby TUT retailer", "apiEndpoint": "/api/retail/dealers", "radiusOptions": [25, 50, 100], "filters": [{"label": "Sales", "value": "sales"}, {"label": "Service", "value": "service"}, {"label": "EV specialist", "value": "ev"}]}),
         component("newsletter-signup", "tut-usa/calls-to-action-promotions-campaigns/newsletter-signup", {"title": "Stay close to launch news and owner insights", "description": "Receive thoughtful updates on product launches, dealer experiences, charging education, and invitation-only retail events.", "formReference": "tut-usa-newsletter", "successMessage": "You are subscribed.", "consentText": "I consent to receiving product and ownership updates from TUT USA."}),
@@ -288,10 +324,10 @@ def build_configure_components(spec: PageSpec, assets: AssetLog) -> list[dict[st
         page_metadata(spec),
         page_header(spec, assets),
         component("configurator", "tut-usa/commerce-catalog-merchandising/configurator", {"title": f"Configure {model.name}", "steps": [{"title": "Exterior finish", "options": [{"label": color, "value": color} for color in model.colors]}, {"title": "Wheel design", "options": [{"label": "20-inch forged", "value": "20-forged", "price": 0}, {"label": "21-inch aero polished", "value": "21-aero", "price": 1800}]}, {"title": "Interior experience", "options": [{"label": "Performance cabin", "value": "performance", "price": 0}, {"label": "Executive lounge", "value": "executive", "price": 4500}]}], "pricingLogic": "Base MSRP plus selected options and destination.", "completionCta": {"label": "Send configuration to retailer", "url": "/tut-usa/contact-and-concierge/concierge-request"}}),
-        component("pricing-table", "tut-usa/calls-to-action-promotions-campaigns/pricing-table", {"title": f"{model.name} package guide", "plans": [{"name": "Core", "price": f"${model.price:,}", "billingLabel": "Base MSRP", "features": [model.highlights[0], "Premium audio", "Adaptive air suspension"], "cta": {"label": "Choose Core", "url": "#"}, "badge": ""}, {"name": "Signature", "price": f"${model.price + 6200:,}", "billingLabel": "Most selected", "features": [model.highlights[0], model.highlights[1], "Extended leather package"], "cta": {"label": "Choose Signature", "url": "#"}, "badge": "Popular"}, {"name": "Atelier", "price": f"${model.price + 13800:,}", "billingLabel": "Coachbuilt options", "features": [model.highlights[0], model.highlights[2], "Bespoke material consultation"], "cta": {"label": "Choose Atelier", "url": "#"}, "badge": "Bespoke"}], "highlightedPlan": "Signature", "billingToggle": False}),
+        component("pricing-table", "tut-usa/calls-to-action-promotions-campaigns/pricing-table", {"title": f"{model.name} package guide", "plans": [{"name": "Core", "price": f"${model.price:,}", "billingLabel": "Base MSRP", "features": [model.highlights[0], "Premium audio", "Adaptive air suspension"], "cta": {"label": "Choose Core", "url": "/tut-usa/contact-and-concierge/concierge-request"}, "badge": ""}, {"name": "Signature", "price": f"${model.price + 6200:,}", "billingLabel": "Most selected", "features": [model.highlights[0], model.highlights[1], "Extended leather package"], "cta": {"label": "Choose Signature", "url": "/tut-usa/contact-and-concierge/concierge-request"}, "badge": "Popular"}, {"name": "Atelier", "price": f"${model.price + 13800:,}", "billingLabel": "Coachbuilt options", "features": [model.highlights[0], model.highlights[2], "Bespoke material consultation"], "cta": {"label": "Choose Atelier", "url": "/tut-usa/contact-and-concierge/concierge-request"}, "badge": "Bespoke"}], "highlightedPlan": "Signature", "billingToggle": False}),
         component("calculator", "tut-usa/forms-data-capture-consent/calculator", {"title": "Estimate your monthly structure", "inputs": [{"label": "Down payment", "name": "down-payment", "min": 5000, "max": 60000, "defaultValue": 15000, "unit": "USD"}, {"label": "Term length", "name": "term", "min": 24, "max": 72, "defaultValue": 48, "unit": "months"}, {"label": "Miles per year", "name": "mileage", "min": 8000, "max": 18000, "defaultValue": 12000, "unit": "mi"}], "formula": "Illustrative only", "resultLabel": "Estimated payment", "disclaimer": "Illustrative only - retailer will confirm taxes and fees."}),
         component("offer-card-alt", "tut-usa/calls-to-action-promotions-campaigns/offer-card-alt", {"title": "Configuration next steps", "description": f"Have a retailer review the {model.name} you built, confirm color allocation, and propose delivery timing.", "items": ["Retail consultation within 1 business day", "Reserved test-drive slot", "Estimated delivery window aligned to your selected trim"], "layout": "list", "cta": {"label": "Request retailer follow-up", "url": "/tut-usa/contact-and-concierge/contact-us"}}),
-        component("cta-button", "tut-usa/calls-to-action-promotions-campaigns/cta-button", {"label": "Compare with another TUT", "url": f"/tut-usa/vehicles/{family_slug(model.family)}/{model.slug}/compare-{model.slug}", "styleVariant": "secondary", "openInNewTab": False}),
+        component("cta-button", "tut-usa/calls-to-action-promotions-campaigns/cta-button", {"label": "Compare with another TUT", "url": "/tut-usa/vehicles/compare-vehicles", "styleVariant": "secondary", "openInNewTab": False}),
     ]
 
 
@@ -358,7 +394,7 @@ def article_detail_components(spec: PageSpec, assets: AssetLog) -> list[dict[str
         component("article-detail", "tut-usa/editorial-article-content/article-detail", {"headline": article.headline, "subtitle": article.subtitle, "heroImage": assets.image(spec.path, "Article Detail", f"{spec.path.replace('/', '-')}-hero.jpg", "1920x1080", f"Editorial news hero for {article.headline}, premium automotive press photography, realistic event or studio setting, sharp subject separation."), "body": article.body_html, "author": article.author, "publishDate": article.publish_date}),
         component("author-list", "tut-usa/editorial-article-content/author-list", {"title": "Contributors", "authors": [article.author], "showBio": False}),
         component("estimated-read-time", "tut-usa/editorial-article-content/estimated-read-time", {"minutes": 4, "label": "Estimated read time"}),
-        component("table-of-contents", "tut-usa/editorial-article-content/table-of-contents", {"title": "In this story", "items": [{"label": "Launch summary", "url": "#summary"}, {"label": "Why it matters", "url": "#impact"}, {"label": "Next steps", "url": "#next"}], "sticky": False}),
+        component("quick-links", "tut-usa/editorial-article-content/quick-links", {"title": "More from the newsroom", "links": [link("tut-usa/news-and-updates/product-launch-article"), link("tut-usa/news-and-updates/press-release-article"), link("tut-usa/news-and-updates/event-coverage-article")], "iconMode": False}),
         component("social-share", "tut-usa/community-social-proof-engagement/social-share", {"title": "Share", "networks": ["LinkedIn", "X", "Email"], "shareUrl": f"https://www.tutmotors.com/{spec.path}", "shareText": article.headline}),
         component("related-content", "tut-usa/navigation-search-discovery/related-content", {"title": "Related coverage", "items": [ARTICLES["product-launch-article"].headline, ARTICLES["press-release-article"].headline, ARTICLES["event-coverage-article"].headline]}),
         component("press-kit", "tut-usa/media-visual-storytelling-assets/press-kit", {"title": "Press kit", "companyOverview": "<p>TUT USA press resources include approved brand copy, executive quotes, and downloadable product imagery requests.</p>", "assets": ["/press/tut-usa-brand-overview.pdf", "/press/tut-eon-launch-factsheet.pdf"], "contact": "media@tutmotors.com"}),
@@ -386,8 +422,7 @@ def manual_components(spec: PageSpec, assets: AssetLog) -> list[dict[str, Any]]:
         page_metadata(spec),
         breadcrumb_component(spec),
         component("knowledge-base-article", "tut-usa/editorial-article-content/knowledge-base-article", {"title": spec.title, "summary": spec.description, "body": "<p>This page centralizes owner documentation, quick-start instructions, and downloadable technical references for U.S. delivered vehicles.</p><p>Use the table of contents to jump to charging, safety, storage, and maintenance sections without scrolling through unrelated content.</p>", "category": "Owner documentation", "relatedArticles": ["Charging & EV Ownership", "Safety & Assistance How-To", "Warranty & Coverage"]}),
-        component("table-of-contents", "tut-usa/editorial-article-content/table-of-contents", {"title": "On this page", "items": [{"label": "Delivery checklist", "url": "#delivery"}, {"label": "Charging basics", "url": "#charging"}, {"label": "Service intervals", "url": "#service"}], "sticky": False}),
-        component("anchor-links", "tut-usa/navigation-search-discovery/anchor-links", {"links": [{"label": "Battery care", "url": "#battery-care"}, {"label": "Cold weather", "url": "#cold-weather"}, {"label": "Software", "url": "#software"}], "orientation": "horizontal"}),
+        component("quick-links", "tut-usa/editorial-article-content/quick-links", {"title": "Related owner guidance", "links": [link("tut-usa/owners/charging-and-ev-ownership"), link("tut-usa/owners/service-and-maintenance"), link("tut-usa/owners/safety-and-assistance-how-to")], "iconMode": False}),
         component("document-download", "tut-usa/media-visual-storytelling-assets/document-download", {"title": "Owner manual PDF", "description": "Full downloadable PDF with searchable sections for setup, charging, storage, and service planning.", "file": "/docs/tut-usa-owner-manual.pdf", "fileType": "PDF", "fileSize": "12.4 MB"}),
         component("framed-message", "tut-usa/layout-page-structure/framed-message", {"title": "Important", "message": "Always confirm tire pressure and charging connector cleanliness before long-distance travel.", "styleVariant": "info", "icon": ""}),
     ]
@@ -437,7 +472,7 @@ def offers_components(spec: PageSpec, assets: AssetLog) -> list[dict[str, Any]]:
     return [
         page_metadata(spec),
         page_header(spec, assets),
-        component("pricing-table", "tut-usa/calls-to-action-promotions-campaigns/pricing-table", {"title": "Illustrative ownership pathways", "plans": [{"name": "Purchase", "price": "$1,849/mo", "billingLabel": "With qualified financing", "features": ["Flexible term lengths", "Retailer-delivered quote", "Tailored trade-in support"], "cta": {"label": "Review purchase path", "url": "#"}, "badge": ""}, {"name": "Lease", "price": "$1,379/mo", "billingLabel": "36 months / 10k miles", "features": ["Wear-and-tear guidance", "Mileage flexibility", "End-of-term concierge"], "cta": {"label": "Review lease path", "url": "#"}, "badge": "Popular"}, {"name": "Executive mobility", "price": "$2,240/mo", "billingLabel": "Managed ownership", "features": ["Dedicated concierge", "Priority service scheduling", "Fleet-style reporting"], "cta": {"label": "Review mobility path", "url": "#"}, "badge": "Premium"}], "highlightedPlan": "Lease", "billingToggle": False}),
+        component("pricing-table", "tut-usa/calls-to-action-promotions-campaigns/pricing-table", {"title": "Illustrative ownership pathways", "plans": [{"name": "Purchase", "price": "$1,849/mo", "billingLabel": "With qualified financing", "features": ["Flexible term lengths", "Retailer-delivered quote", "Tailored trade-in support"], "cta": {"label": "Review purchase path", "url": "/tut-usa/contact-and-concierge/concierge-request"}, "badge": ""}, {"name": "Lease", "price": "$1,379/mo", "billingLabel": "36 months / 10k miles", "features": ["Wear-and-tear guidance", "Mileage flexibility", "End-of-term concierge"], "cta": {"label": "Review lease path", "url": "/tut-usa/contact-and-concierge/concierge-request"}, "badge": "Popular"}, {"name": "Executive mobility", "price": "$2,240/mo", "billingLabel": "Managed ownership", "features": ["Dedicated concierge", "Priority service scheduling", "Fleet-style reporting"], "cta": {"label": "Review mobility path", "url": "/tut-usa/contact-and-concierge/concierge-request"}, "badge": "Premium"}], "highlightedPlan": "Lease", "billingToggle": False}),
         component("plan-card", "tut-usa/calls-to-action-promotions-campaigns/plan-card", {"planName": "Lease with confidence", "price": "$1,379/mo", "features": ["36-month structure", "10,000 miles per year", "Battery warranty coverage aligned to term"], "cta": {"label": "Ask a retailer", "url": "/tut-usa/contact-and-concierge/contact-us"}, "badge": "Most asked about"}),
         component("offer-card", "tut-usa/calls-to-action-promotions-campaigns/offer-card", {"title": "Spring delivery event", "description": "Select U.S. retailers are pairing rate support with complimentary home charging consultation for qualified buyers.", "offerCode": "SPRINGTUT", "expiryDate": "2026-05-31", "cta": {"label": "Request offer details", "url": "/tut-usa/offers-and-finance/financing-and-leasing"}}),
         component("quote-request-form", "tut-usa/forms-data-capture-consent/quote-request-form", {"title": "Request a tailored quote", "fields": [form_field("full-name", "Full name", required=True), form_field("email", "Email", "email", required=True), form_field("preferred-model", "Preferred model", required=True), form_field("zip-code", "ZIP code", required=True)], "productType": "TUT USA retail", "submitAction": "/retail/quote/request"}),
@@ -452,8 +487,8 @@ def accessories_components(spec: PageSpec, assets: AssetLog) -> list[dict[str, A
     return [
         page_metadata(spec),
         page_header(spec, assets),
-        component("collection-spotlight", "tut-usa/calls-to-action-promotions-campaigns/collection-spotlight", {"title": spec.title, "description": spec.description, "items": items, "layout": "grid", "cta": {"label": "View featured accessories", "url": "#"}}),
-        component("product-grid", "tut-usa/commerce-catalog-merchandising/product-grid", {"title": "Collection highlights", "products": [{"productName": items[0], "image": assets.image(spec.path, "Product Grid", f"{spec.path.replace('/', '-')}-item-1.jpg", "600x600", f"Luxury accessory still-life for {items[0]}, premium studio product photography, soft directional light."), "price": 995, "cta": {"label": "View", "url": "#"}}, {"productName": items[1], "image": assets.image(spec.path, "Product Grid", f"{spec.path.replace('/', '-')}-item-2.jpg", "600x600", f"Luxury accessory still-life for {items[1]}, tactile materials, premium neutral backdrop."), "price": 650, "cta": {"label": "View", "url": "#"}}, {"productName": items[2], "image": assets.image(spec.path, "Product Grid", f"{spec.path.replace('/', '-')}-item-3.jpg", "600x600", f"Luxury accessory still-life for {items[2]}, refined brand styling, high-end retail photography."), "price": 420, "cta": {"label": "View", "url": "#"}}], "columns": 3, "enableSorting": True}),
+        component("collection-spotlight", "tut-usa/calls-to-action-promotions-campaigns/collection-spotlight", {"title": spec.title, "description": spec.description, "items": items, "layout": "grid", "cta": {"label": "Ask about featured accessories", "url": "/tut-usa/contact-and-concierge/contact-us"}}),
+        component("product-grid", "tut-usa/commerce-catalog-merchandising/product-grid", {"title": "Collection highlights", "products": [{"productName": items[0], "image": assets.image(spec.path, "Product Grid", f"{spec.path.replace('/', '-')}-item-1.jpg", "600x600", f"Luxury accessory still-life for {items[0]}, premium studio product photography, soft directional light."), "price": 995, "cta": {"label": "Request details", "url": "/tut-usa/contact-and-concierge/contact-us"}}, {"productName": items[1], "image": assets.image(spec.path, "Product Grid", f"{spec.path.replace('/', '-')}-item-2.jpg", "600x600", f"Luxury accessory still-life for {items[1]}, tactile materials, premium neutral backdrop."), "price": 650, "cta": {"label": "Request details", "url": "/tut-usa/contact-and-concierge/contact-us"}}, {"productName": items[2], "image": assets.image(spec.path, "Product Grid", f"{spec.path.replace('/', '-')}-item-3.jpg", "600x600", f"Luxury accessory still-life for {items[2]}, refined brand styling, high-end retail photography."), "price": 420, "cta": {"label": "Request details", "url": "/tut-usa/contact-and-concierge/contact-us"}}], "columns": 3, "enableSorting": True}),
         component("filter-panel", "tut-usa/layout-page-structure/filter-panel", {"title": "Shop by intent", "filters": [{"label": "Use case", "options": ["Travel", "Performance", "Cabin comfort"]}, {"label": "Vehicle fit", "options": ["Sedans", "SUVs", "All models"]}], "applyMode": "manual"}),
         component("sort-control", "tut-usa/layout-page-structure/sort-control", {"label": "Sort", "options": ["Featured", "Newest", "Price"], "defaultOption": "Featured"}),
         component("offer-card", "tut-usa/calls-to-action-promotions-campaigns/offer-card", {"title": "Concierge gift wrapping", "description": "Select lifestyle items can be delivered with premium presentation packaging for gifting moments.", "offerCode": "LIFESTYLETUT", "expiryDate": "2026-12-31", "cta": {"label": "Ask retailer", "url": "/tut-usa/contact-and-concierge/contact-us"}}),
@@ -503,6 +538,24 @@ def contact_components(spec: PageSpec, assets: AssetLog) -> list[dict[str, Any]]
     ]
 
 
+def search_components(spec: PageSpec, assets: AssetLog) -> list[dict[str, Any]]:
+    return [
+        page_metadata(spec),
+        page_header(spec, assets),
+        component("search-bar", "tut-usa/navigation-search-discovery/search-bar", {"placeholder": "Search vehicles, ownership guidance, news, and support"}),
+        component("quick-links", "tut-usa/editorial-article-content/quick-links", {"title": "Popular destinations", "links": [link("tut-usa/vehicles"), link("tut-usa/owners"), link("tut-usa/news-and-updates"), link("tut-usa/contact-and-concierge")], "iconMode": True}),
+    ]
+
+
+def legal_components(spec: PageSpec, assets: AssetLog) -> list[dict[str, Any]]:
+    return [
+        page_metadata(spec),
+        page_header(spec, assets),
+        component("rich-text-block", "tut-usa/editorial-article-content/rich-text-block", {"heading": spec.title, "body": f"<p>{spec.description}</p><p>Contact TUT USA for accessible copies or questions about this policy.</p>", "alignment": "left", "backgroundColor": "", "spacing": "medium"}),
+        component("cta-button", "tut-usa/calls-to-action-promotions-campaigns/cta-button", {"label": "Contact TUT USA", "url": "/tut-usa/contact-and-concierge/contact-us", "styleVariant": "secondary", "openInNewTab": False}),
+    ]
+
+
 BUILDERS: dict[str, Callable[[PageSpec, AssetLog], list[dict[str, Any]]]] = {
     "home": home_components,
     "model-overview": model_overview_components,
@@ -523,6 +576,8 @@ BUILDERS: dict[str, Callable[[PageSpec, AssetLog], list[dict[str, Any]]]] = {
     "learning-hub": learning_components,
     "how-to": how_to_components,
     "contact-support": contact_components,
+    "search": search_components,
+    "legal": legal_components,
 }
 
 
@@ -587,6 +642,10 @@ PAGES: list[PageSpec] = [
     PageSpec("tut-usa/contact-and-concierge/contact-us", "Contact Us", "contact-concierge-support-page", "General support and inquiry page for TUT USA visitors.", "contact-support", {"persona": "General"}),
     PageSpec("tut-usa/contact-and-concierge/concierge-request", "Concierge Request", "contact-concierge-support-page", "White-glove assistance page for premium pre-sale or owner requests.", "contact-support", {"persona": "Concierge"}),
     PageSpec("tut-usa/contact-and-concierge/roadside-and-emergency-help", "Roadside & Emergency Help", "contact-concierge-support-page", "Support page for urgent ownership assistance and service contacts.", "contact-support", {"persona": "Roadside"}),
+    PageSpec("tut-usa/search", "Search", "learning-education-hub-page", "Search across TUT USA vehicles, stories, ownership guidance, and support journeys.", "search"),
+    PageSpec("tut-usa/legal", "Legal", "owner-manual-technical-documentation-page", "Legal, privacy, and digital-use information for TUT USA visitors and owners.", "legal"),
+    PageSpec("tut-usa/legal/privacy", "Privacy Notice", "owner-manual-technical-documentation-page", "How TUT USA handles information submitted through retail, ownership, and support experiences.", "legal"),
+    PageSpec("tut-usa/legal/terms", "Terms & Conditions", "owner-manual-technical-documentation-page", "Terms governing use of TUT USA digital content, offers, and support information.", "legal"),
 ]
 
 PAGE_INDEX = {page.path: page for page in PAGES}
@@ -609,24 +668,116 @@ def delete_children(path: str) -> None:
     return
 
 
-def seed_experience_fragments() -> None:
+def navigation_properties() -> dict[str, Any]:
+    return {"logo": "TUT", "primaryLinks": [link(path) for path in ["tut-usa/vehicles", "tut-usa/innovation", "tut-usa/news-and-updates", "tut-usa/owners", "tut-usa/offers-and-finance", "tut-usa/accessories", "tut-usa/learn", "tut-usa/contact-and-concierge"]], "utilityLinks": [link("tut-usa/search"), link("tut-usa/offers-and-finance/find-a-dealer"), link("tut-usa/owners")], "accountEntry": {"label": "Book a Test Drive", "url": "/tut-usa/offers-and-finance/book-a-test-drive", "openInNewTab": False}, "sticky": True}
+
+
+def footer_properties() -> dict[str, Any]:
+    return {"logo": "TUT", "footerLinkGroups": [{"title": "Vehicles", "links": [link("tut-usa/vehicles/vehicle-lineup"), link("tut-usa/vehicles/sedans"), link("tut-usa/vehicles/suvs"), link("tut-usa/vehicles/electric-vehicles")]}, {"title": "Owners", "links": [link("tut-usa/owners/owners-overview"), link("tut-usa/owners/manuals-and-technical-documents"), link("tut-usa/owners/service-and-maintenance")]}, {"title": "Company", "links": [link("tut-usa/innovation"), link("tut-usa/news-and-updates"), link("tut-usa/contact-and-concierge/contact-us")]}, {"title": "Legal", "links": [link("tut-usa/legal/privacy"), link("tut-usa/legal/terms"), link("tut-usa/contact-and-concierge/roadside-and-emergency-help")]}], "socialLinks": [{"label": "LinkedIn", "url": "https://www.linkedin.com/company/tutmotors", "openInNewTab": True}, {"label": "Instagram", "url": "https://www.instagram.com/tutmotors", "openInNewTab": True}, {"label": "YouTube", "url": "https://www.youtube.com/@tutmotors", "openInNewTab": True}, {"label": "X", "url": "https://x.com/tutmotors", "openInNewTab": True}], "legalLinks": [link("tut-usa/legal/privacy"), link("tut-usa/legal/terms")], "copyrightText": "© 2026 TUT Motors USA. All rights reserved."}
+
+
+def build_seed_graph() -> SeedGraph:
+    assets = AssetLog()
+    return SeedGraph(
+        page_components={spec.path: BUILDERS[spec.kind](spec, assets) for spec in PAGES},
+        experience_fragments={"navigation": navigation_properties(), "footer": footer_properties()},
+        assets=assets,
+    )
+
+
+def collect_link_references(value: Any, source: str, field_path: str = "$") -> list[LinkReference]:
+    references: list[LinkReference] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_path = f"{field_path}.{key}"
+            if key.lower() in URL_FIELD_NAMES:
+                if not isinstance(child, str):
+                    references.append(LinkReference(source, child_path, ""))
+                else:
+                    references.append(LinkReference(source, child_path, child))
+            references.extend(collect_link_references(child, source, child_path))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            references.extend(collect_link_references(child, source, f"{field_path}[{index}]"))
+    return references
+
+
+def validate_url(reference: LinkReference, routes: set[str], fragments: dict[str, set[str]] | None = None) -> str:
+    url = reference.url
+    if not url or url != url.strip() or url == "#" or CONTROL_CHARACTER_PATTERN.search(url):
+        raise SeedGraphValidationError(f"{reference.source} {reference.field_path}: empty, placeholder, or control-character URL {url!r}")
+    if url.startswith("//"):
+        raise SeedGraphValidationError(f"{reference.source} {reference.field_path}: protocol-relative URL is unsafe: {url!r}")
+    parsed = urlsplit(url)
+    scheme = parsed.scheme.lower()
+    if scheme:
+        if scheme in SAFE_EXTERNAL_SCHEMES and parsed.netloc:
+            return "external"
+        if scheme in SAFE_SPECIAL_SCHEMES and parsed.path:
+            return "special"
+        raise SeedGraphValidationError(f"{reference.source} {reference.field_path}: unsafe or malformed scheme in {url!r}")
+    if not parsed.path.startswith("/"):
+        raise SeedGraphValidationError(f"{reference.source} {reference.field_path}: internal URL must be site-root-relative: {url!r}")
+    normalized_route = parsed.path.rstrip("/") or "/"
+    if normalized_route not in routes:
+        raise SeedGraphValidationError(f"{reference.source} {reference.field_path}: unresolved internal route {normalized_route!r} from {url!r}")
+    if parsed.fragment and parsed.fragment not in (fragments or {}).get(normalized_route, set()):
+        raise SeedGraphValidationError(f"{reference.source} {reference.field_path}: unresolved fragment {parsed.fragment!r} on {normalized_route!r}")
+    return "internal-fragment" if parsed.fragment else "internal"
+
+
+def _count_components(nodes: list[dict[str, Any]], source: str, errors: list[str]) -> int:
+    names = [node.get("name") for node in nodes]
+    duplicates = sorted(name for name, count in Counter(names).items() if count > 1)
+    if duplicates:
+        errors.append(f"{source}: duplicate sibling component names: {', '.join(duplicates)}")
+    return sum(1 + _count_components(node.get("children", []), f"{source}/{node.get('name', '?')}", errors) for node in nodes)
+
+
+def validate_seed_graph(graph: SeedGraph, fragments: dict[str, set[str]] | None = None) -> ValidationReport:
+    errors: list[str] = []
+    page_paths = [page.path for page in PAGES]
+    duplicates = sorted(path for path, count in Counter(page_paths).items() if count > 1)
+    if duplicates:
+        errors.append(f"duplicate page paths: {', '.join(duplicates)}")
+    if set(graph.page_components) != set(page_paths):
+        errors.append("generated page-component keys do not exactly match PAGES")
+    component_count = sum(_count_components(nodes, path, errors) for path, nodes in graph.page_components.items())
+    routes = {f"/{ROOT_PATH}", *(f"/{path}" for path in page_paths)}
+    references: list[LinkReference] = []
+    for path, nodes in graph.page_components.items():
+        references.extend(collect_link_references(nodes, path))
+    for name, properties in graph.experience_fragments.items():
+        references.extend(collect_link_references(properties, f"experience-fragments/{name}"))
+    link_counts: Counter[str] = Counter()
+    for reference in references:
+        try:
+            link_counts[validate_url(reference, routes, fragments)] += 1
+        except SeedGraphValidationError as exc:
+            errors.append(str(exc))
+    if errors:
+        raise SeedGraphValidationError("Seed graph validation failed before API access:\n- " + "\n- ".join(errors))
+    return ValidationReport(len(page_paths) + 1, component_count, dict(sorted(link_counts.items())))
+
+
+def seed_experience_fragments(graph: SeedGraph) -> None:
     nav_master = "experience-fragments/tut-usa/global/navigation/master"
     footer_master = "experience-fragments/tut-usa/global/footer/master"
     delete_children(nav_master)
     delete_children(footer_master)
-    nav_component = create_node(nav_master, "navigation", "tut-usa/navigation-search-discovery/navigation", {"logo": "TUT", "primaryLinks": ["Vehicles", "Innovation", "News", "Owners", "Offers", "Accessories", "Learn", "Contact"], "utilityLinks": [{"label": "Search", "url": "/tut-usa/search"}, {"label": "Dealer Locator", "url": "/tut-usa/offers-and-finance/find-a-dealer"}, {"label": "My TUT", "url": "/tut-usa/owners"}], "accountEntry": "Book a Test Drive", "sticky": True})
-    footer_component = create_node(footer_master, "footer", "tut-usa/navigation-search-discovery/footer", {"logo": "TUT", "footerLinkGroups": [{"title": "Vehicles", "links": [link("tut-usa/vehicles/vehicle-lineup"), link("tut-usa/vehicles/sedans"), link("tut-usa/vehicles/suvs"), link("tut-usa/vehicles/electric-vehicles")]}, {"title": "Owners", "links": [link("tut-usa/owners/owners-overview"), link("tut-usa/owners/manuals-and-technical-documents"), link("tut-usa/owners/service-and-maintenance")]}, {"title": "Company", "links": [link("tut-usa/innovation"), link("tut-usa/news-and-updates"), link("tut-usa/contact-and-concierge/contact-us")]}, {"title": "Legal", "links": [{"label": "Privacy notice", "url": "/tut-usa/contact-and-concierge/contact-us#privacy"}, {"label": "Terms", "url": "/tut-usa/offers-and-finance/financing-and-leasing#terms"}, {"label": "Roadside support", "url": "/tut-usa/contact-and-concierge/roadside-and-emergency-help"}]}], "socialLinks": [{"label": "LinkedIn", "url": "https://www.linkedin.com/company/tutmotors"}, {"label": "Instagram", "url": "https://www.instagram.com/tutmotors"}, {"label": "YouTube", "url": "https://www.youtube.com/@tutmotors"}, {"label": "X", "url": "https://x.com/tutmotors"}], "legalLinks": [{"label": "Privacy", "url": "/tut-usa/contact-and-concierge/contact-us#privacy"}, {"label": "Terms", "url": "/tut-usa/offers-and-finance/financing-and-leasing#terms"}], "copyrightText": "© 2026 TUT Motors USA. All rights reserved."})
+    nav_component = ensure_node(nav_master, "navigation", "tut-usa/navigation-search-discovery/navigation", graph.experience_fragments["navigation"])
+    footer_component = ensure_node(footer_master, "footer", "tut-usa/navigation-search-discovery/footer", graph.experience_fragments["footer"])
     for path in ["experience-fragments/tut-usa/global/navigation", "experience-fragments/tut-usa/global/navigation/master", nav_component["path"].replace(".", "/").replace("content/", "", 1), "experience-fragments/tut-usa/global/footer", "experience-fragments/tut-usa/global/footer/master", footer_component["path"].replace(".", "/").replace("content/", "", 1)]:
         publish_path(path)
 
 
-def seed_pages(assets: AssetLog) -> None:
+def seed_pages(graph: SeedGraph) -> None:
     for spec in PAGES:
         parent = "/".join(spec.path.split("/")[:-1])
         name = spec.path.split("/")[-1]
         ensure_node(parent, name, "flexcms/page", {"jcr:title": spec.title, "jcr:description": spec.description, "siteId": SITE_ID, "template": spec.template})
         published_paths = [spec.path]
-        write_component_tree(spec.path, BUILDERS[spec.kind](spec, assets), published_paths)
+        write_component_tree(spec.path, graph.page_components[spec.path], published_paths)
         for path in published_paths:
             publish_path(path)
 
@@ -640,14 +791,18 @@ def verify_author_reachable() -> None:
 
 def main() -> int:
     print("=== TUT USA website seeder ===")
+    graph = build_seed_graph()
+    report = validate_seed_graph(graph)
+    print(f"Validated {report.page_count} pages, {report.component_count} components, and {sum(report.link_counts.values())} links before API access.")
+    print("Link counts by type: " + ", ".join(f"{kind}={count}" for kind, count in report.link_counts.items()))
+    print(f"Unresolved internal destinations: {report.unresolved_internal_destinations}")
     verify_author_reachable()
-    assets = AssetLog()
     seed_root()
     clear_existing_site_pages()
-    seed_experience_fragments()
-    seed_pages(assets)
+    seed_experience_fragments(graph)
+    seed_pages(graph)
     print(f"Seeded {len(PAGES) + 1} pages including the TUT USA root.")
-    print(f"Recorded {assets.count()} placeholder asset references.")
+    print(f"Resolved {graph.assets.count()} asset references to the imported TUT fallback image.")
     return 0
 
 

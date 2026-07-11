@@ -11,6 +11,8 @@ export interface FlexCmsComponentProps {
   fallback?: React.ReactNode;
 }
 
+const PAGE_REFERENCE_RESOURCE_TYPE = 'flexcms/page';
+
 /**
  * Renders a single CMS component by resolving its resourceType to a React component.
  * Recursively renders children for container components.
@@ -24,6 +26,13 @@ export interface FlexCmsComponentProps {
  */
 export function FlexCmsComponent({ node, fallback }: FlexCmsComponentProps) {
   const { mapper } = useFlexCms();
+
+  // A page reference identifies a separate route. Its subtree must not become
+  // inline content when the parent page is rendered.
+  if (node.resourceType === PAGE_REFERENCE_RESOURCE_TYPE) {
+    return null;
+  }
+
 
   const Renderer = mapper.resolve(node.resourceType);
 

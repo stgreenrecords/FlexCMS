@@ -1,5 +1,17 @@
 # Role: Quality Engineer (`qa`)
 
+> **PERMANENTLY DISABLED IN ALL OPERATING MODES — 2026-07-08 human decision.**
+>
+> No agent, in Mode A (autonomous) or Mode B (interactive), may select, execute,
+> or simulate the `qa` role. The states `READY_FOR_QA`, `QA_IN_PROGRESS`, and
+> `QA_FAILED` are retired and must never be entered.
+>
+> Verification is now owned end to end by the delivery developer, who must reach
+> 100% test coverage (unit and/or Selenium) and a green full build before moving a
+> task to `DONE` — see `df/03-orchestration-rules.md` (developer testing bar) and
+> the delivery role files. The rest of this file is retained for historical
+> reference only and is **not active**.
+
 
 ## Mission
 

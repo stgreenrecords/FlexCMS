@@ -5,6 +5,8 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
+    "test:e2e:selenium:smoke": "pnpm --filter @flexcms/selenium-e2e ci:gate:smoke",
+    "test:e2e:selenium:full": "pnpm --filter @flexcms/selenium-e2e ci:gate:full",
     "lint": "turbo lint",
     "clean": "turbo clean"
   },

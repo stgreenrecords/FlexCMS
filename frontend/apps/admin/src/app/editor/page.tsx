@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import {
   DndContext,
   DragEndEvent,
@@ -21,6 +22,25 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Skeleton,
+  Switch,
+  Textarea,
+} from '@flexcms/ui';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -147,6 +167,10 @@ function labelFromKey(key: string): string {
     .trim();
 }
 
+function toTestId(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
 // ---------------------------------------------------------------------------
 // Map API node → PageComponent
 // ---------------------------------------------------------------------------
@@ -257,8 +281,10 @@ export default function VisualPageEditorPage() {
   return (
     <Suspense
       fallback={
-        <div style={{ background: '#131313', color: '#8d90a0', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'Inter, sans-serif' }}>
-          Loading editor…
+        <div className="flex min-h-screen flex-col justify-center gap-4 px-8" style={{ background: '#131313' }}>
+          <Skeleton className="h-6 w-44" />
+          <Skeleton className="h-12 w-full max-w-xl" />
+          <Skeleton className="h-[60vh] w-full" />
         </div>
       }
     >
@@ -706,21 +732,27 @@ function EditorInner() {
 
   if (isLoading) {
     return (
-      <div style={{ background: '#131313', color: '#8d90a0', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'Inter, sans-serif', flexDirection: 'column', gap: 12 }}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b0c6ff" strokeWidth="2" aria-hidden="true" style={{ animation: 'spin 1s linear infinite' }}>
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-        </svg>
-        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-        <span>Loading editor…</span>
+      <div className="flex min-h-screen flex-col gap-4 px-8 py-10" style={{ background: '#131313' }}>
+        <Skeleton className="h-5 w-56" />
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-10 w-72" />
+        </div>
+        <Skeleton className="h-[72vh] w-full" />
       </div>
     );
   }
 
   if (loadError) {
     return (
-      <div style={{ background: '#131313', color: '#ffb4ab', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', fontFamily: 'Inter, sans-serif', flexDirection: 'column', gap: 12 }}>
-        <span style={{ fontSize: 14 }}>Failed to load editor: {loadError}</span>
-        <a href="/content" style={{ color: '#b0c6ff', fontSize: 13 }}>← Back to Content</a>
+      <div className="flex min-h-screen items-center justify-center" style={{ background: '#131313' }}>
+        <div className="w-full max-w-xl rounded-xl border p-6" style={{ borderColor: 'rgba(147,0,10,0.35)', background: 'rgba(147,0,10,0.12)' }}>
+          <p className="text-sm font-semibold" style={{ color: '#ffb4ab' }}>Failed to load editor</p>
+          <p className="mt-2 text-xs" style={{ color: '#f7dad5' }}>{loadError}</p>
+          <Button asChild variant="outline" className="mt-4" data-testid="editor-back-to-content-button">
+            <a href="/content">Back to Content</a>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -756,6 +788,7 @@ function EditorInner() {
               <button
                 key={v}
                 onClick={() => setViewport(v)}
+                data-testid={`editor-viewport-${v}`}
                 className="px-3 py-1 rounded text-sm font-medium transition-colors capitalize"
                 style={{
                   color: viewport === v ? '#b0c6ff' : '#c3c6d6',
@@ -771,6 +804,19 @@ function EditorInner() {
         {/* Center: page name */}
         {contentPath && (
           <div className="flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2">
+            <Breadcrumb className="mb-1" data-testid="editor-breadcrumb">
+              <BreadcrumbList className="text-[0.65rem] uppercase tracking-[0.2em]" style={{ color: '#8d90a0' }}>
+                <BreadcrumbItem>
+                  <BreadcrumbLink asChild>
+                    <Link href="/content">Content</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{pageName}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
             <span className="text-sm font-bold" style={{ color: '#e5e2e1', lineHeight: 1.2 }}>
               {pageName}
             </span>
@@ -791,19 +837,25 @@ function EditorInner() {
             className="flex items-center gap-1 px-3 py-1 rounded-lg"
             style={{ background: '#2a2a2a', border: '1px solid rgba(66,70,84,0.15)' }}
           >
-            <IconButton title="Undo"><UndoIcon /></IconButton>
-            <IconButton title="Redo"><RedoIcon /></IconButton>
+            <IconButton title="Undo" dataTestId="editor-undo-button"><UndoIcon /></IconButton>
+            <IconButton title="Redo" dataTestId="editor-redo-button"><RedoIcon /></IconButton>
             <div style={{ width: 1, height: 16, background: 'rgba(66,70,84,0.4)', margin: '0 4px' }} />
-            <IconButton title="Preview" onClick={() => contentPath && window.open(`/preview?path=${encodeURIComponent(contentPath)}&mode=draft`, '_blank')}>
+            <IconButton
+              title="Preview"
+              dataTestId="editor-preview-button"
+              onClick={() => contentPath && window.open(`/preview?path=${encodeURIComponent(contentPath)}&mode=draft`, '_blank')}
+            >
               <EyeIcon />
             </IconButton>
-            <IconButton title="Settings"><GearIcon /></IconButton>
+            <IconButton title="Settings" dataTestId="editor-settings-button"><GearIcon /></IconButton>
           </div>
 
-          <button
+          <Button
             onClick={handleCancelInheritanceForAll}
             disabled={isSaving || isDetachingInheritance || !components.some((component) => component.isLocked)}
-            className="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
+            variant="ghost"
+            size="sm"
+            className="px-4 py-1.5 text-sm font-bold"
             data-testid="cancel-inheritance-all-button"
             style={{
               color: '#b0c6ff',
@@ -814,21 +866,26 @@ function EditorInner() {
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
           >
             {isDetachingInheritance ? 'Canceling…' : 'Cancel All Inheritance'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-1.5 rounded-lg text-sm font-bold transition-all"
+            variant="ghost"
+            size="sm"
+            className="px-4 py-1.5 text-sm font-bold"
+            data-testid="editor-save-button"
             style={{ color: '#e5e2e1', background: 'transparent', opacity: isSaving ? 0.6 : 1 }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
           >
             {isSaving ? 'Saving…' : 'Save'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handlePublish}
             disabled={isSaving}
-            className="px-5 py-1.5 rounded-lg text-sm font-bold transition-all"
+            size="sm"
+            className="px-5 py-1.5 text-sm font-bold"
+            data-testid="editor-publish-button"
             style={{
               background: 'linear-gradient(135deg, #b0c6ff 0%, #0058cc 100%)',
               color: '#002d6f',
@@ -836,7 +893,7 @@ function EditorInner() {
             }}
           >
             Publish
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -883,6 +940,7 @@ function EditorInner() {
                 <button
                   key={id}
                   onClick={() => setLeftTab(id)}
+                  data-testid={`editor-left-tab-${id}`}
                   className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all text-left"
                   style={leftTab === id ? { background: '#324575', color: '#b0c6ff' } : { color: '#c3c6d6' }}
                   onMouseEnter={(e) => { if (leftTab !== id) (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; }}
@@ -898,11 +956,13 @@ function EditorInner() {
             {leftTab === 'components' && (
               <>
                 {palette.length === 0 ? (
-                  <p className="text-xs px-3" style={{ color: '#8d90a0' }}>
-                    {pageTemplate
-                      ? 'This template has no optional components available in the palette.'
-                      : 'No components registered.'}
-                  </p>
+                  <div className="rounded-lg border px-3 py-4" style={{ borderColor: 'rgba(66,70,84,0.35)', background: 'rgba(19,19,19,0.4)' }}>
+                    <p className="text-xs" style={{ color: '#8d90a0' }}>
+                      {pageTemplate
+                        ? 'This template has no optional components available in the palette.'
+                        : 'No components are registered yet.'}
+                    </p>
+                  </div>
                 ) : (
                   Object.entries(paletteGroups).map(([group, items]) => (
                     <div key={group}>
@@ -934,6 +994,7 @@ function EditorInner() {
                   <button
                     key={c.instanceId}
                     onClick={() => setSelectedId(c.instanceId)}
+                    data-testid={`editor-layer-${toTestId(c.instanceId)}`}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-left transition-colors"
                     style={selectedId === c.instanceId ? { background: '#2a3a5e', color: '#b0c6ff' } : { color: '#c3c6d6' }}
                   >
@@ -948,7 +1009,9 @@ function EditorInner() {
                   </button>
                 ))}
                 {components.length === 0 && (
-                  <p className="text-xs px-3" style={{ color: '#8d90a0' }}>No layers yet.</p>
+                  <div className="rounded-lg border px-3 py-4" style={{ borderColor: 'rgba(66,70,84,0.35)', background: 'rgba(19,19,19,0.4)' }}>
+                    <p className="text-xs" style={{ color: '#8d90a0' }}>No layers yet. Add a component from the palette.</p>
+                  </div>
                 )}
               </div>
             )}
@@ -959,11 +1022,13 @@ function EditorInner() {
                 <p className="text-[11px] font-bold uppercase tracking-wider mb-3 px-3" style={{ color: '#8d90a0' }}>
                   Assets
                 </p>
-                <p className="text-xs px-3" style={{ color: '#8d90a0' }}>
-                  Open the{' '}
-                  <a href="/dam" style={{ color: '#b0c6ff' }}>DAM browser</a>{' '}
-                  to manage assets.
-                </p>
+                <div className="rounded-lg border px-3 py-4" style={{ borderColor: 'rgba(66,70,84,0.35)', background: 'rgba(19,19,19,0.4)' }}>
+                  <p className="text-xs" style={{ color: '#8d90a0' }}>
+                    Open the{' '}
+                    <a href="/dam" style={{ color: '#b0c6ff' }}>DAM browser</a>{' '}
+                    to manage assets.
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -1128,11 +1193,13 @@ function EditorInner() {
                     <p className="text-xs leading-relaxed" style={{ color: '#8d90a0' }}>
                       Template-embedded components are read-only until you cancel inheritance for this page.
                     </p>
-                    <button
+                    <Button
                       onClick={handleCancelInheritance}
                       disabled={isDetachingInheritance}
                       data-testid="cancel-inheritance-button"
-                      className="w-full py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all"
+                      variant="secondary"
+                      size="sm"
+                      className="w-full py-2 text-[11px] font-bold uppercase tracking-widest"
                       style={{
                         background: 'rgba(176,198,255,0.18)',
                         color: '#b0c6ff',
@@ -1140,12 +1207,14 @@ function EditorInner() {
                       }}
                     >
                       {isDetachingInheritance ? 'Canceling Inheritance…' : 'Cancel Inheritance and Edit'}
-                    </button>
+                    </Button>
                   </div>
                 ) : selectedSchema.length === 0 ? (
-                  <p className="text-xs" style={{ color: '#8d90a0' }}>
-                    No editable properties for this component.
-                  </p>
+                  <div className="rounded-lg border px-3 py-4" style={{ borderColor: 'rgba(66,70,84,0.35)', background: 'rgba(19,19,19,0.4)' }}>
+                    <p className="text-xs" style={{ color: '#8d90a0' }}>
+                      No editable properties for this component.
+                    </p>
+                  </div>
                 ) : (
                   selectedSchema.map((field) => (
                     <PropertyField
@@ -1159,23 +1228,28 @@ function EditorInner() {
               </div>
 
               <div className="p-4" style={{ borderTop: '1px solid rgba(66,70,84,0.1)' }}>
-                <button
+                <Button
                   onClick={resetToDefaults}
                   disabled={selectedComponent.isLocked}
-                  className="w-full py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all"
+                  variant="outline"
+                  size="sm"
+                  data-testid="editor-reset-defaults-button"
+                  className="w-full py-2 text-[11px] font-bold uppercase tracking-widest"
                   style={{ background: '#2a2a2a', color: '#8d90a0', opacity: selectedComponent.isLocked ? 0.45 : 1 }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(176,198,255,0.1)'; (e.currentTarget as HTMLButtonElement).style.color = '#b0c6ff'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; (e.currentTarget as HTMLButtonElement).style.color = '#8d90a0'; }}
                 >
                   Reset to Defaults
-                </button>
+                </Button>
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center p-8 text-center">
-              <p className="text-sm" style={{ color: '#8d90a0' }}>
-                Click a component on the canvas to edit its properties.
-              </p>
+              <div className="rounded-lg border px-4 py-6" style={{ borderColor: 'rgba(66,70,84,0.35)', background: 'rgba(19,19,19,0.4)' }}>
+                <p className="text-sm" style={{ color: '#8d90a0' }}>
+                  Click a component on the canvas to edit its properties.
+                </p>
+              </div>
             </div>
           )}
         </aside>
@@ -1299,6 +1373,7 @@ function DraggablePaletteItem({ item, onAdd }: { item: PaletteItem; onAdd: () =>
       {...listeners}
       onClick={onAdd}
       className="flex flex-col items-center justify-center p-3 rounded-lg border transition-all cursor-grab select-none"
+      data-testid={`editor-palette-item-${toTestId(item.resourceType)}`}
       style={{
         background: isDragging ? 'rgba(176,198,255,0.1)' : '#201f1f',
         border: isDragging ? '1px solid rgba(176,198,255,0.5)' : '1px solid rgba(66,70,84,0.2)',
@@ -1395,6 +1470,7 @@ function CanvasComponent({
   return (
     <div
       onClick={onClick}
+      data-testid={`editor-canvas-item-${toTestId(component.instanceId)}`}
       className="relative group cursor-pointer transition-all"
       style={{
         border: isSelected
@@ -1584,124 +1660,93 @@ function PropertyField({ field, value, onChange }: {
   value: unknown;
   onChange: (val: unknown) => void;
 }) {
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    background: 'transparent',
-    border: 'none',
-    borderBottom: '2px solid rgba(66,70,84,0.5)',
-    color: '#fff',
-    padding: '6px 0',
-    fontSize: 13,
-    outline: 'none',
-    fontFamily: 'Inter, sans-serif',
-  };
+  const fieldTestId = `editor-property-${toTestId(field.key)}`;
 
   const labelEl = (
-    <span className="text-[11px] font-bold uppercase tracking-wider block mb-2" style={{ color: '#8d90a0' }}>
+    <Label className="mb-2 block text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8d90a0' }}>
       {field.label}
       {field.required && <span style={{ color: '#ffb4ab', marginLeft: 4 }}>*</span>}
-    </span>
+    </Label>
   );
 
   if (field.type === 'toggle') {
     return (
-      <div className="flex items-center justify-between py-2">
+      <div className="flex items-center justify-between py-2" data-testid={fieldTestId}>
         <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8d90a0' }}>
           {field.label}
         </span>
-        <button
-          onClick={() => onChange(!value)}
-          className="rounded-full relative transition-all"
-          style={{ width: 40, height: 20, background: value ? '#b0c6ff' : '#424654' }}
-        >
-          <div
-            className="absolute rounded-full transition-all"
-            style={{ width: 12, height: 12, top: 4, left: value ? 24 : 4, background: value ? '#002d6f' : '#c3c6d6' }}
-          />
-        </button>
+        <Switch
+          checked={Boolean(value)}
+          onCheckedChange={(checked) => onChange(checked)}
+          data-testid={`${fieldTestId}-input`}
+        />
       </div>
     );
   }
 
   if (field.type === 'select') {
     return (
-      <label className="block">
+      <div className="block" data-testid={fieldTestId}>
         {labelEl}
-        <select
-          value={String(value ?? '')}
-          onChange={(e) => onChange(e.target.value)}
-          style={{
-            width: '100%',
-            background: '#2a2a2a',
-            border: 'none',
-            borderRadius: 8,
-            color: '#e5e2e1',
-            padding: '8px 12px',
-            fontSize: 13,
-            outline: 'none',
-            fontFamily: 'Inter, sans-serif',
-          }}
-        >
-          <option value="">— select —</option>
-          {field.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
-      </label>
+        <Select value={String(value ?? '')} onValueChange={(next) => onChange(next)}>
+          <SelectTrigger data-testid={`${fieldTestId}-input`}>
+            <SelectValue placeholder="— select —" />
+          </SelectTrigger>
+          <SelectContent>
+            {field.options?.map((opt) => (
+              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     );
   }
 
   if (field.type === 'number') {
     return (
-      <label className="block">
+      <div className="block" data-testid={fieldTestId}>
         {labelEl}
-        <input
+        <Input
           type="number"
           value={Number(value ?? 0)}
           onChange={(e) => onChange(Number(e.target.value))}
-          style={{ ...inputStyle, borderRadius: 4, padding: '6px 8px' }}
+          data-testid={`${fieldTestId}-input`}
+          className="h-9"
         />
-      </label>
+      </div>
     );
   }
 
   if (field.type === 'textarea') {
     return (
-      <label className="block">
+      <div className="block" data-testid={fieldTestId}>
         {labelEl}
-        <textarea
+        <Textarea
           value={String(value ?? '')}
           onChange={(e) => onChange(e.target.value)}
           rows={4}
-          style={{
-            ...inputStyle,
-            borderBottom: 'none',
-            border: '1px solid rgba(66,70,84,0.5)',
-            borderRadius: 8,
-            padding: '8px 12px',
-            resize: 'vertical',
-          }}
-          onFocus={(e) => { (e.currentTarget as HTMLTextAreaElement).style.borderColor = '#b0c6ff'; }}
-          onBlur={(e) => { (e.currentTarget as HTMLTextAreaElement).style.borderColor = 'rgba(66,70,84,0.5)'; }}
+          data-testid={`${fieldTestId}-input`}
+          className="min-h-[88px] resize-y"
         />
-      </label>
+      </div>
     );
   }
 
   // text (default)
   return (
-    <label className="block">
+    <div className="block" data-testid={fieldTestId}>
       {labelEl}
-      <input
+      <Input
         type="text"
         value={String(value ?? '')}
         onChange={(e) => onChange(e.target.value)}
-        style={inputStyle}
-        onFocus={(e) => { (e.currentTarget as HTMLInputElement).style.borderBottomColor = '#b0c6ff'; }}
-        onBlur={(e) => { (e.currentTarget as HTMLInputElement).style.borderBottomColor = 'rgba(66,70,84,0.5)'; }}
+        data-testid={`${fieldTestId}-input`}
+        className="h-9"
       />
       {field.description && (
         <span className="text-[10px] mt-1 block" style={{ color: '#424654' }}>{field.description}</span>
       )}
-    </label>
+    </div>
   );
 }
 
@@ -1709,11 +1754,12 @@ function PropertyField({ field, value, onChange }: {
 // Icon button helper
 // ---------------------------------------------------------------------------
 
-function IconButton({ title, children, onClick }: { title: string; children: React.ReactNode; onClick?: () => void }) {
+function IconButton({ title, children, onClick, dataTestId }: { title: string; children: React.ReactNode; onClick?: () => void; dataTestId?: string }) {
   return (
     <button
       title={title}
       onClick={onClick}
+      data-testid={dataTestId}
       className="p-1 rounded transition-colors"
       style={{ color: '#c3c6d6' }}
       onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}

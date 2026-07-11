@@ -4,7 +4,7 @@
 # ---------------------------------------------------------------------------
 # Stage 1: Build
 # ---------------------------------------------------------------------------
-FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9-eclipse-temurin-26-alpine AS builder
 WORKDIR /workspace
 
 # Copy only POM files first to leverage Docker layer caching for dependencies
@@ -36,13 +36,14 @@ COPY . .
 RUN --mount=type=cache,target=/root/.m2 \
     mvn package -DskipTests -B --no-transfer-progress -pl flexcms-app -am
 
-# Extract Spring Boot layered JAR
-RUN java -Djarmode=layertools -jar flexcms-app/target/*.jar extract --destination extracted
+# Extract Spring Boot layered JAR and launcher
+RUN java -Djarmode=tools -jar flexcms-app/target/*.jar \
+    extract --layers --launcher --destination extracted
 
 # ---------------------------------------------------------------------------
 # Stage 2: Runtime image
 # ---------------------------------------------------------------------------
-FROM eclipse-temurin:21-jre-alpine AS runtime
+FROM eclipse-temurin:26-jre-alpine AS runtime
 
 # Non-root user for security
 RUN addgroup -S flexcms && adduser -S flexcms -G flexcms

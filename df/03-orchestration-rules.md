@@ -77,18 +77,52 @@ Sort actionable tasks by:
 - UI-facing frontend work must have design input first.
 - Multi-lane work should be split into child tasks whenever practical.
 
-## Active override - PO role disabled
+## Permanently disabled roles — QA and PO (all operating modes)
 
-Per human decision on 2026-07-07, automated `po` role sessions are disabled
-until further notice. The router must not auto-select `po` for
-`REFINEMENT_QUESTIONS`, `READY_FOR_PO`, `PO_REVIEW`, or `PO_REJECTED` states.
-Those states wait for explicit human product direction or a later decision record
-that re-enables the role. No agent may move a task to `DONE` as PO acceptance
-while this override is active.
+Per human decision on 2026-07-08, the `qa` and `po` roles are **permanently
+disabled in every operating mode** (Mode A autonomous and Mode B interactive).
+This is a standing policy, not a temporary override.
 
-This override does not authorize the current implementation session to execute
-QA. QA remains separate and must be performed in a distinct QA session or by a
-human reviewer.
+- The router and any agent must **never** select, execute, or simulate the `qa`
+  or `po` role.
+- No task may pass through the states `READY_FOR_QA`, `QA_IN_PROGRESS`,
+  `QA_FAILED`, `READY_FOR_PO`, `PO_REVIEW`, or `PO_REJECTED`. These states are
+  retired and must not be entered.
+- `REFINEMENT_QUESTIONS` no longer routes to `po`. When a delivery lane needs a
+  product answer it cannot safely assume, it documents the question and moves the
+  task to `BLOCKED` for explicit human direction.
+- **The delivery lane is now the terminal owner.** After a lane fully satisfies
+  the developer testing bar below, it moves the task straight from
+  `DEV_IN_PROGRESS` to `DONE` — there is no separate QA or PO gate.
+
+### Developer testing bar (replaces the QA gate)
+
+Because QA is disabled, the delivery developer owns verification end to end. Any
+new or changed functionality must be **100% covered, run, and fixed** by the
+developer using unit tests and Selenium test automation before the work is
+reported complete.
+
+- The developer covers each piece of functionality with a unit test or an
+  automated (Selenium) test **immediately** after implementing it, choosing the
+  test type that fits the functionality. Do not write tests whose only purpose is
+  to cover another test; when writing tests *was* the task, that test is the
+  deliverable and needs no meta-test.
+- The developer is responsible for designing the test scenarios that cover 100%
+  of the functionality, then writing, running, and fixing those tests.
+- A developer may **not** report a task complete (move it to `DONE`) until all of
+  the following hold:
+  1. 100% of the functionality is developed and exercised by a full application
+     build that runs **without a single error**;
+  2. test scenarios covering 100% of the functionality are prepared and recorded
+     in the task's artifact folder;
+  3. the unit tests and/or automated tests are implemented and run with **0
+     errors**, and the full application build is **100% working**.
+- If any of these cannot be met, the task stays `DEV_IN_PROGRESS` or moves to
+  `BLOCKED` with the exact failure recorded — it is never reported done.
+
+The objective router gate below still runs as a backstop, but it does not replace
+the developer's own responsibility to reach a green build with full test
+coverage.
 
 
 ## Handoff rules
@@ -106,19 +140,19 @@ Every handoff must include:
 ## Objective quality gate
 
 The loop does not rely solely on an agent's self-reported state change. When a
-delivery lane moves a task to `READY_FOR_QA`, the router runs a deterministic
+delivery lane moves a task to `DONE`, the router runs a deterministic
 build/test/lint command (`DF_GATE_CMD`) itself, from the repository root:
 
-- gate passes -> the task proceeds to `qa`;
+- gate passes -> the `DONE` transition stands;
 - gate fails -> the router overrides the claim, routes the task back to
   `RETURNED_TO_DEV`, and records `df/artifacts/{task-id}/gate-report.md`;
 - gate not configured -> skipped, with a startup warning that quality is
   unguarded.
 
-This makes a green build an objective precondition for QA, independent of what
-the delivery agent claims. Delivery roles should still run the project's checks
-themselves and record the evidence; the router gate is a backstop, not a
-substitute for the role's own validation.
+This makes a green build an objective precondition for completion, independent of
+what the delivery agent claims. With QA and PO disabled, delivery roles carry
+full verification responsibility per the developer testing bar above; the router
+gate is a backstop, not a substitute for the role's own tests and validation.
 
 ## Rework cap
 

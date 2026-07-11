@@ -13,6 +13,7 @@ interface ContentNode {
   id: string;
   name: string;
   icon: string;
+  resourceType: string;
   status: ContentStatus;
   ltreePath: string;   // e.g. "content.experience-fragments.tut-usa"
   urlPath: string;     // e.g. "/content/experience-fragments/tut-usa"
@@ -42,6 +43,7 @@ interface ApiContentNode {
 
 import { getApiBase } from '@/lib/apiBase';
 const API_BASE = getApiBase();
+const PUBLISH_BASE_URL = process.env.NEXT_PUBLIC_PUBLISH_URL ?? 'http://localhost:3001';
 
 function apiToUiNode(n: ApiContentNode): ContentNode {
   const statusMap: Record<string, ContentStatus> = {
@@ -64,6 +66,7 @@ function apiToUiNode(n: ApiContentNode): ContentNode {
     id: n.id,
     name: n.name,
     icon: iconMap[n.resourceType] ?? 'article',
+    resourceType: n.resourceType,
     status: statusMap[n.status] ?? 'draft',
     ltreePath: n.path,
     urlPath: '/' + n.path.replace(/\./g, '/'),
@@ -221,6 +224,11 @@ export default function ContentTreePage() {
     if (breadcrumbs.length <= 1) return;
     const parent = breadcrumbs[breadcrumbs.length - 2];
     navigateToBreadcrumb(parent);
+  }
+
+  function openOnPublish(node: ContentNode) {
+    const publishUrl = new URL(node.urlPath, PUBLISH_BASE_URL).toString();
+    window.open(publishUrl, '_blank', 'noopener,noreferrer');
   }
 
   // Filtered nodes for search
@@ -464,6 +472,7 @@ export default function ContentTreePage() {
                     isSelected={selected.has(node.id)}
                     onSelect={() => toggleSelect(node.id)}
                     onNavigate={() => navigateTo(node)}
+                    onOpenPublish={() => openOnPublish(node)}
                     showActionMenu={actionMenuId === node.id}
                     onActionMenu={(id) => setActionMenuId(id)}
                   />
@@ -608,6 +617,7 @@ function ContentRow({
   isSelected,
   onSelect,
   onNavigate,
+  onOpenPublish,
   showActionMenu,
   onActionMenu,
 }: {
@@ -615,10 +625,22 @@ function ContentRow({
   isSelected: boolean;
   onSelect: () => void;
   onNavigate: () => void;
+  onOpenPublish: () => void;
   showActionMenu: boolean;
   onActionMenu: (id: string | null) => void;
 }) {
   const status = STATUS_CONFIG[node.status];
+
+  function handleClick() {
+    if (node.resourceType !== 'flexcms/page') {
+      onNavigate();
+    }
+  }
+
+  function handleDoubleClick() {
+    if (node.resourceType === 'flexcms/page') onOpenPublish();
+  }
+
 
   return (
     <tr
@@ -627,7 +649,9 @@ function ContentRow({
         borderBottom: '1px solid rgba(66,70,84,0.08)',
         cursor: 'pointer',
       }}
-      onClick={onNavigate}
+      onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
+      title={node.resourceType === 'flexcms/page' ? 'Double-click to open on publish' : undefined}
       onMouseEnter={(e) => {
         if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.02)';
       }}

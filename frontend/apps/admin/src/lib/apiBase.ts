@@ -14,8 +14,14 @@ export function getApiBase(): string {
   const buildTimeApi = process.env.NEXT_PUBLIC_FLEXCMS_API;
   if (buildTimeApi) return buildTimeApi;
 
-  // In the browser, use relative URLs (same origin → nginx proxy)
-  if (typeof window !== 'undefined') return '';
+  // In local browser sessions without proxy/env wiring, hit author directly.
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return `${window.location.protocol}//${host}:8080`;
+    }
+    return '';
+  }
 
   // Server-side fallback (SSR)
   return process.env.FLEXCMS_API_INTERNAL ?? 'http://localhost:8080';

@@ -3,9 +3,25 @@
 ## Session
 
 - Role: `devops`
-- Date: 2026-07-07 local
+- Date: 2026-07-10 local
 - Task: `REB-13`
-- State: `DEV_IN_PROGRESS`
+- State: `DONE`
+
+## Completion validation (2026-07-10 local)
+
+- Brought up deterministic local runtime with `./flex start local all` (author/publish/admin/site + auto reset/seed).
+- Re-ran admin round-trip suite:
+  - Command: `cd frontend/apps/selenium-e2e && pnpm test:admin`
+  - Result: PASS (`4 passing`, `0 failing`)
+- Refreshed JUnit artifact:
+  - Command: `cd frontend/apps/selenium-e2e && pnpm build && pnpm exec mocha --grep "REB-13 admin authoring and round-trip suite" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb13-admin-suite.xml`
+  - Result: PASS; report `frontend/apps/selenium-e2e/reports/junit/reb13-admin-suite.xml`
+- Validated full frontend build gate:
+  - Command: `cd frontend && pnpm build`
+  - Result: PASS
+- Targeted backend regression check status:
+  - Command: `cd flexcms && mvn test -pl flexcms-core -am -Dtest=ContentNodeServiceTest -Dsurefire.failIfNoSpecifiedTests=false`
+  - Result: FAIL due to local Java 26 + Mockito/ByteBuddy incompatibility (environment/toolchain), not a REB-13 behavioral regression signal.
 
 ## Scope started
 

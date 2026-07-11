@@ -1,6 +1,9 @@
 import type { PageResponse } from '@flexcms/sdk';
 
 const AUTHOR_ASSET_PREFIX = '/api/author/assets/';
+const MISSING_DAM_PREFIX = '/dam/tut-usa/missing/';
+export const TUT_IMAGE_FALLBACK =
+  '/tut-usa/assets/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png';
 const INTERNAL_AUTHOR_ASSET_PREFIXES = [
   'http://author:8080/api/author/assets/',
   'http://localhost:8080/api/author/assets/',
@@ -33,6 +36,11 @@ function normalizeValue(value: unknown): unknown {
       // Keep DAM asset URLs relative so the current host/proxy can serve them.
       return value;
     }
+
+    if (value.startsWith(MISSING_DAM_PREFIX)) {
+      return TUT_IMAGE_FALLBACK;
+    }
+
     return value;
   }
 

@@ -94,15 +94,17 @@ but continue serving the human in this session instead of terminating — see
 Choose tasks in this order:
 
 1. tasks explicitly requested by the user in the current message;
-2. tasks marked `RETURNED_TO_DEV`;
-3. tasks marked `QA_FAILED` or `PO_REJECTED`;
-4. tasks marked `REFINEMENT_QUESTIONS`;
-5. design tasks marked `READY_FOR_DESIGN` and delivery tasks marked `READY_FOR_DEV`;
-6. tasks marked `REFINED`;
-7. tasks marked `INTAKE` or `REFINEMENT_IN_PROGRESS`;
-8. tasks marked `OPEN`;
-9. bugs before enhancements when priority is equal;
-10. smaller safe tasks before larger tasks when all else is equal.
+2. tasks marked `RETURNED_TO_DEV` (e.g. bounced back by the router gate);
+3. design tasks marked `READY_FOR_DESIGN` and delivery tasks marked `READY_FOR_DEV`;
+4. tasks marked `REFINED`;
+5. tasks marked `INTAKE` or `REFINEMENT_IN_PROGRESS`;
+6. tasks marked `OPEN`;
+7. bugs before enhancements when priority is equal;
+8. smaller safe tasks before larger tasks when all else is equal.
+
+> QA and PO are disabled, so `QA_FAILED`, `PO_REJECTED`, and `REFINEMENT_QUESTIONS`
+> are not agent-actionable states. Any task sitting in `REFINEMENT_QUESTIONS`
+> waits for a human; agents do not answer product questions.
 
 ## If there is no board yet
 

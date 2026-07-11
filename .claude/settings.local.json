@@ -45,7 +45,9 @@
       "Bash(npm install *)",
       "Bash(python3 -c \"import ast; ast.parse\\(open\\('agents/df-gh-agent.py'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
       "Bash(python3 -)",
-      "Bash(gh models *)"
+      "Bash(gh models *)",
+      "Bash(grep -rn \"READY_FOR_QA\\\\|READY_FOR_PO\\\\|hand off to \\\\`qa\\\\`\\\\|hand off to \\\\`po\\\\`\\\\|to \\\\`qa\\\\`\\\\|to \\\\`po\\\\`\\\\|QA approve\\\\|PO accept\" df/roles/sa.md df/roles/designer.md df/04-documentation-standards.md)",
+      "Bash(grep -rln \"READY_FOR_QA\\\\|READY_FOR_PO\\\\|to \\\\`qa\\\\`\\\\|to \\\\`po\\\\`\\\\|hand off to\" df/00-start-here.md df/01-operating-model.md df/02-state-machine.md df/03-orchestration-rules.md df/04-documentation-standards.md df/roles df/templates df/runtime/board.md)"
     ]
   }
 }

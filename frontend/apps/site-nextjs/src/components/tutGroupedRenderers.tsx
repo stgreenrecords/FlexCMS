@@ -2,6 +2,8 @@
 
 import React from 'react';
 import type { FlexCmsRenderer } from '@flexcms/react';
+import { CallsToActionRenderer } from './tutCampaignRenderers';
+import { EducationLearningRenderer } from './tutLearningRenderers';
 
 export interface TutComponentContract {
   groupName?: string;
@@ -36,6 +38,19 @@ function normalizeLabel(label: string): string {
     .trim();
 }
 
+function firstText(record: Record<string, unknown>, keys: string[]): string | null {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value.trim();
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+  }
+  return null;
+}
+
 function toPrimitivePreview(value: unknown): string {
   if (typeof value === 'string') {
     return value.length > 180 ? `${value.slice(0, 180)}...` : value;
@@ -43,19 +58,33 @@ function toPrimitivePreview(value: unknown): string {
   if (typeof value === 'number' || typeof value === 'boolean') {
     return String(value);
   }
+  if (isRecord(value)) {
+    return firstText(value, ['label', 'title', 'name', 'text', 'value', 'description', 'url']) ?? 'Not provided';
+  }
   return 'Not provided';
 }
 
 function extractImageUrl(value: unknown): string | null {
   if (typeof value === 'string' && value.trim().length > 0) {
-    return value;
+    const candidate = value.trim();
+    if (/^(https?:\/\/|\/|data:image\/)/i.test(candidate)) {
+      return /^\/dam\/tut-usa\/missing\//i.test(candidate)
+        ? '/tut-usa/assets/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png'
+        : candidate;
+    }
+    return null;
   }
 
   if (isRecord(value)) {
     const candidates = [value.url, value.src, value.path, value.imageUrl, value.thumbnailUrl];
     for (const candidate of candidates) {
       if (typeof candidate === 'string' && candidate.trim().length > 0) {
-        return candidate;
+        const normalized = candidate.trim();
+        if (/^(https?:\/\/|\/|data:image\/)/i.test(normalized)) {
+          return /^\/dam\/tut-usa\/missing\//i.test(normalized)
+            ? '/tut-usa/assets/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png'
+            : normalized;
+        }
       }
     }
   }
@@ -64,7 +93,42 @@ function extractImageUrl(value: unknown): string | null {
 }
 
 function isImageField(fieldName: string): boolean {
+  if (/(position|layout|variant|style)$/i.test(fieldName)) {
+    return false;
+  }
   return /(image|photo|thumbnail|poster|logo|icon|background)/i.test(fieldName);
+}
+
+function isLinkValue(value: unknown): value is Record<string, unknown> {
+  return isRecord(value) && typeof value.url === 'string' && value.url.trim().length > 0;
+}
+
+function renderRecordValue(fieldName: string, value: Record<string, unknown>): React.ReactNode {
+  if (isLinkValue(value)) {
+    const label = firstText(value, ['label', 'text', 'title', 'name']) ?? value.url as string;
+    return (
+      <a href={value.url as string} className="underline decoration-current/40 underline-offset-4 hover:decoration-current">
+        {label}
+      </a>
+    );
+  }
+
+  const entries = Object.entries(value).filter(([, entry]) => entry !== undefined && entry !== null);
+  if (entries.length === 0) {
+    return <span style={{ color: 'var(--color-on-surface-variant)' }}>Not provided</span>;
+  }
+
+  return (
+    <dl className="space-y-1">
+      {entries.slice(0, 6).map(([key, entry]) => (
+        <div key={`${fieldName}-${key}`} className="flex flex-wrap gap-x-2">
+          <dt className="font-semibold">{normalizeLabel(key)}:</dt>
+          <dd className="m-0">{toPrimitivePreview(entry)}</dd>
+        </div>
+      ))}
+      {entries.length > 6 ? <div>+{entries.length - 6} more</div> : null}
+    </dl>
+  );
 }
 
 function renderFieldValue(fieldName: string, value: unknown): React.ReactNode {
@@ -80,7 +144,9 @@ function renderFieldValue(fieldName: string, value: unknown): React.ReactNode {
     return (
       <ul className="list-disc space-y-1 pl-5">
         {value.slice(0, 4).map((item, index) => (
-          <li key={`${fieldName}-${index}`}>{toPrimitivePreview(item)}</li>
+          <li key={`${fieldName}-${index}`}>
+            {isLinkValue(item) ? renderRecordValue(fieldName, item) : toPrimitivePreview(item)}
+          </li>
         ))}
         {value.length > 4 ? <li>+{value.length - 4} more</li> : null}
       </ul>
@@ -114,11 +180,7 @@ function renderFieldValue(fieldName: string, value: unknown): React.ReactNode {
   }
 
   if (isRecord(value)) {
-    return (
-      <pre style={{ fontSize: '0.75rem', margin: 0, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>
-        {JSON.stringify(value, null, 2)}
-      </pre>
-    );
+    return renderRecordValue(fieldName, value);
   }
 
   return <span>{toPrimitivePreview(value)}</span>;
@@ -186,11 +248,18 @@ export const groupedTutRenderersByGroup: Record<string, FlexCmsRenderer> = {
   'Support, Documentation & Knowledge': createGroupRenderer('Support, Documentation & Knowledge'),
 };
 
-const defaultTutRenderer = createGroupRenderer('TUT Components');
+export const defaultTutRenderer = createGroupRenderer('TUT Components');
+
+export const semanticGroupRenderers: Record<string, FlexCmsRenderer> = {
+  'Calls to Action, Promotions & Campaigns': CallsToActionRenderer,
+  'Education, Learning & Developer Content': EducationLearningRenderer,
+};
 
 export function buildTutRendererEntries(contracts: TutComponentContract[]): Record<string, FlexCmsRenderer> {
   return contracts.reduce<Record<string, FlexCmsRenderer>>((entries, contract) => {
-    entries[contract.resourceType] = groupedTutRenderersByGroup[contract.groupName ?? ''] ?? defaultTutRenderer;
+    entries[contract.resourceType] = semanticGroupRenderers[contract.groupName ?? '']
+      ?? groupedTutRenderersByGroup[contract.groupName ?? '']
+      ?? defaultTutRenderer;
     return entries;
   }, {});
 }

@@ -86,7 +86,12 @@ cd flexcms && mvn test
 # 3. Frontend build (must pass)
 cd frontend && pnpm install && pnpm build
 
-# 4. Docker image build (if backend code changed)
+# 4. Selenium E2E gates (must pass)
+cd frontend && pnpm test:e2e:selenium:smoke
+cd frontend && pnpm test:e2e:selenium:full
+# Artifact bundle: frontend/apps/selenium-e2e/reports/retained/{smoke,full}/
+
+# 5. Docker image build (if backend code changed)
 cd flexcms && docker build -t flexcms-app:local-test .
 # Skip ONLY if changes are frontend-only
 ```

@@ -11,7 +11,7 @@
 import React from 'react';
 import { ComponentMapper } from '@flexcms/sdk';
 import componentContracts from '../../../../../Design/tut-usa/generated/component-contracts.json';
-import { buildTutRendererEntries, type TutComponentContract } from './tutGroupedRenderers';
+import { buildTutRendererEntries, defaultTutRenderer, type TutComponentContract } from './tutGroupedRenderers';
 import {
   CampaignHeroRenderer,
   FeaturedContentRenderer,
@@ -25,6 +25,17 @@ import {
   DealerLocatorRenderer,
   NewsletterSignupRenderer,
 } from './homepageRenderers';
+import { PageHeaderRenderer, ProductHeroRenderer } from './tutPriorityRenderers';
+import { OfferCardRenderer, PlanCardRenderer, PricingTableRenderer } from './tutCampaignRenderers';
+import { CourseCardRenderer, CourseCatalogRenderer, FaqRenderer, ResourceListRenderer } from './tutLearningRenderers';
+import {
+  CategoryGridRenderer,
+  ComparisonToolRenderer,
+  CtaButtonRenderer,
+  FilterPanelRenderer,
+  ProductCardRenderer,
+  SortControlRenderer,
+} from './tutVehiclesRenderers';
 
 function RichText({ data }: { data: Record<string, unknown> }) {
   return (
@@ -80,6 +91,14 @@ const ContractFallback = ({ data, resourceType, name }: { data: Record<string, u
 );
 
 const tutRendererEntries = buildTutRendererEntries(componentContracts as TutComponentContract[]);
+const DefaultTutRenderer = defaultTutRenderer;
+
+const TutAwareFallback = (props: { data: Record<string, unknown>; resourceType?: string; name?: string; children?: React.ReactNode }) => {
+  if (props.resourceType === 'flexcms/page' || props.resourceType?.startsWith('tut-usa/')) {
+    return <DefaultTutRenderer {...props} />;
+  }
+  return <ContractFallback {...props} />;
+};
 
 export const componentMap = new ComponentMapper<React.ComponentType<{ data: Record<string, unknown>; resourceType?: string; name?: string; children?: React.ReactNode }>>()
   .registerAll(tutRendererEntries)
@@ -98,5 +117,20 @@ export const componentMap = new ComponentMapper<React.ComponentType<{ data: Reco
     'tut-usa/navigation-search-discovery/footer': FooterRenderer,
     'tut-usa/location-local-physical-presence/dealer-locator': DealerLocatorRenderer,
     'tut-usa/calls-to-action-promotions-campaigns/newsletter-signup': NewsletterSignupRenderer,
+    'tut-usa/layout-page-structure/page-header': PageHeaderRenderer,
+    'tut-usa/calls-to-action-promotions-campaigns/product-hero': ProductHeroRenderer,
+    'tut-usa/navigation-search-discovery/category-grid': CategoryGridRenderer,
+    'tut-usa/layout-page-structure/filter-panel': FilterPanelRenderer,
+    'tut-usa/layout-page-structure/sort-control': SortControlRenderer,
+    'tut-usa/commerce-catalog-merchandising/product-card': ProductCardRenderer,
+    'tut-usa/commerce-catalog-merchandising/comparison-tool': ComparisonToolRenderer,
+    'tut-usa/calls-to-action-promotions-campaigns/pricing-table': PricingTableRenderer,
+    'tut-usa/calls-to-action-promotions-campaigns/plan-card': PlanCardRenderer,
+    'tut-usa/calls-to-action-promotions-campaigns/offer-card': OfferCardRenderer,
+    'tut-usa/calls-to-action-promotions-campaigns/cta-button': CtaButtonRenderer,
+    'tut-usa/education-learning-developer-content/course-card': CourseCardRenderer,
+    'tut-usa/education-learning-developer-content/course-catalog': CourseCatalogRenderer,
+    'tut-usa/media-visual-storytelling-assets/resource-list': ResourceListRenderer,
+    'tut-usa/editorial-article-content/faq': FaqRenderer,
   })
-  .setFallback(ContractFallback);
+  .setFallback(TutAwareFallback);
