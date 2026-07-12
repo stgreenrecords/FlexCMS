@@ -1,0 +1,6 @@
+=== TUT USA website seeder ===
+Validated 65 pages, 515 components, and 423 links before API access.
+Link counts by type: external=11, internal=412
+Unresolved internal destinations: 0
+Seeded 65 pages including the TUT USA root.
+Resolved 156 asset references to the imported TUT fallback image.

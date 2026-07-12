@@ -1,3 +1,22 @@
+## 2026-07-12 10:22 CEST - data-engineer - TUT-LINK-SEED
+
+- State: DONE
+- Action: Rebuilt the TUT-USA page/link graph with V18 objects, useful search/legal destinations, recursive pre-write URL validation, idempotent experience-fragment updates, complete unit/live quality checks, and repeated live publication.
+- Evidence: `scripts/seed_tut_usa_website.py`, `scripts/tests/test_seed_tut_usa_website.py`, `df/artifacts/TUT-LINK-SEED/data/summary.md`, `validation-scenarios.md`, `source-map.md`, `live-data-quality.json`, `df/artifacts/TUT-LINK-SEED/handoffs.md`; Python tests `17/17` PASS; generated `65` pages/`515` components/`423` links/`0` unresolved; two live reseeds PASS; Maven compile/test PASS; frontend build `9/9` PASS; Selenium smoke/full PASS.
+- Result: PASS
+- Next: `frontend-dev` starts `TUT-LINK-RENDERING` after `BUG-TUT-VEHICLE-RENDERER` is also DONE, consumes authored links, and adds full-site browser link-integrity coverage.
+- Risks/blockers: No blocker for this task. Deterministic in-place updates remain necessary because local subtree deletion is broken; synthetic demo/legal content is not production policy.
+
+## 2026-07-12 10:22 CEST - State change
+
+- Task: TUT-LINK-SEED
+- From: DEV_IN_PROGRESS
+- To: DONE
+- Role: data-engineer
+- Reason: All acceptance criteria and developer testing requirements pass, including unit coverage, repeated live reseeding, publication/dedup/referential checks, full consuming builds, and Selenium smoke/full gates.
+- Evidence: `df/artifacts/TUT-LINK-SEED/data/summary.md`, `df/artifacts/TUT-LINK-SEED/data/live-data-quality.json`, `df/artifacts/TUT-LINK-SEED/handoffs.md`
+- Next: Keep `TUT-LINK-RENDERING` dependency-blocked until `BUG-TUT-VEHICLE-RENDERER` is DONE, then start its frontend-dev session.
+
 ## 2026-07-11 21:47 CEST - State change
 
 - Task: TUT-LINK-SEED
