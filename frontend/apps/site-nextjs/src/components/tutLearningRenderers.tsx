@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { FlexCmsRenderer } from '@flexcms/react';
+import { linkAttributes, toTutLink } from './tutLink';
 
 function text(value: unknown, fallback = ''): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
@@ -20,14 +21,9 @@ function label(value: unknown, fallback: string): string {
   return text(typeof value === 'string' ? value : entry?.label ?? entry?.title ?? entry?.name, fallback);
 }
 
-function href(value: unknown): string {
-  return text(record(value)?.url ?? value, '#');
-}
-
 function CtaLink({ value, fallback = 'Explore course' }: { value: unknown; fallback?: string }) {
-  const entry = record(value);
-  if (!entry && typeof value !== 'string') return null;
-  return <a href={href(value)} className="inline-flex font-label text-[10px] uppercase tracking-[0.2em] text-primary underline-offset-4 hover:underline">{text(entry?.label ?? entry?.text ?? value, fallback)} →</a>;
+  const link = toTutLink(value, fallback);
+  return link ? <a href={link.url} {...linkAttributes(link)} className="inline-flex font-label text-[10px] uppercase tracking-[0.2em] text-primary underline-offset-4 hover:underline">{link.label} →</a> : null;
 }
 
 export const CourseCardRenderer: FlexCmsRenderer = ({ data }) => (
@@ -71,7 +67,7 @@ export const ResourceListRenderer: FlexCmsRenderer = ({ data }) => {
       <div className="mx-auto max-w-7xl">
         <h2 id="resource-list-title" className="font-headline text-3xl italic text-on-surface">{text(data.title, 'Recommended resources')}</h2>
         <ul className="mt-6 grid gap-3 md:grid-cols-3">
-          {resources.map((resource, index) => <li key={`${href(resource)}-${index}`} className="border-b border-outline-variant/40 py-4"><a href={href(resource)} className="font-body text-sm text-primary underline-offset-4 hover:underline">{label(resource, `Resource ${index + 1}`)}</a></li>)}
+          {resources.map((resource, index) => { const link = toTutLink(resource, `Resource ${index + 1}`); return link ? <li key={`${link.url}-${index}`} className="border-b border-outline-variant/40 py-4"><a href={link.url} {...linkAttributes(link)} className="font-body text-sm text-primary underline-offset-4 hover:underline">{link.label}</a></li> : null; })}
         </ul>
       </div>
     </section>

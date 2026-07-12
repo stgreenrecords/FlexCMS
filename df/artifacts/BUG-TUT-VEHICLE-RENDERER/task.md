@@ -13,6 +13,13 @@ Replace generic contract-driven renderers with authored TUT vehicle and campaign
 ## Role
 `frontend-dev`
 
+## Current state
+`DONE`
+
 ## Design note
 This is a renderer bug fix using the existing TUT reference-site visual tokens and conventions; no new page design package is required.
+
+## Completion record
+
+- 2026-07-12 local: Frontend implementation and developer-owned verification completed. Concrete vehicle/campaign/learning renderers, image-object normalization, unit coverage, full frontend builds, live seeded route probes, and Selenium smoke/full gates passed. See `frontend/summary.md` and `handoffs.md`.
 

@@ -11,11 +11,19 @@ import {
 
 describe('tutVehiclesRenderers', () => {
   it('renders category links instead of metadata fields', () => {
-    render(<CategoryGridRenderer data={{ title: 'Browse by segment', categories: ['Sedans', 'SUVs'] }} />);
+    render(<CategoryGridRenderer data={{ title: 'Browse by segment', categories: [{ label: 'Sedans', url: '/tut-usa/vehicles/sedans' }, { label: 'SUVs', url: '/tut-usa/vehicles/suvs' }] }} />);
 
     expect(screen.getByRole('heading', { name: 'Browse by segment' })).toBeTruthy();
     expect(screen.getByRole('link', { name: /Sedans/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /Sedans/ }).getAttribute('href')).toBe('/tut-usa/vehicles/sedans');
     expect(screen.queryByText('categories:')).toBeNull();
+  });
+
+  it('omits category anchors when authored URLs are absent', () => {
+    render(<CategoryGridRenderer data={{ title: 'Browse by segment', categories: ['Sedans'] }} />);
+
+    expect(screen.queryByRole('link', { name: /Sedans/ })).toBeNull();
+    expect(document.querySelector('a[href="#"], a[href=""], a[href^="javascript:"]')).toBeNull();
   });
 
   it('renders filter and sort controls from authored options', () => {
@@ -67,6 +75,19 @@ describe('tutVehiclesRenderers', () => {
     expect(screen.getByText('$80,000')).toBeTruthy();
     expect(screen.getByRole('link', { name: /Explore TUT S/ }).getAttribute('href')).toBe('/tut-usa/vehicles/tut-s');
     expect(container.querySelector('pre')).toBeNull();
+  });
+
+  it('normalizes authored image objects returned by the CMS', () => {
+    render(
+      <ProductCardRenderer
+        data={{
+          productName: 'TUT X',
+          image: { url: '/tut-usa/assets/images/tut-x.jpg' },
+        }}
+      />
+    );
+
+    expect(screen.getByRole('img', { name: 'TUT X' }).getAttribute('src')).toBe('/tut-usa/assets/images/tut-x.jpg');
   });
 });
 

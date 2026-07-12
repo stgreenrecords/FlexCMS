@@ -4,6 +4,7 @@ import React from 'react';
 import type { FlexCmsRenderer } from '@flexcms/react';
 import { CallsToActionRenderer } from './tutCampaignRenderers';
 import { EducationLearningRenderer } from './tutLearningRenderers';
+import { linkAttributes, toTutLink } from './tutLink';
 
 export interface TutComponentContract {
   groupName?: string;
@@ -99,17 +100,15 @@ function isImageField(fieldName: string): boolean {
   return /(image|photo|thumbnail|poster|logo|icon|background)/i.test(fieldName);
 }
 
-function isLinkValue(value: unknown): value is Record<string, unknown> {
-  return isRecord(value) && typeof value.url === 'string' && value.url.trim().length > 0;
-}
-
 function renderRecordValue(fieldName: string, value: Record<string, unknown>): React.ReactNode {
-  if (isLinkValue(value)) {
-    const label = firstText(value, ['label', 'text', 'title', 'name']) ?? value.url as string;
+  const link = toTutLink(value);
+  if (link) {
+    const fragment = link.url.startsWith('#') ? link.url.slice(1) : null;
     return (
-      <a href={value.url as string} className="underline decoration-current/40 underline-offset-4 hover:decoration-current">
-        {label}
-      </a>
+      <>
+        {fragment ? <span id={fragment} aria-hidden="true" /> : null}
+        <a href={link.url} {...linkAttributes(link)} className="underline decoration-current/40 underline-offset-4 hover:decoration-current">{link.label}</a>
+      </>
     );
   }
 
@@ -145,7 +144,7 @@ function renderFieldValue(fieldName: string, value: unknown): React.ReactNode {
       <ul className="list-disc space-y-1 pl-5">
         {value.slice(0, 4).map((item, index) => (
           <li key={`${fieldName}-${index}`}>
-            {isLinkValue(item) ? renderRecordValue(fieldName, item) : toPrimitivePreview(item)}
+            {toTutLink(item) ? renderRecordValue(fieldName, item as Record<string, unknown>) : toPrimitivePreview(item)}
           </li>
         ))}
         {value.length > 4 ? <li>+{value.length - 4} more</li> : null}

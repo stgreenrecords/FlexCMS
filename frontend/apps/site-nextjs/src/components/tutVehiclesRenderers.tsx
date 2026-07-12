@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { FlexCmsRenderer } from '@flexcms/react';
+import { linkAttributes, toTutLink } from './tutLink';
 
 function text(value: unknown, fallback = ''): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
@@ -20,8 +21,13 @@ function label(value: unknown, fallback: string): string {
   return text(typeof value === 'string' ? value : entry?.label ?? entry?.title ?? entry?.name, fallback);
 }
 
-function href(value: unknown): string {
-  return text(record(value)?.url ?? value, '#');
+function imageUrl(value: unknown): string {
+  const entry = record(value);
+  return text(
+    typeof value === 'string'
+      ? value
+      : entry?.url ?? entry?.src ?? entry?.path ?? entry?.imageUrl ?? entry?.thumbnailUrl,
+  );
 }
 
 export const CategoryGridRenderer: FlexCmsRenderer = ({ data }) => {
@@ -35,11 +41,7 @@ export const CategoryGridRenderer: FlexCmsRenderer = ({ data }) => {
         </h2>
         <div className="mt-8 grid gap-px bg-outline-variant/30 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category, index) => (
-            <a key={`${label(category, `Category ${index + 1}`)}-${index}`} href={href(category)} className="group bg-surface px-6 py-8 transition-colors hover:bg-surface-container-low">
-              <span className="font-label text-[10px] tracking-[0.3em] text-on-surface-variant">0{index + 1}</span>
-              <h3 className="mt-8 font-headline text-3xl italic text-on-surface group-hover:text-primary">{label(category, `Category ${index + 1}`)}</h3>
-              <span className="mt-5 block font-label text-[10px] uppercase tracking-widest text-on-surface-variant">View models →</span>
-            </a>
+            (() => { const link = toTutLink(category); const content = <><span className="font-label text-[10px] tracking-[0.3em] text-on-surface-variant">0{index + 1}</span><h3 className="mt-8 font-headline text-3xl italic text-on-surface group-hover:text-primary">{label(category, `Category ${index + 1}`)}</h3><span className="mt-5 block font-label text-[10px] uppercase tracking-widest text-on-surface-variant">View models →</span></>; return link ? <a key={`${label(category, `Category ${index + 1}`)}-${index}`} href={link.url} {...linkAttributes(link)} className="group bg-surface px-6 py-8 transition-colors hover:bg-surface-container-low">{content}</a> : <div key={`${label(category, `Category ${index + 1}`)}-${index}`} className="group bg-surface px-6 py-8">{content}</div>; })()
           ))}
         </div>
       </div>
@@ -88,8 +90,8 @@ export const SortControlRenderer: FlexCmsRenderer = ({ data }) => (
 );
 
 export const ProductCardRenderer: FlexCmsRenderer = ({ data }) => {
-  const cta = record(data.cta);
-  const image = text(data.image);
+  const cta = toTutLink(data.cta, 'Explore vehicle');
+  const image = imageUrl(data.image);
   const price = typeof data.price === 'number' ? `$${data.price.toLocaleString()}` : text(data.price);
 
   return (
@@ -101,7 +103,7 @@ export const ProductCardRenderer: FlexCmsRenderer = ({ data }) => {
           {price ? <span className="font-label text-xs uppercase tracking-widest text-on-surface-variant">{price}</span> : null}
         </div>
         {text(data.shortDescription) ? <p className="mt-3 font-body text-sm leading-6 text-on-surface-variant">{text(data.shortDescription)}</p> : null}
-        {cta && <a href={href(cta.url)} className="mt-6 inline-flex font-label text-[10px] uppercase tracking-[0.2em] text-primary underline-offset-4 hover:underline">{text(cta.label, 'Explore vehicle')} →</a>}
+        {cta ? <a href={cta.url} {...linkAttributes(cta)} className="mt-6 inline-flex font-label text-[10px] uppercase tracking-[0.2em] text-primary underline-offset-4 hover:underline">{cta.label} →</a> : null}
       </div>
     </article>
   );
@@ -141,11 +143,8 @@ export const ComparisonToolRenderer: FlexCmsRenderer = ({ data }) => {
   );
 };
 
-export const CtaButtonRenderer: FlexCmsRenderer = ({ data }) => (
-  <section className="bg-surface px-6 py-14 text-center sm:px-10 lg:px-12">
-    <a href={href(data.url)} target={data.openInNewTab === true ? '_blank' : undefined} rel={data.openInNewTab === true ? 'noreferrer' : undefined} className="inline-flex bg-primary px-8 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-primary transition-colors hover:bg-primary-fixed">
-      {text(data.label, 'Learn more')}
-    </a>
-  </section>
-);
+export const CtaButtonRenderer: FlexCmsRenderer = ({ data }) => {
+  const link = toTutLink(data, 'Learn more');
+  return <section className="bg-surface px-6 py-14 text-center sm:px-10 lg:px-12">{link ? <a href={link.url} {...linkAttributes(link)} className="inline-flex bg-primary px-8 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-primary transition-colors hover:bg-primary-fixed">{link.label}</a> : null}</section>;
+};
 

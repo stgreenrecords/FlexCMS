@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { FlexCmsRenderer } from '@flexcms/react';
+import { linkAttributes, toTutLink } from './tutLink';
 
 const HERO_IMAGE = '/tut-usa/assets/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png';
 const COLLECTION_IMAGES = [
@@ -36,20 +37,6 @@ function asStringList(value: unknown): string[] {
     .filter((item) => item.length > 0);
 }
 
-function getLink(value: unknown): { label: string; url: string } {
-  if (typeof value === 'string') {
-    return { label: value, url: '#' };
-  }
-
-  if (value && typeof value === 'object') {
-    const entry = value as Record<string, unknown>;
-    const label = asString(entry.label, asString(entry.text, 'Learn more'));
-    const url = asString(entry.url, '#');
-    return { label, url };
-  }
-
-  return { label: 'Learn more', url: '#' };
-}
 
 function getImageUrl(value: unknown): string {
   if (typeof value === 'string' && value.trim().length > 0) return value;
@@ -69,19 +56,20 @@ function toBrowserImageUrl(url: string): string {
 }
 
 export const NavigationRenderer: FlexCmsRenderer = ({ data }) => {
-  const brand = 'TUT';
-  const items = [{ label: 'Sedans' }, { label: 'SUVs' }, { label: 'Electric' }, { label: 'Build' }];
-  const account = getLink(data.accountEntry);
+  const brand = asString(data.logo, 'TUT');
+  const items = asList(data.primaryLinks).map((item) => toTutLink(item)).filter((item): item is NonNullable<typeof item> => item !== null);
+  const utilityItems = asList(data.utilityLinks).map((item) => toTutLink(item)).filter((item): item is NonNullable<typeof item> => item !== null);
+  const account = toTutLink(data.accountEntry);
+  const dealer = utilityItems.find((item) => /dealer/i.test(item.label)) ?? null;
 
   return (
     <nav className="fixed top-0 z-50 flex w-full max-w-none items-center justify-between bg-slate-950/60 px-12 py-6 backdrop-blur-xl">
       <div className="flex items-center gap-12">
         <span className="font-headline text-2xl uppercase tracking-[0.2em] text-slate-100">{brand}</span>
         <div className="hidden items-center gap-8 md:flex">
-          {(items.length ? items : [{ label: 'Sedans' }, { label: 'SUVs' }, { label: 'Electric' }, { label: 'Build' }]).map((item, index) => {
-            const link = getLink(item);
+          {items.map((link, index) => {
             return (
-              <a key={`${link.label}-${index}`} href={link.url} className="font-label text-[11px] uppercase tracking-widest text-slate-400 transition-colors duration-300 hover:text-slate-100">
+              <a key={`${link.label}-${index}`} href={link.url} {...linkAttributes(link)} className="font-label text-[11px] uppercase tracking-widest text-slate-400 transition-colors duration-300 hover:text-slate-100">
                 {link.label}
               </a>
             );
@@ -89,21 +77,18 @@ export const NavigationRenderer: FlexCmsRenderer = ({ data }) => {
         </div>
       </div>
       <div className="flex items-center gap-6">
-        <a href={account.url} className="font-label text-[11px] uppercase tracking-widest text-slate-400 transition-colors duration-500 hover:text-slate-100">
-          {account.label || 'Sign In'}
-        </a>
-        <a href="#" className="bg-primary px-6 py-2 font-label text-[11px] uppercase tracking-widest text-on-primary transition-all hover:bg-primary-fixed">
-          Find a Dealer
-        </a>
+        {utilityItems.filter((item) => item !== dealer).map((link, index) => <a key={`${link.label}-${index}`} href={link.url} {...linkAttributes(link)} className="font-label text-[11px] uppercase tracking-widest text-slate-400 transition-colors duration-500 hover:text-slate-100">{link.label}</a>)}
+        {account ? <a href={account.url} {...linkAttributes(account)} className="font-label text-[11px] uppercase tracking-widest text-slate-400 transition-colors duration-500 hover:text-slate-100">{account.label}</a> : null}
+        {dealer ? <a href={dealer.url} {...linkAttributes(dealer)} className="bg-primary px-6 py-2 font-label text-[11px] uppercase tracking-widest text-on-primary transition-all hover:bg-primary-fixed">{dealer.label}</a> : null}
       </div>
     </nav>
   );
 };
 
 export const HeroBannerRenderer: FlexCmsRenderer = ({ data }) => {
-  const primary = { label: 'Explore TUT S', url: '#' };
-  const secondary = { label: 'Configure Yours', url: '#' };
-  const image = HERO_IMAGE;
+  const primary = toTutLink(data.primaryCta, 'Explore Vehicles');
+  const secondary = toTutLink(data.secondaryCta, 'Book a Test Drive');
+  const image = getImageUrl(data.backgroundImage);
 
   return (
     <header className="relative flex h-screen w-full items-end overflow-hidden bg-surface">
@@ -117,12 +102,8 @@ export const HeroBannerRenderer: FlexCmsRenderer = ({ data }) => {
           <h1 className="font-headline text-6xl italic leading-none tracking-tighter text-slate-100 md:text-8xl lg:text-[9rem]">TUT S.</h1>
           <p className="mt-6 max-w-xl font-body text-lg leading-relaxed text-on-surface-variant md:text-xl">A manifestation of high-performance engineering and bespoke luxury. Redefining the standard of the precision atelier.</p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <a href={primary.url} className="bg-primary px-10 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-primary transition-all duration-300 hover:bg-primary-fixed">
-              {primary.label || 'Explore Now'}
-            </a>
-            <a href={secondary.url} className="border border-outline-variant/30 px-10 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-surface transition-all duration-300 hover:bg-on-surface/5">
-              {secondary.label || 'Configure Yours'}
-            </a>
+            {primary ? <a href={primary.url} {...linkAttributes(primary)} className="bg-primary px-10 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-primary transition-all duration-300 hover:bg-primary-fixed">{primary.label}</a> : null}
+            {secondary ? <a href={secondary.url} {...linkAttributes(secondary)} className="border border-outline-variant/30 px-10 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-surface transition-all duration-300 hover:bg-on-surface/5">{secondary.label}</a> : null}
           </div>
         </div>
         <div className="hidden md:flex md:col-span-4 justify-end">
@@ -147,7 +128,7 @@ export const HeroBannerRenderer: FlexCmsRenderer = ({ data }) => {
 };
 
 export const CampaignHeroRenderer: FlexCmsRenderer = ({ data }) => {
-  const cta = getLink(data.cta);
+  const cta = toTutLink(data.cta, 'Discover our vision');
   const image = CAMPAIGN_IMAGE;
 
   return (
@@ -160,10 +141,9 @@ export const CampaignHeroRenderer: FlexCmsRenderer = ({ data }) => {
         <span className="mb-6 block font-label text-[10px] uppercase tracking-[0.5em] text-primary">Innovation Leadership</span>
         <h2 className="mb-8 font-headline text-5xl italic leading-tight text-slate-100 md:text-7xl">{asString(data.title, 'The Silence of Pure Power.')}</h2>
         <p className="mb-10 font-body text-lg leading-relaxed text-on-surface-variant">{asString(data.description, 'Electrification at TUT is about uncompromising performance.')}</p>
-        <a href={cta.url} className="group flex items-center gap-4 font-label text-xs uppercase tracking-widest text-slate-100">
-          {cta.label || 'Discover our vision'}
-          <span className="text-sm transition-transform duration-300 group-hover:translate-x-2">{'->'}</span>
-        </a>
+        {cta ? <a href={cta.url} {...linkAttributes(cta)} className="group flex items-center gap-4 font-label text-xs uppercase tracking-widest text-slate-100">
+          {cta.label}<span className="text-sm transition-transform duration-300 group-hover:translate-x-2">{'->'}</span>
+        </a> : null}
       </div>
     </section>
   );
@@ -173,6 +153,7 @@ export const ProductGridRenderer: FlexCmsRenderer = ({ data }) => {
   const products = asList(data.products);
   const cards = products.length ? products : [{ title: 'Sedans' }, { title: 'SUVs' }, { title: 'Electric' }];
   const [first, second, third] = cards;
+  const firstLink = toTutLink(first?.cta, `Explore ${asString(first?.productName, 'vehicle')}`);
 
   return (
     <section className="bg-surface px-12 py-24">
@@ -182,6 +163,7 @@ export const ProductGridRenderer: FlexCmsRenderer = ({ data }) => {
       </div>
       <div className="grid h-auto grid-cols-1 gap-6 md:h-[700px] md:grid-cols-12">
         <article className="relative overflow-hidden md:col-span-7 md:h-full">
+          {firstLink ? <a href={firstLink.url} {...linkAttributes(firstLink)} aria-label={firstLink.label} className="absolute inset-0 z-10" /> : null}
           <img src={COLLECTION_IMAGES[0]} alt={asString(first?.productName, 'Sedans')} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/80 to-transparent" />
           <div className="absolute bottom-8 left-8">
@@ -191,6 +173,7 @@ export const ProductGridRenderer: FlexCmsRenderer = ({ data }) => {
         <div className="grid gap-6 md:col-span-5 md:grid-rows-2">
           {[second, third].map((item, index) => (
             <article key={`collection-${index}`} className="relative overflow-hidden md:h-full">
+              {(() => { const itemLink = toTutLink(item?.cta, `Explore ${asString(item?.productName, `model ${index + 2}`)}`); return itemLink ? <a href={itemLink.url} {...linkAttributes(itemLink)} aria-label={itemLink.label} className="absolute inset-0 z-10" /> : null; })()}
               <img src={COLLECTION_IMAGES[index + 1]} alt={asString(item?.productName, `Model ${index + 2}`)} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/80 to-transparent" />
               <div className="absolute bottom-8 left-8">
@@ -221,24 +204,28 @@ export const FeatureListRenderer: FlexCmsRenderer = ({ data }) => {
 };
 
 export const FeaturedContentRenderer: FlexCmsRenderer = ({ data }) => {
-  const items = asStringList(data.items);
+  const items = Array.isArray(data.items) ? data.items : [];
+  const viewAll = toTutLink(data.viewAll, 'View all');
   return (
     <section className="bg-surface px-12 py-24">
       <div className="mb-14 flex items-end justify-between">
         <h2 className="font-headline text-5xl italic text-slate-100">{asString(data.title, 'The Journal')}</h2>
-        <a href="#" className="border-b border-outline-variant pb-1 font-label text-[10px] uppercase tracking-widest text-on-surface-variant hover:text-primary">View all</a>
+        {viewAll ? <a href={viewAll.url} {...linkAttributes(viewAll)} className="border-b border-outline-variant pb-1 font-label text-[10px] uppercase tracking-widest text-on-surface-variant hover:text-primary">{viewAll.label}</a> : null}
       </div>
       <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
-        {(items.length ? items : ['Engineering precision at scale.', 'Interior systems refined for long-haul comfort.', 'Owner journeys built around trust and clarity.']).map((text, idx) => (
-          <article key={`featured-${idx}`} className="group flex flex-col">
+        {(items.length ? items : ['Engineering precision at scale.', 'Interior systems refined for long-haul comfort.', 'Owner journeys built around trust and clarity.']).map((item, idx) => {
+          const link = toTutLink(item, 'Read story');
+          const text = link?.label ?? (typeof item === 'string' ? item : 'Featured story');
+          return <article key={`featured-${idx}`} className="group relative flex flex-col">
+            {link ? <a href={link.url} {...linkAttributes(link)} aria-label={link.label} className="absolute inset-0 z-10" /> : null}
             <div className="mb-8 aspect-[4/5] overflow-hidden bg-surface-container">
               <img src={JOURNAL_IMAGES[idx]} alt={text} className="h-full w-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" loading="lazy" />
             </div>
             <span className="mb-3 block font-label text-[9px] uppercase tracking-[0.4em] text-primary">{idx === 0 ? 'Engineering' : idx === 1 ? 'Design' : 'Community'}</span>
             <h3 className="mb-3 font-headline text-2xl italic text-slate-100">{text}</h3>
             <p className="font-body text-sm leading-relaxed text-on-surface-variant">Latest updates from TUT engineering, design, and ownership programs.</p>
-          </article>
-        ))}
+          </article>;
+        })}
       </div>
     </section>
   );
@@ -264,31 +251,31 @@ export const NewsletterSignupRenderer: FlexCmsRenderer = ({ data }) => (
   </section>
 );
 
-export const FooterRenderer: FlexCmsRenderer = ({ data }) => (
-  <footer className="border-t border-slate-800/30 bg-slate-950 text-slate-500">
-    <div className="grid grid-cols-2 gap-12 px-12 py-20 md:grid-cols-4 lg:grid-cols-6">
-      <div className="col-span-2">
-        <span className="mb-6 block font-headline text-3xl tracking-tighter text-slate-200">{asString(data.brandName, 'TUT')}</span>
-        <p className="mb-8 max-w-xs font-label text-[10px] uppercase tracking-widest text-slate-500">Dedicated to the relentless pursuit of engineering perfection and the art of the machine.</p>
+export const FooterRenderer: FlexCmsRenderer = ({ data }) => {
+  const groups = asList(data.footerLinkGroups).map((group) => ({
+    title: asString(group.title, 'Links'),
+    links: (Array.isArray(group.links) ? group.links : []).map((item) => toTutLink(item)).filter((item): item is NonNullable<typeof item> => item !== null),
+  })).filter((group) => group.links.length > 0);
+  const socialLinks = (Array.isArray(data.socialLinks) ? data.socialLinks : []).map((item) => toTutLink(item)).filter((item): item is NonNullable<typeof item> => item !== null);
+  const legalLinks = (Array.isArray(data.legalLinks) ? data.legalLinks : []).map((item) => toTutLink(item)).filter((item): item is NonNullable<typeof item> => item !== null);
+
+  return (
+    <footer className="border-t border-slate-800/30 bg-slate-950 text-slate-500">
+      <div className="grid grid-cols-2 gap-12 px-12 py-20 md:grid-cols-4 lg:grid-cols-6">
+        <div className="col-span-2">
+          <span className="mb-6 block font-headline text-3xl tracking-tighter text-slate-200">{asString(data.brandName, 'TUT')}</span>
+          <p className="mb-8 max-w-xs font-label text-[10px] uppercase tracking-widest text-slate-500">Dedicated to the relentless pursuit of engineering perfection and the art of the machine.</p>
+        </div>
+        {groups.map((group) => <div key={group.title} className="flex flex-col gap-4"><span className="mb-2 font-label text-[10px] uppercase tracking-widest text-slate-200">{group.title}</span>{group.links.map((link) => <a key={`${group.title}-${link.label}`} href={link.url} {...linkAttributes(link)} className="font-label text-[10px] uppercase tracking-widest">{link.label}</a>)}</div>)}
+        {socialLinks.length > 0 ? <div className="flex flex-col gap-4"><span className="mb-2 font-label text-[10px] uppercase tracking-widest text-slate-200">Social</span>{socialLinks.map((link) => <a key={link.label} href={link.url} {...linkAttributes(link)} className="font-label text-[10px] uppercase tracking-widest">{link.label}</a>)}</div> : null}
       </div>
-      <div className="flex flex-col gap-4">
-        <span className="mb-2 font-label text-[10px] uppercase tracking-widest text-slate-200">Vehicles</span>
-        <a href="#" className="font-label text-[10px] uppercase tracking-widest">Sedans</a>
-        <a href="#" className="font-label text-[10px] uppercase tracking-widest">SUVs</a>
-        <a href="#" className="font-label text-[10px] uppercase tracking-widest">Electric</a>
+      <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-900 px-12 py-8">
+        <span className="font-label text-[10px] uppercase tracking-widest text-slate-600">{asString(data.copyrightText, '© 2026 TUT USA. ALL RIGHTS RESERVED.')}</span>
+        {legalLinks.length > 0 ? <nav aria-label="Legal" className="flex flex-wrap gap-4">{legalLinks.map((link) => <a key={link.label} href={link.url} {...linkAttributes(link)} className="font-label text-[10px] uppercase tracking-widest">{link.label}</a>)}</nav> : null}
       </div>
-      <div className="flex flex-col gap-4">
-        <span className="mb-2 font-label text-[10px] uppercase tracking-widest text-slate-200">Company</span>
-        <a href="#" className="font-label text-[10px] uppercase tracking-widest">Our Story</a>
-        <a href="#" className="font-label text-[10px] uppercase tracking-widest">Innovation</a>
-        <a href="#" className="font-label text-[10px] uppercase tracking-widest">Careers</a>
-      </div>
-    </div>
-    <div className="flex items-center justify-between border-t border-slate-900 px-12 py-8">
-      <span className="font-label text-[10px] uppercase tracking-widest text-slate-600">{asString(data.copyrightText, '© 2026 TUT USA. ALL RIGHTS RESERVED.')}</span>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
 export const PageMetadataRenderer: FlexCmsRenderer = () => null;
 

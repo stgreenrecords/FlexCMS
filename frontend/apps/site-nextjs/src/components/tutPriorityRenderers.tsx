@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { FlexCmsRenderer } from '@flexcms/react';
+import { linkAttributes, toTutLink } from './tutLink';
 
 function text(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : fallback;
@@ -26,15 +27,6 @@ function imageUrl(value: unknown): string | null {
   return null;
 }
 
-function link(value: unknown): { label: string; url: string } | null {
-  const entry = record(value);
-  if (!entry || typeof entry.url !== 'string' || entry.url.trim().length === 0) return null;
-  return {
-    label: text(entry.label ?? entry.text ?? entry.title, 'Learn more'),
-    url: entry.url.trim(),
-  };
-}
-
 function breadcrumbItems(value: unknown): Array<{ label: string; url?: string }> {
   if (!Array.isArray(value)) return [];
   return value.flatMap((item) => {
@@ -42,7 +34,8 @@ function breadcrumbItems(value: unknown): Array<{ label: string; url?: string }>
     const entry = record(item);
     if (!entry) return [];
     const label = text(entry.label ?? entry.title ?? entry.name, '');
-    return label ? [{ label, url: typeof entry.url === 'string' ? entry.url : undefined }] : [];
+    const link = toTutLink(entry, label);
+    return label ? [{ label, url: link?.url }] : [];
   });
 }
 
@@ -87,7 +80,7 @@ export const PageHeaderRenderer: FlexCmsRenderer = ({ data }) => {
 
 export const ProductHeroRenderer: FlexCmsRenderer = ({ data }) => {
   const heroImage = imageUrl(data.image ?? data.backgroundImage ?? data.media);
-  const cta = link(data.cta ?? data.primaryCta);
+  const cta = toTutLink(data.cta ?? data.primaryCta);
   const items = Array.isArray(data.items) ? data.items : [];
   const itemLabels = items.flatMap((item) => {
     if (typeof item === 'string') return [item];
@@ -118,7 +111,7 @@ export const ProductHeroRenderer: FlexCmsRenderer = ({ data }) => {
           </ul>
         ) : null}
         {cta ? (
-          <a href={cta.url} className="mt-10 inline-flex bg-primary px-8 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-primary hover:bg-primary-fixed">
+          <a href={cta.url} {...linkAttributes(cta)} className="mt-10 inline-flex bg-primary px-8 py-4 font-label text-xs uppercase tracking-[0.2em] text-on-primary hover:bg-primary-fixed">
             {cta.label}
           </a>
         ) : null}

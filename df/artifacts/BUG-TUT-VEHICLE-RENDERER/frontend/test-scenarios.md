@@ -13,6 +13,7 @@
 11. Resource list renders authored download links.
 12. FAQ renders authored questions without contract metadata.
 13. Unmapped Education contracts resolve to the semantic learning renderer.
+14. Product-card image objects returned by the CMS normalize to their authored URL and render with the product name as accessible alt text.
 
 Automated coverage: `src/components/__tests__/tutVehiclesRenderers.test.tsx`, `src/components/__tests__/tutCampaignRenderers.test.tsx`, `src/components/__tests__/tutLearningRenderers.test.tsx`, and `src/components/__tests__/tutGroupedRenderers.test.tsx`.
 

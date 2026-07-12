@@ -80,7 +80,7 @@
   },
   "before": {
     "author": {
-      "currentSiteDescendants": 611,
+      "currentSiteDescendants": 613,
       "currentExperienceFragmentDescendants": 2,
       "currentAssets": 0,
       "currentDamFolders": 0,
@@ -138,6 +138,8 @@
         "tut-usa/reb18-e2e-1783758723044",
         "tut-usa/reb18-e2e-1783758840293",
         "tut-usa/reb18-e2e-1783799685571",
+        "tut-usa/reb18-e2e-1783800043183",
+        "tut-usa/reb18-e2e-1783800369298",
         "tut-usa/search",
         "tut-usa/vehicles"
       ],
@@ -154,7 +156,7 @@
     "executed": true,
     "author": {
       "currentContentDelete": {
-        "deleted": 40,
+        "deleted": 42,
         "paths": [
           "tut-usa/accessories",
           "tut-usa/contact-and-concierge",
@@ -192,6 +194,8 @@
           "tut-usa/reb18-e2e-1783758723044",
           "tut-usa/reb18-e2e-1783758840293",
           "tut-usa/reb18-e2e-1783799685571",
+          "tut-usa/reb18-e2e-1783800043183",
+          "tut-usa/reb18-e2e-1783800369298",
           "tut-usa/search",
           "tut-usa/vehicles",
           "experience-fragments/tut-usa/global/footer/master/footer",
@@ -235,14 +239,16 @@
             "content.tut-usa.reb18-e2e-1783758723044: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
             "content.tut-usa.reb18-e2e-1783758840293: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
             "content.tut-usa.reb18-e2e-1783799685571: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
+            "content.tut-usa.reb18-e2e-1783800043183: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
+            "content.tut-usa.reb18-e2e-1783800369298: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
             "content.tut-usa.search: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
             "content.tut-usa.vehicles: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
             "content.experience-fragments.tut-usa.global.footer.master.footer: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']",
             "content.experience-fragments.tut-usa.global.navigation.master.navigation: JDBC exception executing SQL [No results were returned by the query.] [DELETE FROM content_nodes WHERE path::text LIKE ? || '%']"
           ],
-          "failed": 40,
+          "failed": 42,
           "succeeded": 0,
-          "total": 40
+          "total": 42
         }
       },
       "legacyContentDelete": {
@@ -279,7 +285,7 @@
   },
   "after": {
     "author": {
-      "currentSiteDescendants": 611,
+      "currentSiteDescendants": 613,
       "currentExperienceFragmentDescendants": 2,
       "currentAssets": 0,
       "currentDamFolders": 0,

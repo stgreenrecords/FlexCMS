@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { FlexCmsRenderer } from '@flexcms/react';
+import { linkAttributes, toTutLink } from './tutLink';
 
 function text(value: unknown, fallback = ''): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
@@ -20,16 +21,12 @@ function label(value: unknown, fallback: string): string {
   return text(typeof value === 'string' ? value : entry?.label ?? entry?.title ?? entry?.name, fallback);
 }
 
-function href(value: unknown): string {
-  return text(record(value)?.url ?? value, '#');
-}
-
 function CtaLink({ value, fallback = 'Learn more' }: { value: unknown; fallback?: string }) {
-  const entry = record(value);
-  if (!entry && typeof value !== 'string') return null;
+  const link = toTutLink(value, fallback);
+  if (!link) return null;
   return (
-    <a href={href(value)} className="inline-flex bg-primary px-6 py-3 font-label text-[10px] uppercase tracking-[0.2em] text-on-primary transition-colors hover:bg-primary-fixed">
-      {text(entry?.label ?? entry?.text ?? value, fallback)}
+    <a href={link.url} {...linkAttributes(link)} className="inline-flex bg-primary px-6 py-3 font-label text-[10px] uppercase tracking-[0.2em] text-on-primary transition-colors hover:bg-primary-fixed">
+      {link.label}
     </a>
   );
 }

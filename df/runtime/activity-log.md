@@ -1,3 +1,69 @@
+## 2026-07-12 local - frontend-dev - TUT-LINK-RENDERING
+
+- State: BLOCKED
+- Action: Implemented authored TUT link normalization and rendering across navigation, hero, cards, grouped fields, breadcrumbs, footer/legal/social links, CTA components, and supporting renderers; added unit and full-site Selenium link-integrity coverage.
+- Evidence: `frontend/apps/site-nextjs/src/components/tutLink.ts`, changed TUT renderer modules, `frontend/apps/site-nextjs/src/components/__tests__/homepageRenderers.test.tsx`, `frontend/apps/site-nextjs/src/components/__tests__/tutVehiclesRenderers.test.tsx`, `frontend/apps/selenium-e2e/src/cases/templates/tut-usa-link-integrity.spec.ts`, `df/artifacts/TUT-LINK-RENDERING/frontend/summary.md`.
+- Result: PARTIAL PASS. Site package tests passed `27/27`; full frontend build passed; Selenium smoke passed; focused full template run passed the new link-integrity case and completed with `13 passing / 9 failing` overall.
+- Blocker: The mandatory full Selenium gate still fails only the existing `REB-12` `hasPrimaryCta` assertions for `TPL-01`, `TPL-05`, `TPL-07`, `TPL-13`–`TPL-17`, and `TPL-19`; clean route probes returned HTTP 200 with meaningful main content, and no link-integrity assertion failed.
+- Next: Resolve or explicitly waive the nine CTA baseline failures, then rerun `pnpm test:e2e:selenium:full` before marking the task DONE.
+
+## 2026-07-12 local - frontend-dev - BUG-TUT-VEHICLE-RENDERER
+
+- State: DONE
+- Action: Completed authored vehicle, campaign, and learning renderers; normalized CMS image-object payloads; ran focused/site unit tests, site/full frontend builds, live route probes, and Selenium smoke/full gates.
+- Evidence: `frontend/apps/site-nextjs/src/components/tutVehiclesRenderers.tsx`, `frontend/apps/site-nextjs/src/components/__tests__/tutVehiclesRenderers.test.tsx`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/frontend/summary.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/frontend/test-scenarios.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/handoffs.md`, `frontend/apps/selenium-e2e/reports/retained/smoke`, `frontend/apps/selenium-e2e/reports/retained/full`
+- Result: PASS
+- Next: `TUT-LINK-RENDERING` is unblocked and ready for its frontend-dev implementation session.
+- Risks/blockers: Existing non-blocking Next.js image/package-export warnings remain; the first full Selenium attempt failed against a stale site process, then passed after clean restart.
+
+## 2026-07-12 local - State change
+
+- Task: BUG-TUT-VEHICLE-RENDERER
+- From: DEV_IN_PROGRESS
+- To: DONE
+- Role: frontend-dev
+- Reason: Implementation and developer testing bar passed: 27 site unit tests, site build, 9/9 frontend workspace build, live seeded route probes, Selenium smoke, and Selenium full all pass.
+- Evidence: `df/artifacts/BUG-TUT-VEHICLE-RENDERER/frontend/summary.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/handoffs.md`
+- Next: Start `TUT-LINK-RENDERING` in a new frontend-dev task session.
+
+## 2026-07-12 local - State change
+
+- Task: TUT-LINK-RENDERING
+- From: BLOCKED
+- To: READY_FOR_DEV
+- Role: frontend-dev
+- Reason: Its blocking dependency `BUG-TUT-VEHICLE-RENDERER` is now DONE.
+- Evidence: `df/runtime/board.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/handoffs.md`
+- Next: Frontend-dev starts authored-link rendering and full-site link-integrity coverage.
+
+## 2026-07-12 local - frontend-dev - BUG-TUT-VEHICLE-RENDERER
+
+- State: DEV_IN_PROGRESS
+- Action: Resumed the explicitly requested vehicle/campaign/learning renderer task, reviewed the prior implementation and handoff, and confirmed the remaining risk is runtime verification of authored routes and image payload shapes.
+- Evidence: `df/runtime/board.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/task.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/handoffs.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/frontend/summary.md`
+- Result: PARTIAL
+- Next: Validate and, if needed, normalize runtime image payloads; run focused tests, full site build, and Selenium gates.
+- Risks/blockers: Local live-route availability and browser runtime state are not yet confirmed.
+
+## 2026-07-12 local - frontend-dev - TUT-LINK-RENDERING
+
+- State: BLOCKED
+- Action: Reviewed the explicitly requested frontend task, confirmed `TUT-LINK-SEED` is DONE, and verified that `BUG-TUT-VEHICLE-RENDERER` still owns shared renderer files in DEV_IN_PROGRESS. No source implementation was started.
+- Evidence: `df/runtime/board.md`, `df/runtime/frontend-dev-board.md`, `df/artifacts/TUT-LINK-RENDERING/task.md`, `df/artifacts/TUT-LINK-RENDERING/frontend/summary.md`, `df/artifacts/TUT-LINK-RENDERING/handoffs.md`, `df/artifacts/BUG-TUT-VEHICLE-RENDERER/handoffs.md`
+- Result: BLOCKED
+- Next: After `BUG-TUT-VEHICLE-RENDERER` reaches DONE, return this task to DEV_IN_PROGRESS and implement/test authored link rendering.
+- Risks/blockers: Editing now could clobber active shared renderer work; implementation and build gates were not run.
+
+## 2026-07-12 local - State change
+
+- Task: TUT-LINK-RENDERING
+- From: READY_FOR_DEV
+- To: BLOCKED
+- Role: frontend-dev
+- Reason: `BUG-TUT-VEHICLE-RENDERER` remains DEV_IN_PROGRESS and is a documented dependency for shared renderer ownership.
+- Evidence: `df/artifacts/BUG-TUT-VEHICLE-RENDERER/handoffs.md`, `df/runtime/frontend-dev-board.md`
+- Next: Resume in frontend-dev after the vehicle renderer dependency is DONE.
+
 ## 2026-07-12 10:22 CEST - data-engineer - TUT-LINK-SEED
 
 - State: DONE
