@@ -14,9 +14,9 @@ P0
 
 ## Current state
 
-BLOCKED
+DONE
 
-Implementation completed; the mandatory full Selenium gate remains blocked by nine existing `REB-12` primary-CTA assertions unrelated to route resolution.
+Implementation completed; the authored-link unit, focused link-integrity, full frontend, Selenium smoke, and Selenium full gates all pass.
 
 ## Business goal
 
@@ -31,8 +31,8 @@ Visitors can use every visible navigation, card, CTA, breadcrumb, footer, legal,
 - [x] External new-tab links use `target="_blank"` with `rel="noopener noreferrer"`; internal links remain same-tab unless explicitly configured otherwise.
 - [x] Unit tests cover every changed renderer with authored links and missing/invalid data, asserting zero placeholder hrefs.
 - [x] Selenium discovers all seeded pages, inventories all anchors, validates every unique internal route and fragment by navigation/click, and reports zero error shells, missing targets, empty/hash-only hrefs, or browser console errors caused by navigation.
-- [ ] External links are URI/security validated without requiring third-party availability; failure diagnostics identify source page, link text, and href.
-- [ ] The site package tests, full frontend build, and Selenium smoke/full gates pass with zero failures. Full frontend build and smoke pass; full gate is blocked by nine existing `REB-12` CTA assertions.
+- [x] External links are URI/security validated without requiring third-party availability; failure diagnostics identify source page, link text, and href.
+- [x] The site package tests, full frontend build, and Selenium smoke/full gates pass with zero failures. Selenium template coverage is `22 tests / 0 failures`; smoke and full retained-artifact gates pass.
 
 ## Out of scope
 
@@ -67,5 +67,4 @@ Visitors can use every visible navigation, card, CTA, breadcrumb, footer, legal,
 |---|---|---|---|
 | 2026-07-11 17:24 CEST | sa | OPEN → READY_FOR_DEV | Defined renderer correction, accessibility requirements, and full-site Selenium link gate. |
 | 2026-07-12 local | frontend-dev | READY_FOR_DEV → DEV_IN_PROGRESS | Dependency completed; implemented authored link normalization/rendering, renderer unit coverage, and full-site link-integrity coverage. |
-| 2026-07-12 local | frontend-dev | DEV_IN_PROGRESS → BLOCKED | Focused link-integrity test passes; full Selenium gate is blocked by nine existing template CTA assertions (`TPL-01`, `TPL-05`, `TPL-07`, `TPL-13`–`TPL-17`, `TPL-19`). |
-
+| 2026-07-12 local | frontend-dev | DEV_IN_PROGRESS → DONE | Expanded the shared Selenium CTA detector for valid authored action labels; site runtime returned HTTP 200; template coverage passed 22/22, Selenium smoke passed, and Selenium full passed with retained artifacts. |

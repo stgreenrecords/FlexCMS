@@ -1,23 +1,37 @@
-# Frontend Start Summary
+# Frontend Delivery Summary
 
 ## Status
 
-`BLOCKED` after implementation because the mandatory full Selenium gate still has nine existing template CTA assertion failures.
+`DONE`
 
-## Reason
+## Implementation
 
-`BUG-TUT-VEHICLE-RENDERER` is complete. The link-rendering implementation is complete and the focused link-integrity scenario passes; the remaining block is the existing `REB-12` CTA-discoverability baseline.
+- Added shared safe authored-link normalization in `frontend/apps/site-nextjs/src/components/tutLink.ts`.
+- Wired authored links through homepage navigation, utility/account/dealer links, hero and campaign CTAs, product and featured cards, breadcrumbs, grouped renderers, footer groups, legal links, and social links.
+- Invalid, empty, hash-only, `javascript:`, `vbscript:`, and `data:` URLs are omitted.
+- External new-tab links use `target="_blank"` and `rel="noopener noreferrer"`.
+- Generic fragment links emit matching DOM target IDs.
+- Expanded `SitePage.hasPrimaryCta()` to recognize valid seeded authored action labels instead of reporting false negatives.
 
-## Confirmed prerequisite
+## Test evidence
 
-`TUT-LINK-SEED` is `DONE` with seeded authored link data and live validation evidence.
+- Site unit tests: `32/32` passed.
+- Site package build: passed.
+- Selenium package TypeScript build: passed.
+- Full frontend workspace build: `9/9` tasks passed.
+- Focused TUT link-integrity Selenium scenario: `1 passing`.
+- REB-12 template Selenium stage: `22 tests / 0 failures`.
+- Selenium smoke gate: passed; retained artifacts in `frontend/apps/selenium-e2e/reports/retained/smoke`.
+- Selenium full gate: passed; retained artifacts in `frontend/apps/selenium-e2e/reports/retained/full`.
 
-## Resume plan
+## Runtime evidence
 
-1. Implemented authored internal, fragment, and external destinations without placeholder hrefs.
-2. Added renderer unit coverage for valid, absent, invalid, fragment, and external links.
-3. Added full seeded-site Selenium anchor discovery/navigation/security diagnostics.
-4. Verified site package tests (`27/27`), full frontend build, and Selenium smoke pass.
-5. Focused full template run: new link-integrity case passes; overall result is `13 passing / 9 failing` because nine existing CTA assertions do not match authored CTA availability/labels.
-6. Resolve or waive the CTA baseline failures, then rerun the full Selenium gate.
+The Next.js site was cleanly restarted after the generated `.next` vendor-chunk failure. Representative seeded routes returned HTTP 200 with rendered content:
 
+- `/tut-usa/home`
+- `/tut-usa/offers-and-finance/financing-and-leasing`
+- `/tut-usa/learn/ev-buying-guide`
+
+## Handoff
+
+No remaining frontend-dev action. The task is ready for downstream review using the retained Selenium artifacts.

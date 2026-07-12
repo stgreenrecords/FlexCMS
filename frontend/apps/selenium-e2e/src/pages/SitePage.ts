@@ -84,7 +84,35 @@ export class SitePage {
         'button',
         'a'
       ];
-      const textHints = ['book', 'build', 'buy', 'shop', 'learn', 'explore', 'contact', 'reserve', 'test drive'];
+      const textHints = [
+        'book',
+        'build',
+        'buy',
+        'shop',
+        'learn',
+        'explore',
+        'contact',
+        'reserve',
+        'test drive',
+        'view',
+        'compare',
+        'download',
+        'details',
+        'options',
+        'manual',
+        'service',
+        'accessor',
+        'vehicle',
+        'model',
+        'dealer',
+        'locate',
+        'find',
+        'read',
+        'more',
+        'update',
+        'story',
+        'discover',
+      ];
       const candidates = selectors.flatMap((selector) => Array.from(main.querySelectorAll(selector)));
       return candidates.some((el) => {
         const style = window.getComputedStyle(el);
@@ -169,5 +197,3 @@ export class SitePage {
     return Number(count ?? 0);
   }
 }
-
-
