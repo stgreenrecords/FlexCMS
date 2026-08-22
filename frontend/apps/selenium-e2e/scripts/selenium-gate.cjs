@@ -25,12 +25,32 @@ function ensureDir(dirPath) {
   fs.mkdirSync(dirPath, { recursive: true });
 }
 
+// Gate suites run through a shell. On Windows the package manager resolves to
+// `pnpm.cmd`, which `spawnSync` cannot launch directly: the extensionless name
+// fails with ENOENT, and naming the `.cmd` fails with EINVAL because modern Node
+// refuses to spawn batch files unshelled (batch-argument-injection hardening).
+// Using a shell is safe here because the command is built only from the
+// whitelisted script names in MODE_SCRIPTS — no caller input reaches the shell.
+
+const MODE_SCRIPTS = {
+  smoke: ['test:smoke:ci'],
+  full: ['test:templates:ci', 'test:admin:ci', 'test:reb18:ci', 'test:reb19:ci', 'test:reb20:ci', 'test:reb26:ci'],
+};
+
 function runScript(scriptName, logPath) {
-  const result = cp.spawnSync('pnpm', ['run', scriptName], {
+  if (!Object.values(MODE_SCRIPTS).some((scripts) => scripts.includes(scriptName))) {
+    throw new Error(`Refusing to run unknown gate script: ${scriptName}`);
+  }
+
+  // Passed as one command string rather than command + args: with `shell: true`
+  // Node deprecates the args form (DEP0190) because it concatenates without
+  // escaping. The string is built only from the whitelisted script name above.
+  const result = cp.spawnSync(`pnpm run ${scriptName}`, {
     cwd: appRoot,
     encoding: 'utf8',
     env: { ...process.env, CI: 'true' },
     maxBuffer: 1024 * 1024 * 20,
+    shell: true,
   });
 
   const content = [
@@ -38,11 +58,18 @@ function runScript(scriptName, logPath) {
     '',
     result.stdout || '',
     result.stderr || '',
+    result.error ? `spawn error: ${result.error.message}` : '',
   ].join('\n');
   fs.writeFileSync(logPath, content, 'utf8');
 
+  if (result.error) {
+    throw new Error(`Script could not be started: ${scriptName} (${result.error.message}). Log: ${logPath}`);
+  }
+
   if (result.status !== 0) {
-    throw new Error(`Script failed: ${scriptName} (exit ${result.status ?? 'unknown'})`);
+    throw new Error(
+      `Script failed: ${scriptName} (exit ${result.status ?? 'signal ' + result.signal}). Log: ${logPath}`,
+    );
   }
 }
 
@@ -168,9 +195,7 @@ function writeSummary(mode, logsDir, artifactResult) {
 
 function main() {
   const mode = parseMode();
-  const modeScripts = mode === 'smoke'
-    ? ['test:smoke:ci']
-    : ['test:templates:ci', 'test:admin:ci', 'test:reb18:ci'];
+  const modeScripts = MODE_SCRIPTS[mode];
 
   const logsDir = path.join(reportsDir, 'logs', mode);
   ensureDir(logsDir);

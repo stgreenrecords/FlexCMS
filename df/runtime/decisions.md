@@ -87,3 +87,13 @@ Use `df/templates/decision-record.md` for new decision records.
   - The router's objective gate now runs on the `DEV_IN_PROGRESS -> DONE` transition; a failing gate routes the task to `RETURNED_TO_DEV`.
 - Consequences: No separate QA or PO stage exists. Delivery developers carry full verification responsibility and cannot report done without a green build and full test coverage. Reversing this requires a new decision record and restoring the retired states/roles across `df/00-start-here.md`, `df/01-operating-model.md`, `df/02-state-machine.md`, `df/03-orchestration-rules.md`, and the role files.
 
+## 2026-08-19 local - DEC-REB-19-001 - Document editor capability gaps as blockers instead of asserting them green
+
+- Status: Accepted (devops, REB-19)
+- Context: Four of REB-19's ten required scenarios touch page editor capabilities that are not implemented: component reorder persistence, undo/redo, structured (list/object) and asset field editing, and publishing to the publish environment from the editor. A suite can either assert the current broken behaviour as "expected" — which turns a defect into a specification and makes the test go green forever — or refuse to encode it.
+- Decision:
+  - Each affected scenario performs the real capability probe first, then records an implementation blocker naming the exact file and symbol, and marks itself pending rather than asserting broken behaviour as correct.
+  - Blockers are recorded in `df/artifacts/REB-19/devops/blockers.md` and mirrored into `df/runtime/risks.md`; they are not fixed from the `devops` lane because they belong to `frontend-dev` and `backend-dev`.
+  - Where the product supports a working path for a required outcome, the scenario asserts the outcome through that path. REB-19 S10 therefore verifies the published edit on the publish environment through the tree-replicating bulk publish endpoint, while recording that the editor's own publish button does not replicate.
+  - `AuthorableField.isLossyInEditor` marks list, object, and asset fields so no suite authors structured content through a control that would stringify it. REB-26 must honour this flag.
+- Consequences: The REB-19 suite reports 8 passing / 2 pending / 0 failing. The two pending scenarios flip to genuine passes as soon as the capabilities are implemented — no test edit required — and the gate never reports a false green for functionality that does not exist.

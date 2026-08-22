@@ -1,3 +1,107 @@
+## 2026-08-21 16:10 CEDT - devops - REB-20
+
+- State: DEV_IN_PROGRESS -> DONE
+- Action: Implemented the publishing, workflow, scheduling, and bulk operation E2E suite. New `src/cases/admin/publishing-workflow-suite.spec.ts` (S1-S12) covers the `standard-publish` workflow lifecycle, single-node and bulk publish, bulk move and delete, and both scheduled operations, each verified on the author API, the admin UI where one exists, and the publish environment. Supporting code: new `WorkflowsPage` page object, new `OperationMatrixRecorder` (operation x API/UI/publish surface), `ContentTreePage.waitForRowNames()`, and 11 new `AuthorApiClient` methods (workflow start/advance/cancel/list/for-user/active, schedule publish/deactivate, bulk delete/move, publish status and reachability probes); `bulkPublish` now returns the parsed `BulkOperationResult`. Wired `test:reb20{,:ci}` into `package.json`, the gate's `full` stage list, and critical traceability enforcement.
+- Evidence: `df/artifacts/REB-20/devops/summary.md`, `df/artifacts/REB-20/devops/publishing-operation-matrix.csv` (13 rows), `df/artifacts/REB-20/devops/test-scenarios.md`, `df/artifacts/REB-20/devops/blockers.md`, `frontend/apps/selenium-e2e/reports/junit/reb20-suite.xml`, `frontend/apps/selenium-e2e/reports/retained/full/`
+- Environment: author `:8080` (`author,local`) and publish `:8081` (`publish,local`) on JDK 26; admin `:3000` and reference site `:3001` served from production Next.js builds; infra via `docker compose -f infra/local/docker-compose.dev.yml up -d`
+- Checks: `pnpm test:reb20:ci` PASS (**12 tests / 0 failures**, 92.59 s); 13 operation rows (8 PASS / 5 BLOCKED / 0 FAIL / 0 SKIPPED); `cd flexcms && mvn test` PASS (**505 tests**, 0 failures, 0 errors, BUILD SUCCESS); `cd frontend && pnpm build` PASS (9/9 tasks); `node scripts/selenium-gate.cjs --mode full` PASS (REB-12 22, REB-13 4, REB-18 2, REB-19 10, **REB-20 12**, REB-26 24 = **74 tests, 0 failures**; critical/high traceability clean including the new REB-20 row)
+- Reruns: four suite runs before green, plus one infrastructure gate rerun, all recorded in `summary.md`. (1) Run 1, 10/1: S6 failed; runs surfaced R20-3, R20-4 and, via two fixtures that would not delete, R20-2. (2) A wrong finding of mine, withdrawn before it reached any artifact: I recorded that the bulk endpoints never increment `failed`, having read only the catch blocks — `BulkOperationResult.addError()` increments it, and a direct probe showed bulk publish/move report `failed=1` correctly; S12 now carries that as a positive control and reports the real outlier (R20-5). (3) Run 2, 6/6: my own regression — fixed fixture names collided with R20-2, so S1/S2/S3 died on 409 duplicate creates; `createFixturePage` now re-authors an undeletable node in place. (4) Run 3, 11/1: S6 again, whose message exposed R20-1; also fixed a race where a tree listing read right after a row click can return the previous folder's rows, which had made S7's all-negative assertions potentially vacuous. (5) Run 4 and the CI run: green. (6) First full-gate attempt failed at the REB-26 stage with `session not created from chrome not reachable` (Chrome would not launch; a driver probe then started a session in 926 ms) — the retry passed. No check was skipped.
+- Result: PASS
+- Next: `sa` to route the five blockers, all `backend-dev`: `R20-1` (stale `parentPath` after move), `R20-2` (+`sa` for intended delete semantics), `R20-3`, `R20-4` (+`sa`, track with REB-26 `R26-2`), `R20-5`. Remaining devops queue: `INFRA-TESTCONTAINERS-DOCKER29` (P1 bug), then `REB-21`/`REB-22`/`REB-23` (P1), `REB-24` (P2).
+- Risks/blockers: Recorded as `R-REB-20-001..005` in `risks.md`. Publish-side residue is a bounded set of six fixed `reb20-*` paths that each run overwrites (unavoidable under `R26-1`/`R26-2`); author-side residue is exactly the two workflow fixtures pinned by `R20-2`. Purging either needs direct database access, which was not authorised in this session.
+
+## 2026-08-21 16:10 CEDT - State change
+
+- Task: REB-20
+- From: DEV_IN_PROGRESS
+- To: DONE
+- Role: devops
+- Reason: Developer testing bar met — the new suite is green (12 tests, 0 failures) with one evidence row per publishing operation and no unexplained outcomes, 505 backend tests pass, the frontend build is 9/9, and the full Selenium gate passes with 74 tests and 0 failures; test scenarios and per-operation evidence recorded in the task artifact folder.
+- Evidence: `df/artifacts/REB-20/devops/summary.md`, `df/artifacts/REB-20/devops/publishing-operation-matrix.csv`, `frontend/apps/selenium-e2e/reports/retained/full/`
+- Next: SA routing of `R20-1`..`R20-5`.
+
+## 2026-08-21 13:45 CEDT - devops - REB-26
+
+- State: DEV_IN_PROGRESS -> DONE
+- Action: Brought the local stack back up and completed the exhaustive per-UI-component sample-site editing sweep for all 406 active component contracts. No suite logic was changed; the task was finished by running it to completion and recording the evidence. Two environment faults were diagnosed on the way (author backends started without the `local` profile reject every author write with `401`; Next.js dev servers serve HTML for `/_next/static/chunks/*.js`, which trips REB-12's console-error assertion) and both are now recorded in `hints_for_agent.md`.
+- Evidence: `df/artifacts/REB-26/devops/summary.md`, `df/artifacts/REB-26/devops/component-editing-matrix.csv` (406 rows), `df/artifacts/REB-26/devops/field-coverage.csv` (2172 rows), `df/artifacts/REB-26/devops/blockers.md`, `df/artifacts/REB-26/devops/test-scenarios.md`, `frontend/apps/selenium-e2e/reports/junit/reb26-suite.xml`, `frontend/apps/selenium-e2e/reports/retained/full/`
+- Environment: author `:8080` (`author,local`) and publish `:8081` (`publish,local`) on JDK 26; admin `:3000` and reference site `:3001` served from production Next.js builds; infra via `docker compose -f infra/local/docker-compose.dev.yml up -d`
+- Checks: REB-26 sweep run twice with identical matrices — `pnpm test:reb26:ci` (24 tests / 0 failures / 352.68 s, dev frontends) and the full gate's REB-26 stage (24 tests / 0 failures / 291.87 s, production frontends, run of record); **406/406 components PASS**, 0 FAIL / 0 BLOCKED / 0 UNSUPPORTED_UI / 0 SKIPPED; `cd flexcms && mvn test` PASS (**505 tests**, 0 failures, 0 errors, BUILD SUCCESS); `cd frontend && pnpm build` PASS (9/9 tasks); `node scripts/selenium-gate.cjs --mode full` PASS (REB-12 22, REB-13 4, REB-18 2, REB-19 10, REB-26 24 tests; 0 failures; critical/high traceability enforcement clean)
+- Reruns: two discarded attempts, both environment-caused and both recorded in `summary.md`. (1) First sweep attempt: backends lacked the `local` profile, so `flexcms.local-dev` was false, `SecurityConfiguration` kept the authenticated chain, and all 21 batches died on `createNode` with `401`; the matrix was overwritten with 406 `UNSUPPORTED_UI` rows before the cause was found in the JUnit XML. (2) First full-gate attempt: failed at `test:templates:ci` because the frontends were dev servers, giving 4 severe console errors on all 65 pages. No check was skipped.
+- Result: PASS
+- Next: `sa` to route the four blockers — `R26-1`/`R26-2` to `backend-dev` (+`sa` for intended delete/unpublish semantics), `R26-3` to `frontend-dev`, `R26-4` to `frontend-dev` (+`sa` for reference-site scope). `REB-26` no longer blocks `REB-25`.
+- Risks/blockers: `R26-1`/`R26-2` leave one published fixture path (`/tut-usa/reb26-component-sweep`) served by `:8081` after every run; purging needs direct `flexcms_publish` access, which was not authorised in this session. `select` editor controls remain unreachable because every `enum` in `component-contracts.json` is an empty array.
+
+## 2026-08-21 13:45 CEDT - State change
+
+- Task: REB-26
+- From: DEV_IN_PROGRESS
+- To: DONE
+- Role: devops
+- Reason: Developer testing bar met — 406/406 component contracts covered and green in the Selenium sweep, 505 backend tests pass, frontend build 9/9, and the full Selenium gate passes with 0 failures; test scenarios and per-component evidence recorded in the task artifact folder.
+- Evidence: `df/artifacts/REB-26/devops/summary.md`, `df/artifacts/REB-26/devops/component-editing-matrix.csv`, `frontend/apps/selenium-e2e/reports/retained/full/`
+- Next: SA routing of `R26-1`..`R26-4`; `REB-25` is unblocked.
+
+## 2026-08-19 23:05 CEDT - State change
+
+- Task: BUG-PUBLISH-REPLICATION
+- From: DEV_IN_PROGRESS
+- To: DONE
+- Role: backend-dev
+- Reason: Every publish path now replicates. `ContentNodeService.updateStatus` publishes `ContentStatusChangedEvent`; `ContentPublishReplicationListener` replicates after commit (tree for pages/site roots, ACTIVATE otherwise, DEACTIVATE on unpublish); the controller's manual replication loop was removed. Verified live via `/node/status` alone and by the REB-19 rerun.
+- Evidence: `df/artifacts/BUG-PUBLISH-REPLICATION/backend/summary.md`
+- Next: Optional follow-up — `ScheduledPublishingService`'s now-redundant direct `replicate(ACTIVATE)` call can be removed.
+
+## 2026-08-19 23:05 CEDT - State change
+
+- Task: BUG-CONTENT-DELETE
+- From: DEV_IN_PROGRESS
+- To: DONE
+- Role: backend-dev
+- Reason: `deleteSubtree` now carries `@Modifying` so it executes as an update, and matches descendants with an explicit `.` separator so shared-prefix siblings survive. Verified live: delete returns 200, cascades to children, preserves `homepage`/`home-archive`, and an unknown path no longer 500s.
+- Evidence: `df/artifacts/BUG-CONTENT-DELETE/backend/summary.md`
+- Next: `INFRA-TESTCONTAINERS-DOCKER29` so the repository ITs can actually run and gate.
+
+## 2026-08-19 23:05 CEDT - backend-dev - BUG-CONTENT-DELETE, BUG-PUBLISH-REPLICATION
+
+- State: DEV_IN_PROGRESS
+- Action: Fixed both P0 defects raised from REB-19 evidence. (1) `ContentNodeRepository.deleteSubtree` gained `@Modifying` and a sibling-safe predicate, and now returns the deleted row count. (2) Publishing was decoupled from its single caller: a new `ContentStatusChangedEvent` in core is emitted from `updateStatus`, a new `ContentPublishReplicationListener` in the replication module replicates after commit, and `AuthorContentController.bulkPublish` lost its manual replication loop along with its `ReplicationAgent` dependency.
+- Evidence: `df/artifacts/BUG-CONTENT-DELETE/backend/summary.md`, `df/artifacts/BUG-PUBLISH-REPLICATION/backend/summary.md`, `frontend/apps/selenium-e2e/reports/retained/full`.
+- Checks: `mvn install -DskipTests` PASS; `mvn test` PASS with **505 tests / 0 failures / 0 errors / 0 skipped** (was 495; +6 listener, +3 event, +1 delete unit tests); live delete verification (cascade PASS, shared-prefix sibling preserved, unknown path 200); live publish verification through `/node/status` only (publish instance served the page with its component after 2s, previously 0 components indefinitely); `pnpm test:reb19` 8 passing / 2 pending / 0 failing with the S10 blocker gone; `ci:gate:full` PASS (48 tests / 0 failures).
+- Result: PASS
+- Next: `REB-26` is unblocked and can now clean up its fixtures; `INFRA-TESTCONTAINERS-DOCKER29` for the unrunnable/ungated ITs.
+- Risks/blockers: Four repository ITs covering the delete fix are written but could not execute on this host — Testcontainers 1.19.8 cannot negotiate with Docker Engine 29 (HTTP 400). Tracked as `INFRA-TESTCONTAINERS-DOCKER29`; the fix was instead verified live against the real PostgreSQL stack.
+
+## 2026-08-19 22:35 CEDT - State change
+
+- Task: REB-19
+- From: DEV_IN_PROGRESS
+- To: DONE
+- Role: devops
+- Reason: Developer testing bar met — contract-driven page editor authoring matrix implemented and wired into the CI gate; full backend build and 495 unit tests green; full frontend build green; Selenium smoke and full gates green; REB-19 suite 8 passing / 2 documented-blocker pending / 0 failing.
+- Evidence: `df/artifacts/REB-19/devops/summary.md`, `df/artifacts/REB-19/devops/test-scenarios.md`, `df/artifacts/REB-19/devops/matrix-coverage.csv`, `df/artifacts/REB-19/devops/blockers.md`, `df/artifacts/REB-19/handoffs.md`, `frontend/apps/selenium-e2e/reports/retained/{smoke,full}`
+- Next: `devops` can start `REB-26` (its only dependency was REB-19); `sa` should route blocker B-5 (editor publish does not replicate) to `backend-dev`.
+
+## 2026-08-19 22:35 CEDT - devops - REB-19
+
+- State: DEV_IN_PROGRESS
+- Action: Implemented the contract-driven page editor authoring matrix. Added a reusable field-type-aware model over the 406 generated component contracts (`src/fixtures/component-contracts.ts`), a matrix-driven editor page object (`src/pages/EditorAuthoringPage.ts`), a run-generated coverage recorder (`src/reports/matrix.ts`), imported-asset resolution (`src/fixtures/site-assets.ts`), and the 10-scenario suite (`src/cases/admin/editor-authoring-matrix.spec.ts`). Registered `test:reb19`/`test:reb19:ci`, added REB-19 to the `full` gate and to critical traceability, and added `scripts/publish_tut_usa_site.py` so a freshly seeded database can be published to the publish environment.
+- Evidence: `df/artifacts/REB-19/devops/summary.md` (full command/result table), `reports/junit/reb19-suite.xml`, `df/artifacts/REB-19/devops/matrix-coverage.csv` (79 rows: 76 PASS, 3 BLOCKED), `df/artifacts/REB-19/devops/blockers.md`.
+- Checks: `mvn clean install -DskipTests` PASS; `mvn test` PASS (495 tests, 0 failures, 0 errors, 0 skipped); `pnpm install && pnpm build` PASS (9/9); `pnpm test:reb19` 8 passing / 2 pending / 0 failing; `ci:gate:smoke` PASS; `ci:gate:full` PASS (22+4+2+10 tests, 0 failures); `python scripts/publish_tut_usa_site.py` published and verified 72/72 pages.
+- Result: PASS
+- Next: `REB-26` reuses the helpers exactly as documented in `df/artifacts/REB-19/handoffs.md`.
+- Risks/blockers: Seven pre-existing implementation blockers recorded in `df/artifacts/REB-19/devops/blockers.md` (B-1 no list/object/asset controls, B-2 no DAM picker, B-3 component order never persisted, B-4 undo/redo not wired, B-5 editor publish does not replicate to publish, B-6 template constraints presentational only, B-7 content node deletion returns 500 for every node so test fixtures leak). B-5 is a user-visible product defect and is tracked as R-REB-19-001. Docker image build (pre-push step 5) intentionally skipped: no backend source changed.
+
+## 2026-08-19 21:29 CEDT - devops - REB-19
+
+- State: READY_FOR_DEV -> DEV_IN_PROGRESS
+- Action: Claimed REB-19 in Mode B. Corrected the stale `Blocked?` flag (REB-07/10/11/13 are all DONE). Found the workstation had no toolchain at all — no Maven, no pnpm, no `~/.m2`, empty Docker, no `node_modules`/`target` — and provisioned it with the human's explicit approval: Apache Maven 3.9.16 (checksum-verified user-profile install), pnpm 9.0.0 matching the `packageManager` pin, `MAVEN_OPTS=-Djavax.net.ssl.trustStoreType=Windows-ROOT` for the intercepting corporate TLS CA, infra containers from `infra/local/docker-compose.dev.yml`, backend build, TUT-USA reset/seed/asset import, and author/publish/admin/site runtimes.
+- Evidence: `df/artifacts/REB-19/devops/environment-provisioning.md`, `df/artifacts/REB-19/devops/repo-defects.md`, `hints_for_agent.md` (new top entry).
+- Checks: Seed PASS (65 pages, 515 components, 423 links validated); author `:8080` and publish `:8081` healthy; admin `:3000` and site `:3001` serving; baseline `pnpm test:smoke` 10 passing / 0 failing.
+- Result: PASS
+- Next: Implement the REB-19 authoring matrix suite.
+- Risks/blockers: Two repository defects found and fixed — `src/reports/hooks.ts` had never been committed because of an unanchored `reports/` gitignore pattern (blocked every Selenium suite on a fresh clone), and `selenium-gate.cjs` could not spawn pnpm on Windows.
+
 ## 2026-07-12 local - frontend-dev - TUT-LINK-RENDERING
 
 - State: DONE

@@ -46,6 +46,14 @@ Downstream rebuild tasks build on top of this foundation:
 - REB-18 adds `src/cases/admin/content-tree-lifecycle.spec.ts` for content-tree
   navigation/search/selection/action-link checks plus create+publish lifecycle
   assertions (author and publish environment verification).
+- REB-26 adds `src/cases/admin/component-editing-sweep.spec.ts`, an exhaustive
+  sweep that authors **every active component contract** through the page editor
+  and verifies it across the editor UI, author API, headless REST + GraphQL, the
+  draft preview route, the rendered reference site, and the publish environment.
+  It reuses the REB-19 contract model (`src/fixtures/component-contracts.ts`) and
+  writes one matrix row per component to
+  `df/artifacts/REB-26/devops/component-editing-matrix.csv`, plus per-field detail
+  to `field-coverage.csv`.
 - `REB-14` wires this package into CI/local validation gates and retained
   artifact bundles.
 
@@ -82,6 +90,9 @@ pnpm test:admin
 # REB-18 content tree + page lifecycle suite
 pnpm test:reb18
 
+# REB-26 exhaustive per-component editing sweep (all active component contracts)
+pnpm test:reb26
+
 # REB-12 public-site pages suite (home + remaining discovered pages)
 pnpm test:pages
 
@@ -104,6 +115,7 @@ pnpm test:templates:ci
 pnpm test:smoke:ci
 pnpm test:admin:ci
 pnpm test:reb18:ci
+pnpm test:reb26:ci
 pnpm test:full:ci
 
 # REB-14 CI/local validation gates with artifact retention + traceability coverage checks
@@ -151,6 +163,8 @@ pnpm ci:gate:full
 | `REPORTS_DIR` | `reports` | JUnit/report output root |
 | `SCREENSHOTS_DIR` | `reports/screenshots` | Screenshot capture output (on-demand + on-failure) |
 | `CAPTURE_PORT` | `4173` | Local HTTP port used by the REB-02 static capture server |
+| `REB26_BATCH_SIZE` | `20` | REB-26 sweep: components authored per fixture page |
+| `REB26_MAX_BATCHES` | unset | REB-26 sweep: development-only cap on the number of batches. A capped run deliberately fails the completeness scenario, so it can never be mistaken for full coverage |
 
 ## REB-02 outputs
 

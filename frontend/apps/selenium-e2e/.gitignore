@@ -1,4 +1,7 @@
-dist/
-reports/
+# Anchored to the package root on purpose: an unanchored `reports/` or `dist/`
+# also matches source folders such as `src/reports/`, which previously caused
+# `src/reports/hooks.ts` to be silently excluded from version control.
+/dist/
+/reports/
+/test-results/
 node_modules/
-

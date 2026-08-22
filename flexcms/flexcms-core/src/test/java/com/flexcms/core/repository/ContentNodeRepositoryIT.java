@@ -193,6 +193,57 @@ class ContentNodeRepositoryIT {
         assertThat(nodeRepository.findByPath("content.other")).isPresent();  // preserved
     }
 
+    @Test
+    void deleteSubtree_returnsTheNumberOfRowsRemoved() {
+        nodeRepository.saveAll(List.of(
+                node("content.corporate.en.home", "home", "content.corporate.en"),
+                node("content.corporate.en.home.hero", "hero", "content.corporate.en.home"),
+                node("content.corporate.en.home.hero.cta", "cta", "content.corporate.en.home.hero"),
+                node("content.corporate.en.home.text", "text", "content.corporate.en.home")));
+
+        int deleted = nodeRepository.deleteSubtree("content.corporate.en.home");
+
+        assertThat(deleted).isEqualTo(4);
+        assertThat(nodeRepository.findByPath("content.corporate.en.home")).isEmpty();
+        assertThat(nodeRepository.findDescendants("content.corporate.en.home")).isEmpty();
+    }
+
+    @Test
+    void deleteSubtree_leavesSiblingsWithASharedNamePrefixUntouched() {
+        nodeRepository.saveAll(List.of(
+                node("content.corporate.en.home", "home", "content.corporate.en"),
+                node("content.corporate.en.home.hero", "hero", "content.corporate.en.home"),
+                node("content.corporate.en.homepage", "homepage", "content.corporate.en"),
+                node("content.corporate.en.home-archive", "home-archive", "content.corporate.en")));
+
+        int deleted = nodeRepository.deleteSubtree("content.corporate.en.home");
+
+        assertThat(deleted).isEqualTo(2);
+        assertThat(nodeRepository.findByPath("content.corporate.en.homepage")).isPresent();
+        assertThat(nodeRepository.findByPath("content.corporate.en.home-archive")).isPresent();
+    }
+
+    @Test
+    void deleteSubtree_removesALeafNode() {
+        nodeRepository.saveAll(List.of(
+                node("content.corporate.en.home", "home", "content.corporate.en"),
+                node("content.corporate.en.home.hero", "hero", "content.corporate.en.home")));
+
+        int deleted = nodeRepository.deleteSubtree("content.corporate.en.home.hero");
+
+        assertThat(deleted).isEqualTo(1);
+        assertThat(nodeRepository.findByPath("content.corporate.en.home")).isPresent();
+        assertThat(nodeRepository.findByPath("content.corporate.en.home.hero")).isEmpty();
+    }
+
+    @Test
+    void deleteSubtree_unknownPath_deletesNothing() {
+        nodeRepository.save(node("content.corporate.en.home", "home", "content.corporate.en"));
+
+        assertThat(nodeRepository.deleteSubtree("content.corporate.en.missing")).isZero();
+        assertThat(nodeRepository.findByPath("content.corporate.en.home")).isPresent();
+    }
+
     // ── searchContent ──────────────────────────────────────────────────────────
 
     @Test

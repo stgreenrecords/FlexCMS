@@ -1,5 +1,6 @@
 package com.flexcms.core.service;
 
+import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
@@ -15,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 
@@ -53,6 +55,9 @@ class ContentNodeServiceTest {
 
     @Mock
     private PlatformTransactionManager transactionManager;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private ContentNodeService contentNodeService;
@@ -424,6 +429,68 @@ class ContentNodeServiceTest {
         assertThatThrownBy(() ->
                 contentNodeService.updateStatus("content.corporate.en.missing", NodeStatus.PUBLISHED, "user1"))
                 .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void updateStatus_publishesStatusChangedEvent() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        node.setStatus(NodeStatus.DRAFT);
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        contentNodeService.updateStatus("content.corporate.en.home", NodeStatus.PUBLISHED, "user1");
+
+        ArgumentCaptor<ContentStatusChangedEvent> captor =
+                ArgumentCaptor.forClass(ContentStatusChangedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+
+        ContentStatusChangedEvent event = captor.getValue();
+        assertThat(event.getPath()).isEqualTo("content.corporate.en.home");
+        assertThat(event.getPreviousStatus()).isEqualTo(NodeStatus.DRAFT);
+        assertThat(event.getNewStatus()).isEqualTo(NodeStatus.PUBLISHED);
+        assertThat(event.getUserId()).isEqualTo("user1");
+        assertThat(event.isPublished()).isTrue();
+        assertThat(event.isUnpublished()).isFalse();
+    }
+
+    @Test
+    void updateStatus_publishesUnpublishEvent_whenLeavingPublished() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        node.setStatus(NodeStatus.PUBLISHED);
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        contentNodeService.updateStatus("content.corporate.en.home", NodeStatus.ARCHIVED, "user1");
+
+        ArgumentCaptor<ContentStatusChangedEvent> captor =
+                ArgumentCaptor.forClass(ContentStatusChangedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+
+        ContentStatusChangedEvent event = captor.getValue();
+        assertThat(event.isPublished()).isFalse();
+        assertThat(event.isUnpublished()).isTrue();
+    }
+
+    @Test
+    void updateStatus_publishesNoEvent_whenNodeMissing() {
+        when(nodeRepository.findByPath("content.corporate.en.missing")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                contentNodeService.updateStatus("content.corporate.en.missing", NodeStatus.PUBLISHED, "user1"))
+                .isInstanceOf(NotFoundException.class);
+
+        verify(eventPublisher, never()).publishEvent(any(ContentStatusChangedEvent.class));
+    }
+
+    // --- delete ---
+
+    @Test
+    void delete_removesSubtreeAndAudits() {
+        contentNodeService.delete("content.corporate.en.home", "user1");
+
+        verify(nodeRepository).deleteSubtree("content.corporate.en.home");
+        verify(auditService).log(AuditService.ENTITY_CONTENT, null, "content.corporate.en.home",
+                AuditService.ACTION_DELETE, "user1");
     }
 
     // --- getChildren ---

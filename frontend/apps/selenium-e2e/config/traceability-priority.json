@@ -16,6 +16,23 @@
     "priority": "high",
     "junitFile": "reb18-suite.xml",
     "nameIncludes": "REB-18 content tree and page lifecycle suite"
+  },
+  {
+    "traceabilityId": "REB-19",
+    "priority": "critical",
+    "junitFile": "reb19-suite.xml",
+    "nameIncludes": "REB-19 page editor authoring matrix suite"
+  },
+  {
+    "traceabilityId": "REB-20",
+    "priority": "critical",
+    "junitFile": "reb20-suite.xml",
+    "nameIncludes": "REB-20 publishing, workflow, scheduling, and bulk operation suite"
+  },
+  {
+    "traceabilityId": "REB-26",
+    "priority": "critical",
+    "junitFile": "reb26-suite.xml",
+    "nameIncludes": "REB-26 exhaustive per-component sample-site editing suite"
   }
 ]
-

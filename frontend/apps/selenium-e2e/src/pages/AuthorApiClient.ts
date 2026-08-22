@@ -8,6 +8,10 @@ interface AuthorNode {
   resourceType?: string;
   status?: string;
   properties?: Record<string, unknown>;
+  /** ISO instant the scheduler will publish this node at, or null when unscheduled. */
+  scheduledPublishAt?: string | null;
+  /** ISO instant the scheduler will deactivate this node at, or null when unscheduled. */
+  scheduledDeactivateAt?: string | null;
 }
 
 interface ContentListResponse {
@@ -26,9 +30,56 @@ export interface AuthorChildNode {
 
 type NodeStatus = 'DRAFT' | 'IN_REVIEW' | 'APPROVED' | 'PUBLISHED' | 'ARCHIVED';
 
+export interface AuthorTemplateDefinition {
+  name: string;
+  title?: string;
+  description?: string;
+  resourceType?: string;
+  embeddedComponentTypes?: string[];
+  allowedComponentTypes?: string[];
+}
+
+export interface RegistryComponent {
+  resourceType: string;
+  name: string;
+  title?: string;
+  group?: string;
+  isContainer?: boolean;
+  dataSchema?: Record<string, unknown>;
+}
+
 export interface DiscoveredTutUsaPage {
   path: string;
   template: string;
+}
+
+/** Workflow instance as `AuthorWorkflowController` serialises it (REB-20). */
+export interface WorkflowInstance {
+  id: string;
+  workflowName: string;
+  /** Always the ltree form — the workflow controller does not normalise paths. */
+  contentPath: string;
+  contentNodeId?: string;
+  currentStepId?: string;
+  previousStepId?: string;
+  status: WorkflowStatus;
+  startedBy?: string;
+  startedAt?: string;
+  lastAction?: string;
+  lastActionBy?: string;
+  lastActionAt?: string;
+  lastComment?: string | null;
+  completedAt?: string | null;
+}
+
+export type WorkflowStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+
+/** `BulkOperationResult` as the author API serialises it (REB-20). */
+export interface BulkOperationResult {
+  succeeded: number;
+  failed: number;
+  total: number;
+  errors: string[];
 }
 
 export class AuthorApiClient {
@@ -180,6 +231,43 @@ export class AuthorApiClient {
     return (await res.json()) as AuthorNode;
   }
 
+  async updateNodeProperties(
+    path: string,
+    properties: Record<string, unknown>,
+    userId = 'admin',
+  ): Promise<AuthorNode> {
+    const res = await fetch(`${this.apiBase}/author/content/node/properties`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, properties, userId }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update properties for ${path} (${res.status})`);
+    }
+    return (await res.json()) as AuthorNode;
+  }
+
+  /** Template definition, including embedded and allowed component types. */
+  async getTemplate(templateName: string): Promise<AuthorTemplateDefinition> {
+    const res = await fetch(`${this.apiBase}/author/content/templates/${encodeURIComponent(templateName)}`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch template ${templateName} (${res.status})`);
+    }
+    return (await res.json()) as AuthorTemplateDefinition;
+  }
+
+  /** Component registry entries, i.e. the schemas the editor renders from. */
+  async getComponentRegistry(): Promise<RegistryComponent[]> {
+    const res = await fetch(`${this.apiBase}/content/v1/component-registry`, {
+      headers: this.headlessHeaders,
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to fetch component registry (${res.status})`);
+    }
+    const json = (await res.json()) as RegistryComponent[] | { components?: RegistryComponent[] };
+    return Array.isArray(json) ? json : (json.components ?? []);
+  }
+
   async deleteNode(path: string, userId = 'admin'): Promise<void> {
     const res = await fetch(
       `${this.apiBase}/author/content/node?path=${encodeURIComponent(path)}&userId=${encodeURIComponent(userId)}`,
@@ -201,15 +289,218 @@ export class AuthorApiClient {
     return (await res.json()) as AuthorNode;
   }
 
-  async bulkPublish(paths: string[], userId = 'admin'): Promise<void> {
-    const res = await fetch(`${this.apiBase}/author/content/bulk/publish`, {
-      method: 'POST',
+  /**
+   * Publishes every path in one call and returns the per-path result counts.
+   *
+   * Existing callers ignore the return value; REB-20 asserts on it, which is why
+   * the parsed `BulkOperationResult` is handed back instead of `void`.
+   */
+  async bulkPublish(paths: string[], userId = 'admin'): Promise<BulkOperationResult> {
+    return this.bulkRequest('POST', 'bulk/publish', { paths, userId }, 'Bulk publish');
+  }
+
+  /** Deletes every path and its descendants in one call (REB-20). */
+  async bulkDelete(paths: string[], userId = 'admin'): Promise<BulkOperationResult> {
+    return this.bulkRequest('DELETE', 'bulk', { paths, userId }, 'Bulk delete');
+  }
+
+  /** Moves every path under one target parent in one call (REB-20). */
+  async bulkMove(paths: string[], targetParentPath: string, userId = 'admin'): Promise<BulkOperationResult> {
+    return this.bulkRequest('POST', 'bulk/move', { paths, targetParentPath, userId }, 'Bulk move');
+  }
+
+  /** Shared shape for the three bulk endpoints, which differ only in verb and body. */
+  private async bulkRequest(
+    method: 'POST' | 'DELETE',
+    endpoint: string,
+    body: Record<string, unknown>,
+    label: string,
+  ): Promise<BulkOperationResult> {
+    const res = await fetch(`${this.apiBase}/author/content/${endpoint}`, {
+      method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paths, userId }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
-      throw new Error(`Bulk publish failed (${res.status})`);
+      throw new Error(`${label} failed (${res.status})`);
     }
+    const json = (await res.json()) as Partial<BulkOperationResult>;
+    return {
+      succeeded: json.succeeded ?? 0,
+      failed: json.failed ?? 0,
+      total: json.total ?? 0,
+      errors: json.errors ?? [],
+    };
+  }
+
+  // -- Workflow (REB-20) ----------------------------------------------------
+  //
+  // `AuthorWorkflowController` passes `contentPath` straight to the engine, which
+  // looks the node up by exact path -- so every workflow call takes the **ltree**
+  // form (`content.tut-usa.page`), not the `/content/...` URL form the content
+  // endpoints normalise for you.
+
+  async startWorkflow(
+    contentLtreePath: string,
+    workflowName = 'standard-publish',
+    userId = 'admin',
+  ): Promise<WorkflowInstance> {
+    const res = await fetch(`${this.apiBase}/author/workflow/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ workflowName, contentPath: contentLtreePath, userId }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to start workflow '${workflowName}' for ${contentLtreePath} (${res.status})`);
+    }
+    return (await res.json()) as WorkflowInstance;
+  }
+
+  async advanceWorkflow(
+    instanceId: string,
+    action: string,
+    userId = 'admin',
+    comment = '',
+  ): Promise<WorkflowInstance> {
+    const res = await fetch(`${this.apiBase}/author/workflow/advance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ instanceId, action, userId, comment }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to advance workflow ${instanceId} via '${action}' (${res.status})`);
+    }
+    return (await res.json()) as WorkflowInstance;
+  }
+
+  async cancelWorkflow(instanceId: string, userId = 'admin', reason = 'REB-20 cleanup'): Promise<WorkflowInstance> {
+    const query =
+      `instanceId=${encodeURIComponent(instanceId)}` +
+      `&userId=${encodeURIComponent(userId)}` +
+      `&reason=${encodeURIComponent(reason)}`;
+    const res = await fetch(`${this.apiBase}/author/workflow/cancel?${query}`, { method: 'POST' });
+    if (!res.ok) {
+      throw new Error(`Failed to cancel workflow ${instanceId} (${res.status})`);
+    }
+    return (await res.json()) as WorkflowInstance;
+  }
+
+  async listWorkflows(status: WorkflowStatus, size = 200): Promise<WorkflowInstance[]> {
+    return this.workflowPage(`list?status=${status}&size=${size}`, `list status=${status}`);
+  }
+
+  /** The inbox the admin workflows page reads. */
+  async listWorkflowsForUser(userId = 'admin', size = 200): Promise<WorkflowInstance[]> {
+    return this.workflowPage(`for-user?userId=${encodeURIComponent(userId)}&size=${size}`, `for-user ${userId}`);
+  }
+
+  private async workflowPage(query: string, label: string): Promise<WorkflowInstance[]> {
+    const res = await fetch(`${this.apiBase}/author/workflow/${query}`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch workflow ${label} (${res.status})`);
+    }
+    const json = (await res.json()) as { content?: WorkflowInstance[] } | WorkflowInstance[];
+    if (Array.isArray(json)) return json;
+    return json.content ?? [];
+  }
+
+  /** The active workflow for a path, or `null` when the API answers 404. */
+  async getActiveWorkflow(contentLtreePath: string): Promise<WorkflowInstance | null> {
+    const res = await fetch(
+      `${this.apiBase}/author/workflow/active?contentPath=${encodeURIComponent(contentLtreePath)}`,
+    );
+    if (res.status === 404) return null;
+    if (!res.ok) {
+      throw new Error(`Failed to fetch active workflow for ${contentLtreePath} (${res.status})`);
+    }
+    return (await res.json()) as WorkflowInstance;
+  }
+
+  // -- Scheduling (REB-20) --------------------------------------------------
+
+  /** Schedules (or, with `null`, clears) a future publish. */
+  async schedulePublish(path: string, publishAt: Date | null): Promise<void> {
+    await this.scheduleRequest('schedule-publish', 'publishAt', path, publishAt, 'schedule publish');
+  }
+
+  /** Schedules (or, with `null`, clears) a future deactivation. */
+  async scheduleDeactivate(path: string, deactivateAt: Date | null): Promise<void> {
+    await this.scheduleRequest('schedule-deactivate', 'deactivateAt', path, deactivateAt, 'schedule deactivate');
+  }
+
+  private async scheduleRequest(
+    endpoint: string,
+    param: string,
+    path: string,
+    at: Date | null,
+    label: string,
+  ): Promise<void> {
+    const query = at
+      ? `path=${encodeURIComponent(path)}&${param}=${encodeURIComponent(at.toISOString())}`
+      : `path=${encodeURIComponent(path)}`;
+    const res = await fetch(`${this.apiBase}/author/content/node/${endpoint}?${query}`, { method: 'PUT' });
+    if (!res.ok) {
+      throw new Error(`Failed to ${label} for ${path} (${res.status})`);
+    }
+  }
+
+  /**
+   * Waits until the scheduler has consumed a schedule, i.e. cleared the node's
+   * `scheduledPublishAt` / `scheduledDeactivateAt`.
+   *
+   * `ScheduledPublishingService` polls on a 60 s `fixedDelay`, so the default
+   * timeout allows for two cycles plus replication.
+   */
+  async waitForScheduleProcessed(
+    path: string,
+    field: 'scheduledPublishAt' | 'scheduledDeactivateAt',
+    timeoutMs = 180_000,
+  ): Promise<AuthorNode> {
+    const startedAt = Date.now();
+    let node = await this.getNode(path);
+    while (Date.now() - startedAt < timeoutMs) {
+      if (!node[field]) return node;
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+      node = await this.getNode(path);
+    }
+    throw new Error(
+      `Timed out after ${timeoutMs} ms waiting for the scheduler to consume ${field} on ${path} ` +
+        `(still ${String(node[field])})`,
+    );
+  }
+
+  /** Raw HTTP status of a publish-environment page, for retraction checks. */
+  async getPublishPageStatus(urlPath: string): Promise<number> {
+    const normalized = urlPath.startsWith('/') ? urlPath.slice(1) : urlPath;
+    const res = await fetch(`${this.publishBase}/api/content/v1/pages/${normalized}`, {
+      headers: this.headlessHeaders,
+    });
+    return res.status;
+  }
+
+  /** Whether the publish service answers its health probe (AC1, scenario 10). */
+  async isPublishServiceReachable(): Promise<boolean> {
+    try {
+      const res = await fetch(`${this.publishBase}/actuator/health`);
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  /** Polls the publish delivery API until it serves `marker`, or gives up. */
+  async waitForPublishMarker(urlPath: string, marker: string, timeoutMs = 120_000): Promise<boolean> {
+    const startedAt = Date.now();
+    while (Date.now() - startedAt < timeoutMs) {
+      try {
+        const payload = await this.getPublishRenderedPage(urlPath);
+        if (JSON.stringify(payload).includes(marker)) return true;
+      } catch {
+        // A page that has not replicated yet answers 500, not 404 -- keep polling.
+      }
+      await new Promise((resolve) => setTimeout(resolve, 2_000));
+    }
+    return false;
   }
 
   async waitForNode(path: string, timeoutMs = 20_000): Promise<AuthorNode> {

@@ -41,6 +41,45 @@ export class ContentTreePage {
     return names;
   }
 
+  /**
+   * Waits until the visible listing satisfies the given expectations, then returns it.
+   *
+   * `waitUntilLoaded()` only waits for skeleton rows to disappear, which does not
+   * cover the gap between clicking a row and the new folder's `/children` fetch
+   * resolving — during that gap the table still holds the *previous* folder's rows.
+   * Asserting directly on `readVisibleRowNames()` after a navigation is therefore
+   * racy, and an all-negative assertion can pass against the wrong folder entirely.
+   *
+   * @param expectPresent names that must all be listed
+   * @param expectAbsent  names that none of which may be listed
+   */
+  async waitForRowNames(
+    expectPresent: string[],
+    expectAbsent: string[] = [],
+    timeoutMs = 20_000,
+  ): Promise<string[]> {
+    let names: string[] = [];
+    const satisfied = async (): Promise<boolean> => {
+      names = await this.readVisibleRowNames();
+      return (
+        expectPresent.every((name) => names.includes(name)) &&
+        expectAbsent.every((name) => !names.includes(name))
+      );
+    };
+
+    const deadline = Date.now() + timeoutMs;
+    while (Date.now() < deadline) {
+      if (await satisfied()) return names;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+
+    throw new Error(
+      `Timed out after ${timeoutMs} ms waiting for the content tree listing. ` +
+        `Expected present [${expectPresent.join(', ')}] and absent [${expectAbsent.join(', ')}]; ` +
+        `listing held [${names.join(', ')}]`,
+    );
+  }
+
   async readBodyText(): Promise<string> {
     const body = await waitForVisible(this.driver, By.css('body'));
     return body.getText();

@@ -5,6 +5,7 @@ import com.flexcms.core.model.NodeStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -122,11 +123,22 @@ public interface ContentNodeRepository extends JpaRepository<ContentNode, UUID> 
     List<ContentNode> findByProductSku(@Param("sku") String sku);
 
     /**
-     * Delete node and all descendants.
+     * Delete a node and all of its descendants.
+     *
+     * <p>{@code @Modifying} is required: without it Spring Data executes this
+     * statement as a query and PostgreSQL fails with
+     * {@code No results were returned by the query}.</p>
+     *
+     * <p>Descendants are matched with an explicit {@code '.'} separator, as in
+     * {@link #findDescendants(String)}, so deleting {@code content.site.home}
+     * cannot also delete the sibling {@code content.site.homepage}.</p>
+     *
+     * @return the number of rows deleted, i.e. the node plus its descendants
      */
-    @Query(value = "DELETE FROM content_nodes WHERE path::text LIKE :pathPrefix || '%'",
+    @Modifying
+    @Query(value = "DELETE FROM content_nodes WHERE path::text = :pathPrefix OR path::text LIKE :pathPrefix || '.%'",
            nativeQuery = true)
-    void deleteSubtree(@Param("pathPrefix") String pathPrefix);
+    int deleteSubtree(@Param("pathPrefix") String pathPrefix);
 
     /**
      * Find nodes whose scheduled publish time has passed and are not yet published.

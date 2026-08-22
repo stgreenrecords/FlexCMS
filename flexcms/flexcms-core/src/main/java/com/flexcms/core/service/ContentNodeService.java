@@ -1,5 +1,6 @@
 package com.flexcms.core.service;
 
+import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.BulkOperationResult;
@@ -11,6 +12,7 @@ import com.flexcms.core.repository.ContentNodeVersionRepository;
 import com.flexcms.core.util.RichTextSanitizer;
 import io.micrometer.core.annotation.Timed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +40,9 @@ public class ContentNodeService {
 
     @Autowired
     private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /** Lazy to avoid circular dependency via Spring context. */
     @Autowired
@@ -232,11 +237,21 @@ public class ContentNodeService {
         ContentNode node = nodeRepository.findByPath(path)
                 .orElseThrow(() -> NotFoundException.forPath(path));
 
+        NodeStatus previousStatus = node.getStatus();
         node.setStatus(status);
         node.setModifiedBy(userId);
         ContentNode saved = nodeRepository.save(node);
         String action = (status == NodeStatus.PUBLISHED) ? AuditService.ACTION_PUBLISH : AuditService.ACTION_UNPUBLISH;
         auditService.log(AuditService.ENTITY_CONTENT, saved.getId(), saved.getPath(), action, userId);
+
+        // Every publish path funnels through this method — the single-node status
+        // endpoint, bulkUpdateStatus, and scheduled publishing — so emitting here
+        // guarantees each transition is announced exactly once. Consumers such as
+        // replication bind after commit, so a rolled-back transition never reaches
+        // the publish environment.
+        eventPublisher.publishEvent(
+                new ContentStatusChangedEvent(this, saved, previousStatus, status, userId));
+
         return saved;
     }
 

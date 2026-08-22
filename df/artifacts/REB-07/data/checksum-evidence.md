@@ -2,7 +2,7 @@
 
 - Generated map: `df/artifacts/REB-07/data/dam-import-map.json`
 - Unique assets: 182
-- Total bytes: 54440265
+- Total bytes: 54444555
 - Category counts: `{'font': 22, 'image': 145, 'stylesheet': 15}`
 
 ## Sample assets

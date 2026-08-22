@@ -14,13 +14,19 @@
     "test:admin:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-13 admin authoring and round-trip suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb13-admin-suite.xml",
     "test:reb18": "pnpm build && mocha --grep \"REB-18 content tree and page lifecycle suite\"",
     "test:reb18:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-18 content tree and page lifecycle suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb18-suite.xml",
+    "test:reb19": "pnpm build && mocha --grep \"REB-19 page editor authoring matrix suite\"",
+    "test:reb19:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-19 page editor authoring matrix suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb19-suite.xml",
+    "test:reb26": "pnpm build && mocha --grep \"REB-26 exhaustive per-component sample-site editing suite\"",
+    "test:reb20": "pnpm build && mocha --grep \"REB-20 publishing, workflow, scheduling, and bulk operation suite\"",
+    "test:reb20:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-20 publishing, workflow, scheduling, and bulk operation suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb20-suite.xml",
+    "test:reb26:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-26 exhaustive per-component sample-site editing suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb26-suite.xml",
     "test:pages": "pnpm build && mocha --grep \"REB-12 public site pages\"",
     "test:templates": "pnpm build && mocha --grep \"REB-12 template-by-template public site coverage\"",
     "test:templates:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-12 template-by-template public site coverage\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb12-template-results.xml",
     "test:headed": "cross-env HEADLESS=false pnpm build && cross-env HEADLESS=false mocha",
     "test:debug": "cross-env HEADLESS=false SLOWMO=250 pnpm build && cross-env HEADLESS=false SLOWMO=250 mocha --grep @smoke",
     "test:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/selenium-results.xml",
-    "test:full:ci": "pnpm test:templates:ci && pnpm test:admin:ci && pnpm test:reb18:ci",
+    "test:full:ci": "pnpm test:templates:ci && pnpm test:admin:ci && pnpm test:reb18:ci && pnpm test:reb19:ci && pnpm test:reb20:ci && pnpm test:reb26:ci",
     "ci:gate:smoke": "node scripts/selenium-gate.cjs --mode smoke",
     "ci:gate:full": "node scripts/selenium-gate.cjs --mode full",
     "clean": "rimraf dist reports test-results"
@@ -41,5 +47,3 @@
     "typescript": "~5.4.5"
   }
 }
-
-

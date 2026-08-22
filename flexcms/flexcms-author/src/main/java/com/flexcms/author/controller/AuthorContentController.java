@@ -6,8 +6,6 @@ import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.service.ContentNodeService;
-import com.flexcms.replication.model.ReplicationEvent;
-import com.flexcms.replication.service.ReplicationAgent;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -50,9 +48,6 @@ public class AuthorContentController {
 
     @Autowired
     private ScheduledPublishingService scheduledPublishingService;
-
-    @Autowired
-    private ReplicationAgent replicationAgent;
 
     @Operation(summary = "Get content node", description = "Returns a single content node by its path.")
     @GetMapping("/node")
@@ -213,31 +208,14 @@ public class AuthorContentController {
     @PostMapping("/bulk/publish")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
     public ResponseEntity<BulkOperationResult> bulkPublish(@Valid @RequestBody BulkPathsRequest req) {
+        // Replication is not triggered here: every status transition publishes a
+        // ContentStatusChangedEvent, and ContentPublishReplicationListener replicates
+        // after the transition commits. That keeps publish semantics identical for
+        // bulk publish, the single-node status endpoint, and scheduled publishing.
         BulkOperationResult result = nodeService.bulkUpdateStatus(
                 req.paths().stream().map(this::toContentPath).toList(),
                 NodeStatus.PUBLISHED, req.userId());
-        // Trigger replication for each successfully published path
-        req.paths().forEach(path -> {
-            try {
-                String contentPath = toContentPath(path);
-                ContentNode node = nodeService.getByPath(contentPath)
-                        .orElseThrow(() -> NotFoundException.forPath(contentPath));
-
-                if (isTreeReplicationCandidate(node)) {
-                    replicationAgent.replicateTree(contentPath, req.userId());
-                } else {
-                    replicationAgent.replicate(contentPath,
-                            ReplicationEvent.ReplicationAction.ACTIVATE, req.userId());
-                }
-            } catch (Exception e) {
-                result.addError(path, "replication failed: " + e.getMessage());
-            }
-        });
         return ResponseEntity.ok(result);
-    }
-
-    private boolean isTreeReplicationCandidate(ContentNode node) {
-        return "flexcms/page".equals(node.getResourceType()) || "flexcms/site-root".equals(node.getResourceType());
     }
 
     @Operation(summary = "Bulk delete", description = "Deletes all listed content paths and their descendants.")
