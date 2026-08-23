@@ -4,6 +4,7 @@ import com.flexcms.core.exception.ValidationException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.core.model.AssetRendition;
 import com.flexcms.core.model.AssetStatus;
+import com.flexcms.core.repository.AssetFolderSummary;
 import com.flexcms.core.repository.AssetRepository;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
@@ -223,8 +224,24 @@ public class AssetIngestService {
      * @return paginated result
      */
     public Page<Asset> listFolder(String folderPath, String siteId, int page, int size) {
-        return assetRepository.findByFolderPathAndStatus(folderPath, AssetStatus.ACTIVE,
+        return assetRepository.findByFolderPathAndSiteIdAndStatus(folderPath, siteId, AssetStatus.ACTIVE,
                 PageRequest.of(page, Math.min(size, 200)));
+    }
+
+    /**
+     * Every folder of a site that holds at least one active asset.
+     *
+     * <p>Folders are derived from asset paths rather than stored, so this returns only
+     * folders with assets directly in them. A caller building a tree reconstructs the
+     * intermediate folders from the path segments — {@code /content/dam/a/b} implies
+     * {@code /content/dam/a} even when nothing sits directly in it.</p>
+     *
+     * @param siteId site identifier, or {@code null} to group across all sites
+     * @return folder paths with direct asset counts, ordered by path
+     */
+    public List<AssetFolderSummary> listFolders(String siteId) {
+        String effectiveSite = (siteId == null || siteId.isBlank()) ? null : siteId;
+        return assetRepository.findFolderSummaries(effectiveSite, AssetStatus.ACTIVE);
     }
 
     /**

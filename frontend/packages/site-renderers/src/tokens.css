@@ -1,0 +1,42 @@
+/**
+ * Design tokens for the TUT renderers, scoped to a canvas container.
+ *
+ * The renderers in this package resolve every colour and font through a
+ * `--color-*` / `--font-*` custom property. On the public site those are defined on
+ * `:root`. The admin app defines custom properties with the *same names* and
+ * different values — its own light UI theme — so renderers dropped into an admin page
+ * would silently pick up admin's palette and look nothing like the published page.
+ *
+ * Applying this class to the editor canvas re-binds the tokens for that subtree only,
+ * leaving the surrounding admin chrome on its own theme.
+ *
+ * These values are generated from the site's `globals.css` :root block, and
+ * `__tests__/tokens.test.ts` fails if the two drift apart.
+ */
+.flexcms-canvas {
+  --font-body: 'Manrope', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-headline: 'Newsreader', Georgia, serif;
+  --font-label: 'Manrope', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  --color-background: #070d1f;
+  --color-foreground: #dfe4ff;
+  --color-primary: #c6c6c7;
+  --color-on-primary: #3f4041;
+  --color-primary-fixed: #e2e2e2;
+  --color-secondary: #8f9fb7;
+  --color-on-secondary: #102134;
+  --color-surface: #070d1f;
+  --color-surface-variant: #0a2257;
+  --color-surface-container: #0a1839;
+  --color-surface-container-low: #09122b;
+  --color-surface-container-high: #0b1d48;
+  --color-surface-container-highest: #0a2257;
+  --color-on-surface: #dfe4ff;
+  --color-on-surface-variant: #96a9e6;
+  --color-outline: #6073ad;
+  --color-outline-variant: #32457c;
+  --color-error: #ee7d77;
+  --color-on-error: #490106;
+  --color-error-container: #7f2927;
+  --color-on-error-container: #ff9993;
+}

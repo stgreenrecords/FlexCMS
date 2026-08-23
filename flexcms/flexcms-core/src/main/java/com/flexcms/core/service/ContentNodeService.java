@@ -4,6 +4,7 @@ import com.flexcms.core.event.ContentDeletedEvent;
 import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
+import com.flexcms.core.exception.ValidationException;
 import com.flexcms.core.model.BulkOperationResult;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
@@ -293,6 +294,71 @@ public class ContentNodeService {
                 new ContentStatusChangedEvent(this, saved, previousStatus, status, userId));
 
         return saved;
+    }
+
+    /**
+     * Rewrite the {@code orderIndex} of a parent's children to match {@code orderedPaths}.
+     *
+     * <p>Until this existed nothing could change an established order:
+     * {@link #createNode} appends with {@code orderIndex = last + 1} and delivery
+     * sorts by that column, but no service method or endpoint ever updated it. The
+     * page editor's reorder controls therefore had nowhere to persist to — half of
+     * REB-19 blocker B-3.</p>
+     *
+     * <p>Membership is validated strictly: {@code orderedPaths} must name exactly the
+     * parent's current children, no more and no fewer. A caller that omits one would
+     * otherwise get a partial order that looks like it worked, which is harder to
+     * spot than an outright rejection.</p>
+     *
+     * @param parentPath   ltree path of the parent whose children are being ordered
+     * @param orderedPaths child paths in their desired order
+     * @param userId       who performed the reorder
+     * @return the reordered children
+     * @throws NotFoundException  if the parent does not exist
+     * @throws ValidationException if the paths do not match the parent's children
+     */
+    @PreAuthorize("hasPermission(#parentPath, 'WRITE')")
+    @Transactional
+    public List<ContentNode> reorderChildren(String parentPath, List<String> orderedPaths, String userId) {
+        nodeRepository.findByPath(parentPath)
+                .orElseThrow(() -> NotFoundException.forPath(parentPath));
+
+        List<ContentNode> children = nodeRepository.findByParentPathOrderByOrderIndex(parentPath);
+        Map<String, ContentNode> byPath = new HashMap<>();
+        for (ContentNode child : children) {
+            byPath.put(child.getPath(), child);
+        }
+
+        List<String> requested = orderedPaths == null ? List.of() : orderedPaths;
+        Set<String> requestedSet = new LinkedHashSet<>(requested);
+
+        if (requestedSet.size() != requested.size()) {
+            throw new ValidationException("Reorder contains duplicate paths", List.of(
+                    ValidationException.FieldError.of("orderedPaths", "The same child appears more than once")));
+        }
+        if (!requestedSet.equals(byPath.keySet())) {
+            Set<String> unknown = new LinkedHashSet<>(requestedSet);
+            unknown.removeAll(byPath.keySet());
+            Set<String> missing = new LinkedHashSet<>(byPath.keySet());
+            missing.removeAll(requestedSet);
+            throw new ValidationException("Reorder must list exactly the parent's children", List.of(
+                    ValidationException.FieldError.of("orderedPaths",
+                            "unknown=" + unknown + " missing=" + missing)));
+        }
+
+        int index = 0;
+        List<ContentNode> reordered = new ArrayList<>(requested.size());
+        for (String path : requested) {
+            ContentNode child = byPath.get(path);
+            child.setOrderIndex(index++);
+            child.setModifiedBy(userId);
+            reordered.add(child);
+        }
+
+        nodeRepository.saveAll(reordered);
+        auditService.log(AuditService.ENTITY_CONTENT, null, parentPath,
+                AuditService.ACTION_UPDATE, userId);
+        return reordered;
     }
 
     /**

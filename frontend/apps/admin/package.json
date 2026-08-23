@@ -2,7 +2,7 @@
   "name": "@flexcms/admin",
   "version": "1.0.0",
   "private": true,
-  "description": "FlexCMS Admin UI — content authoring interface built with Next.js",
+  "description": "FlexCMS Admin UI \u2014 content authoring interface built with Next.js",
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",
@@ -15,6 +15,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@flexcms/react": "workspace:*",
     "@flexcms/sdk": "workspace:*",
+    "@flexcms/site-renderers": "workspace:*",
     "@flexcms/ui": "workspace:*",
     "@tanstack/react-query": "^5.0.0",
     "next": "^14.2.0",

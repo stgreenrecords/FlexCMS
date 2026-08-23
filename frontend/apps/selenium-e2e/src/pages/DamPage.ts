@@ -55,6 +55,108 @@ export class DamPage {
     return (await body.getText()).trim();
   }
 
+  // ── Folder tree ────────────────────────────────────────────────────────────
+
+  /**
+   * Test id for a folder path, matching `folderTestId` in the page.
+   *
+   * Paths are keyed by their full path rather than their leaf name, because two
+   * folders can share a leaf — `brand/logos` and `archive/logos` are different
+   * folders and must be distinguishable.
+   */
+  static folderTestId(path: string): string {
+    return path.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  }
+
+  /** Whether the folder tree rendered at all. */
+  async hasFolderTree(): Promise<boolean> {
+    const trees = await this.driver.findElements(By.css('[data-testid="dam-folder-tree"]'));
+    return trees.length > 0;
+  }
+
+  /** Folder paths currently visible in the tree, in render order. */
+  async visibleFolderPaths(): Promise<string[]> {
+    const nodes = await this.driver.findElements(
+      By.css('[data-testid^="dam-folder-"]:not([data-testid^="dam-folder-toggle-"])'),
+    );
+    const paths: string[] = [];
+    for (const node of nodes) {
+      const title = await node.getAttribute('title');
+      if (title) paths.push(title);
+    }
+    return paths;
+  }
+
+  /** The count badge shown beside a folder, as rendered. */
+  async folderCount(path: string): Promise<string | null> {
+    const nodes = await this.driver.findElements(
+      By.css(`[data-testid="dam-folder-${DamPage.folderTestId(path)}"]`),
+    );
+    if (nodes.length === 0) return null;
+    const text = (await nodes[0].getText()).trim().split(/\s+/);
+    return text[text.length - 1] ?? null;
+  }
+
+  /** Selects a folder, filtering the grid to its subtree. */
+  async selectFolder(path: string): Promise<void> {
+    const node = await waitForVisible(
+      this.driver,
+      By.css(`[data-testid="dam-folder-${DamPage.folderTestId(path)}"]`),
+    );
+    await node.click();
+    await waitForPageReady(this.driver);
+  }
+
+  /** Expands or collapses a folder without selecting it. */
+  async toggleFolder(path: string): Promise<void> {
+    const toggle = await waitForVisible(
+      this.driver,
+      By.css(`[data-testid="dam-folder-toggle-${DamPage.folderTestId(path)}"]`),
+    );
+    await toggle.click();
+    await waitForPageReady(this.driver);
+  }
+
+  /** Whether a folder is currently expanded, per its toggle's aria-expanded. */
+  async isFolderExpanded(path: string): Promise<boolean> {
+    const toggles = await this.driver.findElements(
+      By.css(`[data-testid="dam-folder-toggle-${DamPage.folderTestId(path)}"]`),
+    );
+    if (toggles.length === 0) return false;
+    return (await toggles[0].getAttribute('aria-expanded')) === 'true';
+  }
+
+  /** Breadcrumb segments for the selected folder, excluding the "Assets" root. */
+  async breadcrumbSegments(): Promise<string[]> {
+    const crumbs = await this.driver.findElements(
+      By.css('[data-testid^="dam-breadcrumb-"]'),
+    );
+    const segments: string[] = [];
+    for (const crumb of crumbs) {
+      const testId = await crumb.getAttribute('data-testid');
+      if (testId === 'dam-breadcrumb-root') continue;
+      segments.push((await crumb.getText()).trim());
+    }
+    return segments;
+  }
+
+  /** Clicks a breadcrumb ancestor by its folder path. */
+  async clickBreadcrumb(path: string): Promise<void> {
+    const crumb = await waitForVisible(
+      this.driver,
+      By.css(`[data-testid="dam-breadcrumb-${DamPage.folderTestId(path)}"]`),
+    );
+    await crumb.click();
+    await waitForPageReady(this.driver);
+  }
+
+  /** Returns to the unfiltered library via the "Assets" breadcrumb. */
+  async clickBreadcrumbRoot(): Promise<void> {
+    const crumb = await waitForVisible(this.driver, By.css('[data-testid="dam-breadcrumb-root"]'));
+    await crumb.click();
+    await waitForPageReady(this.driver);
+  }
+
   /** Whether the library rendered an error state rather than content. */
   async hasErrorState(): Promise<boolean> {
     const body = (await this.readBodyText()).toLowerCase();

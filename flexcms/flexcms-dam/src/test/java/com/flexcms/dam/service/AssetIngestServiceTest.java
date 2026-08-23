@@ -2,6 +2,7 @@ package com.flexcms.dam.service;
 
 import com.flexcms.core.model.Asset;
 import com.flexcms.core.model.AssetStatus;
+import com.flexcms.core.repository.AssetFolderSummary;
 import com.flexcms.core.repository.AssetRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -195,13 +196,68 @@ class AssetIngestServiceTest {
     void listFolder_returnsAssetsFromRepository() {
         Asset a = savedAsset("/dam/images/logo.png", "image/png");
         Page<Asset> page = new PageImpl<>(List.of(a));
-        when(assetRepository.findByFolderPathAndStatus(
-                eq("/dam/images"), eq(AssetStatus.ACTIVE), any(Pageable.class)))
+        when(assetRepository.findByFolderPathAndSiteIdAndStatus(
+                eq("/dam/images"), eq("corporate"), eq(AssetStatus.ACTIVE), any(Pageable.class)))
                 .thenReturn(page);
 
         Page<Asset> result = assetIngestService.listFolder("/dam/images", "corporate", 0, 50);
 
         assertThat(result.getContent()).hasSize(1).containsExactly(a);
+    }
+
+    /**
+     * The site argument used to be accepted and then dropped: the finder keyed on
+     * folder path alone, so two sites sharing a folder name saw each other's assets.
+     * This asserts the site actually reaches the query.
+     */
+    @Test
+    void listFolder_scopesToTheRequestedSite() {
+        when(assetRepository.findByFolderPathAndSiteIdAndStatus(
+                anyString(), anyString(), any(AssetStatus.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        assetIngestService.listFolder("/dam/images", "tut-usa", 0, 50);
+
+        verify(assetRepository).findByFolderPathAndSiteIdAndStatus(
+                eq("/dam/images"), eq("tut-usa"), eq(AssetStatus.ACTIVE), any(Pageable.class));
+    }
+
+    // ── listFolders ──────────────────────────────────────────────────
+
+    @Test
+    void listFolders_returnsSummariesForTheSite() {
+        List<AssetFolderSummary> summaries = List.of(
+                new AssetFolderSummary("content/dam/tut-usa/heroes", 3L),
+                new AssetFolderSummary("content/dam/tut-usa/gallery", 1L));
+        when(assetRepository.findFolderSummaries("tut-usa", AssetStatus.ACTIVE))
+                .thenReturn(summaries);
+
+        assertThat(assetIngestService.listFolders("tut-usa"))
+                .containsExactlyElementsOf(summaries);
+    }
+
+    /**
+     * A blank site is not a site named "": the DAM browser lists assets across all
+     * sites, so its folder tree has to span them too. Blank and null both mean "all".
+     */
+    @Test
+    void listFolders_treatsBlankSiteAsAllSites() {
+        when(assetRepository.findFolderSummaries(null, AssetStatus.ACTIVE))
+                .thenReturn(List.of());
+
+        assetIngestService.listFolders("   ");
+
+        verify(assetRepository).findFolderSummaries(null, AssetStatus.ACTIVE);
+    }
+
+    @Test
+    void listFolders_treatsNullSiteAsAllSites() {
+        when(assetRepository.findFolderSummaries(null, AssetStatus.ACTIVE))
+                .thenReturn(List.of());
+
+        assetIngestService.listFolders(null);
+
+        verify(assetRepository).findFolderSummaries(null, AssetStatus.ACTIVE);
     }
 
     // ── searchAssets ──────────────────────────────────────────────────────────

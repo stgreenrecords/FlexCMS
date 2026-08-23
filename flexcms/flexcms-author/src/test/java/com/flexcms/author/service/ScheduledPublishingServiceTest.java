@@ -113,6 +113,10 @@ class ScheduledPublishingServiceTest {
         ContentNode n1 = draftNode("content.page1");
         ContentNode n2 = draftNode("content.page2");
         when(nodeRepository.findDueForPublish(any())).thenReturn(List.of(n1, n2));
+        // Clearing the schedule re-reads the node, so the transition it just made is
+        // not overwritten by a stale copy.
+        when(nodeRepository.findByPath("content.page1")).thenReturn(Optional.of(n1));
+        when(nodeRepository.findByPath("content.page2")).thenReturn(Optional.of(n2));
 
         service.processScheduledPublishes();
 
@@ -153,7 +157,12 @@ class ScheduledPublishingServiceTest {
     void processScheduledPublishes_replicationFailure_continuesOtherNodes() {
         ContentNode n1 = draftNode("content.page1");
         ContentNode n2 = draftNode("content.page2");
+        // Both carry a due schedule, so "cleared" is an observable change rather than
+        // a field that was already null.
+        n1.setScheduledPublishAt(Instant.now().minusSeconds(10));
+        n2.setScheduledPublishAt(Instant.now().minusSeconds(10));
         when(nodeRepository.findDueForPublish(any())).thenReturn(List.of(n1, n2));
+        when(nodeRepository.findByPath("content.page2")).thenReturn(Optional.of(n2));
         doThrow(new RuntimeException("RabbitMQ down"))
                 .when(nodeService).updateStatus(eq("content.page1"), any(), any());
 
@@ -161,8 +170,10 @@ class ScheduledPublishingServiceTest {
 
         verify(nodeService).updateStatus("content.page1", NodeStatus.PUBLISHED, "system:scheduler");
         verify(nodeService).updateStatus("content.page2", NodeStatus.PUBLISHED, "system:scheduler");
-        // n2 was replicated successfully, so its scheduledPublishAt should be cleared
+        // n2 succeeded, so its schedule is consumed...
         assertThat(n2.getScheduledPublishAt()).isNull();
+        // ...while n1 failed and keeps its schedule for the next cycle to retry.
+        assertThat(n1.getScheduledPublishAt()).isNotNull();
     }
 
     @Test
@@ -170,6 +181,7 @@ class ScheduledPublishingServiceTest {
         ContentNode node = draftNode("content.home");
         node.setScheduledPublishAt(Instant.now().minusSeconds(10));
         when(nodeRepository.findDueForPublish(any())).thenReturn(List.of(node));
+        when(nodeRepository.findByPath("content.home")).thenReturn(Optional.of(node));
 
         service.processScheduledPublishes();
 
@@ -185,6 +197,8 @@ class ScheduledPublishingServiceTest {
         ContentNode n1 = publishedNode("content.page1");
         ContentNode n2 = publishedNode("content.page2");
         when(nodeRepository.findDueForDeactivation(any())).thenReturn(List.of(n1, n2));
+        when(nodeRepository.findByPath("content.page1")).thenReturn(Optional.of(n1));
+        when(nodeRepository.findByPath("content.page2")).thenReturn(Optional.of(n2));
 
         service.processScheduledDeactivations();
 
@@ -210,6 +224,7 @@ class ScheduledPublishingServiceTest {
         ContentNode node = publishedNode("content.home");
         node.setScheduledDeactivateAt(Instant.now().minusSeconds(10));
         when(nodeRepository.findDueForDeactivation(any())).thenReturn(List.of(node));
+        when(nodeRepository.findByPath("content.home")).thenReturn(Optional.of(node));
 
         service.processScheduledDeactivations();
 

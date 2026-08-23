@@ -12,12 +12,18 @@ inside any one task's folder.
 
 ## Scope decision
 
-Fourteen open blockers were triaged. **Eleven were fixed** — ten that had a single
-defensible correct behaviour, plus `B-1`, which the human asked for directly after
-seeing `[object Object]` in the editor's CTA fields.
+**Nineteen** open blockers were triaged across the five tasks — REB-19's `B-1`,
+`B-2`, `B-3`, `B-4`, `B-6` (its `B-5` and `B-7` were already closed by earlier
+backend work), REB-26's `R26-1`–`R26-4`, REB-20's `R20-1`–`R20-5`, REB-21's
+`R21-1`–`R21-4`, and `I29-1`.
 
-Four still need a human or `sa` decision, because the decision itself determines what
-"fixed" would mean:
+**Fourteen were fixed:** the eleven with a single defensible correct behaviour, plus
+`B-1` (asked for directly after the human saw `[object Object]` in the editor's CTA
+fields), `B-3`, and `B-4`. `B-1` is partial — its data-loss half is fixed, its richer
+authoring UX is still design work.
+
+**Five still need a human or `sa` decision**, because the decision itself determines
+what "fixed" would mean:
 
 | Left open | Why |
 |---|---|
@@ -45,6 +51,8 @@ authoring UX it asks for is still design work.
 | `R26-2` | Deactivation flipped only the page node and delivery ignored status | `deactivateContent()` walks the subtree; publish-instance delivery filters on `PUBLISHED` |
 | `I29-1` | PIM seed wrote `products.status = 'ACTIVE'`, which `ProductStatus` cannot parse — every seeded product unreadable | PIM `V5` repairs existing rows; `V4` corrected for fresh installs. `catalogs`/`product_variants` left alone — `ACTIVE` is valid there |
 | `R26-3` | Numeric fields could not be cleared, and clear-then-retype corrupted the value (`42` → clear → `1004` yielded `10040`) | `PropertyField` keeps the raw keystrokes in local state and coerces on change; empty reports `undefined` |
+| `B-3` | The editor silently discarded component additions, deletions, and reordering — `handleSave()` only PUT properties for components that already had a `nodePath`, so anything else vanished on reload while the UI reported success | Backend gained `ContentNodeService.reorderChildren()` and `POST /node/reorder` — nothing in the system could previously *change* an order, only append. `handleSave()` now reconciles against a baseline captured at load: creates added components and adopts their paths, deletes baseline paths that are gone, and persists the surviving order. Template-embedded placeholders are excluded so Save cannot detach them from inheritance as a side effect |
+| `B-4` | Undo/redo buttons were rendered with no `onClick` — pure decoration | A history of `components` snapshots, recorded in an effect. Snapshots rather than inverse operations, because every mutation already flows through `setComponents`, so add/delete/duplicate/reorder/property-edit are covered uniformly. Editing after an undo drops the redo branch; history is capped at 50 |
 | `B-1` | Array and object fields fell through to the text branch, so an author saw `[object Object]` and editing the box replaced the structure with that literal string — 265 array + 66 object fields | `PropField` gained `object`/`list`; `schemaToFields()` recurses into the shape the registry publishes. An object with declared properties renders nested inputs, an array renders a repeater with add/remove/reorder, and an undeclared shape gets a validated JSON editor that writes only when the text parses. Nested edits preserve keys the schema does not mention |
 
 ## Verification
@@ -58,7 +66,7 @@ the product is fixed, with no edit to the specs.
 
 | Suite | Before | After |
 |---|---|---|
-| REB-20 | 8 PASS / 5 BLOCKED | **13 PASS / 0 BLOCKED**, and the run emits no blocker section at all |
+| REB-20 | 8 PASS / 5 BLOCKED | **13 PASS / 0 BLOCKED**, and the run emits no blocker section at all. Counts are *operations recorded* in the matrix — 13 operations across 12 mocha scenarios, both reported by the run |
 | REB-21 | 6 PASS / 3 BLOCKED | **8 PASS / 1 BLOCKED** — the remaining one is `R21-3`, which is intentionally still open |
 | REB-26 | 406 PASS; 1724 / 448 field rows; `S4`: publish still serves the deleted page with 406 components | **24 tests / 0 failures**; 406 PASS; **2053 / 119** field rows; `S4`: *"Publish environment no longer serves /tut-usa/reb26-component-sweep after archive + delete"* |
 
@@ -87,7 +95,7 @@ scheduler:       "Scheduled publish complete: 1/1 succeeded"
                  "Scheduled deactivation complete: 1/1 succeeded"
 ```
 
-## Four flaws in these fixes, caught by tests rather than by inspection
+## Five flaws in these fixes, caught by tests rather than by inspection
 
 Recorded because each one would have shipped as a silent non-fix:
 
@@ -104,7 +112,16 @@ Recorded because each one would have shipped as a silent non-fix:
    was never consumed. Unit tests could not catch this — they mock the service, so
    method security never evaluates. The job now runs as `system:scheduler` with
    `ROLE_ADMIN`; an identity, not a bypass.
-4. **`replicate()` cannot replicate a deletion.** It resolves the node first, and
+4. **My first B-4 attempt broke three passing tests.** Tracking `canUndo`/`canRedo`
+   as state — purely to grey the buttons out — put a `setState` inside an effect
+   keyed on `components`, producing React error #185 ("Maximum update depth
+   exceeded"). The render storm also stopped property inputs accepting typed text,
+   so REB-19's `S3`, `S4`, and `S5` failed. The history effect now writes only to
+   refs and cannot trigger a render; the buttons no longer disable themselves, which
+   is a cosmetic loss worth trading for not having a render loop in the editor.
+   Had I stopped at "S8 passes, B-4 done", I would have broken core authoring to
+   wire two buttons.
+5. **`replicate()` cannot replicate a deletion.** It resolves the node first, and
    the node is gone by then, so every delete logged
    `Delete replication failed: Node not found` and gave up while the API still
    answered 200. **The fix looked correct and did nothing.** Added
@@ -113,9 +130,6 @@ Recorded because each one would have shipped as a silent non-fix:
 
 ## Not attempted
 
-- `B-3` (component order/add/delete never persisted) and `B-4` (undo/redo not
-  wired) are genuine defects with unambiguous correct behaviour, but they are
-  feature implementation rather than repair. Not started.
 - `R26-4`'s headline symptom (42 of 42 form components render no interactive
   control) is bounded and fixable inside the existing group renderers, independent
   of the 406-renderer scope question.

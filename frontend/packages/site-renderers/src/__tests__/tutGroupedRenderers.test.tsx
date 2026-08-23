@@ -77,10 +77,27 @@ describe('tutGroupedRenderers', () => {
       </Renderer>
     );
 
-    expect(screen.getByText('Not provided')).toBeInTheDocument();
+    // With no usable content, the section still identifies itself from the resource
+    // type rather than rendering an anonymous empty box...
+    expect(screen.getByRole('heading', { name: /faq/i })).toBeInTheDocument();
+    // ...and nested children are never dropped.
+    expect(screen.getByTestId('child-content')).toBeInTheDocument();
+  });
+
+  it('falls back to the field list when it can make nothing of the content', () => {
+    const Renderer = groupedTutRenderersByGroup['Support, Documentation & Knowledge'];
+
+    // No heading, no body, no media, no collection, no children: the layouts have
+    // nothing to work with, so the field list renders instead of an empty section.
+    render(
+      <Renderer
+        resourceType="tut-usa/support-documentation-knowledge/faq"
+        data={{ answers: [], heroImage: { id: 'missing-url' } }}
+      />
+    );
+
     expect(screen.getByText('No items')).toBeInTheDocument();
     expect(screen.getByText('Image unavailable')).toBeInTheDocument();
-    expect(screen.getByTestId('child-content')).toBeInTheDocument();
   });
 
   it('renders image fields and long text safely', () => {
@@ -97,9 +114,12 @@ describe('tutGroupedRenderers', () => {
       />
     );
 
-    const image = container.querySelector('img[alt="thumbnail Image"]');
+    // The image is now the section's own media rather than a field-list entry, so it
+    // is identified by its source, and its alt text comes from the heading.
+    const image = container.querySelector('img[src="/tut-usa/assets/images/test.jpg"]');
     expect(image).toBeInTheDocument();
-    expect(image).toHaveAttribute('src', '/tut-usa/assets/images/test.jpg');
+    // `thumbnailImage` is only recognised because image fields are matched by name
+    // shape; an exact-name list would miss every role-named image in the contracts.
     expect(screen.getByText(longCopy)).toBeInTheDocument();
   });
 

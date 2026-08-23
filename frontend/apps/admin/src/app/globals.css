@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Site design tokens, scoped to `.flexcms-canvas` so the editor canvas renders
+   the shared TUT components with the published site's palette rather than the
+   admin UI's. See @flexcms/site-renderers/src/tokens.css. */
+@import '@flexcms/site-renderers/tokens.css';
+
 /* FlexCMS Admin — base styles using theme tokens */
 :root {
   --color-background: #ffffff;

@@ -90,6 +90,12 @@ export interface DamAsset {
 }
 
 /** Envelope shared by the asset list and folder endpoints. */
+/** One DAM folder and the number of assets directly inside it. */
+export interface AssetFolderSummary {
+  path: string;
+  assetCount: number;
+}
+
 export interface DamAssetPage {
   items: DamAsset[];
   totalCount: number;
@@ -700,6 +706,23 @@ export class AuthorApiClient {
       contentType: res.headers.get('content-type') ?? '',
       bytes: buffer,
     };
+  }
+
+  /**
+   * Folder summaries for the DAM tree.
+   *
+   * Only folders that directly hold an asset come back — folders are derived from
+   * asset paths, not stored — so a tree built from this has to reconstruct the
+   * intermediate levels itself.
+   */
+  async listAssetFolders(siteId?: string): Promise<AssetFolderSummary[]> {
+    const query = siteId ? `?siteId=${encodeURIComponent(siteId)}` : '';
+    const res = await fetch(`${this.apiBase}/author/assets/folders${query}`);
+    if (!res.ok) {
+      throw new Error(`list asset folders failed: HTTP ${res.status}`);
+    }
+    const body = (await res.json()) as { folders?: AssetFolderSummary[] };
+    return body.folders ?? [];
   }
 
   /** Lists assets with no keyword, which the API serves across every site. */

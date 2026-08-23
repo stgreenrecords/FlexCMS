@@ -37,7 +37,7 @@ interface Asset {
   pages?: number;        // pdf
   sheets?: number;       // xlsx
   files?: number;        // zip
-  folder: string;
+  folderPath: string;     // real DAM folder, e.g. "content/dam/tut-usa/heroes"
   uploadedAt: string;
   status: AssetStatus;
   thumbnailBg?: string;  // gradient or color for non-image thumbnails
@@ -45,10 +45,37 @@ interface Asset {
   selected?: boolean;
 }
 
-interface Folder {
-  id: string;
+/** One folder as the backend reports it: a path and its direct asset count. */
+interface FolderSummary {
+  path: string;
+  assetCount: number;
+}
+
+/**
+ * A node of the DAM folder tree.
+ *
+ * `directCount` counts assets in this folder alone; `totalCount` includes its
+ * descendants. The sidebar shows `totalCount`, because selecting a folder lists its
+ * whole subtree — showing the direct count beside a subtree listing would make an
+ * intermediate folder read as empty when it is not.
+ */
+interface FolderNode {
+  path: string;
   name: string;
-  count: number;
+  children: FolderNode[];
+  directCount: number;
+  totalCount: number;
+}
+
+/**
+ * A configured site, and the DAM folder it owns.
+ *
+ * `damRoot` arrives in ltree form (`dam.tut-usa`); `damFolder` is the same root as a
+ * slash path, which is how asset folder paths are written.
+ */
+interface SiteInfo {
+  siteId: string;
+  damFolder: string;
 }
 
 type ViewMode = 'grid' | 'list';
@@ -77,8 +104,6 @@ function apiToAsset(a: Record<string, unknown>): Asset {
   const height = a.height as number | undefined;
   const dimensions = width && height ? `${width} × ${height}` : undefined;
 
-  const folder = inferFolder(type);
-
   const id = (a.id as string) ?? String(Math.random());
   const previewUrl = type === 'image' ? `${API_BASE}/api/author/assets/${id}/content` : undefined;
 
@@ -89,7 +114,7 @@ function apiToAsset(a: Record<string, unknown>): Asset {
     size: formatBytes(sizeBytes),
     sizeBytes,
     dimensions,
-    folder,
+    folderPath: normalizeFolder(a.folderPath as string),
     uploadedAt: a.createdAt
       ? new Date(a.createdAt as string).toISOString().slice(0, 10)
       : '—',
@@ -100,14 +125,131 @@ function apiToAsset(a: Record<string, unknown>): Asset {
   };
 }
 
-function inferFolder(type: AssetType): string {
-  switch (type) {
-    case 'image': return 'images';
-    case 'video': return 'videos';
-    case 'pdf': case 'xlsx': case 'document': return 'documents';
-    case 'zip': return 'archives';
-    default: return 'documents';
+/**
+ * Canonical form of a folder path: no leading, trailing, or repeated slashes.
+ *
+ * Stored `folderPath` values are not normalised. Assets ingested through the API carry
+ * `content/dam/<site>/...`, while uploads this page made previously carried
+ * `/dam/images`. Comparing the raw strings would file one folder under two keys, so
+ * every path is normalised before it is used as a tree key or a filter.
+ */
+function normalizeFolder(path: string | null | undefined): string {
+  return (path ?? '').split('/').filter(Boolean).join('/');
+}
+
+/** Stable, readable test id for a folder path. */
+function folderTestId(path: string): string {
+  return path.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+}
+
+/**
+ * Assemble a tree from the flat folder list.
+ *
+ * Folders are derived from asset paths rather than stored as rows, so the backend can
+ * only report folders that directly hold an asset. Intermediate folders are
+ * reconstructed here from the path segments: `content/dam/a/b` implies `content/dam`
+ * and `content/dam/a` even when neither holds an asset of its own — those come out
+ * with `directCount: 0` and a `totalCount` rolled up from below.
+ */
+function buildFolderTree(summaries: FolderSummary[]): FolderNode[] {
+  const roots: FolderNode[] = [];
+  const byPath = new Map<string, FolderNode>();
+
+  function ensure(segments: string[]): FolderNode {
+    const path = segments.join('/');
+    const existing = byPath.get(path);
+    if (existing) return existing;
+
+    const node: FolderNode = {
+      path,
+      name: segments[segments.length - 1],
+      children: [],
+      directCount: 0,
+      totalCount: 0,
+    };
+    byPath.set(path, node);
+    if (segments.length === 1) roots.push(node);
+    else ensure(segments.slice(0, -1)).children.push(node);
+    return node;
   }
+
+  for (const summary of summaries) {
+    const segments = normalizeFolder(summary.path).split('/').filter(Boolean);
+    if (segments.length === 0) continue;
+    ensure(segments).directCount += summary.assetCount;
+  }
+
+  function rollUp(node: FolderNode): number {
+    node.children.sort((a, b) => a.name.localeCompare(b.name));
+    node.totalCount = node.directCount + node.children.reduce((sum, c) => sum + rollUp(c), 0);
+    return node.totalCount;
+  }
+  roots.forEach(rollUp);
+  roots.sort((a, b) => a.name.localeCompare(b.name));
+  return roots;
+}
+
+/**
+ * The site an upload belongs to.
+ *
+ * Preference order: the site whose DAM root contains the selected folder; then a site
+ * whose id appears as a path segment, which covers folders written as
+ * `content/dam/<site>/...` rather than under the declared root; then the first
+ * configured site, for an upload made with nothing selected.
+ */
+function siteForFolder(folder: string | null, sites: SiteInfo[]): SiteInfo | undefined {
+  if (folder) {
+    const underRoot = sites.find(
+      (site) => site.damFolder && (folder === site.damFolder || folder.startsWith(`${site.damFolder}/`)),
+    );
+    if (underRoot) return underRoot;
+
+    const segments = folder.split('/');
+    const bySegment = sites.find((site) => segments.includes(site.siteId));
+    if (bySegment) return bySegment;
+  }
+  return sites[0];
+}
+
+/** Fallback tree source: the folders visible in the assets already fetched. */
+function deriveFolderSummaries(assets: Asset[]): FolderSummary[] {
+  const counts = new Map<string, number>();
+  for (const asset of assets) {
+    if (!asset.folderPath) continue;
+    counts.set(asset.folderPath, (counts.get(asset.folderPath) ?? 0) + 1);
+  }
+  return Array.from(counts, ([path, assetCount]) => ({ path, assetCount }));
+}
+
+/**
+ * Folders open before the author touches anything.
+ *
+ * A small tree opens fully, so everything is reachable in one click. A large one opens
+ * only its top two levels, so the sidebar does not arrive as a wall of folders.
+ */
+function defaultExpandedFolders(roots: FolderNode[]): Set<string> {
+  const all: FolderNode[] = [];
+  const walk = (nodes: FolderNode[]) => {
+    for (const node of nodes) {
+      all.push(node);
+      walk(node.children);
+    }
+  };
+  walk(roots);
+
+  const expanded = new Set<string>();
+  if (all.length <= 40) {
+    all.forEach((node) => expanded.add(node.path));
+    return expanded;
+  }
+  const shallow = (nodes: FolderNode[], depth: number) => {
+    for (const node of nodes) {
+      if (depth < 2) expanded.add(node.path);
+      shallow(node.children, depth + 1);
+    }
+  };
+  shallow(roots, 0);
+  return expanded;
 }
 
 
@@ -245,6 +387,92 @@ function AssetMenu({ asset, onDelete }: { asset: Asset; onDelete: (id: string) =
 }
 
 // ---------------------------------------------------------------------------
+// Folder tree
+// ---------------------------------------------------------------------------
+
+/**
+ * One folder row, and its subtree when open.
+ *
+ * The chevron and the folder itself are separate buttons so that expanding a folder
+ * and selecting it stay separate actions — an author opening a parent on the way to a
+ * child should not have the grid reload the parent's whole subtree in passing.
+ */
+function FolderTreeItem({
+  node, depth, activeFolder, isExpanded, onToggle, onSelect,
+}: {
+  node: FolderNode;
+  depth: number;
+  activeFolder: string | null;
+  isExpanded: (path: string) => boolean;
+  onToggle: (path: string) => void;
+  onSelect: (path: string) => void;
+}) {
+  const isActive = activeFolder === node.path;
+  const hasChildren = node.children.length > 0;
+  const expanded = hasChildren && isExpanded(node.path);
+  const testId = folderTestId(node.path);
+
+  return (
+    <div>
+      <div
+        className={`flex items-center rounded-[var(--radius-md)] text-sm transition-colors
+          ${isActive
+            ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold'
+            : 'text-[var(--color-foreground)] hover:bg-[var(--color-accent)]'
+          }`}
+        style={{ paddingLeft: `${depth * 12}px` }}
+      >
+        {hasChildren ? (
+          <button
+            type="button"
+            onClick={() => onToggle(node.path)}
+            data-testid={`dam-folder-toggle-${testId}`}
+            aria-label={`${expanded ? 'Collapse' : 'Expand'} ${node.name}`}
+            aria-expanded={expanded}
+            className="shrink-0 p-1 ml-1 rounded hover:bg-[var(--color-accent)] text-[var(--color-muted-foreground)]"
+          >
+            <ChevronRightIcon
+              className={`h-3 w-3 transition-transform ${expanded ? 'rotate-90' : ''}`}
+            />
+          </button>
+        ) : (
+          <span className="w-5 shrink-0" aria-hidden="true" />
+        )}
+
+        <button
+          type="button"
+          onClick={() => onSelect(node.path)}
+          data-testid={`dam-folder-${testId}`}
+          title={node.path}
+          aria-current={isActive ? 'true' : undefined}
+          className="flex flex-1 min-w-0 items-center gap-2 py-2 pr-2 text-left"
+        >
+          {expanded
+            ? <FolderOpenIcon className="h-4 w-4 shrink-0" />
+            : <FolderIcon className="h-4 w-4 shrink-0" />}
+          <span className="truncate">{node.name}</span>
+          <span className="ml-auto pl-2 text-[10px] text-[var(--color-muted-foreground)]">
+            {node.totalCount}
+          </span>
+        </button>
+      </div>
+
+      {expanded && node.children.map((child) => (
+        <FolderTreeItem
+          key={child.path}
+          node={child}
+          depth={depth + 1}
+          activeFolder={activeFolder}
+          isExpanded={isExpanded}
+          onToggle={onToggle}
+          onSelect={onSelect}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main page component
 // ---------------------------------------------------------------------------
 
@@ -260,15 +488,74 @@ export default function DamBrowserPage() {
 
   const { files: uploadFiles, addFiles, clear: clearUploadFiles } = useFileUpload();
 
-  // Compute folder list dynamically from loaded assets
-  const folders: Folder[] = useMemo(() => {
-    const folderNames = ['images', 'videos', 'documents', 'archives'];
-    return folderNames.map((name) => ({
-      id: name,
-      name: name.charAt(0).toUpperCase() + name.slice(1),
-      count: assets.filter((a) => a.folder === name).length,
-    }));
-  }, [assets]);
+  /**
+   * Folders as reported by the backend, or null while loading / if the call failed.
+   * Null falls back to deriving the tree from the assets already fetched, so the
+   * sidebar still works — over a partial view of the library — if the endpoint does
+   * not answer.
+   */
+  const [folderSummaries, setFolderSummaries] = useState<FolderSummary[] | null>(null);
+
+  /**
+   * Folders the author has explicitly opened or closed. Absent entries fall through
+   * to `defaultExpandedFolders`. Kept as an override map rather than a materialised
+   * set so the defaults can be computed during render, with no effect writing state
+   * back on every tree change.
+   */
+  const [folderOverrides, setFolderOverrides] = useState<Record<string, boolean>>({});
+
+  const folderTree = useMemo(
+    () => buildFolderTree(folderSummaries ?? deriveFolderSummaries(assets)),
+    [folderSummaries, assets],
+  );
+  const autoExpanded = useMemo(() => defaultExpandedFolders(folderTree), [folderTree]);
+
+  const isFolderExpanded = useCallback(
+    (path: string) => folderOverrides[path] ?? autoExpanded.has(path),
+    [folderOverrides, autoExpanded],
+  );
+  const toggleFolder = useCallback(
+    (path: string) =>
+      setFolderOverrides((prev) => ({
+        ...prev,
+        [path]: !(prev[path] ?? autoExpanded.has(path)),
+      })),
+    [autoExpanded],
+  );
+
+  /** Configured sites, so an upload can name one that exists. */
+  const [sites, setSites] = useState<SiteInfo[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/admin/sites`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        setSites(
+          ((data ?? []) as Record<string, unknown>[]).map((site) => ({
+            siteId: site.siteId as string,
+            damFolder: normalizeFolder(((site.damRoot as string) ?? '').replace(/\./g, '/')),
+          })),
+        );
+      })
+      .catch(() => setSites([]));
+  }, []);
+
+  const loadFolders = useCallback(() => {
+    fetch(`${API_BASE}/api/author/assets/folders`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        setFolderSummaries(
+          ((data.folders ?? []) as Record<string, unknown>[]).map((f) => ({
+            path: normalizeFolder(f.path as string),
+            assetCount: Number(f.assetCount ?? 0),
+          })),
+        );
+      })
+      .catch(() => setFolderSummaries(null));
+  }, []);
+
+  useEffect(() => { loadFolders(); }, [loadFolders]);
 
   // Fetch assets from backend API
   useEffect(() => {
@@ -288,7 +575,13 @@ export default function DamBrowserPage() {
   // Filter
   const filtered = useMemo(() => {
     return assets.filter((a) => {
-      const matchFolder = !activeFolder || a.folder === activeFolder;
+      // Selecting a folder lists its subtree, not just its direct children: with no
+      // folder tiles in the grid, a direct-only listing makes every intermediate
+      // folder look empty. This also keeps the grid consistent with the sidebar,
+      // which counts descendants.
+      const matchFolder = !activeFolder
+        || a.folderPath === activeFolder
+        || a.folderPath.startsWith(`${activeFolder}/`);
       const matchSearch = !search.trim() ||
         a.name.toLowerCase().includes(search.toLowerCase());
       return matchFolder && matchSearch;
@@ -323,12 +616,27 @@ export default function DamBrowserPage() {
   }
 
   function handleUpload() {
+    // `assets.site_id` is a foreign key, so an upload has to name a site that exists.
+    // The page used to hardcode 'corporate', which is not configured here, and every
+    // upload failed the insert.
+    const site = siteForFolder(activeFolder, sites);
+    if (!site) {
+      setUploadError('No site is configured, so there is nowhere to store an asset.');
+      return;
+    }
+    setUploadError(null);
+
+    // Into the selected folder, so where an upload lands is what the tree shows.
+    // Previously every upload went to `/dam/images` regardless, under a root that
+    // nothing else in the system uses.
+    const uploadFolder = activeFolder ?? site.damFolder;
+
     // Upload each file via the real backend API
     const uploads = uploadFiles.map(async (uf) => {
       const formData = new FormData();
       formData.append('file', uf.file);
-      formData.append('path', `/dam/${activeFolder ?? 'images'}/${uf.file.name}`);
-      formData.append('siteId', 'corporate');
+      formData.append('path', `${uploadFolder}/${uf.file.name}`);
+      formData.append('siteId', site.siteId);
       formData.append('userId', 'admin');
       try {
         const res = await fetch(`${API_BASE}/api/author/assets`, {
@@ -339,28 +647,30 @@ export default function DamBrowserPage() {
           const saved = await res.json();
           return apiToAsset(saved);
         }
-      } catch { /* ignore, fallback below */ }
-      // Fallback: create a local placeholder if API call fails
-      return {
-        id: `new-${Date.now()}-${Math.random()}`,
-        name: uf.file.name,
-        type: (uf.file.type.startsWith('image/') ? 'image'
-          : uf.file.type.startsWith('video/') ? 'video'
-          : uf.file.name.endsWith('.pdf') ? 'pdf'
-          : uf.file.name.endsWith('.zip') ? 'zip'
-          : uf.file.name.endsWith('.xlsx') ? 'xlsx'
-          : 'other') as AssetType,
-        size: formatBytes(uf.file.size),
-        sizeBytes: uf.file.size,
-        folder: activeFolder ?? 'images',
-        uploadedAt: new Date().toISOString().slice(0, 10),
-        status: 'processing' as AssetStatus,
-      };
+      } catch { /* reported as a failure below */ }
+      // No placeholder on failure. The page used to insert a local stand-in that was
+      // indistinguishable from a stored asset, so a rejected upload looked like it had
+      // worked — and with a folder tree it would also invent a folder.
+      return null;
     });
-    Promise.all(uploads).then((newAssets) => {
-      setAssets((prev) => [...newAssets, ...prev]);
+    Promise.all(uploads).then((results) => {
+      const stored = results.filter((a): a is Asset => a !== null);
+      const failed = results.length - stored.length;
+
+      setAssets((prev) => [...stored, ...prev]);
       clearUploadFiles();
-      setUploadOpen(false);
+
+      if (failed > 0) {
+        setUploadError(
+          `${failed} of ${results.length} file${results.length === 1 ? '' : 's'} could not be stored.`,
+        );
+      } else {
+        setUploadOpen(false);
+      }
+
+      // Counts changed, and an upload may have created a folder the tree has never
+      // seen, so the tree is re-read rather than patched.
+      if (stored.length > 0) loadFolders();
     });
   }
 
@@ -459,23 +769,51 @@ export default function DamBrowserPage() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Assets</BreadcrumbPage>
+                {activeFolder ? (
+                  <BreadcrumbLink
+                    href="#"
+                    onClick={(e) => { e.preventDefault(); setActiveFolder(null); }}
+                    data-testid="dam-breadcrumb-root"
+                  >
+                    Assets
+                  </BreadcrumbLink>
+                ) : (
+                  <BreadcrumbPage>Assets</BreadcrumbPage>
+                )}
               </BreadcrumbItem>
-              {activeFolder && (
-                <>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage className="capitalize">{activeFolder}</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </>
-              )}
+              {/* One crumb per path segment, each selecting that ancestor. */}
+              {activeFolder?.split('/').map((segment, index, segments) => {
+                const path = segments.slice(0, index + 1).join('/');
+                const isLast = index === segments.length - 1;
+                return (
+                  <React.Fragment key={path}>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      {isLast ? (
+                        <BreadcrumbPage data-testid="dam-breadcrumb-current">{segment}</BreadcrumbPage>
+                      ) : (
+                        <BreadcrumbLink
+                          href="#"
+                          onClick={(e) => { e.preventDefault(); setActiveFolder(path); }}
+                          data-testid={`dam-breadcrumb-${folderTestId(path)}`}
+                        >
+                          {segment}
+                        </BreadcrumbLink>
+                      )}
+                    </BreadcrumbItem>
+                  </React.Fragment>
+                );
+              })}
             </BreadcrumbList>
           </Breadcrumb>
         </div>
 
         <div className="flex flex-1 min-h-0 overflow-hidden">
           {/* Left panel: folder tree */}
-          <aside className="w-56 shrink-0 border-r border-[var(--color-border)] flex flex-col py-4 px-3 gap-1 overflow-y-auto">
+          <aside
+            className="w-64 shrink-0 border-r border-[var(--color-border)] flex flex-col py-4 px-3 gap-1 overflow-y-auto"
+            data-testid="dam-folder-tree"
+          >
             <p className="px-2 mb-2 text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--color-muted-foreground)]">
               Folders
             </p>
@@ -498,25 +836,26 @@ export default function DamBrowserPage() {
               </span>
             </button>
 
-            {folders.map((folder) => (
-              <button
-                key={folder.id}
-                onClick={() => setActiveFolder(folder.id)}
-                className={`flex items-center justify-between px-3 py-2 rounded-[var(--radius-md)] text-sm transition-colors w-full text-left
-                  ${activeFolder === folder.id
-                    ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold'
-                    : 'text-[var(--color-foreground)] hover:bg-[var(--color-accent)]'
-                  }`}
-              >
-                <div className="flex items-center gap-2">
-                  <FolderIcon className="h-4 w-4 shrink-0" />
-                  <span>{folder.name}</span>
-                </div>
-                <span className="text-[10px] text-[var(--color-muted-foreground)]">
-                  {folder.count}
-                </span>
-              </button>
+            {folderTree.map((node) => (
+              <FolderTreeItem
+                key={node.path}
+                node={node}
+                depth={0}
+                activeFolder={activeFolder}
+                isExpanded={isFolderExpanded}
+                onToggle={toggleFolder}
+                onSelect={setActiveFolder}
+              />
             ))}
+
+            {!loading && folderTree.length === 0 && (
+              <p
+                className="px-3 py-2 text-xs text-[var(--color-muted-foreground)]"
+                data-testid="dam-folder-tree-empty"
+              >
+                No folders yet — uploaded assets appear here under their path.
+              </p>
+            )}
 
             <div className="mt-4 pt-4 border-t border-[var(--color-border)] flex flex-col gap-1">
               <button className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] text-sm text-[var(--color-muted-foreground)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors w-full text-left">
@@ -607,6 +946,10 @@ export default function DamBrowserPage() {
                       <DialogTitle>Upload Assets</DialogTitle>
                       <DialogDescription>
                         Drag and drop files or click to browse. Max 100 MB per file.
+                        {' '}Uploading to{' '}
+                        <span className="font-medium text-[var(--color-foreground)]">
+                          {activeFolder ?? siteForFolder(activeFolder, sites)?.damFolder ?? 'no site configured'}
+                        </span>.
                       </DialogDescription>
                     </DialogHeader>
                     <FileUpload
@@ -627,8 +970,16 @@ export default function DamBrowserPage() {
                         ))}
                       </div>
                     )}
+                    {uploadError && (
+                      <p
+                        className="mt-2 text-sm text-[var(--color-destructive)]"
+                        data-testid="dam-upload-error"
+                      >
+                        {uploadError}
+                      </p>
+                    )}
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => { clearUploadFiles(); setUploadOpen(false); }}>
+                      <Button variant="outline" onClick={() => { clearUploadFiles(); setUploadError(null); setUploadOpen(false); }}>
                         Cancel
                       </Button>
                       <Button variant="default" onClick={handleUpload}
@@ -854,6 +1205,15 @@ function FileTextIcon({ className }: { className?: string }) {
       <line x1="16" y1="13" x2="8" y2="13"/>
       <line x1="16" y1="17" x2="8" y2="17"/>
       <polyline points="10 9 9 9 8 9"/>
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className ?? 'h-4 w-4'} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <polyline points="9 18 15 12 9 6" />
     </svg>
   );
 }

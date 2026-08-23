@@ -5,6 +5,15 @@ import type { FlexCmsRenderer } from '@flexcms/react';
 import { CallsToActionRenderer } from './tutCampaignRenderers';
 import { EducationLearningRenderer } from './tutLearningRenderers';
 import { linkAttributes, toTutLink } from './tutLink';
+import {
+  isRecord,
+  normalizeLabel,
+  firstText,
+  toPrimitivePreview,
+  extractImageUrl,
+  isImageField,
+} from './fieldShapes';
+import { createRichGroupRenderer } from './richGroupRenderers';
 
 export interface TutComponentContract {
   groupName?: string;
@@ -28,77 +37,17 @@ const GROUP_LAYOUT_CLASS: Record<string, string> = {
   'Support, Documentation & Knowledge': 'grid grid-cols-1 gap-3',
 };
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
 
-function normalizeLabel(label: string): string {
-  return label
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/[-_]/g, ' ')
-    .trim();
-}
 
-function firstText(record: Record<string, unknown>, keys: string[]): string | null {
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === 'string' && value.trim().length > 0) {
-      return value.trim();
-    }
-    if (typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
-    }
-  }
-  return null;
-}
 
-function toPrimitivePreview(value: unknown): string {
-  if (typeof value === 'string') {
-    return value.length > 180 ? `${value.slice(0, 180)}...` : value;
-  }
-  if (typeof value === 'number' || typeof value === 'boolean') {
-    return String(value);
-  }
-  if (isRecord(value)) {
-    return firstText(value, ['label', 'title', 'name', 'text', 'value', 'description', 'url']) ?? 'Not provided';
-  }
-  return 'Not provided';
-}
 
-function extractImageUrl(value: unknown): string | null {
-  if (typeof value === 'string' && value.trim().length > 0) {
-    const candidate = value.trim();
-    if (/^(https?:\/\/|\/|data:image\/)/i.test(candidate)) {
-      return /^\/dam\/tut-usa\/missing\//i.test(candidate)
-        ? '/tut-usa/assets/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png'
-        : candidate;
-    }
-    return null;
-  }
 
-  if (isRecord(value)) {
-    const candidates = [value.url, value.src, value.path, value.imageUrl, value.thumbnailUrl];
-    for (const candidate of candidates) {
-      if (typeof candidate === 'string' && candidate.trim().length > 0) {
-        const normalized = candidate.trim();
-        if (/^(https?:\/\/|\/|data:image\/)/i.test(normalized)) {
-          return /^\/dam\/tut-usa\/missing\//i.test(normalized)
-            ? '/tut-usa/assets/images/57842e3aa2214c12-ab6axudqj78i-hchlovzt8msscx-elxwrzr3xeyr0u98zghv.png'
-            : normalized;
-        }
-      }
-    }
-  }
 
-  return null;
-}
 
-function isImageField(fieldName: string): boolean {
-  if (/(position|layout|variant|style)$/i.test(fieldName)) {
-    return false;
-  }
-  return /(image|photo|thumbnail|poster|logo|icon|background)/i.test(fieldName);
-}
+
+
+
+
 
 function renderRecordValue(fieldName: string, value: Record<string, unknown>): React.ReactNode {
   const link = toTutLink(value);
@@ -185,7 +134,14 @@ function renderFieldValue(fieldName: string, value: unknown): React.ReactNode {
   return <span>{toPrimitivePreview(value)}</span>;
 }
 
-function createGroupRenderer(groupName: string): FlexCmsRenderer {
+/**
+ * Field-list rendering, kept as the last resort.
+ *
+ * `createRichGroupRenderer` lays content out properly; this remains for content whose
+ * shape it cannot make sense of, so nothing an author has written ever disappears from
+ * the page just because it did not match a layout.
+ */
+function createFieldListRenderer(groupName: string): FlexCmsRenderer {
   const GroupRenderer: FlexCmsRenderer = ({ data, children, resourceType, name }) => {
     const fields = Object.entries(data ?? {}).filter(([, value]) => value !== undefined);
     const resourceHint = resourceType?.split('/').pop() ?? name ?? 'component';
@@ -230,24 +186,28 @@ function createGroupRenderer(groupName: string): FlexCmsRenderer {
   return GroupRenderer;
 }
 
+/**
+ * Every group renders through the shape-driven layouts. The group name is passed
+ * through for diagnostics and for the few places layout still varies by group.
+ */
 export const groupedTutRenderersByGroup: Record<string, FlexCmsRenderer> = {
-  'Layout & Page Structure': createGroupRenderer('Layout & Page Structure'),
-  'Editorial & Article Content': createGroupRenderer('Editorial & Article Content'),
-  'Media, Visual Storytelling & Assets': createGroupRenderer('Media, Visual Storytelling & Assets'),
-  'Navigation, Search & Discovery': createGroupRenderer('Navigation, Search & Discovery'),
-  'Calls to Action, Promotions & Campaigns': createGroupRenderer('Calls to Action, Promotions & Campaigns'),
-  'Forms, Data Capture & Consent': createGroupRenderer('Forms, Data Capture & Consent'),
-  'Commerce, Catalog & Merchandising': createGroupRenderer('Commerce, Catalog & Merchandising'),
-  'Community, Social Proof & Engagement': createGroupRenderer('Community, Social Proof & Engagement'),
-  'Account, Portal & Transactional': createGroupRenderer('Account, Portal & Transactional'),
-  'Events, Booking, Travel & Hospitality': createGroupRenderer('Events, Booking, Travel & Hospitality'),
-  'Brand, Corporate, Investor & Governance': createGroupRenderer('Brand, Corporate, Investor & Governance'),
-  'Location, Local & Physical Presence': createGroupRenderer('Location, Local & Physical Presence'),
-  'Education, Learning & Developer Content': createGroupRenderer('Education, Learning & Developer Content'),
-  'Support, Documentation & Knowledge': createGroupRenderer('Support, Documentation & Knowledge'),
+  'Layout & Page Structure': createRichGroupRenderer('Layout & Page Structure', createFieldListRenderer('Layout & Page Structure')),
+  'Editorial & Article Content': createRichGroupRenderer('Editorial & Article Content', createFieldListRenderer('Editorial & Article Content')),
+  'Media, Visual Storytelling & Assets': createRichGroupRenderer('Media, Visual Storytelling & Assets', createFieldListRenderer('Media, Visual Storytelling & Assets')),
+  'Navigation, Search & Discovery': createRichGroupRenderer('Navigation, Search & Discovery', createFieldListRenderer('Navigation, Search & Discovery')),
+  'Calls to Action, Promotions & Campaigns': createRichGroupRenderer('Calls to Action, Promotions & Campaigns', createFieldListRenderer('Calls to Action, Promotions & Campaigns')),
+  'Forms, Data Capture & Consent': createRichGroupRenderer('Forms, Data Capture & Consent', createFieldListRenderer('Forms, Data Capture & Consent')),
+  'Commerce, Catalog & Merchandising': createRichGroupRenderer('Commerce, Catalog & Merchandising', createFieldListRenderer('Commerce, Catalog & Merchandising')),
+  'Community, Social Proof & Engagement': createRichGroupRenderer('Community, Social Proof & Engagement', createFieldListRenderer('Community, Social Proof & Engagement')),
+  'Account, Portal & Transactional': createRichGroupRenderer('Account, Portal & Transactional', createFieldListRenderer('Account, Portal & Transactional')),
+  'Events, Booking, Travel & Hospitality': createRichGroupRenderer('Events, Booking, Travel & Hospitality', createFieldListRenderer('Events, Booking, Travel & Hospitality')),
+  'Brand, Corporate, Investor & Governance': createRichGroupRenderer('Brand, Corporate, Investor & Governance', createFieldListRenderer('Brand, Corporate, Investor & Governance')),
+  'Location, Local & Physical Presence': createRichGroupRenderer('Location, Local & Physical Presence', createFieldListRenderer('Location, Local & Physical Presence')),
+  'Education, Learning & Developer Content': createRichGroupRenderer('Education, Learning & Developer Content', createFieldListRenderer('Education, Learning & Developer Content')),
+  'Support, Documentation & Knowledge': createRichGroupRenderer('Support, Documentation & Knowledge', createFieldListRenderer('Support, Documentation & Knowledge')),
 };
 
-export const defaultTutRenderer = createGroupRenderer('TUT Components');
+export const defaultTutRenderer = createRichGroupRenderer('TUT Components', createFieldListRenderer('TUT Components'));
 
 export const semanticGroupRenderers: Record<string, FlexCmsRenderer> = {
   'Calls to Action, Promotions & Campaigns': CallsToActionRenderer,
@@ -263,3 +223,13 @@ export function buildTutRendererEntries(contracts: TutComponentContract[]): Reco
   }, {});
 }
 
+// Re-exported so importers of this module keep the surface they had before the
+// helpers moved out to break the import cycle.
+export {
+  isRecord,
+  normalizeLabel,
+  firstText,
+  toPrimitivePreview,
+  extractImageUrl,
+  isImageField,
+} from './fieldShapes';

@@ -4,6 +4,7 @@ import com.flexcms.core.event.ContentDeletedEvent;
 import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
+import com.flexcms.core.exception.ValidationException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
@@ -373,6 +374,69 @@ class ContentNodeServiceTest {
         contentNodeService.delete("content.corporate.en.home", "user1");
 
         verify(nodeRepository).deleteSubtree("content.corporate.en.home");
+    }
+
+    // --- reorderChildren (B-3) ---
+
+    @Test
+    void reorderChildren_rewritesOrderIndexToMatchTheRequestedOrder() {
+        ContentNode parent = buildNode("content.corporate.en.home", "home");
+        ContentNode a = buildNode("content.corporate.en.home.a", "a");
+        ContentNode b = buildNode("content.corporate.en.home.b", "b");
+        ContentNode c = buildNode("content.corporate.en.home.c", "c");
+        a.setOrderIndex(0);
+        b.setOrderIndex(1);
+        c.setOrderIndex(2);
+
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(parent));
+        when(nodeRepository.findByParentPathOrderByOrderIndex("content.corporate.en.home"))
+                .thenReturn(new ArrayList<>(List.of(a, b, c)));
+        when(nodeRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        contentNodeService.reorderChildren("content.corporate.en.home",
+                List.of("content.corporate.en.home.c", "content.corporate.en.home.a", "content.corporate.en.home.b"),
+                "user1");
+
+        // Nothing could change an established order before this method existed:
+        // createNode appends and delivery sorts by orderIndex, but no service call
+        // ever rewrote it (REB-19 blocker B-3).
+        assertThat(c.getOrderIndex()).isEqualTo(0);
+        assertThat(a.getOrderIndex()).isEqualTo(1);
+        assertThat(b.getOrderIndex()).isEqualTo(2);
+        assertThat(c.getModifiedBy()).isEqualTo("user1");
+    }
+
+    @Test
+    void reorderChildren_rejectsAListThatDoesNotMatchTheParentsChildren() {
+        ContentNode parent = buildNode("content.corporate.en.home", "home");
+        ContentNode a = buildNode("content.corporate.en.home.a", "a");
+        ContentNode b = buildNode("content.corporate.en.home.b", "b");
+
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(parent));
+        when(nodeRepository.findByParentPathOrderByOrderIndex("content.corporate.en.home"))
+                .thenReturn(new ArrayList<>(List.of(a, b)));
+
+        // Omitting a child would otherwise produce a partial order that looks like it
+        // worked — harder to notice than a refusal.
+        assertThatThrownBy(() -> contentNodeService.reorderChildren("content.corporate.en.home",
+                List.of("content.corporate.en.home.a"), "user1"))
+                .isInstanceOf(ValidationException.class);
+
+        verify(nodeRepository, never()).saveAll(any());
+    }
+
+    @Test
+    void reorderChildren_rejectsDuplicatePaths() {
+        ContentNode parent = buildNode("content.corporate.en.home", "home");
+        ContentNode a = buildNode("content.corporate.en.home.a", "a");
+
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(parent));
+        when(nodeRepository.findByParentPathOrderByOrderIndex("content.corporate.en.home"))
+                .thenReturn(new ArrayList<>(List.of(a)));
+
+        assertThatThrownBy(() -> contentNodeService.reorderChildren("content.corporate.en.home",
+                List.of("content.corporate.en.home.a", "content.corporate.en.home.a"), "user1"))
+                .isInstanceOf(ValidationException.class);
     }
 
     // --- lock ---

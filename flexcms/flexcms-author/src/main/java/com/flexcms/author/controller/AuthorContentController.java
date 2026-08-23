@@ -204,6 +204,17 @@ public class AuthorContentController {
 
     // ── Bulk operations ────────────────────────────────────────────────────────
 
+    @Operation(summary = "Reorder children",
+            description = "Rewrites the order of a parent's children to match the supplied list of paths.")
+    @PostMapping("/node/reorder")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
+    public ResponseEntity<List<ContentNode>> reorderChildren(@Valid @RequestBody ReorderRequest req) {
+        return ResponseEntity.ok(nodeService.reorderChildren(
+                toContentPath(req.parentPath()),
+                req.orderedPaths().stream().map(this::toContentPath).toList(),
+                req.userId()));
+    }
+
     @Operation(summary = "Bulk publish", description = "Publishes all listed content paths and triggers replication for each.")
     @PostMapping("/bulk/publish")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
@@ -274,6 +285,11 @@ public class AuthorContentController {
     public record MoveNodeRequest(
             @NotBlank(message = "sourcePath is required") String sourcePath,
             @NotBlank(message = "targetParentPath is required") String targetParentPath,
+            @NotBlank(message = "userId is required") String userId) {}
+
+    public record ReorderRequest(
+            @NotBlank(message = "parentPath is required") String parentPath,
+            @NotNull(message = "orderedPaths is required") List<String> orderedPaths,
             @NotBlank(message = "userId is required") String userId) {}
 
     public record BulkPathsRequest(

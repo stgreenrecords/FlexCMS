@@ -234,6 +234,13 @@ export function authorableFieldsByControl(
  * value can be traced from the editor through the author API, the headless JSON,
  * and the rendered page.
  */
+/**
+ * An image that genuinely resolves on both :3000 and :3001, from the captured design
+ * package that both apps ship in `public/tut-usa/assets/images/`.
+ */
+const SEED_IMAGE_PATH =
+  '/tut-usa/assets/images/02b2932f59db0cf8-ab6axudqjze3dqwk3mascd2fhfw6o-bd1xwf0veukzq8uuau.png';
+
 export function authoringValueFor(entry: AuthorableField, marker: string): unknown {
   const { field, control, semantics } = entry;
 
@@ -243,7 +250,14 @@ export function authoringValueFor(entry: AuthorableField, marker: string): unkno
 
   switch (semantics) {
     case 'asset':
-      return `/images/${marker}.jpg`;
+      // A real file, served by both the admin app and the site from their `public/`
+      // directories. It used to be `/images/<marker>.jpg`, which never existed
+      // anywhere: harmless while the editor drew placeholders, but now that the canvas
+      // renders components with the site's real renderers, an asset field becomes an
+      // actual `<img>` and a made-up path becomes a 404 in the console. The marker
+      // stays in the query string, so the authored value is still unique per run and
+      // the round-trip assertions are unchanged.
+      return `${SEED_IMAGE_PATH}?v=${marker}`;
     case 'reference':
       return `/tut-usa/home?ref=${marker}`;
     case 'list':

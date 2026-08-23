@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,7 +18,35 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
 
     Optional<Asset> findByPath(String path);
 
-    Page<Asset> findByFolderPathAndStatus(String folderPath, AssetStatus status, Pageable pageable);
+    /**
+     * Assets directly inside one folder of one site.
+     *
+     * <p>The site predicate is not optional. The previous finder keyed on folder path
+     * alone, so two sites that both had, say, {@code /content/dam/heroes} saw each
+     * other's assets — the caller passed a {@code siteId} that the query then
+     * ignored.</p>
+     */
+    Page<Asset> findByFolderPathAndSiteIdAndStatus(String folderPath, String siteId,
+                                                   AssetStatus status, Pageable pageable);
+
+    /**
+     * Every folder that holds at least one active asset, with its direct asset count.
+     *
+     * <p>{@code siteId} is optional: passing {@code null} groups across all sites,
+     * which mirrors the unscoped asset listing the DAM browser uses.</p>
+     */
+    @Query("""
+            SELECT new com.flexcms.core.repository.AssetFolderSummary(a.folderPath, COUNT(a))
+            FROM Asset a
+            WHERE a.status = :status
+              AND a.folderPath IS NOT NULL
+              AND a.folderPath <> ''
+              AND (:siteId IS NULL OR a.siteId = :siteId)
+            GROUP BY a.folderPath
+            ORDER BY a.folderPath
+            """)
+    List<AssetFolderSummary> findFolderSummaries(@Param("siteId") String siteId,
+                                                 @Param("status") AssetStatus status);
 
     Page<Asset> findBySiteIdAndStatus(String siteId, AssetStatus status, Pageable pageable);
 

@@ -34,7 +34,7 @@ function ensureDir(dirPath) {
 
 const MODE_SCRIPTS = {
   smoke: ['test:smoke:ci'],
-  full: ['test:templates:ci', 'test:admin:ci', 'test:reb18:ci', 'test:reb19:ci', 'test:reb20:ci', 'test:reb21:ci', 'test:reb26:ci'],
+  full: ['test:templates:ci', 'test:admin:ci', 'test:reb18:ci', 'test:reb19:ci', 'test:reb20:ci', 'test:reb21:ci', 'test:damtree:ci', 'test:wysiwyg:ci', 'test:reb26:ci'],
 };
 
 function runScript(scriptName, logPath) {

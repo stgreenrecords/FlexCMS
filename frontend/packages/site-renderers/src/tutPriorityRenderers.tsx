@@ -81,8 +81,8 @@ export const PageHeaderRenderer: FlexCmsRenderer = ({ data }) => {
 export const ProductHeroRenderer: FlexCmsRenderer = ({ data }) => {
   const heroImage = imageUrl(data.image ?? data.backgroundImage ?? data.media);
   const cta = toTutLink(data.cta ?? data.primaryCta);
-  const items = Array.isArray(data.items) ? data.items : [];
-  const itemLabels = items.flatMap((item) => {
+  const items: unknown[] = Array.isArray(data.items) ? data.items : [];
+  const itemLabels: string[] = items.flatMap((item): string[] => {
     if (typeof item === 'string') return [item];
     const entry = record(item);
     if (!entry) return [];

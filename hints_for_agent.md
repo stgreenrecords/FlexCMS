@@ -273,3 +273,19 @@ webServer: {
 }
 ```
 **Why it works:** The Next.js dev server serves hot-module compilation chunks with dynamic names that are not pre-built. The production build (`pnpm build && pnpm start`) serves stable, pre-compiled static files that Playwright can reliably load.
+
+### 2026-08-23 — A partial `mvn install` can silently strip transitive dependencies
+**Context:** Rebuilding a few modules (`mvn -o install -pl flexcms-core,flexcms-dam,flexcms-author`) and restarting `flexcms-app`
+**Symptom:** The app fails to start with `ClassNotFoundException` for a third-party class that is plainly declared as a dependency — `org.owasp.html.HtmlPolicyBuilder` — and was on the classpath minutes earlier
+**What failed:**
+- Checking that the dependency is declared in `flexcms-core/pom.xml` (it is) and that the jar is in `~/.m2` (it is)
+- Checking that the *installed* `flexcms-core` pom declares it (it does)
+- Assuming the restart itself was at fault and restarting again
+**Solution:** Install the parent pom too — `mvn -o install -N` from `flexcms/`, or just install the whole reactor. Then confirm with:
+```
+cd flexcms/flexcms-app && mvn -o dependency:tree -Dincludes=<group>:*
+```
+A line reading `The POM for com.flexcms:<module> is invalid, transitive dependencies (if any) will not be available` is the real error; the `ClassNotFoundException` is only its downstream symptom.
+**Why it works:** A module installed into `~/.m2` is later resolved through its *installed parent*. Module poms here declare dependencies without versions and rely on the parent's `dependencyManagement`, so if the installed parent is older than the source parent and lacks an entry, the module's effective model cannot be built. Maven then drops **every** transitive dependency of that module — not just the unresolvable one — and reports it as a WARNING, so the build still "succeeds" and only the runtime classpath is wrong.
+
+This became reachable when the Testcontainers migration renamed the managed artifacts (`testcontainers-postgresql`, `testcontainers-junit-jupiter`) in the parent pom: any `.m2` still holding a pre-migration parent breaks this way.

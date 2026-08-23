@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Transpile @flexcms/* packages so Next.js processes their JSX
-  transpilePackages: ['@flexcms/sdk', '@flexcms/react'],
+  transpilePackages: ['@flexcms/sdk', '@flexcms/react', '@flexcms/site-renderers'],
   experimental: {
     workerThreads: true,
     webpackBuildWorker: false,

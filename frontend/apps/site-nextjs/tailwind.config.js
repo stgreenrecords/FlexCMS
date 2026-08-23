@@ -3,6 +3,10 @@ module.exports = {
   content: [
     './src/**/*.{ts,tsx,js,jsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
+    // The renderers moved into a package so the admin editor can share them. Their
+    // utility classes are only generated if Tailwind scans them here too — without
+    // this every shared renderer renders unstyled.
+    '../../packages/site-renderers/src/**/*.{ts,tsx}',
   ],
   theme: {
     extend: {

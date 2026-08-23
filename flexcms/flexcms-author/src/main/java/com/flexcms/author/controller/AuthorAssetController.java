@@ -1,5 +1,6 @@
 package com.flexcms.author.controller;
 
+import com.flexcms.core.repository.AssetFolderSummary;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.dam.service.AssetIngestService;
@@ -20,6 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -92,6 +94,21 @@ public class AuthorAssetController {
         response.put("page", result.getNumber());
         response.put("size", result.getSize());
         response.put("hasNextPage", result.hasNext());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "List DAM folders",
+            description = "Returns every folder holding at least one active asset, with its direct asset count. "
+                    + "Folders are derived from asset paths, so a folder with no assets of its own is implied by "
+                    + "its descendants rather than listed.")
+    @GetMapping("/folders")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<Map<String, Object>> listFolders(
+            @RequestParam(required = false) String siteId) {
+        List<AssetFolderSummary> folders = assetService.listFolders(siteId);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("folders", folders);
+        response.put("totalCount", folders.size());
         return ResponseEntity.ok(response);
     }
 

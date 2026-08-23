@@ -47,6 +47,7 @@ import {
 // ---------------------------------------------------------------------------
 
 import { getApiBase } from '@/lib/apiBase';
+import { canvasComponentMap } from '@/lib/canvasRenderers';
 import { normalizeAssetUrl } from '@/lib/normalizeAssetUrls';
 const API_BASE = getApiBase();
 
@@ -207,6 +208,20 @@ function labelFromKey(key: string): string {
     .trim();
 }
 
+/**
+ * Node name for a component the author added in the editor.
+ *
+ * Derived from the resource type plus a short unique suffix, so a page can hold
+ * several instances of the same component and the name still says what it is when
+ * someone reads the content tree.
+ */
+function componentNodeName(comp: PageComponent): string {
+  const leaf = comp.resourceType.split('/').pop() ?? 'component';
+  const slug = leaf.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const suffix = comp.instanceId.replace(/[^a-zA-Z0-9]/g, '').slice(-6).toLowerCase();
+  return `${slug}-${suffix}`;
+}
+
 function toTestId(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
@@ -347,6 +362,59 @@ function EditorInner() {
   const [registry, setRegistry] = useState<ComponentDefinition[]>([]);
   const [palette, setPalette] = useState<PaletteItem[]>([]);
   const [components, setComponents] = useState<PageComponent[]>([]);
+  /**
+   * Node paths the page loaded with, so Save can tell a deletion from a component
+   * that never existed. Held in a ref because it is bookkeeping, not render state.
+   */
+  const loadedNodePathsRef = React.useRef<string[]>([]);
+
+  /**
+   * Undo/redo history of component states.
+   *
+   * Snapshots rather than inverse operations: every mutation already goes through
+   * `setComponents`, so recording the resulting state covers add, delete, duplicate,
+   * reorder, and property edits uniformly, with no per-operation inverse to get
+   * wrong. `applyingHistoryRef` suppresses recording while a snapshot is being
+   * applied, so stepping through history does not append to it.
+   */
+  const historyRef = React.useRef<PageComponent[][]>([]);
+  const historyIndexRef = React.useRef<number>(-1);
+  const applyingHistoryRef = React.useRef<boolean>(false);
+
+  // Record every component state the author reaches, capped so a long session
+  // cannot grow without bound.
+  //
+  // This effect deliberately writes only to refs and never calls setState. An
+  // earlier version also tracked `canUndo`/`canRedo` as state to grey the buttons
+  // out, and that produced React error #185 ("Maximum update depth exceeded"): a
+  // setState in an effect keyed on `components` re-entered the same effect, and the
+  // resulting render storm also stopped property inputs from accepting typed text.
+  // Enabled-state styling is not worth a render loop — `stepHistory` simply no-ops
+  // at either end of the history.
+  useEffect(() => {
+    if (applyingHistoryRef.current) {
+      applyingHistoryRef.current = false;
+      return;
+    }
+
+    // Drop any redo branch: editing after an undo starts a new future.
+    const truncated = historyRef.current.slice(0, historyIndexRef.current + 1);
+    truncated.push(components);
+    const MAX_HISTORY = 50;
+    const trimmed = truncated.length > MAX_HISTORY ? truncated.slice(truncated.length - MAX_HISTORY) : truncated;
+    historyRef.current = trimmed;
+    historyIndexRef.current = trimmed.length - 1;
+  }, [components]);
+
+  function stepHistory(delta: number) {
+    const target = historyIndexRef.current + delta;
+    if (target < 0 || target >= historyRef.current.length) return;
+    historyIndexRef.current = target;
+    applyingHistoryRef.current = true;
+    setComponents(historyRef.current[target]);
+    // Selection may point at a component the snapshot does not contain.
+    setSelectedId(null);
+  }
   const [pageTemplate, setPageTemplate] = useState<PageTemplateDefinition | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [leftTab, setLeftTab] = useState<'components' | 'layers' | 'assets'>('components');
@@ -409,6 +477,9 @@ function EditorInner() {
         );
         const mergedComponents = buildEmbeddedTemplateComponents(template, defs, pageComps);
         setComponents(mergedComponents);
+        loadedNodePathsRef.current = mergedComponents
+          .map((comp) => comp.nodePath)
+          .filter((path): path is string => Boolean(path));
         setPalette(
           template?.allowedComponentTypes?.length
             ? registryToPalette(defs).filter((item) => template?.allowedComponentTypes?.includes(item.resourceType))
@@ -563,16 +634,16 @@ function EditorInner() {
 
   async function handleSave() {
     if (isSaving) return;
-    // Save all components that have a nodePath (i.e., loaded from API)
-    const unsavedComps = components.filter((c) => c.nodePath);
-    if (unsavedComps.length === 0) {
-      setSavedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-      return;
-    }
+    if (!contentPath) return;
+
+    const pageLtreePath = contentPath.replace(/^\//, '').replace(/\//g, '.');
     setIsSaving(true);
+
     try {
+      // 1. Properties of components that already exist as nodes.
+      const existing = components.filter((c) => c.nodePath);
       await Promise.all(
-        unsavedComps.map((comp) =>
+        existing.map((comp) =>
           fetch(`${API_BASE}/api/author/content/node/properties`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -580,6 +651,70 @@ function EditorInner() {
           }),
         ),
       );
+
+      // 2. Components the author added or duplicated in this session.
+      //
+      // A component with no nodePath that is *locked* is a template-embedded
+      // placeholder: `buildEmbeddedTemplateComponents()` synthesises those from the
+      // template's `embeddedComponents` with `isLocked: true` and no path of their
+      // own. Creating page nodes for them would detach them from template
+      // inheritance as a side effect of pressing Save, so they are skipped. An
+      // embedded component the author *has* detached already has a nodePath and is
+      // handled by step 1.
+      const created = new Map<string, string>();
+      for (const comp of components) {
+        if (comp.nodePath || comp.isLocked) continue;
+        const name = componentNodeName(comp);
+        const response = await fetch(`${API_BASE}/api/author/content/node`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            parentPath: pageLtreePath,
+            name,
+            resourceType: comp.resourceType,
+            properties: comp.props,
+            userId: 'admin',
+          }),
+        });
+        if (response.ok) {
+          const node = (await response.json()) as ApiContentNode;
+          created.set(comp.instanceId, node.path);
+        }
+      }
+
+      // 3. Components the author removed, diffed against what the page loaded with.
+      const surviving = new Set(components.map((c) => c.nodePath).filter(Boolean) as string[]);
+      const removed = loadedNodePathsRef.current.filter((path) => !surviving.has(path));
+      for (const path of removed) {
+        await fetch(
+          `${API_BASE}/api/author/content/node?path=${encodeURIComponent(path)}&userId=admin`,
+          { method: 'DELETE' },
+        );
+      }
+
+      // 4. The order the author left them in. Only real page nodes participate:
+      //    the reorder endpoint requires exactly the parent's children.
+      const orderedPaths = components
+        .map((comp) => comp.nodePath ?? created.get(comp.instanceId))
+        .filter((path): path is string => Boolean(path));
+      if (orderedPaths.length > 0) {
+        await fetch(`${API_BASE}/api/author/content/node/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ parentPath: pageLtreePath, orderedPaths, userId: 'admin' }),
+        });
+      }
+
+      // Adopt the new paths so a second Save updates rather than duplicates.
+      if (created.size > 0) {
+        setComponents((prev) =>
+          prev.map((comp) =>
+            created.has(comp.instanceId) ? { ...comp, nodePath: created.get(comp.instanceId) } : comp,
+          ),
+        );
+      }
+      loadedNodePathsRef.current = orderedPaths;
+
       setSavedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     } finally {
       setIsSaving(false);
@@ -877,8 +1012,12 @@ function EditorInner() {
             className="flex items-center gap-1 px-3 py-1 rounded-lg"
             style={{ background: '#2a2a2a', border: '1px solid rgba(66,70,84,0.15)' }}
           >
-            <IconButton title="Undo" dataTestId="editor-undo-button"><UndoIcon /></IconButton>
-            <IconButton title="Redo" dataTestId="editor-redo-button"><RedoIcon /></IconButton>
+            <IconButton title="Undo" dataTestId="editor-undo-button" onClick={() => stepHistory(-1)}>
+              <UndoIcon />
+            </IconButton>
+            <IconButton title="Redo" dataTestId="editor-redo-button" onClick={() => stepHistory(1)}>
+              <RedoIcon />
+            </IconButton>
             <div style={{ width: 1, height: 16, background: 'rgba(66,70,84,0.4)', margin: '0 4px' }} />
             <IconButton
               title="Preview"
@@ -1572,123 +1711,157 @@ function CanvasComponent({
 }
 
 // ---------------------------------------------------------------------------
-// ComponentPreview — renders a visual placeholder for each component
+// ComponentPreview — renders each component with the site's own renderer
 // ---------------------------------------------------------------------------
 
+/**
+ * Draws a component exactly as the published site draws it.
+ *
+ * This used to be a hand-written switch: it matched on substrings of the resource
+ * type ("hero", "banner", ...) and fell back to a grey box carrying the component's
+ * name. Components the site renders as real UI — product grids, feature lists,
+ * featured content — appeared here as those grey boxes, so authors were editing a
+ * wireframe and only discovered the real layout after publishing.
+ *
+ * It now resolves against `@flexcms/site-renderers`, the registry the site itself
+ * renders from, so the canvas is WYSIWYG by construction: there is no second
+ * renderer set that can drift.
+ *
+ * The `flexcms-canvas` class re-binds the design tokens for this subtree. Admin and
+ * the site both define `--color-*` properties with the same names and different
+ * values, so without it the site's components would render in the admin app's light
+ * palette.
+ */
 function ComponentPreview({ component }: { component: PageComponent }) {
   const { resourceType, label, props } = component;
-  const type = resourceType.split('/').pop() ?? resourceType;
+  const Renderer = canvasComponentMap.resolve(resourceType);
 
-  // Hero / Banner types
-  if (type.includes('hero') || type.includes('banner')) {
-    const title = String(props['title'] ?? props['headlineTitle'] ?? props['headline'] ?? label);
-    const subtitle = String(props['subtitle'] ?? props['description'] ?? props['subheadline'] ?? '');
-    const cta = String(props['ctaLabel'] ?? props['cta'] ?? props['buttonLabel'] ?? 'Explore Now');
+  if (!Renderer) {
+    // The registry sets a fallback, so this is unreachable in practice — but a
+    // missing renderer must not blank the canvas.
     return (
-      <div
-        className="relative overflow-hidden flex items-center"
-        style={{
-          minHeight: props['fullHeight'] ? 480 : 300,
-          padding: `${props['paddingTop'] ?? 80}px 48px ${props['paddingBottom'] ?? 80}px`,
-          background: 'linear-gradient(135deg, #131313 0%, #1c1b1b 100%)',
-        }}
-      >
-        <div className="absolute top-0 right-0" style={{ width: 400, height: 400, background: 'radial-gradient(circle, rgba(176,198,255,0.08) 0%, transparent 70%)', borderRadius: '50%', transform: 'translate(30%, -30%)' }} />
-        <div className="relative z-10 max-w-2xl space-y-6">
-          <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest" style={{ background: 'rgba(176,198,255,0.1)', border: '1px solid rgba(176,198,255,0.2)', color: '#b0c6ff' }}>
-            {label}
-          </div>
-          <h1 className="font-black tracking-tighter leading-none" style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)', color: '#fff' }}>{title}</h1>
-          {subtitle && <p className="text-lg leading-relaxed" style={{ color: '#c3c6d6' }}>{subtitle}</p>}
-          <button className="px-8 py-3 font-bold text-sm uppercase tracking-tighter" style={{ background: '#fff', color: '#131313' }}>{cta}</button>
+      <div className="flex items-center justify-center gap-3 py-10"
+        style={{ background: '#131313', color: '#424654' }}>
+        <BlockIcon />
+        <div>
+          <p className="text-sm font-bold" style={{ color: '#8d90a0' }}>{label}</p>
+          <p className="text-[11px]" style={{ color: '#424654' }}>{resourceType}</p>
         </div>
       </div>
     );
   }
 
-  // Text / rich-text types
-  if (type.includes('text') || type.includes('richtext') || type.includes('body')) {
-    const content = String(props['content'] ?? props['text'] ?? props['body'] ?? '');
-    const title = String(props['title'] ?? props['heading'] ?? '');
-    return (
-      <div className="px-12 py-16" style={{ background: '#131313' }}>
-        <div className="max-w-2xl">
-          {title && <h2 className="text-2xl font-bold mb-6" style={{ color: '#fff' }}>{title}</h2>}
-          {content ? (
-            content.split('\n').map((line, i) =>
-              line.trim() === '' ? <br key={i} /> : <p key={i} className="leading-loose mb-4" style={{ color: '#c3c6d6' }}>{line}</p>,
-            )
-          ) : (
-            <p style={{ color: '#424654' }}>Rich text content…</p>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Image types
-  if (type.includes('image') || type.includes('photo') || type.includes('media')) {
-    const rawSrc = String(props['src'] ?? props['imagePath'] ?? props['imageUrl'] ?? '');
-    const src = rawSrc ? normalizeAssetUrl(rawSrc, API_BASE) : '';
-    const alt = String(props['alt'] ?? props['altText'] ?? '');
-    return (
-      <div className="flex items-center justify-center" style={{ height: 200, background: '#2a2a2a', color: '#8d90a0' }}>
-        {src ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={src} alt={alt} className="max-h-full object-cover w-full" />
-        ) : (
-          <div className="text-center">
-            <ImageIconSm />
-            <p className="text-xs mt-2">Image placeholder</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Grid / card types
-  if (type.includes('grid') || type.includes('card') || type.includes('list')) {
-    const cols = Number(props['columns'] ?? props['cols'] ?? 3);
-    return (
-      <div className="p-8" style={{ background: '#131313' }}>
-        <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-          {Array.from({ length: cols }).map((_, i) => (
-            <div key={i} className="rounded-lg flex items-center justify-center text-xs" style={{ height: 120, background: '#1c1b1b', color: '#8d90a0', border: '1px dashed rgba(66,70,84,0.4)' }}>
-              {label} {i + 1}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Navigation / header types
-  if (type.includes('nav') || type.includes('header') || type.includes('footer')) {
-    return (
-      <div className="flex items-center justify-between px-12 py-4" style={{ background: '#0e0e0e', borderBottom: '1px solid rgba(66,70,84,0.2)' }}>
-        <span className="font-bold" style={{ color: '#b0c6ff' }}>{String(props['siteName'] ?? props['title'] ?? 'Site Name')}</span>
-        <div className="flex gap-6">
-          {['Home', 'About', 'Products', 'Contact'].map((link) => (
-            <span key={link} className="text-sm" style={{ color: '#c3c6d6' }}>{link}</span>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Default: generic placeholder
   return (
-    <div
-      className="flex items-center justify-center gap-3 py-10"
-      style={{ background: '#131313', color: '#424654', borderTop: '1px solid rgba(66,70,84,0.1)' }}
-    >
-      <BlockIcon />
-      <div>
-        <p className="text-sm font-bold" style={{ color: '#8d90a0' }}>{label}</p>
-        <p className="text-[11px]" style={{ color: '#424654' }}>{resourceType}</p>
-      </div>
+    <div className="flexcms-canvas" data-canvas-resource-type={resourceType}>
+      <CanvasRenderBoundary label={label} resourceType={resourceType}>
+        <CollapsibleRender label={label} resourceType={resourceType}>
+          <Renderer data={props} resourceType={resourceType} name={label} />
+        </CollapsibleRender>
+      </CanvasRenderBoundary>
     </div>
   );
+}
+
+/**
+ * Gives a component a body to click when its renderer draws nothing.
+ *
+ * Some components have no visual output by design — page metadata is the obvious one —
+ * and others collapse when their content is not authored yet. That is faithful to the
+ * published page, but on the canvas it means the component cannot be selected at all,
+ * because the selection chip only appears *after* selection.
+ *
+ * The stub renders alongside the measured element rather than inside it, so it never
+ * influences the measurement it is triggered by.
+ */
+function CollapsibleRender({
+  label,
+  resourceType,
+  children,
+}: {
+  label: string;
+  resourceType: string;
+  children: React.ReactNode;
+}) {
+  const hostRef = React.useRef<HTMLDivElement>(null);
+  const [collapsed, setCollapsed] = useState(false);
+
+  React.useLayoutEffect(() => {
+    const host = hostRef.current;
+    if (!host || typeof ResizeObserver === 'undefined') return;
+
+    // A few pixels of tolerance: a renderer that emits only margins or a hairline
+    // border is still nothing an author can aim at.
+    const measure = () => setCollapsed(host.getBoundingClientRect().height < 8);
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(host);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      {collapsed && (
+        <div
+          className="flex items-center gap-3 px-4 py-3"
+          style={{ background: '#131313', color: '#8d90a0', borderTop: '1px solid rgba(66,70,84,0.4)' }}
+          data-canvas-collapsed="true"
+        >
+          <BlockIcon />
+          <div>
+            <p className="text-sm font-bold">{label}</p>
+            <p className="text-[11px]" style={{ color: '#424654' }}>
+              Renders nothing on the page — select to edit its fields
+            </p>
+          </div>
+        </div>
+      )}
+      <div ref={hostRef}>{children}</div>
+    </>
+  );
+}
+
+/**
+ * Keeps one bad component from taking down the editor.
+ *
+ * Site renderers are written against published content, where a field is either
+ * authored or absent. In the editor they are pointed at content mid-edit — a
+ * half-typed URL, a cleared number, an array the author is still building — so a
+ * renderer that would never throw in production can throw here. Losing the whole
+ * canvas (and the unsaved work behind it) to one component's render error is a far
+ * worse outcome than showing that component as a box.
+ */
+class CanvasRenderBoundary extends React.Component<
+  { label: string; resourceType: string; children: React.ReactNode },
+  { failed: boolean }
+> {
+  constructor(props: { label: string; resourceType: string; children: React.ReactNode }) {
+    super(props);
+    this.state = { failed: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <div
+          className="flex items-center justify-center gap-3 py-10"
+          style={{ background: '#2a1a1a', color: '#e0a0a0', border: '1px dashed #7f4a4a' }}
+        >
+          <div>
+            <p className="text-sm font-bold">{this.props.label} could not be previewed</p>
+            <p className="text-[11px]">
+              {this.props.resourceType} — its editable fields still work in the panel
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -2074,15 +2247,21 @@ function PropertyField({ field, value, onChange }: {
 // Icon button helper
 // ---------------------------------------------------------------------------
 
-function IconButton({ title, children, onClick, dataTestId }: { title: string; children: React.ReactNode; onClick?: () => void; dataTestId?: string }) {
+function IconButton({ title, children, onClick, dataTestId, disabled }: { title: string; children: React.ReactNode; onClick?: () => void; dataTestId?: string; disabled?: boolean }) {
   return (
     <button
       title={title}
       onClick={onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
       data-testid={dataTestId}
       className="p-1 rounded transition-colors"
-      style={{ color: '#c3c6d6' }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; (e.currentTarget as HTMLButtonElement).style.color = '#fff'; }}
+      style={{ color: '#c3c6d6', opacity: disabled ? 0.4 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
+      onMouseEnter={(e) => {
+        if (disabled) return;
+        (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a';
+        (e.currentTarget as HTMLButtonElement).style.color = '#fff';
+      }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#c3c6d6'; }}
     >
       {children}
