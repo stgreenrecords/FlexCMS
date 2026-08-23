@@ -1,5 +1,7 @@
 package com.flexcms.multisite.service;
 
+import com.flexcms.core.exception.NotFoundException;
+import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.LiveCopyRelationship;
 import com.flexcms.core.model.NodeStatus;
@@ -129,7 +131,9 @@ class LiveCopyServiceTest {
 
         assertThatThrownBy(() -> liveCopyService.createLiveCopy(
                 "content.missing", "content.regional.en", "about", true, null, "admin"))
-                .isInstanceOf(IllegalArgumentException.class)
+                // NotFoundException so the API answers 404. An IllegalArgumentException
+                // reaches the global handler's catch-all and becomes an opaque 500.
+                .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Source not found");
     }
 
@@ -140,7 +144,7 @@ class LiveCopyServiceTest {
 
         assertThatThrownBy(() -> liveCopyService.createLiveCopy(
                 "content.corporate.en.about", "content.nonexistent", "about", true, null, "admin"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Target parent not found");
     }
 
@@ -152,7 +156,9 @@ class LiveCopyServiceTest {
 
         assertThatThrownBy(() -> liveCopyService.createLiveCopy(
                 "content.corporate.en.about", "content.regional.en", "about", true, null, "admin"))
-                .isInstanceOf(IllegalStateException.class)
+                // ConflictException so the API answers 409: a name collision is the
+                // caller's to resolve, not a server fault.
+                .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Target path already exists");
     }
 

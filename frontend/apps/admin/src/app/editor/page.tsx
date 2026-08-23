@@ -1232,7 +1232,7 @@ function EditorInner() {
             {/* Locked XF Navigation slot — cannot be moved, edited, or deleted */}
             <LockedXfSlot
               label="Experience Fragment — Navigation"
-              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/navigation"
+              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/navigation/master"
             />
 
             <DndContext
@@ -1327,7 +1327,7 @@ function EditorInner() {
             {/* Locked XF Footer slot — cannot be moved, edited, or deleted */}
             <LockedXfSlot
               label="Experience Fragment — Footer"
-              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/footer"
+              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/footer/master"
             />
           </div>
         </section>
@@ -1791,7 +1791,22 @@ function CollapsibleRender({
 
     // A few pixels of tolerance: a renderer that emits only margins or a hairline
     // border is still nothing an author can aim at.
-    const measure = () => setCollapsed(host.getBoundingClientRect().height < 8);
+    //
+    // The host's own height is not enough. A sticky or fixed-position renderer — the
+    // site navigation is one — is taken out of flow, so the host measures zero while
+    // the component is plainly on screen. Descendants are checked too, so "renders
+    // nothing" means nothing rendered anywhere, not merely nothing in flow.
+    const measure = () => {
+      if (host.getBoundingClientRect().height >= 8) {
+        setCollapsed(false);
+        return;
+      }
+      const painted = Array.from(host.querySelectorAll('*')).some((el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.height >= 8 && rect.width >= 8;
+      });
+      setCollapsed(!painted);
+    };
     measure();
 
     const observer = new ResizeObserver(measure);

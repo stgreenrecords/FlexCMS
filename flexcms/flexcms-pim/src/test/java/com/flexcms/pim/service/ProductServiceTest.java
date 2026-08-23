@@ -82,7 +82,10 @@ class ProductServiceTest {
         UUID catalogId = UUID.randomUUID();
         Catalog c = catalog(UUID.randomUUID());
         when(catalogRepo.findById(catalogId)).thenReturn(Optional.of(c));
-        when(productRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        // saveAndFlush: the service flushes before snapshotting a version, so the
+        // `@PreUpdate` that bumps Product.version has run by the time the snapshot
+        // reads it. Stubbing only save() leaves the service with a null product.
+        when(productRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Product result = productService.create("SKU-001", "Blue Shoe", catalogId,
                 Map.of("color", "blue"), "user1");
@@ -90,7 +93,8 @@ class ProductServiceTest {
         assertThat(result.getSku()).isEqualTo("SKU-001");
         assertThat(result.getCatalog()).isEqualTo(c);
         assertThat(result.getSchema()).isEqualTo(c.getSchema());
-        verify(productRepo).save(any(Product.class));
+        // saveAndFlush, because create snapshots a version straight after saving.
+        verify(productRepo).saveAndFlush(any(Product.class));
     }
 
     @Test
@@ -111,7 +115,10 @@ class ProductServiceTest {
         Product existing = product("SKU-001");
         existing.getAttributes().put("color", "blue");
         when(productRepo.findBySku("SKU-001")).thenReturn(Optional.of(existing));
-        when(productRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        // saveAndFlush: the service flushes before snapshotting a version, so the
+        // `@PreUpdate` that bumps Product.version has run by the time the snapshot
+        // reads it. Stubbing only save() leaves the service with a null product.
+        when(productRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Product result = productService.update("SKU-001", Map.of("size", "42"), "user1");
 
@@ -126,7 +133,10 @@ class ProductServiceTest {
         carried.setSourceProduct(source);
         carried.setOverriddenFields(new String[0]);
         when(productRepo.findBySku("SKU-001")).thenReturn(Optional.of(carried));
-        when(productRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        // saveAndFlush: the service flushes before snapshotting a version, so the
+        // `@PreUpdate` that bumps Product.version has run by the time the snapshot
+        // reads it. Stubbing only save() leaves the service with a null product.
+        when(productRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
 
         productService.update("SKU-001", Map.of("color", "red"), "user1");
 
@@ -170,7 +180,10 @@ class ProductServiceTest {
     void updateStatus_changesProductStatus() {
         Product p = product("SKU-001");
         when(productRepo.findBySku("SKU-001")).thenReturn(Optional.of(p));
-        when(productRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        // saveAndFlush: the service flushes before snapshotting a version, so the
+        // `@PreUpdate` that bumps Product.version has run by the time the snapshot
+        // reads it. Stubbing only save() leaves the service with a null product.
+        when(productRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Product result = productService.updateStatus("SKU-001", ProductStatus.PUBLISHED, "user1");
 
@@ -233,7 +246,7 @@ class ProductServiceTest {
         Catalog c = catalog(UUID.randomUUID());
         p.setCatalog(c);
         when(productRepo.findBySku("WIDGET-2024")).thenReturn(Optional.of(p));
-        when(productRepo.save(any())).thenReturn(p);
+        when(productRepo.saveAndFlush(any())).thenReturn(p);
 
         productService.updateStatus("WIDGET-2024", ProductStatus.PUBLISHED, "editor");
 
@@ -247,7 +260,7 @@ class ProductServiceTest {
     void updateStatus_draft_doesNotSendRabbitMessage() {
         Product p = product("WIDGET-2024");
         when(productRepo.findBySku("WIDGET-2024")).thenReturn(Optional.of(p));
-        when(productRepo.save(any())).thenReturn(p);
+        when(productRepo.saveAndFlush(any())).thenReturn(p);
 
         productService.updateStatus("WIDGET-2024", ProductStatus.DRAFT, "editor");
 

@@ -1,5 +1,7 @@
 package com.flexcms.multisite.service;
 
+import com.flexcms.core.exception.ConflictException;
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.LiveCopyRelationship;
 import com.flexcms.core.repository.ContentNodeRepository;
@@ -65,15 +67,21 @@ public class LiveCopyService {
                                        String excludedProps, String userId) {
 
         ContentNode sourceRoot = nodeRepository.findByPath(sourcePath)
-                .orElseThrow(() -> new IllegalArgumentException("Source not found: " + sourcePath));
+                // NotFoundException, not IllegalArgumentException: the latter reaches the
+                // global handler's catch-all and answers 500 with an opaque correlation
+                // ID, so a caller naming a path that does not exist cannot tell a typo
+                // from a server fault.
+                .orElseThrow(() -> new NotFoundException("Source not found: " + sourcePath));
 
         if (!nodeRepository.existsByPath(targetParentPath)) {
-            throw new IllegalArgumentException("Target parent not found: " + targetParentPath);
+            throw new NotFoundException("Target parent not found: " + targetParentPath);
         }
 
         String targetRootPath = targetParentPath + "." + sanitizeName(targetName);
         if (nodeRepository.existsByPath(targetRootPath)) {
-            throw new IllegalStateException("Target path already exists: " + targetRootPath);
+            // A name collision is the caller's to resolve, so it is a 409 rather than a
+            // 500 — the same treatment the Experience Fragment service already gives it.
+            throw new ConflictException("Target path already exists: " + targetRootPath);
         }
 
         // Copy root node

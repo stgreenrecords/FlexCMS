@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import java.util.List;
@@ -171,5 +173,37 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ProblemDetail> response = handler.handleNotFound(ex, request);
 
         assertThat(response.getBody().getInstance().toString()).isEqualTo("/api/content/v1/pages/site/page");
+    }
+
+    // -------------------------------------------------------------------------
+    // HttpMessageNotReadableException → 400
+    // -------------------------------------------------------------------------
+
+    /**
+     * An unreadable body is a client error on every endpoint that accepts one.
+     *
+     * <p>This exception had no handler, so it fell to the catch-all and returned 500
+     * with nothing but a correlation ID. Found while probing the live-copy API: sending
+     * an array where a string was expected produced an opaque server error rather than
+     * naming the offending field.</p>
+     */
+    @Test
+    void malformedRequestBody_returns400AndNamesTheCause() {
+        HttpMessageNotReadableException ex = new HttpMessageNotReadableException(
+                "JSON parse error",
+                new IllegalArgumentException("Cannot deserialize value of type `java.lang.String` from Array value"),
+                new MockHttpInputMessage(new byte[0]));
+
+        ResponseEntity<ProblemDetail> response = handler.handleUnreadableBody(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        ProblemDetail problem = response.getBody();
+        assertThat(problem).isNotNull();
+        assertThat(problem.getTitle()).isEqualTo("Malformed Request Body");
+        assertThat(problem.getProperties()).containsEntry("errorCode", "MALFORMED_REQUEST_BODY");
+        // The parser's own message is what tells a caller which field was wrong.
+        assertThat(problem.getDetail()).contains("Cannot deserialize value of type");
+        assertThat(problem.getProperties()).containsKey("correlationId");
     }
 }

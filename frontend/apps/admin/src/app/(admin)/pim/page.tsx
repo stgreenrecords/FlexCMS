@@ -118,6 +118,8 @@ function CatalogListSkeleton() {
 export default function PimCatalogListPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
+  /** Surfaced in the UI: a failed load must not look like an empty catalog list. */
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [seasonFilter, setSeasonFilter] = useState('All Seasons');
   const [statusFilter, setStatusFilter] = useState('All Status');
@@ -130,11 +132,22 @@ export default function PimCatalogListPage() {
     setIsLoading(true);
     fetch(`${API_BASE}/api/pim/v1/catalogs`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data: Record<string, unknown>[]) => {
-        const items = data.map(apiToCatalog);
-        setCatalogs(items);
+      .then((data: Record<string, unknown>) => {
+        // The endpoint answers a paged envelope, `{items: [...], totalCount, ...}`.
+        // This treated the whole body as an array and called `data.map(...)`, which
+        // throws — and the `.catch` below turned that into an empty list, so the page
+        // reported "No catalogs found" while the API was returning catalogs.
+        const rows = (Array.isArray(data) ? data : (data.items ?? data.content ?? [])) as Record<
+          string,
+          unknown
+        >[];
+        setCatalogs(rows.map(apiToCatalog));
+        setLoadError(null);
       })
-      .catch(() => setCatalogs([]))
+      .catch((reason) => {
+        setCatalogs([]);
+        setLoadError(`Could not load catalogs (${String(reason)}).`);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

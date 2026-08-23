@@ -41,6 +41,12 @@ public class ContentPublishReplicationListener {
     /** Node types whose whole subtree must travel together, so components are not lost. */
     private static final String PAGE_RESOURCE_TYPE = "flexcms/page";
     private static final String SITE_ROOT_RESOURCE_TYPE = "flexcms/site-root";
+    /**
+     * An Experience Fragment variation holds component children exactly as a page
+     * does — the components an author edits live under `.../master`, not under the
+     * fragment folder.
+     */
+    private static final String XF_VARIATION_RESOURCE_TYPE = "flexcms/xf-page";
 
     @Autowired
     private ReplicationAgent replicationAgent;
@@ -105,10 +111,18 @@ public class ContentPublishReplicationListener {
     }
 
     /**
-     * Pages and site roots own child component nodes, so publishing one must carry
-     * its whole subtree; anything else replicates as a single node.
+     * Nodes that own child component nodes, so publishing one must carry its whole
+     * subtree; anything else replicates as a single node.
+     *
+     * <p>Experience Fragment variations were missing from this list, so publishing one
+     * replicated the variation and left its components on the author instance. The
+     * fragment then existed on publish as an empty shell — the headless XF API served
+     * it with `components: []` — while the equivalent page operation worked. Publishing
+     * each component individually was the only way to get reusable content live.</p>
      */
     private boolean isTreeReplicationCandidate(String resourceType) {
-        return PAGE_RESOURCE_TYPE.equals(resourceType) || SITE_ROOT_RESOURCE_TYPE.equals(resourceType);
+        return PAGE_RESOURCE_TYPE.equals(resourceType)
+                || SITE_ROOT_RESOURCE_TYPE.equals(resourceType)
+                || XF_VARIATION_RESOURCE_TYPE.equals(resourceType);
     }
 }

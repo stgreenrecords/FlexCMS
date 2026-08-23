@@ -17,7 +17,17 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     Optional<Product> findBySku(String sku);
 
-    @Query(value = "SELECT p FROM Product p JOIN FETCH p.catalog JOIN FETCH p.schema WHERE p.catalog.id = :catalogId",
+    /**
+     * Products of one catalog, with everything the JSON response reaches.
+     *
+     * <p>`sourceProduct` is fetched because the serialised `resolvedAttributes` walks the
+     * inheritance chain. Without it, listing a catalog that held any carried-forward
+     * product failed with "Could not initialize proxy — no session": carrying a product
+     * forward made the target catalog impossible to list at all. LEFT because most
+     * products inherit from nothing.</p>
+     */
+    @Query(value = "SELECT p FROM Product p JOIN FETCH p.catalog JOIN FETCH p.schema "
+                 + "LEFT JOIN FETCH p.sourceProduct WHERE p.catalog.id = :catalogId",
            countQuery = "SELECT COUNT(p) FROM Product p WHERE p.catalog.id = :catalogId")
     Page<Product> findByCatalogId(UUID catalogId, Pageable pageable);
 

@@ -112,6 +112,44 @@ describe('Editor WYSIWYG canvas suite', function () {
     expect(stub.length, 'no stub was rendered for the empty component').to.equal(1);
   });
 
+  it('S5 keeps the editor toolbar clickable when a component positions itself fixed', async () => {
+    // The site navigation renders `position: fixed; top: 0; z-index: 50`. Inside the
+    // canvas that escapes its container and lays itself over the editor's own toolbar,
+    // and REB-26 found it as Save becoming unclickable — an author could not save any
+    // page holding a navigation component. The canvas now establishes a containing
+    // block, so a component that pins itself to "the top" pins to its own slot.
+    const d = driver as WebDriver;
+    await d.get(
+      `${env.adminUrl}/editor?path=` +
+        encodeURIComponent('/experience-fragments/tut-usa/global/navigation/master'),
+    );
+    await waitForPageReady(d);
+    await d.wait(
+      async () => (await d.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'The editor canvas never rendered the navigation component',
+    );
+
+    // A rendered fixed nav is the precondition; without it this proves nothing.
+    const navs = await d.findElements(By.css('[data-canvas-resource-type] nav'));
+    expect(navs.length, 'expected the navigation component to render a nav').to.be.greaterThan(0);
+
+    const save = await waitForVisible(d, By.css('[data-testid="editor-save-button"]'));
+    const box = await save.getRect();
+
+    // Whatever sits at the Save button's centre must be the Save button itself.
+    const owner = await d.executeScript<string>(
+      `const el = document.elementFromPoint(arguments[0], arguments[1]);
+       return el ? (el.closest('[data-testid="editor-save-button"]') ? 'save' : el.tagName + '.' + el.className) : 'none';`,
+      Math.round(box.x + box.width / 2),
+      Math.round(box.y + box.height / 2),
+    );
+    expect(owner, 'something is covering the Save button').to.equal('save');
+
+    // And it must actually take the click.
+    await save.click();
+  });
+
   it('S4 shows the same content in the editor as the published page does', async () => {
     const d = await openEditor();
 

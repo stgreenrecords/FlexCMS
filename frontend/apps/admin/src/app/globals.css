@@ -7,6 +7,26 @@
    admin UI's. See @flexcms/site-renderers/src/tokens.css. */
 @import '@flexcms/site-renderers/tokens.css';
 
+/*
+ * Keep site components inside the canvas.
+ *
+ * The shared renderers are written for a page they own, so some of them position
+ * themselves against the viewport — the site navigation is `position: fixed; top: 0;
+ * z-index: 50`. Rendered inside the admin editor that escapes the canvas entirely and
+ * lays itself over the editor's own toolbar: REB-26 caught it as the Save button
+ * becoming unclickable ("Other element would receive the click: <nav class='fixed
+ * top-0 z-50 ...'>"), which would have left an author unable to save any page holding
+ * a navigation component.
+ *
+ * `contain` makes each canvas component a containing block for its fixed and absolute
+ * descendants, so a component that pins itself to "the top" pins to the top of its own
+ * slot. Painting is clipped to that slot too, which is what a canvas preview wants:
+ * one component cannot draw over another or over the surrounding chrome.
+ */
+.flexcms-canvas {
+  contain: layout paint;
+}
+
 /* FlexCMS Admin — base styles using theme tokens */
 :root {
   --color-background: #ffffff;

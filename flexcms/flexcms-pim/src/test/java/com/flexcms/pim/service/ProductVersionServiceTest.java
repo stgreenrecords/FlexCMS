@@ -90,7 +90,7 @@ class ProductVersionServiceTest {
         saved.setVersion(1L);
 
         when(catalogRepo.findById(catalogId)).thenReturn(Optional.of(catalog));
-        when(productRepo.save(any())).thenReturn(saved);
+        when(productRepo.saveAndFlush(any())).thenReturn(saved);
 
         productService.create("SKU-NEW", "New Product", catalogId, Map.of("size", "M"), "alice");
 
@@ -104,7 +104,7 @@ class ProductVersionServiceTest {
         UUID id = UUID.randomUUID();
         Product p = product(id);
         when(productRepo.findBySku("SKU-001")).thenReturn(Optional.of(p));
-        when(productRepo.save(any())).thenReturn(p);
+        when(productRepo.saveAndFlush(any())).thenReturn(p);
 
         productService.update("SKU-001", Map.of("color", "green"), "bob");
 
@@ -136,7 +136,7 @@ class ProductVersionServiceTest {
 
         when(productRepo.findById(id)).thenReturn(Optional.of(p));
         when(productVersionRepo.findByProductIdAndVersionNumber(id, 2L)).thenReturn(Optional.of(snapshot));
-        when(productRepo.save(any())).thenReturn(p);
+        when(productRepo.saveAndFlush(any())).thenReturn(p);
 
         productService.restoreVersion(id, 2L, "admin");
 
@@ -153,7 +153,7 @@ class ProductVersionServiceTest {
 
         when(productRepo.findById(id)).thenReturn(Optional.of(p));
         when(productVersionRepo.findByProductIdAndVersionNumber(id, 1L)).thenReturn(Optional.of(snapshot));
-        when(productRepo.save(any())).thenReturn(p);
+        when(productRepo.saveAndFlush(any())).thenReturn(p);
 
         productService.restoreVersion(id, 1L, "admin");
 

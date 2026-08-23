@@ -1,5 +1,7 @@
 package com.flexcms.pim.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.flexcms.pim.converter.PimJsonbConverter;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnTransformer;
@@ -9,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "product_variants")
 public class ProductVariant {
@@ -17,6 +20,15 @@ public class ProductVariant {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    /**
+     * Not serialized. These endpoints return the child directly, and the parent is
+     * already identified by the request path — while walking back up drags a lazily
+     * loaded Product and its Catalog into the response, which fails outside the
+     * session with "Could not write JSON: Could not initialize proxy" and made every
+     * variant and asset-reference call answer HTTP 500. Product already ignores the
+     * inverse side for the same reason.
+     */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

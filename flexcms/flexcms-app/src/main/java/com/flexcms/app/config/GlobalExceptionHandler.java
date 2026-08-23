@@ -10,12 +10,15 @@ import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -54,6 +57,97 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleConflict(ConflictException ex, HttpServletRequest request) {
         ProblemDetail problem = buildProblem(HttpStatus.CONFLICT, ex, request);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
+    }
+
+    /**
+     * A request body the framework cannot read is the caller's mistake, not a fault.
+     *
+     * <p>Unhandled, this fell to the catch-all below and every malformed body — a
+     * string where an array was expected, a truncated payload, the wrong content type —
+     * answered 500 with nothing but a correlation ID. That is unactionable for the
+     * caller and indistinguishable from a real server failure in the logs, on every
+     * endpoint that accepts a body.</p>
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ProblemDetail> handleUnreadableBody(HttpMessageNotReadableException ex,
+                                                              HttpServletRequest request) {
+        String correlationId = resolveCorrelationId(request);
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setType(URI.create(TYPE_BASE + "malformed-request-body"));
+        problem.setTitle("Malformed Request Body");
+        // The parser's own message names the offending field and token, which is the
+        // part a caller can act on; the framework wraps it with class detail that is
+        // not useful over the wire.
+        problem.setDetail("The request body could not be read: "
+                + (ex.getMostSpecificCause() != null
+                        ? ex.getMostSpecificCause().getMessage()
+                        : ex.getMessage()));
+        problem.setInstance(URI.create(request.getRequestURI()));
+        problem.setProperty("errorCode", "MALFORMED_REQUEST_BODY");
+        problem.setProperty("correlationId", correlationId);
+        problem.setProperty("timestamp", Instant.now().toString());
+
+        log.warn("[{}] Malformed request body on {}: {}", correlationId, request.getRequestURI(),
+                ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
+    }
+
+    /**
+     * A database integrity rule the caller tripped, not a server fault.
+     *
+     * <p>These reached the catch-all and answered 500 with a correlation ID, hiding
+     * rules the caller could act on: deleting a PIM catalog that still holds products,
+     * or a product another was carried forward from, both surfaced as "an unexpected
+     * error occurred". The constraint name is included because it is the only part
+     * that says *which* rule was broken.</p>
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(DataIntegrityViolationException ex,
+                                                                      HttpServletRequest request) {
+        String correlationId = resolveCorrelationId(request);
+        String cause = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage()
+                : ex.getMessage();
+
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        problem.setType(URI.create(TYPE_BASE + "conflict"));
+        problem.setTitle("Conflict");
+        problem.setDetail("The request conflicts with existing data: " + cause);
+        problem.setInstance(URI.create(request.getRequestURI()));
+        problem.setProperty("errorCode", "DATA_INTEGRITY_VIOLATION");
+        problem.setProperty("correlationId", correlationId);
+        problem.setProperty("timestamp", Instant.now().toString());
+
+        log.warn("[{}] Data integrity violation on {}: {}", correlationId, request.getRequestURI(), cause);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
+    }
+
+    /**
+     * A required query parameter the caller omitted.
+     *
+     * <p>Unhandled, this reached the catch-all and answered 500 — so calling an endpoint
+     * without one of its required parameters looked like a server fault instead of a
+     * missing argument. Found on `POST /api/pim/v1/imports/infer-schema`, which needs a
+     * `sourceType`; the same applied to every endpoint with a required parameter.</p>
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ProblemDetail> handleMissingParameter(MissingServletRequestParameterException ex,
+                                                                HttpServletRequest request) {
+        String correlationId = resolveCorrelationId(request);
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setType(URI.create(TYPE_BASE + "missing-parameter"));
+        problem.setTitle("Missing Request Parameter");
+        problem.setDetail("Required parameter '" + ex.getParameterName() + "' of type "
+                + ex.getParameterType() + " is missing.");
+        problem.setInstance(URI.create(request.getRequestURI()));
+        problem.setProperty("errorCode", "MISSING_PARAMETER");
+        problem.setProperty("parameterName", ex.getParameterName());
+        problem.setProperty("correlationId", correlationId);
+        problem.setProperty("timestamp", Instant.now().toString());
+
+        log.warn("[{}] Missing request parameter '{}' on {}", correlationId, ex.getParameterName(),
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
     @ExceptionHandler(ValidationException.class)

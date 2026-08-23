@@ -100,6 +100,8 @@ class CarryforwardServiceTest {
         when(productRepo.findByCatalogId(eq(src.getId()), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(srcProd)));
         when(productRepo.existsBySku("SHOE-X1-2026-2027")).thenReturn(false);
+        // carryforward creates products in a loop and takes no version snapshot, so
+        // the service uses a plain save() here.
         when(productRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         int count = productService.carryforward(src.getId(), tgt.getId(), "user1");
@@ -159,7 +161,10 @@ class CarryforwardServiceTest {
         carried.getAttributes().put("size", "L");   // only size overridden
 
         when(productRepo.findBySku("SHOE-X1-2026-2027")).thenReturn(Optional.of(carried));
-        when(productRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        // saveAndFlush: the service flushes before snapshotting a version, so the
+        // `@PreUpdate` that bumps Product.version has run by the time the snapshot
+        // reads it. Stubbing only save() leaves the service with a null product.
+        when(productRepo.saveAndFlush(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Product merged = productService.mergeInheritedAttributes("SHOE-X1-2026-2027", "user1");
 

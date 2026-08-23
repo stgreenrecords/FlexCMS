@@ -6,6 +6,7 @@ import com.flexcms.pim.repository.CatalogRepository;
 import com.flexcms.pim.repository.ProductRepository;
 import com.flexcms.pim.repository.ProductSchemaRepository;
 import com.flexcms.pim.repository.ProductVersionRepository;
+import org.hibernate.Hibernate;
 
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -96,10 +97,14 @@ public class ProductService {
         schemaValidationService.validateOrThrow(catalog.getSchema(), attributes);
         product.setAttributes(attributes);
 
-        product = productRepo.save(product);
+        // saveAndFlush, not save: the version snapshot below reads
+        // `product.getVersion()`, and the `@PreUpdate` that increments it only runs
+        // at flush. Without the flush the snapshot reuses the previous number and
+        // collides on (product_id, version_number).
+        product = productRepo.saveAndFlush(product);
         productVersionRepo.save(ProductVersion.fromProduct(product));
         productSearchService.index(product);
-        return product;
+        return withAssociationsLoaded(product);
     }
 
     /**
@@ -128,10 +133,14 @@ public class ProductService {
 
         product.getAttributes().putAll(newAttributes);
         product.setUpdatedBy(userId);
-        product = productRepo.save(product);
+        // saveAndFlush, not save: the version snapshot below reads
+        // `product.getVersion()`, and the `@PreUpdate` that increments it only runs
+        // at flush. Without the flush the snapshot reuses the previous number and
+        // collides on (product_id, version_number).
+        product = productRepo.saveAndFlush(product);
         productVersionRepo.save(ProductVersion.fromProduct(product));
         productSearchService.index(product);
-        return product;
+        return withAssociationsLoaded(product);
     }
 
     // -------------------------------------------------------------------------
@@ -193,7 +202,7 @@ public class ProductService {
 
         if (product.getSourceProduct() == null) {
             // Already standalone — nothing to merge
-            return product;
+            return withAssociationsLoaded(product);
         }
 
         // Resolved attributes already does the deep merge (recursive through source chain)
@@ -202,7 +211,11 @@ public class ProductService {
         product.setSourceProduct(null);
         product.setOverriddenFields(new String[0]);
         product.setUpdatedBy(userId);
-        product = productRepo.save(product);
+        // saveAndFlush, not save: the version snapshot below reads
+        // `product.getVersion()`, and the `@PreUpdate` that increments it only runs
+        // at flush. Without the flush the snapshot reuses the previous number and
+        // collides on (product_id, version_number).
+        product = productRepo.saveAndFlush(product);
 
         ProductVersion snapshot = ProductVersion.fromProduct(product);
         snapshot.setChangeSummary("Merged inherited attributes — inheritance chain broken");
@@ -210,7 +223,7 @@ public class ProductService {
         productSearchService.index(product);
 
         log.info("Merged inherited attributes for product {} ({})", product.getId(), sku);
-        return product;
+        return withAssociationsLoaded(product);
     }
 
     /**
@@ -283,7 +296,11 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
         product.setStatus(status);
         product.setUpdatedBy(userId);
-        product = productRepo.save(product);
+        // saveAndFlush, not save: the version snapshot below reads
+        // `product.getVersion()`, and the `@PreUpdate` that increments it only runs
+        // at flush. Without the flush the snapshot reuses the previous number and
+        // collides on (product_id, version_number).
+        product = productRepo.saveAndFlush(product);
         productVersionRepo.save(ProductVersion.fromProduct(product));
 
         // When a product is published, notify the CMS layer so pages that reference
@@ -296,6 +313,26 @@ public class ProductService {
         }
 
         productSearchService.index(product);
+        return withAssociationsLoaded(product);
+    }
+
+    /**
+     * Loads the lazy associations that the JSON response includes.
+     *
+     * <p>A product fetched by SKU carries `catalog` and `schema` as proxies. Anything
+     * that returns the entity has to touch them inside the transaction, or serialisation
+     * fails with "Could not initialize proxy — no session" once the session has closed.</p>
+     */
+    private Product withAssociationsLoaded(Product product) {
+        if (product.getCatalog() != null) {
+            Hibernate.initialize(product.getCatalog());
+            if (product.getCatalog().getSchema() != null) {
+                Hibernate.initialize(product.getCatalog().getSchema());
+            }
+        }
+        if (product.getSchema() != null) {
+            Hibernate.initialize(product.getSchema());
+        }
         return product;
     }
 
@@ -326,7 +363,10 @@ public class ProductService {
         product.setAttributes(new HashMap<>(snapshot.getAttributes()));
         product.setName(snapshot.getName());
         product.setUpdatedBy(userId);
-        product = productRepo.save(product);
+        // saveAndFlush for the same reason as the other snapshot sites: restoring also
+        // writes a version row, and without the flush it reuses the pre-increment
+        // number and collides on (product_id, version_number).
+        product = productRepo.saveAndFlush(product);
 
         ProductVersion restoredSnapshot = ProductVersion.fromProduct(product);
         restoredSnapshot.setChangeSummary("Restored from version " + versionNumber);
@@ -334,7 +374,7 @@ public class ProductService {
         productSearchService.index(product);
 
         log.info("Restored product {} to version {} (new version: {})", productId, versionNumber, product.getVersion());
-        return product;
+        return withAssociationsLoaded(product);
     }
 
     // -------------------------------------------------------------------------

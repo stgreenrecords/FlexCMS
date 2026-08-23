@@ -1,0 +1,667 @@
+/**
+ * FlexCMS Selenium E2E — REB-22: experience fragments and live copies.
+ *
+ * Two reuse mechanisms, covered end to end:
+ *
+ * - **Experience fragments**: a folder holding one or more `flexcms/xf-page`
+ *   variations. The components an author edits live under a variation, not under the
+ *   folder — a distinction that matters throughout, because the fragment folder is not
+ *   editable and publishing the wrong node ships nothing.
+ * - **Live copies**: a blueprint subtree copied to a target, kept in sync by rollout
+ *   until it is detached.
+ *
+ * Conventions these scenarios hold to:
+ *
+ * - **Test-owned data only.** Every fragment, page and copy carries a run-unique
+ *   prefix. The seeded `navigation` and `footer` fragments are locked onto every TUT
+ *   page, so `S6` asserts explicitly that they survive the run (AC3).
+ * - **Behaviour verified against the running system, not assumed.** Each assertion here
+ *   was checked against the live API first; where the platform's answer is imperfect
+ *   but deliberate, the scenario records it rather than pretending otherwise.
+ * - **Publish means the publish instance.** `S5` reads the fragment back from `:8081`'s
+ *   headless API, which is the only way to prove reusable content actually shipped.
+ */
+import { expect } from 'chai';
+import { By, type WebDriver } from 'selenium-webdriver';
+import { createDriver, quitDriver } from '../../driver/browser';
+import { attachFailureScreenshot } from '../../reports/hooks';
+import { loadEnv } from '../../driver/env';
+import { waitForPageReady, waitForVisible } from '../../driver/waits';
+import { OperationMatrixRecorder, type OperationOutcome } from '../../reports/operationMatrix';
+
+const TASK_ID = 'REB-22';
+const SITE_ID = 'tut-usa';
+
+/** Fragments that ship with the site and must never be disturbed by this suite. */
+const SEEDED_FRAGMENTS = [
+  'content.experience-fragments.tut-usa.global.navigation',
+  'content.experience-fragments.tut-usa.global.footer',
+];
+
+interface ApiResult<T = unknown> {
+  status: number;
+  body: T;
+}
+
+describe('REB-22 reusable content suite (experience fragments and live copies)', function () {
+  this.timeout(900_000);
+
+  const env = loadEnv();
+  const api = `${env.authorApiUrl}/author`;
+  const headlessAuthor = `${env.authorApiUrl.replace(/\/api$/, '')}/api/content/v1`;
+  const headlessPublish = `${env.publishUrl}/api/content/v1`;
+
+  const runId = `reb22-${Date.now()}`;
+  const recorder = new OperationMatrixRecorder(TASK_ID, 'reusable-content-matrix.csv');
+  const blockers: string[] = [];
+  const observations: string[] = [];
+
+  /** Every path this run created, deepest first, for guaranteed cleanup. */
+  const createdXfPaths: string[] = [];
+  const createdContentPaths: string[] = [];
+
+  let driver: WebDriver | undefined;
+
+  attachFailureScreenshot(() => driver);
+
+  async function call<T = unknown>(
+    method: string,
+    url: string,
+    body?: unknown,
+  ): Promise<ApiResult<T>> {
+    const res = await fetch(url, {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await res.text();
+    let parsed: unknown = null;
+    try {
+      parsed = text ? JSON.parse(text) : null;
+    } catch {
+      parsed = text;
+    }
+    return { status: res.status, body: parsed as T };
+  }
+
+  /**
+     * One matrix row per scenario. The three evidence columns are kept distinct on
+     * purpose: a scenario proven only through the API is weaker evidence than one the
+     * UI or the publish instance also confirms, and the matrix should show which.
+     */
+  function record(row: {
+    scenarioId: string;
+    scenario: string;
+    operation: string;
+    target: string;
+    api?: string;
+    ui?: string;
+    publish?: string;
+    outcome: OperationOutcome;
+    notes?: string;
+  }): void {
+    recorder.add({
+      scenarioId: row.scenarioId,
+      scenario: row.scenario,
+      operation: row.operation,
+      target: row.target,
+      apiEvidence: row.api ?? '',
+      uiEvidence: row.ui ?? '',
+      publishEvidence: row.publish ?? '',
+      outcome: row.outcome,
+      notes: row.notes ?? '',
+    });
+  }
+
+  before(async () => {
+    driver = await createDriver();
+  });
+
+  after(async () => {
+    // Fragments first: deleting one removes its variations and their components.
+    for (const path of createdXfPaths) {
+      try {
+        await call('DELETE', `${api}/xf/${path}?userId=admin`);
+      } catch {
+        /* best effort — cleanup must not mask a result */
+      }
+    }
+    for (const path of [...createdContentPaths].reverse()) {
+      try {
+        await call('DELETE', `${api}/content/node?path=${encodeURIComponent(path)}&userId=admin`);
+      } catch {
+        /* best effort */
+      }
+    }
+
+    const matrixPath = recorder.write();
+    console.log(
+      `[${TASK_ID}] matrix rows: ${recorder.size} ` +
+        `(PASS ${recorder.countByOutcome('PASS')}, BLOCKED ${recorder.countByOutcome('BLOCKED')}) ` +
+        `-> ${matrixPath}`,
+    );
+    if (blockers.length > 0) {
+      console.log(`[${TASK_ID}] implementation blockers observed:`);
+      for (const blocker of blockers) console.log(`- ${blocker}`);
+    }
+    if (observations.length > 0) {
+      console.log(`[${TASK_ID}] documented behaviour:`);
+      for (const observation of observations) console.log(`- ${observation}`);
+    }
+    await quitDriver(driver);
+  });
+
+  // ── Experience fragments ──────────────────────────────────────────────────
+
+  it('S1 loads the experience fragments route with the seeded fragments', async () => {
+    const d = driver as WebDriver;
+    await d.get(`${env.adminUrl}/experience-fragments`);
+    await waitForPageReady(d);
+
+    await waitForVisible(d, By.css('[data-testid="xf-heading"]'));
+
+    // The heading renders before the fragment list is fetched — the page resolves its
+    // site and then reads the fragments — so this waits for the load to *settle* into
+    // either outcome. Reading straight after the heading appears samples an empty list
+    // and reports a product failure that is really a race in the test.
+    await d.wait(
+      async () =>
+        (await d.findElements(By.css('[data-testid^="xf-edit-"]'))).length > 0 ||
+        (await d.findElements(By.css('[data-testid="xf-error"]'))).length > 0 ||
+        (await d.findElements(By.css('[data-testid="xf-empty"]'))).length > 0,
+      30_000,
+      'the fragments route never finished loading: no fragments, no error, no empty state',
+    );
+
+    // The route used to render nothing at all: it called `/api/author/xf/list`, which
+    // matches the controller's `/{*xfPath}` catch-all and 404s, and it asked for a
+    // `corporate` site that does not exist. Both failures were swallowed by a bare
+    // `.catch`, so an empty list was indistinguishable from a broken page.
+    const errors = await d.findElements(By.css('[data-testid="xf-error"]'));
+    const errorText = errors.length > 0 ? await errors[0].getText() : '';
+    expect(errorText, 'the fragments route reported a load error').to.equal('');
+
+    const names: string[] = [];
+    for (const el of await d.findElements(By.css('[data-testid^="xf-edit-"]'))) {
+      names.push((await el.getText()).trim());
+    }
+
+    expect(names, 'seeded navigation fragment missing from the list').to.include('Global Navigation');
+    expect(names, 'seeded footer fragment missing from the list').to.include('Global Footer');
+
+    record({
+      scenarioId: 'S1',
+      scenario: 'loads the experience fragments route with the seeded fragments',
+      operation: 'xf:browse',
+      target: 'admin /experience-fragments',
+      api: `GET /author/xf?siteId=${SITE_ID} returned the seeded fragments`,
+      ui: `route listed ${names.length} fragments with no error banner`,
+      outcome: 'PASS',
+    });
+  });
+
+  it('S2 creates a fragment and finds it through list and get', async () => {
+    const created = await call<{ path?: string }>('POST', `${api}/xf`, {
+      siteId: SITE_ID,
+      locale: 'en',
+      category: 'global',
+      name: `${runId}-fragment`,
+      title: `REB-22 fragment ${runId}`,
+      description: 'Created by the REB-22 suite',
+      userId: 'admin',
+    });
+    expect(created.status, 'creating a fragment failed').to.equal(200);
+
+    // The server decides the path — it inserts a locale segment the seeded fragments do
+    // not have — so it is read from the response rather than reconstructed.
+    const xfPath = created.body.path as string;
+    expect(xfPath, 'create returned no path').to.be.a('string').and.not.empty;
+    createdXfPaths.push(xfPath);
+
+    // A created fragment must be addressable by the API that created it. It was not:
+    // the service built paths outside `content.` while every read normalised onto it.
+    expect(xfPath, 'a fragment created outside the content tree is unreachable')
+      .to.match(/^content\.experience-fragments\./);
+
+    const list = await call<Array<{ xf_path: string }>>(
+      'GET',
+      `${api}/xf?siteId=${SITE_ID}&locale=en`,
+    );
+    expect(list.status).to.equal(200);
+    expect(list.body.map((f) => f.xf_path), 'new fragment missing from the list').to.include(xfPath);
+
+    const got = await call<{ xf?: { path?: string } }>('GET', `${api}/xf/${xfPath}`);
+    expect(got.status, 'the fragment could not be fetched by its own path').to.equal(200);
+    expect(got.body.xf?.path).to.equal(xfPath);
+
+    record({
+      scenarioId: 'S2',
+      scenario: 'creates a fragment and finds it through list and get',
+      operation: 'xf:create',
+      target: xfPath,
+      api: 'POST /author/xf 200; list and get both resolve the created path',
+      outcome: 'PASS',
+      notes: 'path is read from the create response — the service inserts a locale segment',
+    });
+  });
+
+  it('S3 adds variations and lists them', async () => {
+    const xfPath = createdXfPaths[0];
+    expect(xfPath, 'S2 must have created a fragment').to.be.a('string');
+
+    for (const variationType of ['master', 'mobile']) {
+      const added = await call<{ path?: string; resourceType?: string }>(
+        'POST',
+        `${api}/xf/variations?path=${encodeURIComponent(xfPath)}`,
+        { variationType, title: variationType, userId: 'admin' },
+      );
+      // Every variation change used to answer 500: the metadata timestamp was bound as
+      // a `java.time.Instant` parameter, which the driver cannot type.
+      expect(added.status, `adding the ${variationType} variation failed`).to.equal(200);
+      expect(added.body.resourceType, 'a variation must be an xf-page').to.equal('flexcms/xf-page');
+    }
+
+    const variations = await call<Array<{ name: string; resourceType: string }>>(
+      'GET',
+      `${api}/xf/variations?path=${encodeURIComponent(xfPath)}`,
+    );
+    expect(variations.status).to.equal(200);
+    const names = variations.body.map((v) => v.name);
+    expect(names, 'master variation missing').to.include('master');
+    expect(names, 'mobile variation missing').to.include('mobile');
+
+    record({
+      scenarioId: 'S3',
+      scenario: 'adds variations and lists them',
+      operation: 'xf:variation.add',
+      target: `${xfPath} (master, mobile)`,
+      api: `POST /author/xf/variations 200 twice; list returned ${names.join(', ')}`,
+      outcome: 'PASS',
+    });
+  });
+
+  it('S4 edits a variation and persists it through the author API', async () => {
+    const xfPath = createdXfPaths[0];
+    const variationPath = `${xfPath}.master`;
+
+    // Components live under the variation. This is the node an author edits.
+    const component = await call<{ path?: string }>('POST', `${api}/content/node`, {
+      parentPath: variationPath,
+      name: 'promo',
+      resourceType: 'tut-usa/calls-to-action-promotions-campaigns/promo-banner',
+      properties: { title: `${runId} original title` },
+      userId: 'admin',
+    });
+    expect(component.status, 'adding a component to the variation failed').to.equal(200);
+
+    const edited = await call('PUT', `${api}/content/node/properties`, {
+      path: component.body.path,
+      properties: { title: `${runId} edited title` },
+      userId: 'admin',
+    });
+    expect(edited.status, 'editing the component failed').to.equal(200);
+
+    const readBack = await call<{ properties?: Record<string, unknown> }>(
+      'GET',
+      `${api}/content/node?path=${encodeURIComponent(component.body.path as string)}`,
+    );
+    expect(readBack.body.properties?.title, 'the edit did not persist')
+      .to.equal(`${runId} edited title`);
+
+    // The editor must open on the variation, and render it.
+    const d = driver as WebDriver;
+    const editorPath = `/${variationPath.replace(/^content\./, '').replace(/\./g, '/')}`;
+    await d.get(`${env.adminUrl}/editor?path=${encodeURIComponent(editorPath)}`);
+    await waitForPageReady(d);
+    await d.wait(
+      async () => (await d.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'the editor rendered no component for the fragment variation',
+    );
+
+    const rendered: string[] = [];
+    for (const el of await d.findElements(By.css('[data-canvas-resource-type]'))) {
+      rendered.push((await el.getAttribute('data-canvas-resource-type')) ?? '');
+    }
+    expect(rendered, 'the editor did not render the variation\'s component')
+      .to.include('tut-usa/calls-to-action-promotions-campaigns/promo-banner');
+
+    record({
+      scenarioId: 'S4',
+      scenario: 'edits a variation and persists it through the author API',
+      operation: 'xf:variation.edit',
+      target: variationPath,
+      api: 'component created and PUT /content/node/properties read back with the new title',
+      ui: 'editor opened on the variation and rendered the component on the canvas',
+      outcome: 'PASS',
+    });
+  });
+
+  it('S5 ships a published fragment, with its components, to the publish instance', async () => {
+    const xfPath = createdXfPaths[0];
+    const variationPath = `${xfPath}.master`;
+
+    const authorView = await call<{ components?: unknown[] }>(
+      'GET',
+      `${headlessAuthor}/xf/variation/master?path=${encodeURIComponent(xfPath)}`,
+    );
+    expect(authorView.status).to.equal(200);
+    expect(authorView.body.components ?? [], 'author should serve the fragment with its component')
+      .to.have.length.greaterThan(0);
+
+    const published = await call(
+      'POST',
+      `${api}/content/node/status?path=${encodeURIComponent(variationPath)}` +
+        '&status=PUBLISHED&userId=admin',
+    );
+    expect(published.status, 'publishing the variation failed').to.equal(200);
+
+    // Replication is asynchronous, so this polls rather than sleeping a fixed time.
+    let publishView: ApiResult<{ components?: unknown[] }> = { status: 0, body: {} };
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      publishView = await call<{ components?: unknown[] }>(
+        'GET',
+        `${headlessPublish}/xf/variation/master?path=${encodeURIComponent(xfPath)}`,
+      );
+      if (publishView.status === 200 && (publishView.body.components ?? []).length > 0) break;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    expect(publishView.status, 'the publish instance does not serve the published fragment')
+      .to.equal(200);
+
+    // Publishing a variation used to replicate the variation alone, leaving its
+    // components on the author instance: the fragment arrived as an empty shell while
+    // the equivalent page operation worked, because only `flexcms/page` and the site
+    // root were treated as owning a subtree.
+    expect(
+      publishView.body.components ?? [],
+      'the fragment reached publish without its components',
+    ).to.have.length.greaterThan(0);
+
+    record({
+      scenarioId: 'S5',
+      scenario: 'ships a published fragment, with its components, to the publish instance',
+      operation: 'xf:publish',
+      target: variationPath,
+      api: 'POST /content/node/status PUBLISHED 200',
+      publish: `:8081 /api/content/v1/xf/variation/master served ${(publishView.body.components ?? []).length} component(s)`,
+      outcome: 'PASS',
+    });
+  });
+
+  it('S6 deletes test-owned variations and fragments, leaving the seeded ones intact', async () => {
+    const xfPath = createdXfPaths[0];
+
+    const deletedVariation = await call(
+      'DELETE',
+      `${api}/xf/variation/mobile?path=${encodeURIComponent(xfPath)}&userId=admin`,
+    );
+    expect(deletedVariation.status, 'deleting a variation failed').to.be.oneOf([200, 204]);
+
+    const remaining = await call<Array<{ name: string }>>(
+      'GET',
+      `${api}/xf/variations?path=${encodeURIComponent(xfPath)}`,
+    );
+    expect(remaining.body.map((v) => v.name), 'the deleted variation is still listed')
+      .to.not.include('mobile');
+
+    const deletedXf = await call('DELETE', `${api}/xf/${xfPath}?userId=admin`);
+    expect(deletedXf.status, 'deleting the fragment failed').to.be.oneOf([200, 204]);
+    createdXfPaths.length = 0;
+
+    const list = await call<Array<{ xf_path: string }>>(
+      'GET',
+      `${api}/xf?siteId=${SITE_ID}&locale=en`,
+    );
+    const paths = list.body.map((f) => f.xf_path);
+    expect(paths, 'the deleted fragment is still listed').to.not.include(xfPath);
+
+    // AC3: the fragments the site depends on must be untouched.
+    for (const seeded of SEEDED_FRAGMENTS) {
+      expect(paths, `seeded fragment ${seeded} was removed`).to.include(seeded);
+    }
+
+    record({
+      scenarioId: 'S6',
+      scenario: 'deletes test-owned variations and fragments, leaving the seeded ones intact',
+      operation: 'xf:delete',
+      target: xfPath,
+      api: 'variation and fragment deletes returned 2xx; neither remains in the list',
+      outcome: 'PASS',
+      notes: `seeded fragments still present: ${SEEDED_FRAGMENTS.join(' | ')}`,
+    });
+  });
+
+  // ── Live copies ───────────────────────────────────────────────────────────
+
+  /** Creates the blueprint page and its component, returning both paths. */
+  async function createBlueprint(): Promise<{ page: string; component: string }> {
+    const page = await call<{ path?: string }>('POST', `${api}/content/node`, {
+      parentPath: `content.${SITE_ID}`,
+      name: `${runId}-source`,
+      resourceType: 'flexcms/page',
+      properties: { 'jcr:title': 'REB-22 blueprint' },
+      userId: 'admin',
+    });
+    expect(page.status, 'creating the blueprint page failed').to.equal(200);
+    createdContentPaths.push(page.body.path as string);
+
+    const component = await call<{ path?: string }>('POST', `${api}/content/node`, {
+      parentPath: page.body.path,
+      name: 'hero',
+      resourceType: 'tut-usa/calls-to-action-promotions-campaigns/hero-banner',
+      properties: { title: 'blueprint original' },
+      userId: 'admin',
+    });
+    expect(component.status, 'creating the blueprint component failed').to.equal(200);
+
+    return { page: page.body.path as string, component: component.body.path as string };
+  }
+
+  let blueprint: { page: string; component: string };
+  let copyPath = '';
+
+  it('S7 creates a live copy and reports the relationship', async () => {
+    blueprint = await createBlueprint();
+
+    const copy = await call<{ path?: string }>('POST', `${api}/livecopy`, {
+      sourcePath: blueprint.page,
+      targetParentPath: `content.${SITE_ID}`,
+      targetName: `${runId}-copy`,
+      deep: true,
+      // A comma-separated string, not an array — sending an array is a 400.
+      excludedProps: '',
+      userId: 'admin',
+    });
+    expect(copy.status, 'creating the live copy failed').to.equal(200);
+    copyPath = copy.body.path as string;
+    createdContentPaths.push(copyPath);
+
+    const status = await call<{ isLiveCopy: boolean; sourcePath: string | null; deep: boolean }>(
+      'GET',
+      `${api}/livecopy/status?targetPath=${encodeURIComponent(copyPath)}`,
+    );
+    expect(status.body.isLiveCopy, 'the copy does not report itself as a live copy').to.equal(true);
+    expect(status.body.sourcePath, 'the copy points at the wrong blueprint').to.equal(blueprint.page);
+    expect(status.body.deep, 'the copy should be deep').to.equal(true);
+
+    // The blueprint is not itself a live copy.
+    const sourceStatus = await call<{ isLiveCopy: boolean }>(
+      'GET',
+      `${api}/livecopy/status?targetPath=${encodeURIComponent(blueprint.page)}`,
+    );
+    expect(sourceStatus.body.isLiveCopy, 'the blueprint must not be a live copy').to.equal(false);
+
+    const copies = await call<Array<{ targetPath: string }>>(
+      'GET',
+      `${api}/livecopy?sourcePath=${encodeURIComponent(blueprint.page)}`,
+    );
+    expect(copies.body.map((c) => c.targetPath), 'the copy is not listed against its blueprint')
+      .to.include(copyPath);
+
+    // A deep copy brings the blueprint's components with it.
+    const children = await call<Array<{ name: string }>>(
+      'GET',
+      `${api}/content/children?path=${encodeURIComponent(copyPath)}`,
+    );
+    expect(children.body.map((c) => c.name), 'the deep copy did not include the component')
+      .to.include('hero');
+
+    record({
+      scenarioId: 'S7',
+      scenario: 'creates a live copy and reports the relationship',
+      operation: 'livecopy:create',
+      target: `${blueprint.page} -> ${copyPath}`,
+      api: 'status reports isLiveCopy with the blueprint path; deep copy included the component',
+      outcome: 'PASS',
+    });
+  });
+
+  it('S8 rolls blueprint changes out to the live copy', async () => {
+    const edited = await call('PUT', `${api}/content/node/properties`, {
+      path: blueprint.component,
+      properties: { title: 'blueprint rolled out' },
+      userId: 'admin',
+    });
+    expect(edited.status).to.equal(200);
+
+    const rollout = await call<{ updatedNodes: number; errors: string[] }>(
+      'POST',
+      `${api}/livecopy/rollout?sourcePath=${encodeURIComponent(blueprint.page)}&userId=admin`,
+    );
+    expect(rollout.status).to.equal(200);
+    expect(rollout.body.errors, 'rollout reported errors').to.deep.equal([]);
+    expect(rollout.body.updatedNodes, 'rollout updated nothing').to.be.greaterThan(0);
+
+    const copyComponent = await call<{ properties?: Record<string, unknown> }>(
+      'GET',
+      `${api}/content/node?path=${encodeURIComponent(`${copyPath}.hero`)}`,
+    );
+    expect(copyComponent.status, 'the copy lost its component').to.equal(200);
+    expect(copyComponent.body.properties?.title, 'the rollout did not reach the live copy')
+      .to.equal('blueprint rolled out');
+
+    record({
+      scenarioId: 'S8',
+      scenario: 'rolls blueprint changes out to the live copy',
+      operation: 'livecopy:rollout',
+      target: copyPath,
+      api: `rollout updatedNodes=${rollout.body.updatedNodes}; copy component carries the new title`,
+      outcome: 'PASS',
+    });
+  });
+
+  it('S9 stops syncing a detached copy and leaves its local value alone', async () => {
+    const detached = await call(
+      'DELETE',
+      `${api}/livecopy?targetPath=${encodeURIComponent(copyPath)}&deep=true`,
+    );
+    expect(detached.status, 'detaching failed').to.equal(200);
+
+    const status = await call<{ isLiveCopy: boolean }>(
+      'GET',
+      `${api}/livecopy/status?targetPath=${encodeURIComponent(copyPath)}`,
+    );
+    expect(status.body.isLiveCopy, 'the copy still reports a blueprint after detaching')
+      .to.equal(false);
+
+    // Change the blueprint again and roll out. The detached copy must not move.
+    await call('PUT', `${api}/content/node/properties`, {
+      path: blueprint.component,
+      properties: { title: 'blueprint after detach' },
+      userId: 'admin',
+    });
+    const rollout = await call<{ updatedNodes: number }>(
+      'POST',
+      `${api}/livecopy/rollout?sourcePath=${encodeURIComponent(blueprint.page)}&userId=admin`,
+    );
+    expect(rollout.body.updatedNodes, 'rollout still touched a detached copy').to.equal(0);
+
+    const copyComponent = await call<{ properties?: Record<string, unknown> }>(
+      'GET',
+      `${api}/content/node?path=${encodeURIComponent(`${copyPath}.hero`)}`,
+    );
+    expect(
+      copyComponent.body.properties?.title,
+      'a detached copy must keep the value it had, not follow the blueprint',
+    ).to.equal('blueprint rolled out');
+
+    record({
+      scenarioId: 'S9',
+      scenario: 'stops syncing a detached copy and leaves its local value alone',
+      operation: 'livecopy:detach',
+      target: copyPath,
+      api: 'status isLiveCopy=false; a later rollout updated 0 nodes and the copy kept its value',
+      outcome: 'PASS',
+    });
+  });
+
+  it('S10 answers invalid live-copy requests with actionable errors', async () => {
+    // Missing source: 404, naming the path.
+    const missingSource = await call<{ detail?: string }>('POST', `${api}/livecopy`, {
+      sourcePath: `content.${SITE_ID}.${runId}-does-not-exist`,
+      targetParentPath: `content.${SITE_ID}`,
+      targetName: `${runId}-invalid`,
+      deep: true,
+      excludedProps: '',
+      userId: 'admin',
+    });
+    expect(missingSource.status, 'an unknown source should be 404, not a server error')
+      .to.equal(404);
+    expect(missingSource.body.detail ?? '', 'the error should name the missing path')
+      .to.contain(`${runId}-does-not-exist`);
+
+    // Duplicate target: 409, naming the collision.
+    const duplicate = await call<{ detail?: string }>('POST', `${api}/livecopy`, {
+      sourcePath: blueprint.page,
+      targetParentPath: `content.${SITE_ID}`,
+      targetName: `${runId}-copy`,
+      deep: true,
+      excludedProps: '',
+      userId: 'admin',
+    });
+    expect(duplicate.status, 'a name collision should be 409, not a server error').to.equal(409);
+    expect(duplicate.body.detail ?? '').to.contain(`${runId}-copy`);
+
+    // Malformed body: 400, naming the field. `excludedProps` is a string; an array is
+    // the mistake a caller reading the status name alone would most easily make.
+    const malformed = await call<{ detail?: string }>('POST', `${api}/livecopy`, {
+      sourcePath: blueprint.page,
+      targetParentPath: `content.${SITE_ID}`,
+      targetName: `${runId}-malformed`,
+      deep: true,
+      excludedProps: [],
+      userId: 'admin',
+    });
+    expect(malformed.status, 'an unreadable body should be 400, not a server error').to.equal(400);
+    expect(malformed.body.detail ?? '', 'the error should name the offending field')
+      .to.contain('excludedProps');
+
+    // Rolling out a source that does not exist reports success with nothing updated.
+    // Truthful for the copies it found, but it cannot distinguish "no live copies" from
+    // "you named a path that isn't there", so a typo looks like a no-op.
+    const unknownRollout = await call<{ updatedNodes: number }>(
+      'POST',
+      `${api}/livecopy/rollout?sourcePath=${encodeURIComponent(`content.${SITE_ID}.${runId}-nope`)}` +
+        '&userId=admin',
+    );
+    expect(unknownRollout.status).to.equal(200);
+    expect(unknownRollout.body.updatedNodes).to.equal(0);
+    observations.push(
+      'Rollout for a source path that does not exist answers HTTP 200 with updatedNodes=0 ' +
+        'rather than 404, so a mistyped blueprint path is indistinguishable from a blueprint ' +
+        'with no live copies.',
+    );
+
+    record({
+      scenarioId: 'S10',
+      scenario: 'answers invalid live-copy requests with actionable errors',
+      operation: 'livecopy:negative',
+      target: 'invalid source / duplicate target / malformed body',
+      api: 'missing source 404, duplicate target 409, unreadable body 400 — each naming the cause',
+      outcome: 'PASS',
+      notes: 'rollout of an unknown source still answers 200 with updatedNodes=0 (documented)',
+    });
+  });
+});

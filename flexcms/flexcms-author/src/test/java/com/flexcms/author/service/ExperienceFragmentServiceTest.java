@@ -1,5 +1,6 @@
 package com.flexcms.author.service;
 
+import com.flexcms.core.util.PathUtils;
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
@@ -7,6 +8,7 @@ import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.service.ContentNodeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -51,7 +53,6 @@ class ExperienceFragmentServiceTest {
 
     @Test
     void createExperienceFragment_savesXfFolderAndMetadata() {
-        // The path would be experience-fragments.demo-site.en.site.header
         when(nodeRepository.existsByPath(anyString())).thenReturn(false);
         when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(jdbc.update(anyString(), any(Object[].class))).thenReturn(1);
@@ -63,6 +64,72 @@ class ExperienceFragmentServiceTest {
         assertThat(result.getSiteId()).isEqualTo("demo-site");
         assertThat(result.getLocale()).isEqualTo("en");
         verify(nodeRepository, atLeastOnce()).save(any(ContentNode.class));
+    }
+
+    /**
+     * The created path must sit under {@code content.}, because that is where every
+     * other operation looks.
+     *
+     * <p>This was previously only a comment in the test above, and the value it
+     * described was wrong: fragments were written to a second tree at the database
+     * root while the controller, {@code getExperienceFragment} and
+     * {@code deleteExperienceFragment} all normalise onto {@code content.}. Create
+     * reported success and the fragment was then unreachable — 404 on read, 404 on
+     * delete, invisible from the content tree.</p>
+     */
+    @Test
+    void createExperienceFragment_rootsThePathUnderContent() {
+        when(nodeRepository.existsByPath(anyString())).thenReturn(false);
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(jdbc.update(anyString(), any(Object[].class))).thenReturn(1);
+
+        ContentNode result = xfService.createExperienceFragment(
+                "demo-site", "en", "site", "header", "Site Header", "Global header", "admin");
+
+        assertThat(result.getPath())
+                .isEqualTo("content.experience-fragments.demo-site.en.site.header");
+    }
+
+    /**
+     * The path create writes to must be the path read and delete resolve, or the API
+     * cannot address what it just made. Both of those go through
+     * {@code PathUtils.toContentPath}, which prefixes {@code content.} when it is
+     * absent — so an already-rooted path has to survive it unchanged.
+     */
+    @Test
+    void createExperienceFragment_pathSurvivesContentPathNormalisation() {
+        when(nodeRepository.existsByPath(anyString())).thenReturn(false);
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(jdbc.update(anyString(), any(Object[].class))).thenReturn(1);
+
+        ContentNode result = xfService.createExperienceFragment(
+                "demo-site", "en", "site", "header", "Site Header", "Global header", "admin");
+
+        assertThat(PathUtils.toContentPath(result.getPath()))
+                .as("a created fragment must be addressable by the API that created it")
+                .isEqualTo(result.getPath());
+    }
+
+    @Test
+    void createExperienceFragment_ancestorsAreRootedUnderContentToo() {
+        when(nodeRepository.existsByPath(anyString())).thenReturn(false);
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(jdbc.update(anyString(), any(Object[].class))).thenReturn(1);
+
+        xfService.createExperienceFragment(
+                "demo-site", "en", "site", "header", "Site Header", "Global header", "admin");
+
+        ArgumentCaptor<ContentNode> captor = ArgumentCaptor.forClass(ContentNode.class);
+        verify(nodeRepository, atLeastOnce()).save(captor.capture());
+
+        // Every node the create touched — containers included — belongs in the content
+        // tree. A stray ancestor is how the orphaned parallel tree came about.
+        // The tree root itself is the bare "content", so it is matched separately
+        // rather than by prefix.
+        assertThat(captor.getAllValues())
+                .allSatisfy(node -> assertThat(node.getPath())
+                        .matches(p -> p.equals("content") || p.startsWith("content."),
+                                "rooted at or under content"));
     }
 
     @Test
@@ -87,6 +154,53 @@ class ExperienceFragmentServiceTest {
 
         // path should not contain a category segment
         assertThat(result.getPath()).doesNotContain("null");
+    }
+
+    // ── metadata timestamp binding ──────────────────────────────────────────
+
+    /**
+     * The {@code updated_at} bump must not bind a Java temporal value.
+     *
+     * <p>Both variation operations used to pass {@code Instant.now()} as a statement
+     * parameter. The driver cannot infer a SQL type for it, so every add and every
+     * delete failed with a 500 — which a mocked {@code JdbcTemplate} happily accepts,
+     * which is why the unit tests never noticed. Asserting the call shape catches it:
+     * the timestamp belongs in the SQL, as {@code NOW()}, not in the arguments.</p>
+     */
+    @Test
+    void addVariation_doesNotBindATemporalParameter() {
+        String xfPath = "content.experience-fragments.demo-site.en.site.header";
+        when(nodeRepository.findByPath(xfPath)).thenReturn(Optional.of(xfFolder(xfPath)));
+        when(nodeRepository.existsByPath(anyString())).thenReturn(false);
+        when(nodeRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        xfService.addVariation(xfPath, "mobile", "Mobile", "admin");
+
+        ArgumentCaptor<String> sql = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object> args = ArgumentCaptor.forClass(Object.class);
+        verify(jdbc).update(sql.capture(), args.capture());
+
+        assertThat(sql.getValue()).contains("NOW()");
+        assertThat(args.getAllValues())
+                .as("a temporal value bound as a parameter is what the driver rejects")
+                .noneMatch(a -> a instanceof java.time.temporal.Temporal);
+    }
+
+    @Test
+    void deleteVariation_doesNotBindATemporalParameter() {
+        String xfPath = "content.experience-fragments.demo-site.en.site.header";
+        String varPath = xfPath + ".mobile";
+        when(nodeRepository.findByPath(varPath)).thenReturn(Optional.of(xfPage(varPath)));
+
+        xfService.deleteVariation(xfPath, "mobile", "admin");
+
+        ArgumentCaptor<String> sql = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<Object> args = ArgumentCaptor.forClass(Object.class);
+        verify(jdbc).update(sql.capture(), args.capture());
+
+        assertThat(sql.getValue()).contains("NOW()");
+        assertThat(args.getAllValues())
+                .noneMatch(a -> a instanceof java.time.temporal.Temporal);
     }
 
     // ── addVariation ────────────────────────────────────────────────────────
@@ -272,6 +386,9 @@ class ExperienceFragmentServiceTest {
         xfService.deleteVariation(xfPath, "mobile", "admin");
 
         verify(nodeRepository).deleteSubtree(varPath);
-        verify(jdbc).update(contains("UPDATE experience_fragment_metadata"), any(), eq(xfPath));
+        // One bound argument, the path. This used to expect two — the second being an
+        // `Instant` the PostgreSQL driver cannot type, so the assertion described a
+        // call that always failed in production. The timestamp is now SQL `NOW()`.
+        verify(jdbc).update(contains("UPDATE experience_fragment_metadata"), eq(xfPath));
     }
 }

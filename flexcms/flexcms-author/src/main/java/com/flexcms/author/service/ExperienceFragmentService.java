@@ -12,7 +12,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.*;
 
 /**
@@ -40,7 +39,20 @@ public class ExperienceFragmentService {
     private static final Logger log = LoggerFactory.getLogger(ExperienceFragmentService.class);
 
     /** Prefix for all XF paths in the content_nodes table. */
-    public static final String XF_ROOT = "experience-fragments";
+    /**
+     * Root of the Experience Fragment tree.
+     *
+     * <p>The {@code content.} prefix is load-bearing. This constant used to be a bare
+     * {@code "experience-fragments"}, so {@link #buildXfPath} wrote new fragments to a
+     * second tree at the database root while every read path — the controller's
+     * {@code PathUtils.toContentPath}, {@link #getExperienceFragment} and
+     * {@link #deleteExperienceFragment} — normalised onto {@code content.}. A fragment
+     * created through the API could therefore never be fetched, edited or deleted
+     * through that same API: it answered 404 at a path the create call had just
+     * reported success for, and the orphaned nodes were unreachable from the content
+     * tree entirely.</p>
+     */
+    public static final String XF_ROOT = "content.experience-fragments";
 
     /** Maximum inline resolution depth — guards against circular XF references. */
     public static final int MAX_RESOLUTION_DEPTH = 5;
@@ -132,8 +144,7 @@ public class ExperienceFragmentService {
         ContentNode variation = saveNode(varPath, slug, "flexcms/xf-page",
                 xfPath, xfFolder.getSiteId(), xfFolder.getLocale(), props, userId);
 
-        jdbc.update("UPDATE experience_fragment_metadata SET updated_at = ? WHERE xf_path = ?",
-                Instant.now(), xfPath);
+        touchMetadata(xfPath);
 
         log.info("Added variation '{}' to Experience Fragment {}", variationType, xfPath);
         return variation;
@@ -244,8 +255,7 @@ public class ExperienceFragmentService {
                         "Variation '" + variationType + "' not found on XF: " + xfPath));
 
         nodeRepository.deleteSubtree(variationPath);
-        jdbc.update("UPDATE experience_fragment_metadata SET updated_at = ? WHERE xf_path = ?",
-                Instant.now(), xfPath);
+        touchMetadata(xfPath);
 
         log.info("Deleted variation '{}' from Experience Fragment {}", variationType, xfPath);
     }
@@ -285,6 +295,21 @@ public class ExperienceFragmentService {
                 saveNode(p, segments[i], "flexcms/container", parentOfP, siteId, locale, props, userId);
             }
         }
+    }
+
+    /**
+     * Bumps a fragment's {@code updated_at} after its variations change.
+     *
+     * <p>Uses the database's {@code NOW()} rather than binding a timestamp. Both call
+     * sites previously passed {@code Instant.now()} as a JDBC parameter, which the
+     * PostgreSQL driver cannot map — "Can't infer the SQL type to use for an instance
+     * of java.time.Instant" — so <em>every</em> attempt to add or remove a variation
+     * failed with HTTP 500. Since a fragment with no variation cannot be edited at
+     * all, that made new Experience Fragments unusable.</p>
+     */
+    private void touchMetadata(String xfPath) {
+        jdbc.update("UPDATE experience_fragment_metadata SET updated_at = NOW() WHERE xf_path = ?",
+                xfPath);
     }
 
     /** Creates and saves a {@link ContentNode} directly via the repository. */

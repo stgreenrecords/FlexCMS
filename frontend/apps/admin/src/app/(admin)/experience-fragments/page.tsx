@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@flexcms/ui';
 
 // ---------------------------------------------------------------------------
@@ -27,6 +28,19 @@ interface XFNode {
   author: { initials: string; name: string; color: string };
   depth?: number;
   children?: XFNode[];
+  /**
+   * The variation an author edits. A fragment folder holds no components of its own —
+   * its children are variations, and the components live under one of them — so this
+   * is what the editor is opened on. `master` where it exists, otherwise the first.
+   */
+  editPath?: string;
+  /** Every variation path, for operations that apply to the whole fragment. */
+  variationPaths?: string[];
+}
+
+/** Slash form of an ltree path, which is what the editor route expects. */
+function toEditorPath(ltreePath: string): string {
+  return `/${ltreePath.replace(/^content\./, '').replace(/\./g, '/')}`;
 }
 
 
@@ -71,6 +85,7 @@ function flattenAll(nodes: XFNode[]): XFNode[] {
 // ---------------------------------------------------------------------------
 
 export default function ExperienceFragmentsPage() {
+  const router = useRouter();
   const [xfNodes, setXfNodes]           = useState<XFNode[]>([]);
   const [loading, setLoading]           = useState(true);
   const [view, setView]                 = useState<'list' | 'tree'>('tree');
@@ -79,29 +94,248 @@ export default function ExperienceFragmentsPage() {
   const [expanded, setExpanded]         = useState<Set<string>>(new Set());
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
-  useEffect(() => {
+  const [error, setError] = useState<string | null>(null);
+  /** The site the fragments were read from, and the locales it declares. */
+  const [siteId, setSiteId] = useState<string>('');
+  const [locales, setLocales] = useState<string[]>([]);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  /**
+   * Loads the fragments for the first configured site.
+   *
+   * The site is resolved rather than hardcoded: this page asked for `corporate`, which
+   * is not a configured site here, so the list came back empty even when the URL was
+   * right.
+   */
+  const loadFragments = useCallback(async () => {
     setLoading(true);
-    fetch(`${API_BASE}/api/author/xf/list?siteId=corporate&locale=en`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data: Record<string, unknown>[]) => {
-        if (data.length > 0) {
-          const items: XFNode[] = data.map((n, i) => ({
-            id: (n.id as string) ?? String(i),
-            name: (n.name as string) ?? 'Untitled',
+    setError(null);
+    try {
+      const siteRes = await fetch(`${API_BASE}/api/admin/sites`);
+      if (!siteRes.ok) throw new Error(`Could not read sites (HTTP ${siteRes.status})`);
+      const sites = (await siteRes.json()) as Record<string, unknown>[];
+      const site = sites[0];
+      const siteId = site?.siteId as string | undefined;
+      setSiteId(siteId ?? '');
+      setLocales(
+        Array.isArray(site?.supportedLocales) ? (site.supportedLocales as string[]) : [],
+      );
+      if (!siteId) {
+        setXfNodes([]);
+        setError('No site is configured, so there are no Experience Fragments to show.');
+        return;
+      }
+
+      // Note the URL: the list is `GET /api/author/xf`. `/api/author/xf/list` matches
+      // the `/{*xfPath}` catch-all and 404s as a fragment literally named "list".
+      const res = await fetch(
+        `${API_BASE}/api/author/xf?siteId=${encodeURIComponent(siteId)}&locale=en`,
+      );
+      if (!res.ok) throw new Error(`Could not list Experience Fragments (HTTP ${res.status})`);
+      const data = (await res.json()) as Record<string, unknown>[];
+
+      // Variations come from a second call per fragment: the list response carries no
+      // variation data, and the variation is what an author actually edits.
+      const items: XFNode[] = await Promise.all(
+        data.map(async (n, i) => {
+          const path = (n.xf_path as string) ?? '';
+          let variations: Record<string, unknown>[] = [];
+          try {
+            const vres = await fetch(
+              `${API_BASE}/api/author/xf/variations?path=${encodeURIComponent(path)}`,
+            );
+            if (vres.ok) variations = (await vres.json()) as Record<string, unknown>[];
+          } catch {
+            // A fragment with unreadable variations is still worth listing.
+          }
+
+          const paths = variations.map((v) => v.path as string).filter(Boolean);
+          const master = paths.find((p) => p.endsWith('.master')) ?? paths[0];
+          const published = variations.some((v) => v.status === 'PUBLISHED');
+          const modifiedBy =
+            (variations.find((v) => v.modifiedBy)?.modifiedBy as string) ?? 'system';
+
+          return {
+            id: path || String(i),
+            name: (n.title as string) ?? path.split('.').pop() ?? 'Untitled',
             icon: 'widgets',
-            status: 'live' as XFStatus,
-            path: (n.path as string) ?? '',
-            variationCount: 0,
-            lastModified: n.modifiedAt ? new Date(n.modifiedAt as string).toLocaleDateString() : '—',
-            author: { initials: ((n.createdBy as string) ?? 'SY').slice(0, 2).toUpperCase(), name: (n.createdBy as string) ?? 'System', color: '#b0c6ff' },
+            status: (published ? 'live' : 'draft') as XFStatus,
+            path,
+            variationCount: paths.length,
+            lastModified: n.updated_at
+              ? new Date(n.updated_at as string).toLocaleDateString()
+              : '—',
+            author: {
+              initials: modifiedBy.slice(0, 2).toUpperCase(),
+              name: modifiedBy,
+              color: '#b0c6ff',
+            },
             depth: 0,
-          }));
-          setXfNodes(items);
-        }
-      })
-      .catch(() => { /* API unavailable */ })
-      .finally(() => setLoading(false));
+            editPath: master,
+            variationPaths: paths,
+          };
+        }),
+      );
+      setXfNodes(items);
+    } catch (e) {
+      // Previously swallowed, which is why the page looked empty rather than broken.
+      setXfNodes([]);
+      setError(e instanceof Error ? e.message : 'Could not load Experience Fragments.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { void loadFragments(); }, [loadFragments]);
+
+  /** Opens the editor on the fragment's variation. */
+  const editFragment = useCallback((node: XFNode) => {
+    if (!node.editPath) {
+      setError(`"${node.name}" has no variation to edit yet — add one first.`);
+      return;
+    }
+    router.push(`/editor?path=${encodeURIComponent(toEditorPath(node.editPath))}`);
+  }, [router]);
+
+  /**
+   * Runs one fragment action, then re-reads the list.
+   *
+   * Every action here maps onto an endpoint that exists. `Rename` is absent from the
+   * menu on purpose: the XF API has no rename, and shipping a button that cannot work
+   * is the defect being fixed.
+   */
+  const runAction = useCallback(async (action: string, node: XFNode) => {
+    if (action === 'Edit Variations') {
+      editFragment(node);
+      return;
+    }
+
+    setBusy(node.id);
+    setError(null);
+    try {
+      if (action === 'Delete') {
+        const res = await fetch(
+          `${API_BASE}/api/author/xf/${node.path}?userId=admin`,
+          { method: 'DELETE' },
+        );
+        if (!res.ok) throw new Error(`Delete failed (HTTP ${res.status})`);
+      } else if (action === 'Publish') {
+        // A fragment is published by publishing its variations; there is no
+        // fragment-level publish endpoint.
+        const paths = node.variationPaths ?? [];
+        if (paths.length === 0) throw new Error('Nothing to publish — no variations exist.');
+        for (const path of paths) {
+          const res = await fetch(
+            `${API_BASE}/api/author/content/node/status?path=${encodeURIComponent(path)}` +
+              '&status=PUBLISHED&userId=admin',
+            { method: 'POST' },
+          );
+          if (!res.ok) throw new Error(`Publishing ${path} failed (HTTP ${res.status})`);
+        }
+      } else if (action === 'Duplicate') {
+        const segments = node.path.split('.');
+        const name = segments.pop() ?? 'fragment';
+        const siteId = segments[2] ?? '';
+        const category = segments[3] ?? 'global';
+        const res = await fetch(`${API_BASE}/api/author/xf`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            siteId,
+            locale: 'en',
+            category,
+            name: `${name}-copy`,
+            title: `${node.name} (copy)`,
+            description: `Copy of ${node.name}`,
+            userId: 'admin',
+          }),
+        });
+        if (!res.ok) throw new Error(`Duplicate failed (HTTP ${res.status})`);
+
+        // The server decides the path — it inserts a locale segment, which a
+        // hand-built path would miss. Predicting it left copies with no variations,
+        // and a fragment without a variation cannot be edited.
+        const createdNode = (await res.json()) as { path?: string };
+        const copyPath = createdNode.path;
+        if (!copyPath) throw new Error('Duplicate returned no path for the new fragment.');
+
+        // Carry the variation structure across, so the copy is editable like the original.
+        for (const variationPath of node.variationPaths ?? []) {
+          const variationType = variationPath.split('.').pop() ?? 'master';
+          const vres = await fetch(
+            `${API_BASE}/api/author/xf/variations?path=${encodeURIComponent(copyPath)}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ variationType, title: variationType, userId: 'admin' }),
+            },
+          );
+          if (!vres.ok) {
+            throw new Error(
+              `Copied the fragment but not its "${variationType}" variation (HTTP ${vres.status}).`,
+            );
+          }
+        }
+      } else if (action === 'New Fragment Here') {
+        const segments = node.path.split('.');
+        const siteId = segments[2] ?? '';
+        const category = segments[3] ?? 'global';
+        const name = `fragment-${Date.now()}`;
+        const res = await fetch(`${API_BASE}/api/author/xf`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            siteId,
+            locale: 'en',
+            category,
+            name,
+            title: 'New fragment',
+            description: '',
+            userId: 'admin',
+          }),
+        });
+        if (!res.ok) throw new Error(`Create failed (HTTP ${res.status})`);
+
+        const createdNode = (await res.json()) as { path?: string };
+        if (!createdNode.path) throw new Error('Create returned no path for the new fragment.');
+
+        // A fragment with no variation cannot be edited, so give it a master.
+        const vres = await fetch(
+          `${API_BASE}/api/author/xf/variations?path=${encodeURIComponent(createdNode.path)}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ variationType: 'master', title: 'Master', userId: 'admin' }),
+          },
+        );
+        if (!vres.ok) {
+          throw new Error(
+            `Created the fragment but could not add its master variation (HTTP ${vres.status}).`,
+          );
+        }
+      }
+
+      await loadFragments();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : `${action} failed.`);
+    } finally {
+      setBusy(null);
+    }
+  }, [editFragment, loadFragments]);
+
+  /** Figures for the footer and the Usage Overview, from the fragments actually loaded. */
+  const totals = useMemo(() => {
+    const all = flattenAll(xfNodes);
+    const fragments = all.filter((n) => !n.children || n.children.length === 0);
+    const variations = fragments.reduce((sum, n) => sum + n.variationCount, 0);
+    // Anything that is not the master is an alternative variant of the fragment.
+    const variants = fragments.reduce(
+      (sum, n) => sum + (n.variationPaths ?? []).filter((p) => !p.endsWith('.master')).length,
+      0,
+    );
+    const published = fragments.filter((n) => n.status === 'live').length;
+    return { fragments: fragments.length, variations, variants, published };
+  }, [xfNodes]);
 
   const visibleNodes = useMemo(() => {
     if (view === 'list') {
@@ -172,6 +406,17 @@ export default function ExperienceFragmentsPage() {
               <p className="text-sm mt-1" style={{ color: '#8d90a0' }}>
                 Reusable content blocks shared across sites, channels and locales.
               </p>
+              {/* Failures used to be swallowed by a bare `.catch(() => {})`, so a 404
+                  from the list endpoint looked identical to having no fragments. */}
+              {error && (
+                <p
+                  className="text-sm mt-2 rounded px-3 py-2"
+                  style={{ color: '#ffb4ab', background: 'rgba(147,0,10,0.18)' }}
+                  data-testid="xf-error"
+                >
+                  {error}
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               {selected.size > 0 && (
@@ -311,6 +556,9 @@ export default function ExperienceFragmentsPage() {
                     onToggleExpand={view === 'tree' ? () => toggleExpand(node.id) : undefined}
                     showActionMenu={actionMenuId === node.id}
                     onActionMenu={(id) => setActionMenuId(id)}
+                    onEdit={editFragment}
+                    onAction={runAction}
+                    busy={busy === node.id}
                   />
                 ))}
                 {visibleNodes.length === 0 && (
@@ -332,13 +580,13 @@ export default function ExperienceFragmentsPage() {
               className="p-4 flex items-center justify-between"
               style={{ background: 'rgba(42,42,42,0.1)', borderTop: '1px solid rgba(66,70,84,0.1)' }}
             >
-              <p className="text-[0.7rem] font-medium" style={{ color: '#8d90a0' }}>
+              <p className="text-[0.7rem] font-medium" style={{ color: '#8d90a0' }} data-testid="xf-count">
                 Showing{' '}
-                <span style={{ color: '#e5e2e1' }}>1 – {visibleNodes.length}</span>
+                <span style={{ color: '#e5e2e1' }}>{visibleNodes.length}</span>
                 {' '}of{' '}
-                <span style={{ color: '#e5e2e1' }}>38</span> fragments
+                <span style={{ color: '#e5e2e1' }}>{totals.fragments}</span>
+                {totals.fragments === 1 ? ' fragment' : ' fragments'}
               </p>
-              <PaginationControls />
             </div>
           </div>
 
@@ -351,29 +599,31 @@ export default function ExperienceFragmentsPage() {
               <StatCard
                 iconName="widgets"
                 iconColor="#b0c6ff"
-                badge="+5"
+                badge={siteId || '—'}
                 badgeColor="#b0c6ff"
-                label="Active Fragments"
-                value="38 Fragments"
-                description="Used across 6 sites and 12 channel configurations."
+                label="Fragments"
+                value={`${totals.fragments} ${totals.fragments === 1 ? 'Fragment' : 'Fragments'}`}
+                description={`${totals.variations} ${
+                  totals.variations === 1 ? 'variation' : 'variations'
+                } in total.`}
               />
               <StatCard
                 iconName="translate"
                 iconColor="#ffb59b"
-                badge="9 locales"
+                badge={`${locales.length} ${locales.length === 1 ? 'locale' : 'locales'}`}
                 badgeColor="#8d90a0"
-                label="Localisation"
-                value="72% Translated"
-                description="28% of fragments awaiting localisation into target locales."
+                label="Locales"
+                value={locales.join(', ') || '—'}
+                description="Locales this site is configured for."
               />
               <StatCard
                 iconName="call_split"
                 iconColor="#b3c5fd"
-                badge="3 active"
+                badge={`${totals.published} live`}
                 badgeColor="#b3c5fd"
-                label="A/B Variants"
-                value="12 Variants"
-                description="Live A/B tests running across promotional banners."
+                label="Alternative Variants"
+                value={`${totals.variants} ${totals.variants === 1 ? 'Variant' : 'Variants'}`}
+                description="Variations beyond each fragment's master."
               />
             </div>
           </div>
@@ -413,6 +663,9 @@ function XFRow({
   onToggleExpand,
   showActionMenu,
   onActionMenu,
+  onEdit,
+  onAction,
+  busy,
 }: {
   node: XFNode;
   isSelected: boolean;
@@ -421,6 +674,9 @@ function XFRow({
   onToggleExpand?: () => void;
   showActionMenu: boolean;
   onActionMenu: (id: string | null) => void;
+  onEdit: (node: XFNode) => void;
+  onAction: (action: string, node: XFNode) => void;
+  busy: boolean;
 }) {
   const status = STATUS_CONFIG[node.status];
   const depth  = node.depth ?? 0;
@@ -468,9 +724,26 @@ function XFRow({
             </button>
           )}
           <NodeIcon name={node.icon} status={node.status} />
-          <span className="text-sm font-semibold" style={{ color: '#e5e2e1' }}>
-            {node.name}
-          </span>
+          {isLeaf ? (
+            // The primary way in. Opening a fragment used to be impossible from this
+            // page: the name was plain text and every menu action was inert.
+            <button
+              type="button"
+              onClick={() => onEdit(node)}
+              className="text-sm font-semibold text-left transition-colors"
+              style={{ color: '#e5e2e1', textDecoration: 'underline', textDecorationColor: 'transparent' }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.textDecorationColor = '#b0c6ff'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.textDecorationColor = 'transparent'; }}
+              title={node.editPath ? `Edit ${node.editPath}` : 'No variation to edit yet'}
+              data-testid={`xf-edit-${node.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+            >
+              {node.name}
+            </button>
+          ) : (
+            <span className="text-sm font-semibold" style={{ color: '#e5e2e1' }}>
+              {node.name}
+            </span>
+          )}
         </div>
       </td>
 
@@ -558,17 +831,21 @@ function XFRow({
                 boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
               }}
             >
+              {/* Rename is absent deliberately: the XF API has no rename operation, and
+                  an action that cannot work is the defect this page had. */}
               {(isLeaf
                 ? ['Edit Variations', 'Publish', 'Duplicate', 'Delete']
-                : ['New Fragment Here', 'Rename', 'Delete']
+                : ['New Fragment Here', 'Delete']
               ).map((action) => (
                 <button
                   key={action}
                   className="w-full text-left px-4 py-2 text-sm transition-colors"
-                  style={{ color: action === 'Delete' ? '#ffb4ab' : '#e5e2e1' }}
+                  style={{ color: action === 'Delete' ? '#ffb4ab' : '#e5e2e1', opacity: busy ? 0.5 : 1 }}
+                  disabled={busy}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
-                  onClick={() => onActionMenu(null)}
+                  onClick={() => { onActionMenu(null); onAction(action, node); }}
+                  data-testid={`xf-action-${action.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                 >
                   {action}
                 </button>
@@ -679,27 +956,6 @@ function ContextRailButton({ title, children }: { title: string; children: React
   );
 }
 
-function PaginationControls() {
-  return (
-    <div className="flex items-center gap-1">
-      {['‹', '1', '2', '3', '…', '8', '›'].map((p, i) => (
-        <button
-          key={i}
-          className="w-7 h-7 rounded text-xs font-semibold transition-colors"
-          style={
-            p === '1'
-              ? { background: '#2a2a2a', color: '#b0c6ff' }
-              : { color: '#8d90a0' }
-          }
-          onMouseEnter={(e) => { if (p !== '1') (e.currentTarget as HTMLButtonElement).style.background = '#2a2a2a'; }}
-          onMouseLeave={(e) => { if (p !== '1') (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
-        >
-          {p}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // SVG Icons

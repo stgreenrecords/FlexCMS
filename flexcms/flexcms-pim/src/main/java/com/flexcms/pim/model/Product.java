@@ -51,6 +51,13 @@ public class Product {
     private ProductStatus status = ProductStatus.DRAFT;
 
     /** Source product for year-over-year carryforward */
+    /**
+     * Not serialised: nesting the whole parent product — with its catalog and schema —
+     * inside every child would be unbounded, and the useful view of inheritance is
+     * already exposed as `resolvedAttributes` plus `overriddenFields`. `variants` is
+     * ignored for the same reason.
+     */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_product_id")
     private Product sourceProduct;

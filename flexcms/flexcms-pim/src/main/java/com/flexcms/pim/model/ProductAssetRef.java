@@ -1,5 +1,7 @@
 package com.flexcms.pim.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.util.UUID;
@@ -9,6 +11,7 @@ import java.util.UUID;
  * References DAM assets by path (string), not by foreign key — the PIM
  * database has no knowledge of the DAM/CMS database schema.
  */
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "product_asset_refs",
        uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "asset_path", "role"}))
@@ -18,6 +21,15 @@ public class ProductAssetRef {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    /**
+     * Not serialized. These endpoints return the child directly, and the parent is
+     * already identified by the request path — while walking back up drags a lazily
+     * loaded Product and its Catalog into the response, which fails outside the
+     * session with "Could not write JSON: Could not initialize proxy" and made every
+     * variant and asset-reference call answer HTTP 500. Product already ignores the
+     * inverse side for the same reason.
+     */
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

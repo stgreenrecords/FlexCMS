@@ -22,6 +22,8 @@ import java.util.UUID;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -83,6 +85,46 @@ class ProductSearchServiceTest {
         assertThat(fullText).contains("SKU-001");
         assertThat(fullText).contains("red");
         assertThat(fullText).contains("1.5kg");
+    }
+
+    /**
+     * A failing search cluster must not stop a product being authored.
+     *
+     * <p>`index` is called inline from product create, update, status change,
+     * carryforward and merge. It used to let the repository's exception through, so an
+     * unreachable or version-incompatible Elasticsearch turned every product *write*
+     * into an HTTP 500 — the PIM looked broken when only search was. The index is
+     * derived data with reindex endpoints of its own.</p>
+     */
+    @Test
+    void index_searchClusterFailure_doesNotBreakTheWrite() {
+        when(productSearchRepository.save(any()))
+                .thenThrow(new RuntimeException("[es/index] failed: media_type_header_exception"));
+
+        assertThatCode(() -> productSearchService.index(product)).doesNotThrowAnyException();
+
+        verify(productSearchRepository).save(any());
+    }
+
+    @Test
+    void remove_searchClusterFailure_doesNotBreakTheDelete() {
+        doThrow(new RuntimeException("[es/delete] failed"))
+                .when(productSearchRepository).deleteBySku("SKU-001");
+
+        assertThatCode(() -> productSearchService.remove("SKU-001")).doesNotThrowAnyException();
+    }
+
+    /**
+     * A caller that explicitly asked to reindex must hear about a failure: unlike the
+     * side-effect path above, the reindex *is* the operation.
+     */
+    @Test
+    void indexAll_searchClusterFailure_stillFails() {
+        when(productSearchRepository.saveAll(any()))
+                .thenThrow(new RuntimeException("[es/bulk] failed"));
+
+        assertThatThrownBy(() -> productSearchService.indexAll(List.of(product)))
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test

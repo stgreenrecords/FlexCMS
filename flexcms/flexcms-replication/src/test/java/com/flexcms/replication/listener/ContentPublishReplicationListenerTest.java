@@ -65,6 +65,40 @@ class ContentPublishReplicationListenerTest {
         verify(replicationAgent).replicateTree("content.tut-usa", "admin");
     }
 
+    /**
+     * An Experience Fragment variation owns component children just as a page does.
+     *
+     * <p>It was absent from the tree-replication list, so publishing one replicated the
+     * variation and left its components behind: the headless XF API on the publish
+     * instance served the fragment with `components: []`, and the only way to get
+     * reusable content live was to publish each component individually. The equivalent
+     * page operation worked, which made the gap easy to miss.</p>
+     */
+    @Test
+    void publishingAnXfVariation_replicatesTheWholeSubtree() {
+        ContentNode variation = node(
+                "content.experience-fragments.tut-usa.global.navigation.master", "flexcms/xf-page");
+
+        listener.onContentStatusChanged(event(variation, NodeStatus.DRAFT, NodeStatus.PUBLISHED));
+
+        verify(replicationAgent).replicateTree(
+                "content.experience-fragments.tut-usa.global.navigation.master", "admin");
+        verify(replicationAgent, never()).replicate(anyString(), any(), anyString());
+    }
+
+    /** The fragment *folder* holds no components, so it replicates as a single node. */
+    @Test
+    void publishingAnXfFolder_replicatesTheSingleNode() {
+        ContentNode folder = node(
+                "content.experience-fragments.tut-usa.global.navigation", "flexcms/xf-folder");
+
+        listener.onContentStatusChanged(event(folder, NodeStatus.DRAFT, NodeStatus.PUBLISHED));
+
+        verify(replicationAgent).replicate("content.experience-fragments.tut-usa.global.navigation",
+                ReplicationEvent.ReplicationAction.ACTIVATE, "admin");
+        verify(replicationAgent, never()).replicateTree(anyString(), anyString());
+    }
+
     @Test
     void publishingAComponent_replicatesTheSingleNode() {
         ContentNode component = node("content.tut-usa.home.hero-banner",

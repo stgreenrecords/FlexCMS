@@ -43,9 +43,19 @@ public class ProductSearchService {
      * Index (or re-index) a single product.
      */
     public void index(Product product) {
-        ProductDocument doc = toDocument(product);
-        productSearchRepository.save(doc);
-        log.debug("Indexed product: {}", product.getSku());
+        try {
+            ProductDocument doc = toDocument(product);
+            productSearchRepository.save(doc);
+            log.debug("Indexed product: {}", product.getSku());
+        } catch (RuntimeException e) {
+            // Best effort by design. This runs inside product create/update/status, so
+            // rethrowing makes an unreachable or incompatible search cluster look like a
+            // broken PIM: every write answers 500 and no product can be authored at all.
+            // The index is derived data — rebuild it with /api/pim/v1/search/reindex/*.
+            log.warn("Search indexing failed for product {} — the product was saved and the "
+                    + "index is now stale; rebuild with /api/pim/v1/search/reindex/*: {}",
+                    product.getSku(), e.getMessage());
+        }
     }
 
     /**
@@ -63,8 +73,14 @@ public class ProductSearchService {
      * Remove a product from the index by SKU.
      */
     public void remove(String sku) {
-        productSearchRepository.deleteBySku(sku);
-        log.debug("Removed product from index: {}", sku);
+        try {
+            productSearchRepository.deleteBySku(sku);
+            log.debug("Removed product from index: {}", sku);
+        } catch (RuntimeException e) {
+            // Called while deleting a product; the same reasoning as index() applies.
+            log.warn("Removing product {} from the search index failed — the product was "
+                    + "deleted and the index is now stale: {}", sku, e.getMessage());
+        }
     }
 
     /**
