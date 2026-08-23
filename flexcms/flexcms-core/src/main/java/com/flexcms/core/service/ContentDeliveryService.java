@@ -1,6 +1,7 @@
 package com.flexcms.core.service;
 
 import com.flexcms.core.model.ContentNode;
+import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.plugin.model.RenderContext;
 import com.flexcms.plugin.spi.ComponentModel;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,19 @@ import java.util.*;
  */
 @Service
 public class ContentDeliveryService {
+
+    /**
+     * Whether this instance serves the public site. Set from {@code flexcms.runmode},
+     * the same property that gates {@code ContentPublishReplicationListener}.
+     */
+    @Value("${flexcms.runmode:author}")
+    private String runmode;
+
+    /** True when this JVM is a publish instance and must hide unpublished content. */
+    private boolean isPublishRunmode() {
+        return "publish".equalsIgnoreCase(runmode);
+    }
+
 
     private static final Logger log = LoggerFactory.getLogger(ContentDeliveryService.class);
 
@@ -59,6 +74,18 @@ public class ContentDeliveryService {
     public Map<String, Object> renderPage(String path, RenderContext context) {
         ContentNode page = nodeService.getWithChildren(path)
                 .orElseThrow(() -> new IllegalArgumentException("Page not found: " + path));
+
+        // On a publish instance, only published content is public.
+        //
+        // Delivery used to ignore status entirely, so a page deactivated through
+        // replication still answered on :8081 — unpublishing changed nothing a
+        // visitor could see. The check is deliberately scoped to the publish
+        // runmode: the author instance must keep serving DRAFT content, because the
+        // editor preview and the author delivery API depend on it (and REB-20's
+        // publish-isolation guard asserts exactly that asymmetry).
+        if (isPublishRunmode() && page.getStatus() != NodeStatus.PUBLISHED) {
+            throw new IllegalArgumentException("Page not published: " + path);
+        }
 
         Map<String, Object> result = new LinkedHashMap<>();
 

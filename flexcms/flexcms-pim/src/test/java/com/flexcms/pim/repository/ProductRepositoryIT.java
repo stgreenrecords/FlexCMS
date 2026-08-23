@@ -13,7 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -37,11 +37,15 @@ class ProductRepositoryIT {
 
     @Container
     @SuppressWarnings("resource") // lifecycle managed by @Testcontainers + @Container
-    static final PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16-alpine")
+    static final PostgreSQLContainer postgres =
+            new PostgreSQLContainer("postgres:16-alpine")
                     .withDatabaseName("flexcms_pim_test")
                     .withUsername("flexcms")
-                    .withPassword("flexcms");
+                    .withPassword("flexcms")
+                    // The PIM migrations expect uuid-ossp/pg_trgm to already exist —
+                    // CI and init-db.sql provision them per database, a bare container
+                    // does not. See db/it/pim-extensions.sql.
+                    .withInitScript("db/it/pim-extensions.sql");
 
     @DynamicPropertySource
     static void configurePimDataSource(DynamicPropertyRegistry registry) {
@@ -64,9 +68,19 @@ class ProductRepositoryIT {
 
     @BeforeEach
     void setUp() {
-        productRepository.deleteAll();
-        catalogRepository.deleteAll();
-        schemaRepository.deleteAll();
+        // deleteAllInBatch(), not deleteAll(): the PIM Flyway migrations include the
+        // sample-data seed (V4__tut_pim_sample_seed.sql), and deleteAll() hydrates every
+        // row into an entity before deleting it. The seeded products carry
+        // status = 'ACTIVE', which ProductStatus does not define (DRAFT, REVIEW,
+        // PUBLISHED, ARCHIVED), so hydrating them throws
+        // "No enum constant com.flexcms.pim.model.ProductStatus.ACTIVE" before any test
+        // body runs. A bulk delete issues one DELETE statement and never maps a row, so
+        // this suite stays independent of whatever the seed contains. The seed/enum
+        // mismatch itself is a product defect, reported separately — see
+        // df/artifacts/INFRA-TESTCONTAINERS-DOCKER29/devops/blockers.md.
+        productRepository.deleteAllInBatch();
+        catalogRepository.deleteAllInBatch();
+        schemaRepository.deleteAllInBatch();
 
         testSchema = new ProductSchema();
         testSchema.setName("test-schema");

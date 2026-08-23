@@ -17,6 +17,17 @@ scale and adds the findings below.
 
 ## R26-1 — Deleting a published page never removes it from the publish environment
 
+> **RESOLVED 2026-08-23.** `ContentNodeService.delete()` now publishes a
+> `ContentDeletedEvent`, and `ContentPublishReplicationListener.onContentDeleted()`
+> turns it into the `ReplicationAction.DELETE` the receiver always handled, via the
+> new `ReplicationAgent.replicateDelete()` (the existing `replicate()` could not be
+> reused — it resolves the node first, and the node is gone by then). Verified live:
+> create -> publish -> `:8081` serves -> delete -> `:8081` no longer serves, with
+> `Replicated deletion of …` on the author and `Deleted content from publish: …` on
+> the publish instance. REB-26 `S4` now reports "Publish environment no longer serves
+> /tut-usa/reb26-component-sweep after archive + delete".
+
+
 **Severity:** highest-impact finding in this task. An author deletes a page in the
 admin UI; the public publish environment keeps serving it indefinitely.
 
@@ -61,6 +72,14 @@ the fixture, the author API answered `404` for
 ---
 
 ## R26-2 — Unpublishing (archive/deactivate) does not stop the publish environment serving a page
+
+> **RESOLVED 2026-08-23.** `ReplicationReceiver.deactivateContent()` now walks the
+> whole subtree instead of flipping only the page node, and publish-instance delivery
+> filters on `PUBLISHED` in `ContentDeliveryService.renderPage()`. The status check is
+> gated on `flexcms.runmode` so the author keeps serving drafts, which the editor
+> preview and REB-20's publish-isolation guard both depend on. Verified live by
+> REB-20 `S9` and REB-26 `S4`.
+
 
 **Severity:** high. This is the workaround an author would reach for after R26-1,
 and it does not work either.
@@ -113,6 +132,12 @@ should filter on status.
 ---
 
 ## R26-3 — Numeric property fields cannot be cleared, and clear-then-retype corrupts the value
+
+> **RESOLVED 2026-08-23.** `PropertyField()`'s number branch keeps the raw keystrokes
+> in local state and coerces on change, so an emptied field stays empty and reports
+> `undefined` instead of snapping to 0, and a partially typed value (`-`, `1.`) is no
+> longer mangled mid-entry. Verified across the 71 numeric fields in the REB-26 sweep.
+
 
 **Where:** `frontend/apps/admin/src/app/editor/page.tsx` → `PropertyField()`,
 number branch

@@ -22,7 +22,7 @@ export const EDITOR_HIDDEN_KEYS = ['children'] as const;
 export const TEMPLATE_DETACHED_FLAG = 'flexcmsTemplateDetached';
 
 /** The control the admin editor renders for a field. */
-export type EditorControl = 'text' | 'textarea' | 'number' | 'toggle' | 'select';
+export type EditorControl = 'text' | 'textarea' | 'number' | 'toggle' | 'select' | 'structured';
 
 /** What the field means in content terms, independent of the control used. */
 export type FieldSemantics = 'scalar' | 'richtext' | 'asset' | 'reference' | 'list' | 'object';
@@ -66,6 +66,12 @@ export interface AuthorableField {
    * lower-cased with every non-alphanumeric run collapsed to a single dash.
    */
   inputTestId: string;
+  /**
+   * For `structured` controls, the test id of the editor container. An object with a
+   * declared shape renders `-group`; an array renders `-list`. Undefined for the
+   * primitive controls, which expose a single `-input`.
+   */
+  containerTestId?: string;
   /**
    * True when the editor renders a control that cannot express the field's real
    * shape — arrays, objects, and asset references all fall back to a plain text
@@ -148,6 +154,12 @@ export function editorControlFor(field: ComponentContractField): EditorControl {
   if (field.type === 'boolean') return 'toggle';
   if (field.type === 'number' || field.type === 'integer') return 'number';
 
+  // Structured values get a dedicated editor: a nested group for an object whose
+  // shape the registry declares, a repeater for an array. They used to fall through
+  // to `text`, which rendered `[object Object]` and replaced the structure with that
+  // string on edit (REB-19 blocker B-1).
+  if (field.type === 'array' || field.type === 'object') return 'structured';
+
   if (field.type === 'string') {
     const key = field.name.toLowerCase();
     const isTextarea =
@@ -191,6 +203,13 @@ export function authorableFields(contract: ComponentContract): AuthorableField[]
         semantics,
         fieldTestId,
         inputTestId: `${fieldTestId}-input`,
+        // Structured editors render a container, not a single input: `-group` for an
+        // object with a declared shape, `-list` for an array. Anything else keeps the
+        // plain `-input` contract.
+        containerTestId:
+          control === 'structured'
+            ? (semantics === 'object' ? `${fieldTestId}-group` : `${fieldTestId}-list`)
+            : undefined,
         isLossyInEditor: semantics === 'list' || semantics === 'object' || semantics === 'asset',
       };
     });

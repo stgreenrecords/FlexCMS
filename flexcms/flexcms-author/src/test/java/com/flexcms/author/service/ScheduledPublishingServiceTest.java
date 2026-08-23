@@ -4,8 +4,7 @@ import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
-import com.flexcms.replication.model.ReplicationEvent.ReplicationAction;
-import com.flexcms.replication.service.ReplicationAgent;
+import com.flexcms.core.service.ContentNodeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -27,7 +26,7 @@ import static org.mockito.Mockito.*;
 class ScheduledPublishingServiceTest {
 
     @Mock private ContentNodeRepository nodeRepository;
-    @Mock private ReplicationAgent replicationAgent;
+    @Mock private ContentNodeService nodeService;
 
     @InjectMocks
     private ScheduledPublishingService service;
@@ -117,9 +116,27 @@ class ScheduledPublishingServiceTest {
 
         service.processScheduledPublishes();
 
-        verify(replicationAgent).replicate("content.page1", ReplicationAction.ACTIVATE, "system:scheduler");
-        verify(replicationAgent).replicate("content.page2", ReplicationAction.ACTIVATE, "system:scheduler");
+        // The scheduler transitions the node; ContentPublishReplicationListener is
+        // what turns that into replication. Asserting the transition here is what
+        // catches the original defect, where the page went live on publish while the
+        // author still read DRAFT.
+        verify(nodeService).updateStatus("content.page1", NodeStatus.PUBLISHED, "system:scheduler");
+        verify(nodeService).updateStatus("content.page2", NodeStatus.PUBLISHED, "system:scheduler");
         verify(nodeRepository, times(2)).save(any(ContentNode.class));
+    }
+
+    @Test
+    void processScheduledPublishes_transitionsStatusSoAuthorAndPublishAgree() {
+        ContentNode node = draftNode("content.page1");
+        when(nodeRepository.findDueForPublish(any(Instant.class))).thenReturn(List.of(node));
+
+        service.processScheduledPublishes();
+
+        // The regression this pins: the scheduler used to call the replication agent
+        // directly and never transition the node, so the page was live on :8081 while
+        // the author still showed DRAFT — and findDueForPublish (status <> PUBLISHED)
+        // would have re-selected it on a later schedule.
+        verify(nodeService).updateStatus("content.page1", NodeStatus.PUBLISHED, "system:scheduler");
     }
 
     @Test
@@ -128,7 +145,7 @@ class ScheduledPublishingServiceTest {
 
         service.processScheduledPublishes();
 
-        verifyNoInteractions(replicationAgent);
+        verifyNoInteractions(nodeService);
         verify(nodeRepository, never()).save(any());
     }
 
@@ -138,12 +155,12 @@ class ScheduledPublishingServiceTest {
         ContentNode n2 = draftNode("content.page2");
         when(nodeRepository.findDueForPublish(any())).thenReturn(List.of(n1, n2));
         doThrow(new RuntimeException("RabbitMQ down"))
-                .when(replicationAgent).replicate(eq("content.page1"), any(), any());
+                .when(nodeService).updateStatus(eq("content.page1"), any(), any());
 
         service.processScheduledPublishes();
 
-        verify(replicationAgent).replicate("content.page1", ReplicationAction.ACTIVATE, "system:scheduler");
-        verify(replicationAgent).replicate("content.page2", ReplicationAction.ACTIVATE, "system:scheduler");
+        verify(nodeService).updateStatus("content.page1", NodeStatus.PUBLISHED, "system:scheduler");
+        verify(nodeService).updateStatus("content.page2", NodeStatus.PUBLISHED, "system:scheduler");
         // n2 was replicated successfully, so its scheduledPublishAt should be cleared
         assertThat(n2.getScheduledPublishAt()).isNull();
     }
@@ -171,8 +188,10 @@ class ScheduledPublishingServiceTest {
 
         service.processScheduledDeactivations();
 
-        verify(replicationAgent).replicate("content.page1", ReplicationAction.DEACTIVATE, "system:scheduler");
-        verify(replicationAgent).replicate("content.page2", ReplicationAction.DEACTIVATE, "system:scheduler");
+        // Same reasoning as the publish case: previously neither the author status
+        // nor the publish site reflected a scheduled deactivation.
+        verify(nodeService).updateStatus("content.page1", NodeStatus.ARCHIVED, "system:scheduler");
+        verify(nodeService).updateStatus("content.page2", NodeStatus.ARCHIVED, "system:scheduler");
         verify(nodeRepository, times(2)).save(any(ContentNode.class));
     }
 
@@ -182,7 +201,7 @@ class ScheduledPublishingServiceTest {
 
         service.processScheduledDeactivations();
 
-        verifyNoInteractions(replicationAgent);
+        verifyNoInteractions(nodeService);
         verify(nodeRepository, never()).save(any());
     }
 

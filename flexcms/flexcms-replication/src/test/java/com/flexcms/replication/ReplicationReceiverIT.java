@@ -14,8 +14,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -48,8 +48,8 @@ class ReplicationReceiverIT {
             new RabbitMQContainer("rabbitmq:3.13-management-alpine");
 
     @Container
-    static final PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16-alpine")
+    static final PostgreSQLContainer postgres =
+            new PostgreSQLContainer("postgres:16-alpine")
                     .withDatabaseName("flexcms_test")
                     .withUsername("flexcms")
                     .withPassword("flexcms");

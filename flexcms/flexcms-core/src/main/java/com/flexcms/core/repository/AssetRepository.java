@@ -21,12 +21,23 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
 
     Page<Asset> findBySiteIdAndStatus(String siteId, AssetStatus status, Pageable pageable);
 
+    /**
+     * Keyword search across an asset's name, title, and metadata.
+     *
+     * <p>There is deliberately no {@code tags} clause. This query used to include
+     * {@code OR :query = ANY(tags)}, but neither the {@code assets} table nor the
+     * {@link com.flexcms.core.model.Asset} entity has ever had a {@code tags}
+     * column, so every call failed with
+     * {@code PSQLException: ERROR: column "tags" does not exist} — the endpoint
+     * returned HTTP 500 for every keyword. Tags, where they exist, live inside the
+     * {@code metadata} JSONB document, which the clause below already searches as
+     * text.</p>
+     */
     @Query(value = """
             SELECT * FROM assets
             WHERE site_id = :siteId AND status = 'ACTIVE'
               AND (name ILIKE '%' || :query || '%'
                    OR title ILIKE '%' || :query || '%'
-                   OR :query = ANY(tags)
                    OR metadata::text ILIKE '%' || :query || '%')
             ORDER BY modified_at DESC
             """, nativeQuery = true)

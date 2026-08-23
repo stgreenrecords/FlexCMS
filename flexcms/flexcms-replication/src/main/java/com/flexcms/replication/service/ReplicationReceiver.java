@@ -153,6 +153,21 @@ public class ReplicationReceiver {
     }
 
     private void deactivateContent(ReplicationEvent event) {
+        // Deactivate the whole subtree, not just the page node.
+        //
+        // Activation replicates a page together with its components via
+        // replicateTree, but deactivation used to flip only the page itself to
+        // DRAFT and leave every child component ACTIVE/PUBLISHED underneath it.
+        // The subtree therefore survived a deactivation in a half-published state.
+        List<ContentNode> descendants = nodeRepository.findDescendants(event.getPath());
+        for (ContentNode descendant : descendants) {
+            descendant.setStatus(NodeStatus.DRAFT);
+        }
+        if (!descendants.isEmpty()) {
+            nodeRepository.saveAll(descendants);
+            log.debug("Deactivated {} descendant node(s) under {}", descendants.size(), event.getPath());
+        }
+
         nodeRepository.findByPath(event.getPath()).ifPresent(node -> {
             node.setStatus(NodeStatus.DRAFT);
             nodeRepository.save(node);

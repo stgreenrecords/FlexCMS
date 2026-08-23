@@ -194,14 +194,17 @@ export class EditorAuthoringPage {
   }
 
   async probeField(entry: AuthorableField): Promise<PropertyFieldProbe> {
-    const input = await this.findInput(entry.inputTestId);
+    // A structured field renders a container rather than a single input, so probe
+    // for whichever element the control actually produces.
+    const targetTestId = entry.containerTestId ?? entry.inputTestId;
+    const input = await this.findInput(targetTestId);
     if (!input) {
-      return { key: entry.key, inputTestId: entry.inputTestId, present: false };
+      return { key: entry.key, inputTestId: targetTestId, present: false };
     }
     const tagName = (await input.getTagName()).toLowerCase();
     const disabled =
       (await input.getAttribute('disabled')) !== null || (await input.getAttribute('aria-disabled')) === 'true';
-    return { key: entry.key, inputTestId: entry.inputTestId, present: true, tagName, disabled };
+    return { key: entry.key, inputTestId: targetTestId, present: true, tagName, disabled };
   }
 
   /** Every property input currently rendered in the sidebar, by test id. */

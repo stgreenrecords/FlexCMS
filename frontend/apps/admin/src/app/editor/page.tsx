@@ -111,10 +111,19 @@ interface PageTemplateDefinition {
 interface PropField {
   key: string;
   label: string;
-  type: 'text' | 'number' | 'toggle' | 'select' | 'textarea';
+  type: 'text' | 'number' | 'toggle' | 'select' | 'textarea' | 'object' | 'list';
   options?: string[];
   description?: string;
   required?: boolean;
+  /** For `object`: the nested fields, when the schema declares `properties`. */
+  fields?: PropField[];
+  /** For `list`: how to edit one item. */
+  item?: {
+    /** Primitive item editor, or `object` for a nested group / JSON item. */
+    type: 'text' | 'number' | 'object';
+    /** For object items with a declared shape: the nested fields. */
+    fields?: PropField[];
+  };
 }
 
 const TEMPLATE_DETACHED_FLAG = 'flexcmsTemplateDetached';
@@ -143,8 +152,37 @@ function schemaToFields(schema: Record<string, unknown> | undefined): PropField[
         fieldType = 'toggle';
       } else if (type === 'number' || type === 'integer') {
         fieldType = 'number';
+      } else if (type === 'object') {
+        // Structured value: never fall through to the text branch, which used to
+        // render `[object Object]` and replace the object with that string on edit.
+        fieldType = 'object';
+      } else if (type === 'array') {
+        fieldType = 'list';
       } else if (type === 'string' && (format === 'textarea' || key.toLowerCase().includes('description') || key.toLowerCase().includes('content') || key.toLowerCase().includes('body'))) {
         fieldType = 'textarea';
+      }
+
+      // Nested shape, where the registry declares one. `schemaToFields` recurses so
+      // an object's own properties get the same treatment as a top-level field.
+      let nestedFields: PropField[] | undefined;
+      if (fieldType === 'object' && propDef['properties']) {
+        nestedFields = schemaToFields(propDef);
+      }
+
+      let item: PropField['item'] | undefined;
+      if (fieldType === 'list') {
+        const items = (propDef['items'] as Record<string, unknown> | undefined) ?? {};
+        const itemType = items['type'] as string | undefined;
+        if (itemType === 'number' || itemType === 'integer') {
+          item = { type: 'number' };
+        } else if (itemType === 'object') {
+          item = {
+            type: 'object',
+            fields: items['properties'] ? schemaToFields(items) : undefined,
+          };
+        } else {
+          item = { type: 'text' };
+        }
       }
 
       return {
@@ -154,6 +192,8 @@ function schemaToFields(schema: Record<string, unknown> | undefined): PropField[
         options: enumValues,
         description,
         required: required.includes(key),
+        fields: nestedFields,
+        item,
       };
     });
 }
@@ -1655,12 +1695,94 @@ function ComponentPreview({ component }: { component: PageComponent }) {
 // PropertyField — renders a single form field driven by schema type
 // ---------------------------------------------------------------------------
 
+/**
+ * Validated JSON editor for a structured value whose shape the schema does not
+ * describe.
+ *
+ * Used for `object` fields with no declared `properties` and for array items typed
+ * only as `object` — 116 array fields across the contracts are `array of object`
+ * with no item properties, so this is the common case, not an edge one.
+ *
+ * The draft text is local state so a half-typed document is not thrown away on
+ * every keystroke, and `onChange` fires only when the text parses. That is the whole
+ * point: the previous text input wrote whatever string it held straight into a field
+ * the contract requires to be structured.
+ */
+function JsonValueEditor({
+  value,
+  onChange,
+  testId,
+  rows,
+}: {
+  value: unknown;
+  onChange: (val: unknown) => void;
+  testId: string;
+  rows: number;
+}) {
+  const serialised = React.useMemo(() => {
+    if (value === undefined || value === null) return '';
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
+    }
+  }, [value]);
+
+  const [draft, setDraft] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const shown = draft ?? serialised;
+
+  return (
+    <div className="block">
+      <Textarea
+        value={shown}
+        onChange={(e) => {
+          const raw = e.target.value;
+          setDraft(raw);
+          if (raw.trim() === '') {
+            setError(null);
+            onChange(undefined);
+            return;
+          }
+          try {
+            const parsed = JSON.parse(raw);
+            setError(null);
+            onChange(parsed);
+          } catch (err) {
+            // Keep the text so the author can finish typing; write nothing.
+            setError(err instanceof Error ? err.message : 'Invalid JSON');
+          }
+        }}
+        onBlur={() => setDraft(null)}
+        rows={rows}
+        spellCheck={false}
+        data-testid={`${testId}-json`}
+        className="min-h-[80px] resize-y font-mono text-[11px]"
+      />
+      {error && (
+        <span className="text-[10px] mt-1 block" style={{ color: '#ffb4ab' }} data-testid={`${testId}-json-error`}>
+          {error} — the value is left unchanged until the JSON is valid.
+        </span>
+      )}
+    </div>
+  );
+}
+
 function PropertyField({ field, value, onChange }: {
   field: PropField;
   value: unknown;
   onChange: (val: unknown) => void;
 }) {
   const fieldTestId = `editor-property-${toTestId(field.key)}`;
+
+  /**
+   * In-progress text for the number input, or null when it is not being edited.
+   *
+   * Declared unconditionally at the top of the component: the number branch below
+   * returns early, but hooks must run on every render regardless of which branch
+   * is taken.
+   */
+  const [numberDraft, setNumberDraft] = useState<string | null>(null);
 
   const labelEl = (
     <Label className="mb-2 block text-[11px] font-bold uppercase tracking-wider" style={{ color: '#8d90a0' }}>
@@ -1703,13 +1825,40 @@ function PropertyField({ field, value, onChange }: {
   }
 
   if (field.type === 'number') {
+    // The raw string is what the input shows; the number is what we persist.
+    //
+    // This used to be `value={Number(value ?? 0)}` with
+    // `onChange={Number(e.target.value)}`. Because `Number('')` is 0, emptying the
+    // field snapped it back to "0" — there was no way to author "no value" for an
+    // optional number — and the ordinary select-all/delete/retype sequence left the
+    // new digits sitting next to that re-inserted zero: clearing a field holding 42
+    // and typing 1004 produced 10040, silently wrong. Keeping the keystrokes in
+    // local state and coercing only on change fixes both: an empty box stays empty
+    // and reports undefined, and a partially typed value like "-" or "1." is not
+    // mangled mid-entry.
+    const persisted = value === null || value === undefined || value === '' ? '' : String(value);
+    const shown = numberDraft ?? persisted;
+
     return (
       <div className="block" data-testid={fieldTestId}>
         {labelEl}
         <Input
           type="number"
-          value={Number(value ?? 0)}
-          onChange={(e) => onChange(Number(e.target.value))}
+          value={shown}
+          onChange={(e) => {
+            const raw = e.target.value;
+            setNumberDraft(raw);
+            if (raw === '') {
+              onChange(undefined);
+              return;
+            }
+            const parsed = Number(raw);
+            // Ignore intermediate states the browser reports as NaN ("-", "1e").
+            if (!Number.isNaN(parsed)) {
+              onChange(parsed);
+            }
+          }}
+          onBlur={() => setNumberDraft(null)}
           data-testid={`${fieldTestId}-input`}
           className="h-9"
         />
@@ -1728,6 +1877,177 @@ function PropertyField({ field, value, onChange }: {
           data-testid={`${fieldTestId}-input`}
           className="min-h-[88px] resize-y"
         />
+      </div>
+    );
+  }
+
+  if (field.type === 'object') {
+    const current = (value && typeof value === 'object' && !Array.isArray(value))
+      ? (value as Record<string, unknown>)
+      : {};
+
+    // Known shape: edit each declared property, preserving any key the schema does
+    // not mention so an edit cannot silently drop data.
+    if (field.fields?.length) {
+      return (
+        <div className="block" data-testid={fieldTestId}>
+          {labelEl}
+          <div
+            className="rounded-lg border p-3 space-y-3"
+            style={{ borderColor: '#2a2d3a', backgroundColor: 'rgba(255,255,255,0.02)' }}
+            data-testid={`${fieldTestId}-group`}
+          >
+            {field.fields.map((sub) => (
+              <PropertyField
+                key={sub.key}
+                field={sub}
+                value={current[sub.key]}
+                onChange={(next) => {
+                  const merged = { ...current };
+                  if (next === undefined || next === '') delete merged[sub.key];
+                  else merged[sub.key] = next;
+                  onChange(merged);
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // Unknown shape: a validated JSON editor is the honest fallback — it still shows
+    // the real value and refuses to write anything unparseable.
+    return (
+      <div className="block" data-testid={fieldTestId}>
+        {labelEl}
+        <JsonValueEditor value={value} onChange={onChange} testId={fieldTestId} rows={5} />
+      </div>
+    );
+  }
+
+  if (field.type === 'list') {
+    const items: unknown[] = Array.isArray(value) ? (value as unknown[]) : [];
+    const itemType = field.item?.type ?? 'text';
+
+    const replaceAt = (index: number, next: unknown) => {
+      const copy = [...items];
+      copy[index] = next;
+      onChange(copy);
+    };
+    const removeAt = (index: number) => onChange(items.filter((_, i) => i !== index));
+    const move = (index: number, delta: number) => {
+      const target = index + delta;
+      if (target < 0 || target >= items.length) return;
+      const copy = [...items];
+      [copy[index], copy[target]] = [copy[target], copy[index]];
+      onChange(copy);
+    };
+    const addItem = () => {
+      const blank = itemType === 'number' ? 0 : itemType === 'object' ? {} : '';
+      onChange([...items, blank]);
+    };
+
+    return (
+      <div className="block" data-testid={fieldTestId}>
+        {labelEl}
+        <div className="space-y-2" data-testid={`${fieldTestId}-list`}>
+          {items.length === 0 && (
+            <span className="text-[10px] block" style={{ color: '#8d90a0' }}>No items yet.</span>
+          )}
+          {items.map((entry, index) => (
+            <div
+              key={index}
+              className="rounded-lg border p-2"
+              style={{ borderColor: '#2a2d3a', backgroundColor: 'rgba(255,255,255,0.02)' }}
+              data-testid={`${fieldTestId}-item-${index}`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#8d90a0' }}>
+                  {index + 1}
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label={`Move item ${index + 1} up`}
+                    onClick={() => move(index, -1)}
+                    className="text-[11px] px-1"
+                    style={{ color: '#8d90a0' }}
+                  >↑</button>
+                  <button
+                    type="button"
+                    aria-label={`Move item ${index + 1} down`}
+                    onClick={() => move(index, 1)}
+                    className="text-[11px] px-1"
+                    style={{ color: '#8d90a0' }}
+                  >↓</button>
+                  <button
+                    type="button"
+                    aria-label={`Remove item ${index + 1}`}
+                    onClick={() => removeAt(index)}
+                    className="text-[11px] px-1"
+                    style={{ color: '#ffb4ab' }}
+                    data-testid={`${fieldTestId}-remove-${index}`}
+                  >✕</button>
+                </div>
+              </div>
+
+              {itemType === 'object' && field.item?.fields?.length ? (
+                <div className="space-y-3">
+                  {field.item.fields.map((sub) => {
+                    const record = (entry && typeof entry === 'object' && !Array.isArray(entry))
+                      ? (entry as Record<string, unknown>)
+                      : {};
+                    return (
+                      <PropertyField
+                        key={sub.key}
+                        field={sub}
+                        value={record[sub.key]}
+                        onChange={(next) => {
+                          const merged = { ...record };
+                          if (next === undefined || next === '') delete merged[sub.key];
+                          else merged[sub.key] = next;
+                          replaceAt(index, merged);
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              ) : itemType === 'object' ? (
+                <JsonValueEditor
+                  value={entry}
+                  onChange={(next) => replaceAt(index, next)}
+                  testId={`${fieldTestId}-item-${index}`}
+                  rows={4}
+                />
+              ) : (
+                <Input
+                  type={itemType === 'number' ? 'number' : 'text'}
+                  value={entry === null || entry === undefined ? '' : String(entry)}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (itemType === 'number') {
+                      const parsed = Number(raw);
+                      replaceAt(index, raw === '' ? undefined : Number.isNaN(parsed) ? raw : parsed);
+                    } else {
+                      replaceAt(index, raw);
+                    }
+                  }}
+                  data-testid={`${fieldTestId}-item-${index}-input`}
+                  className="h-9"
+                />
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addItem}
+            className="text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded"
+            style={{ color: '#b0c6ff', backgroundColor: 'rgba(176,198,255,0.1)' }}
+            data-testid={`${fieldTestId}-add`}
+          >
+            + Add item
+          </button>
+        </div>
       </div>
     );
   }

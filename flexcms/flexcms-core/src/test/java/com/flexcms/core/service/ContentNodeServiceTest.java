@@ -1,5 +1,6 @@
 package com.flexcms.core.service;
 
+import com.flexcms.core.event.ContentDeletedEvent;
 import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
@@ -33,6 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -321,6 +323,31 @@ class ContentNodeServiceTest {
     }
 
     @Test
+    void move_reparentsTheMovedNodeItself_notJustItsDescendants() {
+        ContentNode source = buildNode("content.corporate.en.home", "home");
+        source.setParentPath("content.corporate.en");
+        ContentNode target = buildNode("content.corporate.en.section", "section");
+        ContentNode child = buildNode("content.corporate.en.home.hero", "hero");
+        child.setParentPath("content.corporate.en.home");
+
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(source));
+        when(nodeRepository.findByPath("content.corporate.en.section")).thenReturn(Optional.of(target));
+        when(nodeRepository.findDescendants("content.corporate.en.home")).thenReturn(new ArrayList<>(List.of(child)));
+        when(nodeRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        ContentNode moved = contentNodeService.move("content.corporate.en.home",
+                "content.corporate.en.section", "user1");
+
+        // The regression this pins: parentPath used to be rewritten by substituting
+        // sourcePath, which is a no-op for the moved node itself (its parentPath is
+        // its *old* parent and does not contain sourcePath). The node kept pointing
+        // at the folder it left, so it vanished from the new parent's /children
+        // listing and lingered in the old parent's.
+        assertThat(moved.getParentPath()).isEqualTo("content.corporate.en.section");
+        assertThat(child.getParentPath()).isEqualTo("content.corporate.en.section.home");
+    }
+
+    @Test
     void move_setsModifiedBy_onAllNodes() {
         ContentNode source = buildNode("content.corporate.en.home", "home");
         ContentNode target = buildNode("content.corporate.en.section", "section");
@@ -340,6 +367,9 @@ class ContentNodeServiceTest {
 
     @Test
     void delete_callsDeleteSubtree() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
+
         contentNodeService.delete("content.corporate.en.home", "user1");
 
         verify(nodeRepository).deleteSubtree("content.corporate.en.home");
@@ -486,11 +516,43 @@ class ContentNodeServiceTest {
 
     @Test
     void delete_removesSubtreeAndAudits() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
+
         contentNodeService.delete("content.corporate.en.home", "user1");
 
         verify(nodeRepository).deleteSubtree("content.corporate.en.home");
-        verify(auditService).log(AuditService.ENTITY_CONTENT, null, "content.corporate.en.home",
+        // The audit entry now carries the id the node had, which a blind delete
+        // could not know.
+        verify(auditService).log(AuditService.ENTITY_CONTENT, node.getId(), "content.corporate.en.home",
                 AuditService.ACTION_DELETE, "user1");
+    }
+
+    @Test
+    void delete_throwsNotFound_whenPathDoesNotExist() {
+        when(nodeRepository.findByPath("content.corporate.en.ghost")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> contentNodeService.delete("content.corporate.en.ghost", "user1"))
+                .isInstanceOf(NotFoundException.class);
+
+        // Nothing may be deleted or audited for a path that never existed.
+        verify(nodeRepository, never()).deleteSubtree(anyString());
+        verify(auditService, never()).log(anyString(), any(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void delete_publishesContentDeletedEvent_soPublishCanDropTheContent() {
+        ContentNode node = buildNode("content.corporate.en.home", "home");
+        when(nodeRepository.findByPath("content.corporate.en.home")).thenReturn(Optional.of(node));
+
+        contentNodeService.delete("content.corporate.en.home", "user1");
+
+        ArgumentCaptor<ContentDeletedEvent> captor = ArgumentCaptor.forClass(ContentDeletedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        ContentDeletedEvent event = captor.getValue();
+        assertThat(event.getPath()).isEqualTo("content.corporate.en.home");
+        assertThat(event.getNodeId()).isEqualTo(node.getId());
+        assertThat(event.getUserId()).isEqualTo("user1");
     }
 
     // --- getChildren ---
@@ -586,6 +648,11 @@ class ContentNodeServiceTest {
 
     @Test
     void bulkDelete_callsDeleteSubtreeForEachPath() {
+        when(nodeRepository.findByPath("content.corporate.en.p1"))
+                .thenReturn(Optional.of(buildNode("content.corporate.en.p1", "p1")));
+        when(nodeRepository.findByPath("content.corporate.en.p2"))
+                .thenReturn(Optional.of(buildNode("content.corporate.en.p2", "p2")));
+
         BulkOperationResult result = contentNodeService.bulkDelete(
                 List.of("content.corporate.en.p1", "content.corporate.en.p2"), "user1");
 
@@ -595,7 +662,32 @@ class ContentNodeServiceTest {
     }
 
     @Test
+    void bulkDelete_reportsMissingPathAsFailedRatherThanSucceeded() {
+        when(nodeRepository.findByPath("content.corporate.en.real"))
+                .thenReturn(Optional.of(buildNode("content.corporate.en.real", "real")));
+        when(nodeRepository.findByPath("content.corporate.en.ghost")).thenReturn(Optional.empty());
+
+        BulkOperationResult result = contentNodeService.bulkDelete(
+                List.of("content.corporate.en.real", "content.corporate.en.ghost"), "user1");
+
+        // Before this, deleteSubtree() simply affected zero rows for a path that never
+        // existed and nothing raised, so a caller could not tell "deleted 2 pages"
+        // from "one of these was a typo".
+        assertThat(result.getSucceeded()).isEqualTo(1);
+        assertThat(result.getFailed()).isEqualTo(1);
+        assertThat(result.getErrors()).hasSize(1);
+        assertThat(result.getErrors().get(0)).contains("content.corporate.en.ghost");
+        verify(nodeRepository, never()).deleteSubtree("content.corporate.en.ghost");
+    }
+
+    @Test
     void bulkDelete_isolatesPerPathFailure() {
+        // Both paths exist; only the delete of one blows up. Without these stubs the
+        // lookup delete() now performs would fail both for the wrong reason.
+        when(nodeRepository.findByPath("content.corporate.en.bad"))
+                .thenReturn(Optional.of(buildNode("content.corporate.en.bad", "bad")));
+        when(nodeRepository.findByPath("content.corporate.en.good"))
+                .thenReturn(Optional.of(buildNode("content.corporate.en.good", "good")));
         org.mockito.Mockito.doThrow(new RuntimeException("db error"))
                 .when(nodeRepository).deleteSubtree("content.corporate.en.bad");
 

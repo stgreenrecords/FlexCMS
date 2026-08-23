@@ -201,20 +201,6 @@
                 <version>20220608.1</version>
             </dependency>
 
-            <!-- Testcontainers BOM.
-                 Pinned to the 1.x line because Testcontainers 2.x (managed by the Spring
-                 Boot parent as ${testcontainers.version}) renames these artifact
-                 coordinates; migrating is tracked separately.
-                 KNOWN CONSTRAINT: 1.19.8 bundles a docker-java that Docker Engine 29+
-                 rejects with HTTP 400, so every *IT integration test fails locally with
-                 "Could not find a valid Docker environment" on such hosts. -->
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>1.19.8</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>com.networknt</groupId>
                 <artifactId>json-schema-validator</artifactId>
@@ -260,6 +246,31 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <!-- Integration tests (*IT) run here, at `verify`, not in `mvn test`.
+                 Surefire's default includes match *Test/Test*/*Tests, never the *IT
+                 suffix, so before this plugin existed the four Testcontainers suites
+                 were compiled and then silently never executed. They need Docker, so
+                 they gate `mvn verify` rather than the much cheaper `mvn test`. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <!-- `verify` is what turns a failed IT into a failed build:
+                                 integration-test alone records failures without failing. -->
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

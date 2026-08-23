@@ -30,6 +30,12 @@
     "nameIncludes": "REB-20 publishing, workflow, scheduling, and bulk operation suite"
   },
   {
+    "traceabilityId": "REB-21",
+    "priority": "critical",
+    "junitFile": "reb21-suite.xml",
+    "nameIncludes": "REB-21 DAM authoring and asset-reference suite"
+  },
+  {
     "traceabilityId": "REB-26",
     "priority": "critical",
     "junitFile": "reb26-suite.xml",

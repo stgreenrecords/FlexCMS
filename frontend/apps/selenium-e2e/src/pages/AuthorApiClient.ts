@@ -74,6 +74,30 @@ export interface WorkflowInstance {
 
 export type WorkflowStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 
+/** Asset metadata as `AuthorAssetController` serialises it (REB-21). */
+export interface DamAsset {
+  id: string;
+  path?: string;
+  filename?: string;
+  name?: string;
+  mimeType?: string;
+  fileSize?: number;
+  siteId?: string;
+  storageKey?: string;
+  status?: string;
+  createdBy?: string;
+  createdAt?: string;
+}
+
+/** Envelope shared by the asset list and folder endpoints. */
+export interface DamAssetPage {
+  items: DamAsset[];
+  totalCount: number;
+  page: number;
+  size: number;
+  hasNextPage: boolean;
+}
+
 /** `BulkOperationResult` as the author API serialises it (REB-20). */
 export interface BulkOperationResult {
   succeeded: number;
@@ -592,6 +616,180 @@ export class AuthorApiClient {
     const title = json.data?.page?.title;
     if (!title) throw new Error(`GraphQL page title missing for path ${urlPath}`);
     return title;
+  }
+
+  // -- DAM (REB-21) ---------------------------------------------------------
+
+  /**
+   * Uploads a binary to the DAM.
+   *
+   * The endpoint is `multipart/form-data` with the binary in `file` and the rest
+   * as query parameters, so the body is a `FormData` and `Content-Type` is left to
+   * the runtime — setting it by hand drops the multipart boundary.
+   */
+  async uploadAsset(input: {
+    bytes: Uint8Array;
+    filename: string;
+    contentType: string;
+    path: string;
+    siteId?: string;
+    userId?: string;
+  }): Promise<DamAsset> {
+    const siteId = input.siteId ?? this.defaultSite;
+    const userId = input.userId ?? 'admin';
+    const query =
+      `path=${encodeURIComponent(input.path)}` +
+      `&siteId=${encodeURIComponent(siteId)}` +
+      `&userId=${encodeURIComponent(userId)}`;
+
+    const form = new FormData();
+    form.append('file', new Blob([input.bytes], { type: input.contentType }), input.filename);
+
+    const res = await fetch(`${this.apiBase}/author/assets?${query}`, { method: 'POST', body: form });
+    if (!res.ok) {
+      throw new Error(`Asset upload failed for ${input.path} (${res.status})`);
+    }
+    return (await res.json()) as DamAsset;
+  }
+
+  /** Upload attempt that returns the status instead of throwing (negative cases). */
+  async tryUploadAsset(input: {
+    bytes: Uint8Array;
+    filename: string;
+    contentType: string;
+    path: string;
+    siteId?: string;
+    userId?: string;
+  }): Promise<{ status: number; asset?: DamAsset; body: string }> {
+    const siteId = input.siteId ?? this.defaultSite;
+    const userId = input.userId ?? 'admin';
+    const query =
+      `path=${encodeURIComponent(input.path)}` +
+      `&siteId=${encodeURIComponent(siteId)}` +
+      `&userId=${encodeURIComponent(userId)}`;
+
+    const form = new FormData();
+    form.append('file', new Blob([input.bytes], { type: input.contentType }), input.filename);
+
+    const res = await fetch(`${this.apiBase}/author/assets?${query}`, { method: 'POST', body: form });
+    const body = await res.text();
+    if (!res.ok) return { status: res.status, body };
+    return { status: res.status, asset: JSON.parse(body) as DamAsset, body };
+  }
+
+  async getAsset(id: string): Promise<DamAsset> {
+    const res = await fetch(`${this.apiBase}/author/assets/${encodeURIComponent(id)}`);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch asset ${id} (${res.status})`);
+    }
+    return (await res.json()) as DamAsset;
+  }
+
+  /** Raw status for an asset lookup, for existence checks after delete. */
+  async getAssetStatus(id: string): Promise<number> {
+    const res = await fetch(`${this.apiBase}/author/assets/${encodeURIComponent(id)}`);
+    return res.status;
+  }
+
+  /** Streams an asset's bytes, returning the payload and its declared type. */
+  async getAssetContent(id: string): Promise<{ status: number; contentType: string; bytes: Uint8Array }> {
+    const res = await fetch(`${this.apiBase}/author/assets/${encodeURIComponent(id)}/content`);
+    const buffer = res.ok ? new Uint8Array(await res.arrayBuffer()) : new Uint8Array();
+    return {
+      status: res.status,
+      contentType: res.headers.get('content-type') ?? '',
+      bytes: buffer,
+    };
+  }
+
+  /** Lists assets with no keyword, which the API serves across every site. */
+  async listAssets(page = 0, size = 200): Promise<DamAssetPage> {
+    return this.assetPage(`author/assets?page=${page}&size=${size}`, 'list assets');
+  }
+
+  /** Keyword search with an explicit site — see the note on the API's default. */
+  async searchAssets(query: string, siteId?: string, page = 0, size = 200): Promise<DamAssetPage> {
+    const site = siteId ?? this.defaultSite;
+    return this.assetPage(
+      `author/assets?q=${encodeURIComponent(query)}&siteId=${encodeURIComponent(site)}&page=${page}&size=${size}`,
+      `search assets q=${query} site=${site}`,
+    );
+  }
+
+  /** Keyword search with **no** siteId, which the API silently scopes to "corporate". */
+  async searchAssetsWithoutSite(query: string, page = 0, size = 200): Promise<DamAssetPage> {
+    return this.assetPage(
+      `author/assets?q=${encodeURIComponent(query)}&page=${page}&size=${size}`,
+      `search assets q=${query} (no siteId)`,
+    );
+  }
+
+  async listAssetFolder(folderPath: string, siteId?: string, page = 0, size = 200): Promise<DamAssetPage> {
+    const site = siteId ?? this.defaultSite;
+    return this.assetPage(
+      `author/assets/folder?folderPath=${encodeURIComponent(folderPath)}` +
+        `&siteId=${encodeURIComponent(site)}&page=${page}&size=${size}`,
+      `list folder ${folderPath}`,
+    );
+  }
+
+  /**
+   * Keyword search that reports the HTTP status instead of throwing.
+   *
+   * The endpoint currently answers 500 for every keyword (`AssetRepository.search`
+   * references a `tags` column the `assets` table does not have), so the suite has
+   * to be able to record that rather than die on it.
+   */
+  async trySearchAssets(
+    query: string,
+    siteId?: string,
+    page = 0,
+    size = 200,
+  ): Promise<{ status: number; page?: DamAssetPage }> {
+    const site = siteId ? `&siteId=${encodeURIComponent(siteId)}` : '';
+    const res = await fetch(
+      `${this.apiBase}/author/assets?q=${encodeURIComponent(query)}${site}&page=${page}&size=${size}`,
+    );
+    if (!res.ok) return { status: res.status };
+    const json = (await res.json()) as Partial<DamAssetPage>;
+    return {
+      status: res.status,
+      page: {
+        items: json.items ?? [],
+        totalCount: json.totalCount ?? 0,
+        page: json.page ?? 0,
+        size: json.size ?? 0,
+        hasNextPage: json.hasNextPage ?? false,
+      },
+    };
+  }
+
+  private async assetPage(query: string, label: string): Promise<DamAssetPage> {
+    const res = await fetch(`${this.apiBase}/${query}`);
+    if (!res.ok) {
+      throw new Error(`Failed to ${label} (${res.status})`);
+    }
+    const json = (await res.json()) as Partial<DamAssetPage>;
+    return {
+      items: json.items ?? [],
+      totalCount: json.totalCount ?? 0,
+      page: json.page ?? 0,
+      size: json.size ?? 0,
+      hasNextPage: json.hasNextPage ?? false,
+    };
+  }
+
+  /** Deletes an asset **by path** — the endpoint takes no id. */
+  async deleteAsset(path: string): Promise<number> {
+    const res = await fetch(`${this.apiBase}/author/assets?path=${encodeURIComponent(path)}`, {
+      method: 'DELETE',
+    });
+    return res.status;
+  }
+
+  /** Absolute URL of an asset's binary, as the admin UI builds it for previews. */
+  assetContentUrl(id: string): string {
+    return `${this.apiBase}/author/assets/${id}/content`;
   }
 
   static toSitePath(contentPath: string): string {

@@ -27,6 +27,67 @@
 
 ## Hints
 
+### 2026-08-23 — Rebuilding the frontends while their servers run invalidates any Selenium run in flight
+**Context:** Running `cd frontend && pnpm build` (turbo) to pick up a code change while `pnpm start` / `next start`
+are already serving :3000 and :3001, then running or continuing a Selenium suite
+**Symptom:** Scenarios fail with results that look like product regressions but are not. A REB-26 sweep reported
+`0/20 PASS` for four consecutive batches; the failure screenshot showed the browser on
+`ERR_CONNECTION_REFUSED` / "This site can't be reached", and by the time the run ended both servers answered
+normally again — so nothing was reproducible afterwards.
+**What failed:**
+- Reading the batch outcome: `0 PASS, 0 BLOCKED, 0 FAIL of 20` grades as `UNSUPPORTED_UI`, which looks exactly
+  like an editor-control gap rather than a dead server.
+- Re-running immediately without restarting the servers — the next batch hit the same half-swapped `.next`.
+**Solution:** treat a frontend rebuild as a restart. Kill the servers, `pnpm build`, start them again, health-check
+both, and only then launch a suite:
+```bash
+# stop whatever holds 3000/3001, then
+cd frontend && pnpm build
+cd apps/admin       && pnpm start &
+cd apps/site-nextjs && pnpm exec next start -p 3001 &
+curl -s -o /dev/null -w "%{http_code}
+" http://localhost:3000
+curl -s -o /dev/null -w "%{http_code}
+" http://localhost:3001/tut-usa/home
+```
+**Why it works:** `next start` serves the prebuilt `.next` directory and reads its build manifest at request time.
+A turbo rebuild replaces those files underneath the running process, so in-flight requests can 500 or the process
+can drop the connection entirely until it is restarted against a complete build. Nothing in the suite output
+distinguishes that from a broken feature — always confirm both ports answer before believing a UI failure.
+
+### 2026-08-23 — A `@Scheduled` job calling a `@PreAuthorize`d service fails with "Authentication object was not found"
+**Context:** Any background job that goes through a secured service method — e.g. `ScheduledPublishingService`
+calling `ContentNodeService.updateStatus()`, which is `@PreAuthorize("hasPermission(#path, 'PUBLISH')")`
+**Symptom:** The job logs a failure every cycle and never makes progress; the scheduled work is retried forever:
+```
+ERROR c.f.a.s.ScheduledPublishingService : Scheduled publish failed for 'content.tut-usa.x':
+       An Authentication object was not found in the SecurityContext
+```
+**What failed:**
+- Unit tests — they mock the collaborating service, so Spring method security never evaluates and the job looks
+  correct. Only a live run (or an integration test through the real bean) shows it.
+- Assuming `flexcms.local-dev: true` covers it: that property relaxes the HTTP filter chain, not `@PreAuthorize`
+  method security, which applies regardless of runmode.
+**Solution:** give the job an identity for the duration of its work, rather than reaching for a non-secured
+back door:
+```java
+SecurityContext previous = SecurityContextHolder.getContext();
+try {
+    SecurityContext ctx = SecurityContextHolder.createEmptyContext();
+    ctx.setAuthentication(new UsernamePasswordAuthenticationToken(
+            "system:scheduler", "n/a", List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+    SecurityContextHolder.setContext(ctx);
+    work.run();
+} finally {
+    SecurityContextHolder.setContext(previous);   // pooled thread — always restore
+}
+```
+`ROLE_ADMIN` is what `NodeAclService.isAllowed()` accepts for unrestricted access, and the audit trail then
+attributes the change to `system:scheduler` instead of to nobody.
+**Why it works:** `@Scheduled` runs on a pooled thread with an empty `SecurityContext`; Spring's method security
+rejects the call before the method body executes. Supplying a principal satisfies the check without weakening the
+annotation, and restoring the previous context prevents the identity leaking to the next task on that thread.
+
 ### 2026-08-21 — Selenium gate suites must run against **production** frontend builds, not `pnpm dev`
 **Context:** Running `node scripts/selenium-gate.cjs --mode full` (or the REB-12 template suite alone) with the
 admin/reference-site started via `pnpm dev`
@@ -129,14 +190,24 @@ javac has no notion of release 26, so it rejects the build before compiling a si
 response on the route, so the string is always in the HTML. Only the rendered document reflects which page
 the browser actually displayed.
 
-### 2026-08-19 — Testcontainers `*IT` tests fail with "Could not find a valid Docker environment" on Docker 29
+### 2026-08-19 — [RESOLVED 2026-08-22] Testcontainers `*IT` tests fail with "Could not find a valid Docker environment" on Docker 29
 **Context:** Running any integration test (`ContentNodeRepositoryIT`, `ProductRepositoryIT`, `ReplicationAgentIT`, `ReplicationReceiverIT`)
 **Symptom:** `java.lang.IllegalStateException: Could not find a valid Docker environment` even though `docker ps` works and containers are running. The detail line shows `NpipeSocketClientProviderStrategy: failed with exception BadRequestException (Status 400 ...)`.
 **What failed:**
 - `DOCKER_HOST=npipe:////./pipe/dockerDesktopLinuxEngine` (the active `desktop-linux` context endpoint) — no change.
 - `DOCKER_API_VERSION=1.44` — no change.
 - Removing the `testcontainers-bom` pin so the Spring Boot 4.1 parent's `testcontainers.version` (2.0.5) applies — the build then cannot resolve `org.testcontainers:junit-jupiter`, `postgresql`, or `rabbitmq`, because Testcontainers 2.x renamed those coordinates. It is a migration, not a version bump.
-**Solution:** No quick fix — the root cause is that `pom.xml` pins `testcontainers-bom` to `1.19.8`, whose bundled docker-java is rejected by Docker Engine 29 (`docker version` shows server API 1.55, min 1.40). Track/finish the migration under `INFRA-TESTCONTAINERS-DOCKER29`. **Meanwhile, verify repository/native-SQL changes live against the running local PostgreSQL stack instead** — that is stronger evidence than the container tests anyway, and `mvn test` does not run `*IT` classes at all (surefire's default includes do not match the `*IT` suffix, and nothing runs `mvn verify`), so a green `mvn test` never covered them in the first place.
+**Solution (done — `INFRA-TESTCONTAINERS-DOCKER29`, 2026-08-22):** remove the `testcontainers-bom` pin from
+`flexcms/pom.xml` entirely and inherit the Spring Boot-managed line (2.0.5 for Boot 4.1.0). The 2.x rename is
+mechanical: every module artifactId gains a `testcontainers-` prefix (`junit-jupiter` ->
+`testcontainers-junit-jupiter`, `postgresql` -> `testcontainers-postgresql`, `rabbitmq` ->
+`testcontainers-rabbitmq`); the base artifact stays `org.testcontainers:testcontainers`. In Java code, 2.x keeps
+`org.testcontainers.containers.*` as **deprecated** aliases and adds `org.testcontainers.postgresql` /
+`org.testcontainers.rabbitmq`, whose classes drop the `SELF` self-type generic — so `PostgreSQLContainer<?>`
+becomes `PostgreSQLContainer`. All four suites now pass on Engine 29.7.2 (47 tests). **They run at `verify`, not
+`test`:** surefire's default includes never match `*IT`, so `mvn test` still executes zero integration tests —
+use `cd flexcms && mvn verify` (Docker required). See `df/artifacts/INFRA-TESTCONTAINERS-DOCKER29/devops/summary.md`.
+
 **Why it works:** Docker Engine 29 dropped support for the old API versions that Testcontainers 1.19.x negotiates, so the daemon answers `/info` with HTTP 400 before any container starts. Nothing on the client side short of upgrading the library changes that.
 
 ### 2026-08-19 — Fresh clone: Maven/pnpm absent, Maven Central fails TLS, Selenium package cannot compile

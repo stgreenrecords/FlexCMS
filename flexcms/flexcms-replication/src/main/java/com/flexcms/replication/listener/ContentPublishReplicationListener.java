@@ -1,5 +1,6 @@
 package com.flexcms.replication.listener;
 
+import com.flexcms.core.event.ContentDeletedEvent;
 import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.replication.model.ReplicationEvent;
 import com.flexcms.replication.service.ReplicationAgent;
@@ -70,6 +71,36 @@ public class ContentPublishReplicationListener {
             // recoverable, rolling the publish back is not what the author asked for.
             log.error("Replication failed for '{}' after status change {} -> {}: {}",
                     path, event.getPreviousStatus(), event.getNewStatus(), e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Removes deleted content from the publish environment.
+     *
+     * <p>{@code ReplicationReceiver} has always handled
+     * {@code ReplicationAction.DELETE}, but until {@link ContentDeletedEvent} existed
+     * nothing produced one: deleting a published page removed it from the author and
+     * left the public site serving it forever. Bound AFTER_COMMIT for the same reason
+     * as the status listener — a rolled-back delete must not reach publish.</p>
+     *
+     * <p>A failure is logged rather than rethrown: the author-side delete has already
+     * committed, and the node cannot be resurrected by failing here. The residue is
+     * recoverable by re-issuing the delete once replication is healthy.</p>
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onContentDeleted(ContentDeletedEvent event) {
+        String path = event.getPath();
+        if (path == null) {
+            return;
+        }
+        try {
+            // replicateDelete, not replicate: the latter resolves the node first and
+            // the node is already gone by the time a deletion is announced.
+            replicationAgent.replicateDelete(path, event.getNodeId(), event.getSiteId(),
+                    event.getLocale(), event.getUserId());
+            log.debug("Replicated deletion of {}", path);
+        } catch (Exception e) {
+            log.error("Delete replication failed for '{}': {}", path, e.getMessage(), e);
         }
     }
 

@@ -12,14 +12,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -47,8 +49,8 @@ class ReplicationAgentIT {
             new RabbitMQContainer("rabbitmq:3.13-management-alpine");
 
     @Container
-    static final PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16-alpine")
+    static final PostgreSQLContainer postgres =
+            new PostgreSQLContainer("postgres:16-alpine")
                     .withDatabaseName("flexcms_test")
                     .withUsername("flexcms")
                     .withPassword("flexcms");
@@ -70,7 +72,7 @@ class ReplicationAgentIT {
     @Autowired ContentNodeRepository nodeRepository;
     @Autowired ReplicationLogRepository replicationLogRepository;
     @Autowired AmqpAdmin amqpAdmin;
-    @Autowired AmqpTemplate amqpTemplate;
+    @Autowired RabbitTemplate amqpTemplate;
     @Autowired TopicExchange replicationExchange;
 
     /** Temporary queue created per-test to capture messages sent by the agent. */
@@ -109,6 +111,24 @@ class ReplicationAgentIT {
         return nodeRepository.save(n);
     }
 
+
+    /**
+     * Reads one {@link ReplicationEvent} off the capture queue.
+     *
+     * <p>The type is stated explicitly rather than cast from
+     * {@code receiveAndConvert(queue, timeout)}. Without a target type the converter
+     * resolves the payload from the {@code __TypeId__} header, which
+     * {@code DefaultJackson2JavaTypeMapper} then refuses because its trusted packages
+     * are only {@code java.util} and {@code java.lang}. Production never hits that
+     * path: {@code ReplicationReceiver} consumes via {@code @RabbitListener}, where
+     * Spring AMQP infers the payload type from the handler signature. This overload
+     * gives the test the same type information through the same converter.
+     */
+    private ReplicationEvent receiveEvent() {
+        return amqpTemplate.receiveAndConvert(
+                captureQueueName, 5_000, new ParameterizedTypeReference<ReplicationEvent>() { });
+    }
+
     // ── Tests: replicate (single node) ────────────────────────────────────────
 
     @Test
@@ -118,8 +138,7 @@ class ReplicationAgentIT {
         UUID eventId = replicationAgent.replicate(
                 "content.corporate.en.home", ReplicationEvent.ReplicationAction.ACTIVATE, "alice");
 
-        ReplicationEvent received = (ReplicationEvent)
-                amqpTemplate.receiveAndConvert(captureQueueName, 5_000);
+        ReplicationEvent received = receiveEvent();
 
         assertThat(received).isNotNull();
         assertThat(received.getEventId()).isEqualTo(eventId);
@@ -191,8 +210,7 @@ class ReplicationAgentIT {
 
         UUID eventId = replicationAgent.replicateTree("content.corporate.en.home", "alice");
 
-        ReplicationEvent received = (ReplicationEvent)
-                amqpTemplate.receiveAndConvert(captureQueueName, 5_000);
+        ReplicationEvent received = receiveEvent();
 
         assertThat(received).isNotNull();
         assertThat(received.getEventId()).isEqualTo(eventId);
@@ -222,8 +240,7 @@ class ReplicationAgentIT {
 
         UUID eventId = replicationAgent.replicateAsset("/content/dam/logo.png", renditions, "alice");
 
-        ReplicationEvent received = (ReplicationEvent)
-                amqpTemplate.receiveAndConvert(captureQueueName, 5_000);
+        ReplicationEvent received = receiveEvent();
 
         assertThat(received).isNotNull();
         assertThat(received.getEventId()).isEqualTo(eventId);

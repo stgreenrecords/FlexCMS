@@ -4,17 +4,17 @@ S1,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoic
 S1,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceDate,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceNumber,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,address,text,scalar,ui,PASS,control text present and typed as contracted
-S1,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,amenities,text,list,ui,PASS,control present but lossy: list field edited through a plain text input
+S1,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,amenities,structured,list,ui,PASS,"list field renders a structured editor (nested group / repeater), not a text input"
 S1,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,map,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,officeName,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,photo,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
 S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,backgroundImage,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
 S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,eyebrow,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,headline,text,scalar,ui,PASS,control text present and typed as contracted
-S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,primaryCta,text,object,ui,PASS,control present but lossy: object field edited through a plain text input
-S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,secondaryCta,text,object,ui,PASS,control present but lossy: object field edited through a plain text input
+S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,primaryCta,structured,object,ui,PASS,"object field renders a structured editor (nested group / repeater), not a text input"
+S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,secondaryCta,structured,object,ui,PASS,"object field renders a structured editor (nested group / repeater), not a text input"
 S1,"Calls to Action, Promotions & Campaigns",tut-usa/calls-to-action-promotions-campaigns/hero-banner,Hero Banner,subheadline,text,scalar,ui,PASS,control text present and typed as contracted
-S1,"Commerce, Catalog & Merchandising",tut-usa/commerce-catalog-merchandising/product-card,Product Card,cta,text,object,ui,PASS,control present but lossy: object field edited through a plain text input
+S1,"Commerce, Catalog & Merchandising",tut-usa/commerce-catalog-merchandising/product-card,Product Card,cta,structured,object,ui,PASS,"object field renders a structured editor (nested group / repeater), not a text input"
 S1,"Commerce, Catalog & Merchandising",tut-usa/commerce-catalog-merchandising/product-card,Product Card,image,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
 S1,"Commerce, Catalog & Merchandising",tut-usa/commerce-catalog-merchandising/product-card,Product Card,price,number,scalar,ui,PASS,control number present and typed as contracted
 S1,"Commerce, Catalog & Merchandising",tut-usa/commerce-catalog-merchandising/product-card,Product Card,productName,text,scalar,ui,PASS,control text present and typed as contracted
@@ -33,19 +33,19 @@ S1,Editorial & Article Content,tut-usa/editorial-article-content/case-study-deta
 S1,"Education, Learning & Developer Content",tut-usa/education-learning-developer-content/faculty-profile,Faculty Profile,bio,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Education, Learning & Developer Content",tut-usa/education-learning-developer-content/faculty-profile,Faculty Profile,name,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Education, Learning & Developer Content",tut-usa/education-learning-developer-content/faculty-profile,Faculty Profile,photo,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
-S1,"Education, Learning & Developer Content",tut-usa/education-learning-developer-content/faculty-profile,Faculty Profile,specialties,text,list,ui,PASS,control present but lossy: list field edited through a plain text input
+S1,"Education, Learning & Developer Content",tut-usa/education-learning-developer-content/faculty-profile,Faculty Profile,specialties,structured,list,ui,PASS,"list field renders a structured editor (nested group / repeater), not a text input"
 S1,"Education, Learning & Developer Content",tut-usa/education-learning-developer-content/faculty-profile,Faculty Profile,title,text,scalar,ui,PASS,control text present and typed as contracted
-S1,"Events, Booking, Travel & Hospitality",tut-usa/events-booking-travel-hospitality/webinar-replay,Webinar Replay,cta,text,object,ui,PASS,control present but lossy: object field edited through a plain text input
+S1,"Events, Booking, Travel & Hospitality",tut-usa/events-booking-travel-hospitality/webinar-replay,Webinar Replay,cta,structured,object,ui,PASS,"object field renders a structured editor (nested group / repeater), not a text input"
 S1,"Events, Booking, Travel & Hospitality",tut-usa/events-booking-travel-hospitality/webinar-replay,Webinar Replay,slidesFile,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
 S1,"Events, Booking, Travel & Hospitality",tut-usa/events-booking-travel-hospitality/webinar-replay,Webinar Replay,summary,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Events, Booking, Travel & Hospitality",tut-usa/events-booking-travel-hospitality/webinar-replay,Webinar Replay,title,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Events, Booking, Travel & Hospitality",tut-usa/events-booking-travel-hospitality/webinar-replay,Webinar Replay,videoUrl,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Forms, Data Capture & Consent",tut-usa/forms-data-capture-consent/lead-form,Lead Form,description,textarea,scalar,ui,PASS,control textarea present and typed as contracted
-S1,"Forms, Data Capture & Consent",tut-usa/forms-data-capture-consent/lead-form,Lead Form,fields,text,list,ui,PASS,control present but lossy: list field edited through a plain text input
+S1,"Forms, Data Capture & Consent",tut-usa/forms-data-capture-consent/lead-form,Lead Form,fields,structured,list,ui,PASS,"list field renders a structured editor (nested group / repeater), not a text input"
 S1,"Forms, Data Capture & Consent",tut-usa/forms-data-capture-consent/lead-form,Lead Form,submitAction,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Forms, Data Capture & Consent",tut-usa/forms-data-capture-consent/lead-form,Lead Form,successRedirect,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Forms, Data Capture & Consent",tut-usa/forms-data-capture-consent/lead-form,Lead Form,title,text,scalar,ui,PASS,control text present and typed as contracted
-S1,Layout & Page Structure,tut-usa/layout-page-structure/sidebar-promo,Sidebar Promo,cta,text,object,ui,PASS,control present but lossy: object field edited through a plain text input
+S1,Layout & Page Structure,tut-usa/layout-page-structure/sidebar-promo,Sidebar Promo,cta,structured,object,ui,PASS,"object field renders a structured editor (nested group / repeater), not a text input"
 S1,Layout & Page Structure,tut-usa/layout-page-structure/sidebar-promo,Sidebar Promo,description,textarea,scalar,ui,PASS,control textarea present and typed as contracted
 S1,Layout & Page Structure,tut-usa/layout-page-structure/sidebar-promo,Sidebar Promo,image,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
 S1,Layout & Page Structure,tut-usa/layout-page-structure/sidebar-promo,Sidebar Promo,title,text,scalar,ui,PASS,control text present and typed as contracted
@@ -53,7 +53,7 @@ S1,"Location, Local & Physical Presence",tut-usa/location-local-physical-presenc
 S1,"Location, Local & Physical Presence",tut-usa/location-local-physical-presence/campus-location,Campus Location,mapLink,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Location, Local & Physical Presence",tut-usa/location-local-physical-presence/campus-location,Campus Location,name,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Location, Local & Physical Presence",tut-usa/location-local-physical-presence/campus-location,Campus Location,photo,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
-S1,"Location, Local & Physical Presence",tut-usa/location-local-physical-presence/campus-location,Campus Location,programs,text,list,ui,PASS,control present but lossy: list field edited through a plain text input
+S1,"Location, Local & Physical Presence",tut-usa/location-local-physical-presence/campus-location,Campus Location,programs,structured,list,ui,PASS,"list field renders a structured editor (nested group / repeater), not a text input"
 S1,"Media, Visual Storytelling & Assets",tut-usa/media-visual-storytelling-assets/video-embed,Video Embed,autoplay,toggle,scalar,ui,PASS,control toggle present and typed as contracted
 S1,"Media, Visual Storytelling & Assets",tut-usa/media-visual-storytelling-assets/video-embed,Video Embed,posterImage,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
 S1,"Media, Visual Storytelling & Assets",tut-usa/media-visual-storytelling-assets/video-embed,Video Embed,title,text,scalar,ui,PASS,control text present and typed as contracted
@@ -65,10 +65,10 @@ S1,"Navigation, Search & Discovery",tut-usa/navigation-search-discovery/logo,Log
 S1,"Navigation, Search & Discovery",tut-usa/navigation-search-discovery/logo,Logo,image,text,asset,ui,PASS,control present but lossy: asset field edited through a plain text input
 S1,"Navigation, Search & Discovery",tut-usa/navigation-search-discovery/logo,Logo,themeVariant,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,lastReviewed,text,scalar,ui,PASS,control text present and typed as contracted
-S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,levels,text,list,ui,PASS,control present but lossy: list field edited through a plain text input
+S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,levels,structured,list,ui,PASS,"list field renders a structured editor (nested group / repeater), not a text input"
 S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,owner,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,title,text,scalar,ui,PASS,control text present and typed as contracted
-S2,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceDate,text,scalar,"ui,author-api,headless,rendered",PASS,marker reb19-1787320769586-text
+S2,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceDate,text,scalar,"ui,author-api,headless,rendered",PASS,marker reb19-1787478652184-text
 S3,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,photo,text,asset,"ui,author-api,headless,rendered",PASS,asset /tut-usa/assets/images/02b2932f59db0cf8-ab6axudqjze3dqwk3mascd2fhfw6o-bd1xwf0veukzq8uuau.png
 S4,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceNumber,text,scalar,"ui,author-api,rendered",PASS,empty value renders without console errors
 S5,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceDate,text,scalar,"ui,headless,rendered",PASS,784 characters

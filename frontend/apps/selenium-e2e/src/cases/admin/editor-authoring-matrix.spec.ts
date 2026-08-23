@@ -46,6 +46,9 @@ const ALLOWED_TAGS_BY_CONTROL: Record<string, string[]> = {
   textarea: ['textarea'],
   toggle: ['button', 'input'],
   select: ['button'],
+  // Array and object fields render a container — a nested group or a repeater —
+  // rather than a single form control, since REB-19 blocker B-1 was fixed.
+  structured: ['div'],
 };
 
 describe('REB-19 page editor authoring matrix suite', function () {
@@ -274,7 +277,16 @@ describe('REB-19 page editor authoring matrix suite', function () {
           probe.tagName ?? '',
         );
 
-        if (entry.isLossyInEditor) {
+        if (entry.control === 'structured') {
+          record(
+            'S1',
+            contract,
+            entry,
+            'ui',
+            'PASS',
+            `${entry.semantics} field renders a structured editor (nested group / repeater), not a text input`,
+          );
+        } else if (entry.isLossyInEditor) {
           record(
             'S1',
             contract,
@@ -294,11 +306,13 @@ describe('REB-19 page editor authoring matrix suite', function () {
     );
 
     blocker(
-      'Editor has no dedicated control for list, object, or asset fields — ' +
-        'frontend/apps/admin/src/app/editor/page.tsx -> schemaToFields() only emits ' +
-        "'text' | 'number' | 'toggle' | 'select' | 'textarea', so arrays/objects render as " +
-        'String(value) in a text input ("[object Object]") and assets get no DAM picker. ' +
-        'Editing such a field through the UI would persist a string in place of structured data.',
+      'Asset fields still have no DAM picker — ' +
+        'frontend/apps/admin/src/app/editor/page.tsx renders them as a plain text input for the ' +
+        'asset path, so an author has to know and type the URL. That is REB-19 blocker B-2, which ' +
+        'waits on a picker design from the designer. List and object fields are no longer affected: ' +
+        'since B-1 was fixed, schemaToFields() emits structured editors for them (nested group, ' +
+        'repeater, or validated JSON) instead of String(value), so a UI edit can no longer replace ' +
+        'a structure with the string "[object Object]".',
     );
   });
 

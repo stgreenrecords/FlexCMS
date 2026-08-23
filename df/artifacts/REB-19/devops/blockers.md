@@ -14,6 +14,20 @@ remain open.
 
 ## B-1 — Editor has no control type for list, object, or asset fields
 
+> **PARTIALLY RESOLVED 2026-08-23 — the data-loss half is fixed.** `PropField['type']`
+> gained `object` and `list`, and `schemaToFields()` recurses into the shape the
+> component registry publishes, so: an object with declared properties renders a group
+> of nested inputs (a CTA now shows Label and URL); an array renders a repeater with
+> add/remove/reorder; and a structure the schema does not describe gets a validated
+> JSON editor that writes only when the text parses. `[object Object]` can no longer
+> render, and a UI edit can no longer replace a structure with that string. Editing a
+> nested key preserves keys the schema does not mention.
+>
+> Still open, and still an `sa`/`designer` decision: the richer authoring UX this
+> blocker asks for (inline previews, drag-reorder, typed item pickers). Asset fields
+> also remain plain text inputs pending the `B-2` DAM picker.
+
+
 **Where:** `frontend/apps/admin/src/app/editor/page.tsx` → `schemaToFields()` and
 `PropertyField()`
 

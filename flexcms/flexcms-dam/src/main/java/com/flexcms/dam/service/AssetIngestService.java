@@ -1,5 +1,6 @@
 package com.flexcms.dam.service;
 
+import com.flexcms.core.exception.ValidationException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.core.model.AssetRendition;
 import com.flexcms.core.model.AssetStatus;
@@ -8,6 +9,7 @@ import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,13 +41,57 @@ public class AssetIngestService {
     @Autowired
     private RenditionPipelineService renditionPipeline;
 
+    /** 100 MB, matching the cap the admin upload dialog advertises. */
+    private static final long DEFAULT_MAX_UPLOAD_BYTES = 100L * 1024 * 1024;
+
+    /**
+     * Largest accepted upload, in bytes. Defaults to the 100 MB the admin upload
+     * dialog advertises, so the API and the UI agree instead of the UI being the
+     * only thing enforcing a limit.
+     *
+     * <p>The field is initialised in code as well as annotated: {@code @Value} is
+     * only applied when Spring builds the bean, so a service constructed directly —
+     * a plain unit test, or any manual wiring — would otherwise leave this primitive
+     * at 0 and reject every upload as "too large".</p>
+     */
+    @Value("${flexcms.dam.max-upload-bytes:104857600}")
+    private long maxUploadBytes = DEFAULT_MAX_UPLOAD_BYTES;
+
+    /**
+     * Content types refused outright, matched against the type Tika detects from
+     * the bytes rather than anything the client declares.
+     *
+     * This is a denylist, not an allow-list, on purpose: the DAM legitimately holds
+     * fonts and stylesheets as well as images, video, and documents (REB-07 imported
+     * 22 fonts and 15 stylesheets), so an allow-list copied from the admin dialog's
+     * `accept` attribute would reject assets the platform is meant to store.
+     * Whether the DAM should move to a positive allow-list is an `sa` policy
+     * decision — see df/artifacts/REB-21/devops/blockers.md R21-1.
+     */
+    private static final Set<String> REFUSED_MIME_TYPES = Set.of(
+            "application/x-msdownload",
+            "application/x-dosexec",
+            "application/vnd.microsoft.portable-executable",
+            "application/x-executable",
+            "application/x-elf",
+            "application/x-mach-binary",
+            "application/x-sharedlib",
+            "application/x-msi",
+            "application/x-bat",
+            "application/x-sh",
+            "text/x-shellscript"
+    );
+
     /**
      * Ingest a new asset: upload original, detect metadata, generate renditions.
      */
     @Transactional
     public Asset ingest(String path, String filename, byte[] data, String siteId, String userId) {
-        // Detect MIME type
+        // Detect MIME type from the bytes themselves; a client-declared type is not
+        // trusted for the refusal check below.
         String mimeType = tika.detect(data, filename);
+
+        validateUpload(filename, data, mimeType);
 
         // Generate storage key
         String storageKey = "originals/" + UUID.randomUUID() + "/" + filename;
@@ -89,6 +135,38 @@ public class AssetIngestService {
 
         log.info("Ingested asset: {} ({}, {} bytes)", path, mimeType, data.length);
         return asset;
+    }
+
+    /**
+     * Rejects uploads that must never become assets.
+     *
+     * Checks, in order: the file has content, it is within the configured size cap,
+     * and its **detected** content type is not an executable. Detection runs on the
+     * bytes, so renaming `payload.exe` to `photo.png` does not get past it.
+     *
+     * @throws ValidationException mapped to HTTP 422 by GlobalExceptionHandler
+     */
+    private void validateUpload(String filename, byte[] data, String mimeType) {
+        if (data == null || data.length == 0) {
+            throw new ValidationException("Asset upload is empty", List.of(
+                    ValidationException.FieldError.of("file",
+                            "File is empty; an asset must contain at least one byte")));
+        }
+
+        if (data.length > maxUploadBytes) {
+            throw new ValidationException("Asset upload is too large", List.of(
+                    ValidationException.FieldError.of("file",
+                            "File is " + data.length + " bytes, which exceeds the "
+                                    + maxUploadBytes + " byte limit")));
+        }
+
+        String detected = mimeType == null ? "" : mimeType.toLowerCase(Locale.ROOT);
+        if (REFUSED_MIME_TYPES.contains(detected)) {
+            log.warn("Refused asset upload '{}': detected executable content type {}", filename, detected);
+            throw new ValidationException("Asset content type is not allowed", List.of(
+                    ValidationException.FieldError.of("file",
+                            "Detected content type " + detected + " is not allowed in the DAM")));
+        }
     }
 
     /**

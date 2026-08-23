@@ -74,6 +74,41 @@ public class ReplicationAgent {
     }
 
     /**
+     * Replicate a deletion, so the publish environment drops the content too.
+     *
+     * <p>Deliberately does <em>not</em> load the node: this is called after the
+     * subtree has already been removed on the author side, so a lookup would always
+     * fail. {@link #replicate} cannot be reused for the same reason — it resolves the
+     * node first and throws {@code Node not found} for exactly this case.</p>
+     *
+     * <p>{@code ReplicationReceiver.deleteContent()} only needs the path, which it
+     * passes to {@code deleteSubtree}, so identity and site/locale are sufficient
+     * payload.</p>
+     *
+     * @param path      ltree path of the deleted subtree root
+     * @param nodeId    id the node had before deletion, for traceability
+     * @param siteId    site the content belonged to, may be null
+     * @param locale    locale the content belonged to, may be null
+     * @param userId    who performed the deletion
+     * @return the replication event id
+     */
+    @Transactional
+    public UUID replicateDelete(String path, UUID nodeId, String siteId, String locale, String userId) {
+        ReplicationEvent event = ReplicationEvent.contentActivate(
+                path, nodeId, null, siteId, locale, userId);
+        event.setAction(ReplicationEvent.ReplicationAction.DELETE);
+
+        rabbitTemplate.convertAndSend(
+                ReplicationQueueConfig.EXCHANGE_NAME,
+                ReplicationQueueConfig.CONTENT_ROUTING_KEY,
+                event);
+
+        logReplication(event);
+        log.info("Replicated deletion: {} by {}", path, userId);
+        return event.getEventId();
+    }
+
+    /**
      * Tree activation: replicate a page and all its descendants.
      */
     @Transactional

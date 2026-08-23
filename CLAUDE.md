@@ -163,6 +163,7 @@ Do NOT add anything to `WORK_BOARD_KYLE.md` or `WORK_BOARD_ERIK.md` until the us
 | 4. **Implement** | Follow `CLAUDE.md` conventions. Verify each AC as you go. | No mock/dummy data in production code |
 | 5. **Build** | Backend: `cd flexcms && mvn clean compile`. Frontend: `cd frontend && pnpm build`. | ❌ MUST pass — do not proceed if build fails |
 | 6. **Unit Tests** | Run `cd flexcms && mvn test`. Fix any failures before continuing. | ❌ MUST pass — all tests green, no skips |
+| 6b. **Integration Tests** | Run `cd flexcms && mvn verify` (Docker must be running). Covers the four `*IT` Testcontainers suites, which `mvn test` never executes. | ❌ MUST pass — all `*IT` green |
 | 7. **E2E Tests** | If `admin-e2e` package exists: `cd frontend/apps/admin-e2e && pnpm exec playwright test`. Apply the **Test Failure Protocol** (see below) on any failure. | ❌ MUST pass — 0 failing tests |
 | 8. **Pre-Push Gate** | Run the **full local validation** (see below). Fix any failures. **NEVER push to GitHub until every check passes locally.** | ❌ ALL must pass — zero exceptions |
 | 9. **Update Board** | Agent's board §3: status → ✅ DONE. `WORK_BOARD.md §2`: clear locks. Agent's board §5: add Completion Note. | Every field in the template must be filled |
@@ -206,22 +207,36 @@ Do NOT add anything to `WORK_BOARD_KYLE.md` or `WORK_BOARD_ERIK.md` until the us
 cd flexcms && mvn clean compile
 # ❌ If this fails → fix compile errors before anything else
 
-# Step 2: Backend unit + integration tests
+# Step 2: Backend unit tests
 cd flexcms && mvn test
 # ❌ If this fails → fix failing tests; never skip or @Ignore them
+# ℹ️  This runs UNIT tests only. Surefire's default includes match *Test/Test*/*Tests
+#     and never the *IT suffix, so `mvn test` does not execute a single integration
+#     test. Step 3 is what covers those.
 
-# Step 3: Frontend build (all packages in dependency order)
+# Step 3: Backend integration tests (*IT, Testcontainers — Docker must be running)
+cd flexcms && mvn verify
+# ❌ If this fails → fix it; these are the only tests that exercise the native SQL,
+#    the PIM Flyway migrations, and real RabbitMQ replication against real services
+# ℹ️  failsafe runs **/*IT.java at the `verify` phase: ContentNodeRepositoryIT,
+#     ProductRepositoryIT, ReplicationAgentIT, ReplicationReceiverIT. `verify` also
+#     re-runs Step 2's unit tests, so it is safe to run this instead of both.
+# ℹ️  Docker Engine 29+ is fine; Testcontainers comes from the Spring Boot-managed
+#     line (2.x). Each suite starts its own postgres:16-alpine / rabbitmq container,
+#     so nothing depends on the local compose stack being up.
+
+# Step 4: Frontend build (all packages in dependency order)
 cd frontend && pnpm install && pnpm build
 # ❌ If this fails → fix TypeScript/build errors
 
-# Step 4: E2E tests — mock API mode (no running backend required)
+# Step 5: E2E tests — mock API mode (no running backend required)
 # Run only if admin-e2e package exists
 if [ -d "frontend/apps/admin-e2e" ]; then
   cd frontend/apps/admin-e2e && pnpm exec playwright test --project=chromium
 fi
 # ❌ If this fails → apply Test Failure Protocol (see below)
 
-# Step 5: Docker image build (if you changed backend code)
+# Step 6: Docker image build (if you changed backend code)
 cd flexcms && docker build -t flexcms-app:local-test .
 # ❌ If this fails → fix Dockerfile or packaging issues
 # ℹ️  Skip this step ONLY if your changes are frontend-only

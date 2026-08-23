@@ -1,5 +1,6 @@
 package com.flexcms.core.service;
 
+import com.flexcms.core.event.ContentDeletedEvent;
 import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.NotFoundException;
@@ -158,9 +159,25 @@ public class ContentNodeService {
 
         for (ContentNode n : subtree) {
             String updatedPath = n.getPath().replace(sourcePath, newPath);
-            String updatedParent = n.getParentPath() != null
-                    ? n.getParentPath().replace(sourcePath, newPath)
-                    : targetParentPath;
+
+            // The moved node's own parentPath is the target; only its descendants
+            // can have it rewritten by substitution.
+            //
+            // This used to be `n.getParentPath().replace(sourcePath, newPath)` for
+            // every node, which is a no-op for the subtree's root: that node's
+            // parentPath is its *old* parent and does not contain sourcePath, so the
+            // root kept pointing at the folder it was moved out of. Its path was
+            // correct but every children-based view disagreed — the new parent's
+            // /children listing did not include it, the old parent's still did, and
+            // the admin content tree showed the page in the folder it had left.
+            // Descendants were always fine because their parentPath starts with
+            // sourcePath. bulkMove() delegates here, so both paths were affected.
+            String updatedParent = n.getPath().equals(sourcePath)
+                    ? targetParentPath
+                    : (n.getParentPath() != null
+                            ? n.getParentPath().replace(sourcePath, newPath)
+                            : targetParentPath);
+
             n.setPath(updatedPath);
             n.setParentPath(updatedParent);
             n.setModifiedBy(userId);
@@ -180,9 +197,32 @@ public class ContentNodeService {
     @PreAuthorize("hasPermission(#path, 'DELETE')")
     @Transactional
     public void delete(String path, String userId) {
+        // Look the node up first. deleteSubtree() is a bulk SQL DELETE that affects
+        // zero rows for a path that does not exist and raises nothing, so without
+        // this a caller could not tell "deleted 3 pages" from "all 3 paths were
+        // wrong" — bulkDelete() counted fictional paths as succeeded and audited
+        // them. Bulk publish and bulk move already reject a missing path; delete was
+        // the outlier.
+        ContentNode node = nodeRepository.findByPath(path)
+                .orElseThrow(() -> NotFoundException.forPath(path));
+
+        // Captured before deletion: the listener cannot look any of this up afterwards.
+        UUID nodeId = node.getId();
+        String resourceType = node.getResourceType();
+        String siteId = node.getSiteId();
+        String locale = node.getLocale();
+
         nodeRepository.deleteSubtree(path);
-        auditService.log(AuditService.ENTITY_CONTENT, null, path,
+        auditService.log(AuditService.ENTITY_CONTENT, nodeId, path,
                 AuditService.ACTION_DELETE, userId);
+
+        // Announce the deletion so the publish environment can drop it too.
+        // ReplicationReceiver has always handled ReplicationAction.DELETE, but no
+        // producer ever emitted one: deleting a published page left it served
+        // indefinitely. Consumers bind AFTER_COMMIT, so a rolled-back delete is
+        // never replicated.
+        eventPublisher.publishEvent(
+                new ContentDeletedEvent(this, path, nodeId, resourceType, siteId, locale, userId));
     }
 
     /**

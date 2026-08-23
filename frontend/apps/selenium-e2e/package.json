@@ -18,6 +18,8 @@
     "test:reb19:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-19 page editor authoring matrix suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb19-suite.xml",
     "test:reb26": "pnpm build && mocha --grep \"REB-26 exhaustive per-component sample-site editing suite\"",
     "test:reb20": "pnpm build && mocha --grep \"REB-20 publishing, workflow, scheduling, and bulk operation suite\"",
+    "test:reb21": "pnpm build && mocha --grep \"REB-21 DAM authoring and asset-reference suite\"",
+    "test:reb21:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-21 DAM authoring and asset-reference suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb21-suite.xml",
     "test:reb20:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-20 publishing, workflow, scheduling, and bulk operation suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb20-suite.xml",
     "test:reb26:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-26 exhaustive per-component sample-site editing suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb26-suite.xml",
     "test:pages": "pnpm build && mocha --grep \"REB-12 public site pages\"",
@@ -26,7 +28,7 @@
     "test:headed": "cross-env HEADLESS=false pnpm build && cross-env HEADLESS=false mocha",
     "test:debug": "cross-env HEADLESS=false SLOWMO=250 pnpm build && cross-env HEADLESS=false SLOWMO=250 mocha --grep @smoke",
     "test:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/selenium-results.xml",
-    "test:full:ci": "pnpm test:templates:ci && pnpm test:admin:ci && pnpm test:reb18:ci && pnpm test:reb19:ci && pnpm test:reb20:ci && pnpm test:reb26:ci",
+    "test:full:ci": "pnpm test:templates:ci && pnpm test:admin:ci && pnpm test:reb18:ci && pnpm test:reb19:ci && pnpm test:reb20:ci && pnpm test:reb21:ci && pnpm test:reb26:ci",
     "ci:gate:smoke": "node scripts/selenium-gate.cjs --mode smoke",
     "ci:gate:full": "node scripts/selenium-gate.cjs --mode full",
     "clean": "rimraf dist reports test-results"

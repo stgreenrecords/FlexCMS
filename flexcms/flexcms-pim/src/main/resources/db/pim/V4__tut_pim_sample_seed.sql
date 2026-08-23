@@ -99,7 +99,7 @@ SELECT
         "basePrice_EUR": 325000,
         "basePrice_CAD": 420000
     }'::jsonb,
-    'ACTIVE',
+    'PUBLISHED',
     'system',
     'system'
 FROM catalogs c
@@ -139,7 +139,7 @@ SELECT
         "basePrice_EUR": 225000,
         "basePrice_CAD": 295000
     }'::jsonb,
-    'ACTIVE',
+    'PUBLISHED',
     'system',
     'system'
 FROM catalogs c
@@ -179,7 +179,7 @@ SELECT
         "basePrice_EUR": 280000,
         "basePrice_CAD": 365000
     }'::jsonb,
-    'ACTIVE',
+    'PUBLISHED',
     'system',
     'system'
 FROM catalogs c
@@ -219,7 +219,7 @@ SELECT
         "basePrice_EUR": 260000,
         "basePrice_CAD": 340000
     }'::jsonb,
-    'ACTIVE',
+    'PUBLISHED',
     'system',
     'system'
 FROM catalogs c

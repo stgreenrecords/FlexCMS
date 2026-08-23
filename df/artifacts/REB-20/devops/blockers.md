@@ -15,6 +15,14 @@ and confirms it a second way.
 
 ## R20-1 — Moving content leaves the moved node's `parentPath` stale
 
+> **RESOLVED 2026-08-23.** `ContentNodeService.move()` sets the subtree root's
+> `parentPath` to the target explicitly; substitution still handles descendants, whose
+> `parentPath` legitimately contains `sourcePath`. Covered by a new unit test
+> (`move_reparentsTheMovedNodeItself_notJustItsDescendants` — the existing test only
+> asserted the *child's* parentPath, which is how this shipped) and verified live by
+> REB-20 `S6`, now PASS.
+
+
 **Severity:** highest-impact finding in this task. Content silently disappears
 from the folder it was moved into and keeps appearing in the folder it left.
 
@@ -69,6 +77,13 @@ asserts both the root's and a descendant's `parentPath`.
 
 ## R20-2 — A page that has ever had a workflow can never be deleted
 
+> **RESOLVED 2026-08-23.** Migration `V19__workflow_instances_cascade_on_content_delete.sql`
+> adds `ON DELETE CASCADE` to `workflow_instances.content_node_id`. A workflow instance
+> describes the review of one node, so it goes when the node goes — keeping orphans
+> would also let `getActiveWorkflow(path)` return an active workflow for deleted
+> content. Verified live: `confdeltype = 'c'` on the constraint, and REB-20 `S12` PASS.
+
+
 **Severity:** high. Any page that went through review becomes permanently
 undeletable, and the author is shown only a generic error.
 
@@ -109,6 +124,17 @@ wrong under any of those choices.
 ---
 
 ## R20-3 — Scheduled publish never updates the author-side status
+
+> **RESOLVED 2026-08-23.** `ScheduledPublishingService` now calls
+> `ContentNodeService.updateStatus()`, so the scheduled path performs the same status
+> transition, audit entry, and `ContentStatusChangedEvent` as every other publish path
+> — including the *tree* replication a page needs, which the previous direct
+> single-node `replicate()` call also got wrong. Two follow-on defects were found and
+> fixed while verifying: the schedule-clearing helper re-saved a pre-transition entity
+> (writing DRAFT back over PUBLISHED), and the `@Scheduled` thread had no
+> `SecurityContext` for the `@PreAuthorize`d call. Verified live by REB-20 `S8`, PASS
+> in 30 s, with `Scheduled publish complete: 1/1 succeeded`.
+
 
 **Severity:** high. The public is served a page the author still shows as a draft.
 
@@ -152,6 +178,11 @@ status transition as the other two publish paths, so all three behave identicall
 
 ## R20-4 — Scheduled deactivation does not retract content, and leaves the author status untouched
 
+> **RESOLVED 2026-08-23.** Same routing through `updateStatus()` (to `ARCHIVED`), plus
+> the `R26-2` subtree/delivery fix so the retraction is visible to the public.
+> Verified live by REB-20 `S9` with `Scheduled deactivation complete: 1/1 succeeded`.
+
+
 **Severity:** high. Confirms REB-26 `R26-2` through a second code path, and adds
 an author-side symptom.
 
@@ -182,6 +213,12 @@ whether publish delivery should filter on status. Track together with `R26-2`.
 ---
 
 ## R20-5 — Bulk delete reports success for content that never existed
+
+> **RESOLVED 2026-08-23.** `ContentNodeService.delete()` resolves the node first and
+> throws `NotFoundException`, which `bulkDelete()` already records as a per-path error.
+> Covered by `bulkDelete_reportsMissingPathAsFailedRatherThanSucceeded` and verified
+> live: `DELETE` of a never-existing path now answers 404, and REB-20 `S7`/`S12` PASS.
+
 
 **Severity:** medium. A caller cannot tell a successful delete from a no-op.
 

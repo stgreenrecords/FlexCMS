@@ -101,6 +101,9 @@ const ALLOWED_TAGS_BY_CONTROL: Record<string, string[]> = {
   textarea: ['textarea'],
   toggle: ['button', 'input'],
   select: ['button'],
+  // Structured fields render a container (object group / array repeater), not a
+  // single form control.
+  structured: ['div'],
 };
 
 /** Everything the sweep plans, authors, and verifies for one component. */
@@ -466,14 +469,24 @@ describe('REB-26 exhaustive per-component sample-site editing suite', function (
               }
 
               if (entry.isLossyInEditor) {
-                // B-1: authoring these through the UI would persist a string.
+                // Structured and asset fields are authored through the author API, not
+                // the UI — the sweep's contract is that the *stored shape* survives an
+                // editor save, and driving a nested repeater per field would test the
+                // editor's ergonomics instead of the round trip.
+                //
+                // For list/object this is no longer a blocker: since REB-19 B-1 was
+                // fixed they render a real structured editor (asserted present above),
+                // rather than a text input that would persist `[object Object]`.
+                const structured = entry.control === 'structured';
                 recordField(
                   scenarioId,
                   plan.contract,
                   entry,
                   'ui',
-                  'BLOCKED',
-                  `${entry.semantics} field renders as a plain text input; authored through the author API instead`,
+                  structured ? 'PASS' : 'BLOCKED',
+                  structured
+                    ? `${entry.semantics} field renders a structured editor; value authored through the author API`
+                    : `${entry.semantics} field renders as a plain text input; authored through the author API instead`,
                 );
                 continue;
               }
