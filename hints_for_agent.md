@@ -289,3 +289,59 @@ A line reading `The POM for com.flexcms:<module> is invalid, transitive dependen
 **Why it works:** A module installed into `~/.m2` is later resolved through its *installed parent*. Module poms here declare dependencies without versions and rely on the parent's `dependencyManagement`, so if the installed parent is older than the source parent and lacks an entry, the module's effective model cannot be built. Maven then drops **every** transitive dependency of that module — not just the unresolvable one — and reports it as a WARNING, so the build still "succeeds" and only the runtime classpath is wrong.
 
 This became reachable when the Testcontainers migration renamed the managed artifacts (`testcontainers-postgresql`, `testcontainers-junit-jupiter`) in the parent pom: any `.m2` still holding a pre-migration parent breaks this way.
+
+### 2026-08-24 — A test that builds its own target verifies the destination, not the journey
+**Context:** Selenium/E2E coverage of admin authoring flows
+**Symptom:** A suite is green, sometimes with "100% coverage", while the feature is visibly broken for a human using it
+**What failed:**
+- Opening the editor on a path the test assembled itself — `` `${xfPath}.master` ``, or a literal `.../navigation/master`. Both passed while every link in the product pointed at the fragment *folder*, which the editor could not render
+- Asserting palette drag-and-drop by way of the click-to-insert path, which kept working while dragging was completely dead
+- Trusting a hardcoded href string in a test instead of reading the `href` the app actually rendered
+**Solution:** Assert the navigation, not just the destination. Concretely:
+1. **Follow the app's own links.** Read `href` from the DOM and `get()` that, rather than composing the URL you believe it should be.
+2. **Drive the real interaction.** If the feature is a drag, use a pointer sequence (`actions().move().press().move()…`); if the same outcome is reachable by a click that works, a click-based assertion proves nothing about the drag.
+3. **Add an invariant that is entry-point independent.** "No structural node may ever render as a component, whatever the URL" catches the whole class, including entry points nobody enumerated. Path-specific scenarios only catch the paths you thought of.
+4. **Check the precondition is real.** `expect(anchors.length).to.be.greaterThan(0)` before asserting what clicking an anchor does — otherwise the scenario passes vacuously.
+**Why it works:** Constructing the target encodes the assumption you are trying to test. The application is then free to build a different, wrong URL and every assertion still holds. Both editor bugs found on 2026-08-24 lived in that blind spot, behind suites that were green.
+
+### 2026-08-24 — dnd-kit draggables must share a DndContext with their drop targets
+**Context:** The admin page editor: a component palette on the left, a sortable canvas in the centre
+**Symptom:** Dragging from the palette does nothing — no drag image, no drop, no error. Reordering items already on the canvas works perfectly
+**What failed:**
+- Looking for a bug in `handleDragEnd`, which was correct and simply never called
+- Assuming the sortable machinery was broken, when it was demonstrably working for canvas reordering
+**Solution:** Check where `<DndContext>` opens relative to *every* `useDraggable`/`useSortable` in the flow. Here it opened inside the canvas `<section>`, so the palette's draggables were outside it. Move the context up to enclose both ends of the drag; leave `SortableContext` scoped to the list it sorts.
+**Why it works:** `useDraggable` resolves its context from React context. Outside a provider it still returns `listeners` and `attributes` that attach without complaint, so the failure is completely silent — the pointer events fire and no drag ever begins. The working reorder is a misleading signal: those draggables are inside the context, so their success says nothing about the ones outside it.
+
+### 2026-08-24 — A test that appends to a shared fixture degrades until it fails, and only under load
+
+**Context:** Running the full Selenium gate. `REB-13 … edits a page property and persists it after
+refresh` failed inside `test:admin:ci`, but the same suite passed 4/4 when run standalone against
+the very same build.
+
+**Symptom:** `reb13-admin-suite.xml` was never written; the only evidence was the retained
+screenshot, which showed the editor loaded correctly with the SLUG field reading
+`home reb13-1787168098340 reb13-17…`.
+
+**What failed:** Suspecting the most recent product change (a `pointer-events: none` rule on
+`.flexcms-canvas`) because the failing test edits properties. It was innocent — the properties
+panel is outside the canvas, and the suite passed standalone with that rule in place. Re-running
+the suite in isolation proves nothing here: isolation is precisely the condition under which the
+bug hides.
+
+**Solution:** `EditorPage.updateFirstEditableTextField(suffix)` read the field's current value and
+wrote back `${previousValue} ${suffix}` — it *appended*. Nothing ever reset the fixture, so the
+stored slug grew by one marker per gate run and had reached 624 characters across 32 runs. Replaced
+it with `setFirstEditableTextField(value)`, which overwrites, and reset the stored slug to `home`
+via `PUT /api/author/content/node/properties` (sending the node's other properties back unchanged).
+The helper now also re-reads the input after `sendKeys` and fails there if the value does not match.
+
+**Why it works:** `sendKeys` types one character at a time into a controlled React input that
+re-renders on every keystroke, and the assertion compares the *entire* string for equality. The
+longer the value, the likelier one keystroke is lost — so the test got monotonically more fragile
+with every run and tipped over first on the loaded machine running the whole gate. Overwriting keeps
+the value bounded and constant-length, and it additionally proves the previous value was replaced,
+which appending never did. **Generalisation:** any test that mutates shared fixture state
+*cumulatively* is a time bomb whose fuse length is the number of times it has run. When a test
+fails in the gate but passes alone, look for state the test itself left behind, and read the failure
+screenshot before theorising — the accumulated value was visible in it.

@@ -71,8 +71,10 @@ describe('REB-13 admin authoring and round-trip suite @smoke', function () {
       return;
     }
 
+    // A fresh value each run, written over the previous one rather than appended, so the
+    // shared fixture page does not accumulate markers run after run.
     const marker = `reb13-${Date.now()}`;
-    const expectedValue = await editorPage.updateFirstEditableTextField(marker);
+    const expectedValue = await editorPage.setFirstEditableTextField(marker);
     await editorPage.clickSave();
     await editorPage.waitForAnySaveTimestamp();
 

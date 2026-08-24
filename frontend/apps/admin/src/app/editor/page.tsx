@@ -51,6 +51,21 @@ import { canvasComponentMap } from '@/lib/canvasRenderers';
 import { normalizeAssetUrl } from '@/lib/normalizeAssetUrls';
 const API_BASE = getApiBase();
 
+/** Fragment folders hold variations, not components; the variations hold the components. */
+const XF_FOLDER_RESOURCE_TYPE = 'flexcms/xf-folder';
+const XF_VARIATION_RESOURCE_TYPE = 'flexcms/xf-page';
+
+/**
+ * The variation an Experience Fragment folder should be edited through.
+ *
+ * `master` by convention, falling back to whichever variation exists so a fragment
+ * built with only a `mobile` variation is still editable.
+ */
+function pickEditableVariation(children: ApiContentNode[]): ApiContentNode | null {
+  const variations = children.filter((c) => c.resourceType === XF_VARIATION_RESOURCE_TYPE);
+  return variations.find((v) => v.name === 'master') ?? variations[0] ?? null;
+}
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -423,6 +438,21 @@ function EditorInner() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDetachingInheritance, setIsDetachingInheritance] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  /**
+   * Shown when the editor was opened on something that is not directly editable and it
+   * resolved to a variation, so the author is not silently editing a different node
+   * from the one they clicked.
+   */
+  const [xfNotice, setXfNotice] = useState<string | null>(null);
+
+  /**
+   * ltree path of the node the editor actually loaded.
+   *
+   * Not always the node named in the URL: opening an Experience Fragment folder resolves
+   * to one of its variations. Save and Publish must act on what is on screen, or they
+   * write to the wrong parent.
+   */
+  const [loadedLtreePath, setLoadedLtreePath] = useState<string>('');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [detachError, setDetachError] = useState<string | null>(null);
   const [detachInfo, setDetachInfo] = useState<string | null>(null);
@@ -451,9 +481,51 @@ function EditorInner() {
       ? fetch(pageUrl).then((r) => (r.ok ? r.json() : Promise.reject(`Page ${r.status}`))).catch(() => null)
       : Promise.resolve(null);
 
-    Promise.all([fetchRegistry, fetchPage]).then(async ([reg, page]) => {
+    Promise.all([fetchRegistry, fetchPage]).then(async ([reg, pageResponse]) => {
       const defs: ComponentDefinition[] = reg.components ?? [];
       setRegistry(defs);
+
+      // An Experience Fragment folder is not editable: its children are variations, and
+      // the components live under one of those. Handed a folder — which the content tree
+      // links to for every node, and which bookmarks preserve — the editor previously
+      // rendered the variation itself as a component and showed "Renderer pending:
+      // flexcms/xf-page". Resolve to the variation instead of rendering nonsense.
+      let page = pageResponse;
+      let resolvedFrom: string | null = null;
+
+      if (page && (page as ApiContentNode).resourceType === XF_FOLDER_RESOURCE_TYPE) {
+        const folder = page as ApiContentNode;
+        const variation = pickEditableVariation(folder.children ?? []);
+
+        if (variation) {
+          const variationResponse = await fetch(
+            `${API_BASE}/api/author/content/page?path=${encodeURIComponent(variation.path)}`,
+          );
+          if (variationResponse.ok) {
+            page = (await variationResponse.json()) as ApiContentNode;
+            resolvedFrom = folder.path;
+          }
+        } else {
+          setXfNotice(
+            `"${folder.name}" is an Experience Fragment with no variation yet, so there is `
+            + 'nothing to edit. Add a variation from the Experience Fragments page first.',
+          );
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (resolvedFrom) {
+        const variationName = (page as ApiContentNode).name;
+        setXfNotice(
+          `Editing the "${variationName}" variation of this Experience Fragment. `
+          + 'The fragment itself holds variations rather than components.',
+        );
+      } else {
+        setXfNotice(null);
+      }
+
+      setLoadedLtreePath(page ? (page as ApiContentNode).path : '');
 
       let template: PageTemplateDefinition | null = null;
       if (page) {
@@ -636,7 +708,11 @@ function EditorInner() {
     if (isSaving) return;
     if (!contentPath) return;
 
-    const pageLtreePath = contentPath.replace(/^\//, '').replace(/\//g, '.');
+    // The node on screen, not the node in the URL: the two differ whenever the editor
+    // resolved a fragment folder to a variation, and parenting new components to the
+    // folder would corrupt the fragment.
+    const pageLtreePath = loadedLtreePath
+      || contentPath.replace(/^\//, '').replace(/\//g, '.');
     setIsSaving(true);
 
     try {
@@ -725,7 +801,9 @@ function EditorInner() {
     if (isSaving || !contentPath) return;
     setIsSaving(true);
     try {
-      const ltreePath = contentPath.replace(/^\//, '').replace(/\//g, '.');
+      // Same reasoning as Save: publish what is open, not what the URL named.
+      const ltreePath = loadedLtreePath
+        || contentPath.replace(/^\//, '').replace(/\//g, '.');
       const url = `${API_BASE}/api/author/content/node/status?path=${encodeURIComponent(ltreePath)}&status=PUBLISHED&userId=admin`;
       const res = await fetch(url, { method: 'POST' });
       if (res.ok) {
@@ -1079,6 +1157,21 @@ function EditorInner() {
       {/* ────────────────────────────────────────────────────────────────────
           Main editor: left panel + canvas + right panel
       ──────────────────────────────────────────────────────────────────── */}
+      {/*
+        One drag context around the whole body: the palette lives in the left aside and
+        the drop targets live in the canvas, and dnd-kit only connects a draggable to a
+        droppable within the same context. With the context opened inside the canvas, the
+        palette items were outside it and dragging one did nothing — while reordering
+        components already on the canvas kept working, which is what made the gap easy to
+        miss.
+      */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
       <div className="flex flex-1 overflow-hidden">
 
         {/* ── Left panel: Component palette ── */}
@@ -1229,19 +1322,27 @@ function EditorInner() {
               transition: 'width 0.3s ease',
             }}
           >
+            {/* Says which node is actually open when the editor resolved to another one. */}
+            {xfNotice && (
+              <div
+                className="px-6 py-3 text-sm"
+                style={{
+                  background: 'rgba(176,198,255,0.10)',
+                  color: '#b0c6ff',
+                  borderBottom: '1px solid rgba(176,198,255,0.25)',
+                }}
+                data-testid="editor-resolution-notice"
+              >
+                {xfNotice}
+              </div>
+            )}
+
             {/* Locked XF Navigation slot — cannot be moved, edited, or deleted */}
             <LockedXfSlot
               label="Experience Fragment — Navigation"
               xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/navigation/master"
             />
 
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragEnd={handleDragEnd}
-            >
               <SortableContext
                 items={components.map((c) => c.instanceId)}
                 strategy={verticalListSortingStrategy}
@@ -1322,7 +1423,6 @@ function EditorInner() {
                   </div>
                 )}
               </DragOverlay>
-            </DndContext>
 
             {/* Locked XF Footer slot — cannot be moved, edited, or deleted */}
             <LockedXfSlot
@@ -1433,6 +1533,7 @@ function EditorInner() {
           )}
         </aside>
       </div>
+      </DndContext>
 
       {/* ────────────────────────────────────────────────────────────────────
           Footer status bar

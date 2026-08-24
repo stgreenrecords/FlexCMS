@@ -25,6 +25,25 @@
  */
 .flexcms-canvas {
   contain: layout paint;
+
+  /*
+   * Component content is inert while authoring.
+   *
+   * The canvas renders the site's real renderers, so a CTA is a real anchor and a form is
+   * a real form. Clicking one used to follow the link and navigate out of the editor,
+   * losing unsaved work — a regression from moving the canvas onto the shared renderers,
+   * because the grey placeholders they replaced had nothing to click.
+   *
+   * Suppressing pointer events here rather than on each renderer keeps this a property of
+   * *the canvas* rather than of every component, and it cannot be forgotten by the next
+   * renderer someone writes. Clicks fall through to the wrapper that owns selection, so
+   * clicking a component still opens its properties — which is the behaviour an author
+   * wants from a click in edit mode.
+   *
+   * Links stay live where they belong: the Preview button opens /preview, a separate route
+   * serving the real page, and the published site is unaffected.
+   */
+  pointer-events: none;
 }
 
 /* FlexCMS Admin — base styles using theme tokens */

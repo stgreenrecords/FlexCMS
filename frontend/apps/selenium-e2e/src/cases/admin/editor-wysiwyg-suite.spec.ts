@@ -190,4 +190,114 @@ describe('Editor WYSIWYG canvas suite', function () {
       .split(/[^a-z0-9]+/)
       .filter((word) => word.length > 3);
   }
+
+  it('S6 adds a component by dragging it from the palette onto the canvas', async () => {
+    // Palette-to-canvas insertion had no scenario at all, which is why the gate stayed
+    // green while it was completely broken: the palette's draggables sat outside the
+    // editor's DndContext, so dragging one did nothing. Reordering components already on
+    // the canvas kept working (REB-19 S7) because those live inside the context — the
+    // passing test was the reason the outage looked fine.
+    const d = driver as WebDriver;
+
+    await d.get(`${env.adminUrl}/editor?path=${encodeURIComponent(`/${SITE_ID}/home`)}`);
+    await waitForPageReady(d);
+    await d.wait(
+      async () => (await d.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'the editor rendered no canvas to drop onto',
+    );
+
+    const canvasTypes = async (): Promise<string[]> => {
+      const nodes = await d.findElements(By.css('[data-canvas-resource-type]'));
+      const types: string[] = [];
+      for (const node of nodes) types.push((await node.getAttribute('data-canvas-resource-type')) ?? '');
+      return types;
+    };
+
+    const before = await canvasTypes();
+
+    const tile = await waitForVisible(d, By.css('[data-testid^="editor-palette-item-"]'));
+    const testId = (await tile.getAttribute('data-testid')) ?? '';
+    // Derived from the tile rather than hardcoded, so the expectation follows whatever
+    // the palette happens to offer first.
+    const draggedSlug = testId.replace('editor-palette-item-', '');
+    const canvas = await d.findElement(By.css('[data-canvas-resource-type]'));
+
+    // A pointer drag, deliberately — the editor also inserts on click, and that path
+    // worked throughout the outage, so a click-based assertion would have proved nothing.
+    await d.actions({ async: true })
+      .move({ origin: tile })
+      .press()
+      // dnd-kit's pointer sensor only starts once the activation distance is cleared.
+      .move({ origin: tile, x: 8, y: 8 })
+      .move({ origin: canvas, x: 0, y: -40 })
+      .move({ origin: canvas, x: 0, y: 0 })
+      .move({ origin: canvas, x: 0, y: 30 })
+      .release()
+      .perform();
+
+    await d.wait(
+      async () => (await canvasTypes()).length > before.length,
+      15_000,
+      'dragging from the palette added nothing — the palette draggables are probably '
+        + 'outside the DndContext again',
+    );
+
+    const after = await canvasTypes();
+    expect(after.length, 'the drag should add exactly one component').to.equal(before.length + 1);
+
+    const normalise = (value: string) => value.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase();
+    expect(
+      after.map(normalise).join(' | '),
+      `the canvas did not gain the dragged component "${draggedSlug}"`,
+    ).to.contain(normalise(draggedSlug));
+  });
+
+  it('S7 selects a component instead of following the links inside it', async () => {
+    // A regression from putting the site's real renderers on the canvas: a CTA is now a
+    // real anchor, so clicking one navigated out of the editor and took unsaved work with
+    // it. In edit mode a click belongs to the editor — it should select the component and
+    // open its properties. Links stay live in /preview and on the published site.
+    const d = driver as WebDriver;
+
+    await d.get(`${env.adminUrl}/editor?path=${encodeURIComponent(`/${SITE_ID}/home`)}`);
+    await waitForPageReady(d);
+    await d.wait(
+      async () => (await d.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'the editor rendered no components',
+    );
+
+    const editorUrl = await d.getCurrentUrl();
+
+    // Find a component that really does contain an anchor with a destination, or this
+    // proves nothing.
+    const anchors = await d.findElements(By.css('[data-canvas-resource-type] a[href]'));
+    expect(anchors.length, 'no component on the canvas contains a link to click')
+      .to.be.greaterThan(0);
+
+    const anchorHref = await anchors[0].getAttribute('href');
+    expect(anchorHref, 'the anchor has no destination').to.be.a('string').and.not.equal('');
+
+    // Click the anchor's own position. `pointer-events: none` on the canvas means the
+    // click lands on the wrapper that owns selection rather than on the link.
+    await d.actions({ async: true }).move({ origin: anchors[0] }).click().perform();
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    expect(
+      await d.getCurrentUrl(),
+      `clicking a component link navigated away from the editor (to ${anchorHref})`,
+    ).to.equal(editorUrl);
+
+    // And the click did what an author expects: the properties panel is now bound to a
+    // component rather than showing the empty prompt.
+    const panel = await (await d.findElement(By.css('body'))).getText();
+    expect(panel, 'clicking a component did not open its properties')
+      .to.not.contain('Click a component on the canvas to edit its properties');
+
+    // The canvas is inert, not invisible: the anchor is still rendered and still carries
+    // its destination, so the WYSIWYG fidelity S4 asserts is unaffected.
+    expect(await anchors[0].getAttribute('href'), 'the link lost its destination')
+      .to.equal(anchorHref);
+  });
 });

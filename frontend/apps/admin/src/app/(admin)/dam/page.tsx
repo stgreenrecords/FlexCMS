@@ -806,6 +806,19 @@ export default function DamBrowserPage() {
               })}
             </BreadcrumbList>
           </Breadcrumb>
+
+          {/*
+            The route had no heading at all, so it had no accessible page title and no
+            stable selector — the only admin route in that state. Named for the sidebar
+            entry that leads here, so the page is called the same thing everywhere.
+          */}
+          <h1
+            className="text-2xl font-extrabold tracking-tight mt-2"
+            style={{ color: 'var(--color-foreground)' }}
+            data-testid="dam-heading"
+          >
+            Media Library
+          </h1>
         </div>
 
         <div className="flex flex-1 min-h-0 overflow-hidden">

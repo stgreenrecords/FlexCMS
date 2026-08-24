@@ -1,4 +1,5 @@
 import { loadEnv } from '../driver/env';
+import { publishVerifier } from '../harness/publishVerification';
 
 interface AuthorNode {
   id?: string;
@@ -115,7 +116,16 @@ export interface BulkOperationResult {
 export class AuthorApiClient {
   private readonly env = loadEnv();
   private readonly apiBase = this.env.authorApiUrl;
-  private readonly publishBase = this.env.publishUrl;
+  /**
+   * Publish base URL, taken from the shared verifier rather than read directly.
+   *
+   * `PublishVerifier` refuses to construct when the configured publish URL resolves to
+   * the author host, so every publish read on this client inherits that guard: a
+   * misconfigured environment fails loudly at construction instead of quietly verifying
+   * "publish" against the author instance, where unpublished content is served anyway
+   * and the assertion would pass for nothing (REB-25 AC2).
+   */
+  private readonly publishBase = publishVerifier(this.env).baseUrl;
   private readonly graphqlUrl = this.env.authorApiUrl.replace(/\/api$/, '') + '/graphql';
   private readonly defaultSite = process.env.FLEXCMS_DEFAULT_SITE ?? 'tut-usa';
   private readonly defaultLocale = process.env.FLEXCMS_DEFAULT_LOCALE ?? 'en';

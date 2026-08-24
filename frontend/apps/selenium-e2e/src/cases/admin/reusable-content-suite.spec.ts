@@ -433,6 +433,259 @@ describe('REB-22 reusable content suite (experience fragments and live copies)',
     });
   });
 
+  // ── Entry points into the editor ──────────────────────────────────────────
+  //
+  // These exist because the suite above did not have them. It built `.master` paths
+  // itself, so it proved the editor works when handed the right node and never asked
+  // whether anything hands it the right node.
+
+  /** Structural node types that hold other nodes rather than authorable content. */
+  const STRUCTURAL_RESOURCE_TYPES = ['flexcms/xf-folder', 'flexcms/xf-page'];
+
+  /** Resource types the editor canvas is currently rendering. */
+  async function canvasResourceTypes(d: WebDriver): Promise<string[]> {
+    const nodes = await d.findElements(By.css('[data-canvas-resource-type]'));
+    const types: string[] = [];
+    for (const node of nodes) {
+      types.push((await node.getAttribute('data-canvas-resource-type')) ?? '');
+    }
+    return types;
+  }
+
+  async function openEditorAt(d: WebDriver, urlPath: string): Promise<void> {
+    await d.get(`${env.adminUrl}/editor?path=${encodeURIComponent(urlPath)}`);
+    await waitForPageReady(d);
+    await d.wait(
+      async () => (await d.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      `the editor rendered no component for ${urlPath}`,
+    );
+  }
+
+  it('S11 makes a fragment folder URL editable instead of rendering its variation as a component', async () => {
+    const d = driver as WebDriver;
+
+    // The URL from the report: the fragment folder, with no variation segment.
+    await openEditorAt(d, '/content/experience-fragments/tut-usa/global/navigation');
+
+    const body = await (await d.findElement(By.css('body'))).getText();
+    expect(body, 'the canvas is still showing an unrendered structural node')
+      .to.not.contain('Renderer pending');
+
+    const types = await canvasResourceTypes(d);
+    expect(types, 'the folder\'s variation is being rendered as if it were a component')
+      .to.not.include('flexcms/xf-page');
+    expect(types, 'the fragment\'s own component is not on the canvas')
+      .to.include('tut-usa/navigation-search-discovery/navigation');
+
+    // And the author is told which node they are actually editing.
+    const notice = await d.findElements(By.css('[data-testid="editor-resolution-notice"]'));
+    expect(notice.length, 'the editor resolved to another node without saying so').to.equal(1);
+    expect(await notice[0].getText()).to.contain('master');
+
+    record({
+      scenarioId: 'S11',
+      scenario: 'makes a fragment folder URL editable instead of rendering its variation as a component',
+      operation: 'xf:folder-url',
+      target: '/content/experience-fragments/tut-usa/global/navigation',
+      ui: 'resolved to the master variation, rendered the navigation component, notice shown',
+      outcome: 'PASS',
+    });
+  });
+
+  it('S12 follows the content tree\'s own Edit link into the editor', async () => {
+    const d = driver as WebDriver;
+
+    await d.get(`${env.adminUrl}/content`);
+    await waitForPageReady(d);
+
+    // Rows first: the tree fetches its nodes after the shell renders.
+    await d.wait(
+      async () => (await d.findElements(By.css('tbody tr'))).length > 0,
+      30_000,
+      'the content tree never rendered any rows',
+    );
+
+    // The Edit link is inside a row's action menu and does not exist until it is opened,
+    // which is why looking for inline editor links found none.
+    const rows = await d.findElements(By.css('tbody tr'));
+    let editHref: string | null = null;
+
+    for (const row of rows.slice(0, 3)) {
+      const triggers = await row.findElements(By.css('td:last-child button'));
+      if (triggers.length === 0) continue;
+
+      await triggers[0].click();
+      await d.wait(
+        async () => (await d.findElements(By.css('a[href*="/editor?path="]'))).length > 0,
+        5_000,
+        'the row action menu exposed no Edit link',
+      ).catch(() => undefined);
+
+      const links = await d.findElements(By.css('a[href*="/editor?path="]'));
+      if (links.length > 0) {
+        editHref = await links[0].getAttribute('href');
+        break;
+      }
+    }
+
+    expect(editHref, 'no row in the content tree offered an Edit link').to.be.a('string');
+
+    // Follow the tree's own link. Its href comes from the node's urlPath, so this is the
+    // construction that produced the reported fragment-folder URL.
+    await d.get(editHref as string);
+    await waitForPageReady(d);
+    await d.wait(
+      async () => (await d.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      `the content tree's Edit link (${editHref}) rendered nothing on the canvas`,
+    );
+
+    const structural = (await canvasResourceTypes(d))
+      .filter((t) => STRUCTURAL_RESOURCE_TYPES.includes(t));
+    expect(
+      structural,
+      `the content tree's Edit link renders a structural node as a component: ${editHref}`,
+    ).to.deep.equal([]);
+
+    observations.push(
+      "The content tree's Edit link is built from the node's urlPath, so for an Experience "
+        + 'Fragment folder it produces the folder URL rather than a variation. The editor '
+        + 'resolves that to the master variation (S11), which is why this entry point works '
+        + 'without changing the tree.',
+    );
+
+    record({
+      scenarioId: 'S12',
+      scenario: "follows the content tree's own Edit link into the editor",
+      operation: 'xf:content-tree-entry',
+      target: editHref as string,
+      ui: 'the tree\'s Edit link lands on authorable components, no structural node rendered',
+      outcome: 'PASS',
+    });
+  });
+
+  it('S13 follows the editor\'s own Edit in Experience Fragments link', async () => {
+    const d = driver as WebDriver;
+
+    // Open a normal page, then use the link the editor renders rather than the path this
+    // suite would have guessed. If that href ever loses its variation segment again, this
+    // fails where the previous scenarios did not.
+    await openEditorAt(d, '/tut-usa/home');
+
+    const links = await d.findElements(By.css('a[href*="experience-fragments"]'));
+    expect(links.length, 'the page editor renders no link to its experience fragments')
+      .to.be.greaterThan(0);
+
+    const href = await links[0].getAttribute('href');
+    expect(href, 'the fragment link has no href').to.be.a('string');
+
+    await d.get(href as string);
+    await waitForPageReady(d);
+    await d.wait(
+      async () => (await d.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      `the editor's own fragment link (${href}) rendered nothing`,
+    );
+
+    const types = await canvasResourceTypes(d);
+    expect(
+      types.filter((t) => STRUCTURAL_RESOURCE_TYPES.includes(t)),
+      `the editor's own fragment link renders a structural node as a component: ${href}`,
+    ).to.deep.equal([]);
+
+    record({
+      scenarioId: 'S13',
+      scenario: "follows the editor's own Edit in Experience Fragments link",
+      operation: 'xf:editor-link',
+      target: href as string,
+      ui: 'the link lands on authorable components rather than a structural node',
+      outcome: 'PASS',
+    });
+  });
+
+  it('S14 never renders a structural node as a component, whatever the URL', async () => {
+    const d = driver as WebDriver;
+
+    // The invariant behind S11–S13. A folder or a variation is a container; the canvas is
+    // for authorable components. Asserting this across several shapes of URL catches the
+    // whole class from entry points nobody has enumerated.
+    const urls = [
+      '/tut-usa/home',
+      '/content/experience-fragments/tut-usa/global/navigation',
+      '/content/experience-fragments/tut-usa/global/navigation/master',
+      '/content/experience-fragments/tut-usa/global/footer',
+    ];
+
+    const offenders: string[] = [];
+    for (const url of urls) {
+      await openEditorAt(d, url);
+      const structural = (await canvasResourceTypes(d))
+        .filter((t) => STRUCTURAL_RESOURCE_TYPES.includes(t));
+      if (structural.length > 0) offenders.push(`${url} -> ${structural.join(', ')}`);
+    }
+
+    expect(offenders, `structural nodes rendered as components:\n  ${offenders.join('\n  ')}`)
+      .to.deep.equal([]);
+
+    record({
+      scenarioId: 'S14',
+      scenario: 'never renders a structural node as a component, whatever the URL',
+      operation: 'xf:canvas-invariant',
+      target: `${urls.length} editor URLs`,
+      ui: `no ${STRUCTURAL_RESOURCE_TYPES.join('/')} node appeared on any canvas`,
+      outcome: 'PASS',
+    });
+  });
+
+  it('S15 saves to the node on screen, not the node named in the URL', async () => {
+    const d = driver as WebDriver;
+    const folderUrl = '/content/experience-fragments/tut-usa/global/navigation';
+    const folderPath = 'content.experience-fragments.tut-usa.global.navigation';
+
+    // The editor now resolves that folder to its master variation, which means Save has
+    // two candidate parents. Writing to the folder would put components among the
+    // variations and corrupt the fragment, so this checks the folder gained no children
+    // beyond the variations it is supposed to have.
+    const before = await call<Array<{ name: string; resourceType: string }>>(
+      'GET',
+      `${api}/content/children?path=${encodeURIComponent(folderPath)}`,
+    );
+    const beforeNames = (before.body ?? []).map((c) => c.name).sort();
+
+    await openEditorAt(d, folderUrl);
+
+    const save = await waitForVisible(d, By.css('[data-testid="editor-save-button"]'));
+    await save.click();
+    await waitForPageReady(d);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const after = await call<Array<{ name: string; resourceType: string }>>(
+      'GET',
+      `${api}/content/children?path=${encodeURIComponent(folderPath)}`,
+    );
+    const afterNames = (after.body ?? []).map((c) => c.name).sort();
+
+    expect(afterNames, 'saving from a folder URL added children to the fragment folder')
+      .to.deep.equal(beforeNames);
+
+    // Every child of the folder is still a variation, not a component.
+    for (const child of after.body ?? []) {
+      expect(child.resourceType, `the folder gained a non-variation child "${child.name}"`)
+        .to.equal('flexcms/xf-page');
+    }
+
+    record({
+      scenarioId: 'S15',
+      scenario: 'saves to the node on screen, not the node named in the URL',
+      operation: 'xf:save-target',
+      target: folderPath,
+      api: `folder children unchanged (${afterNames.join(', ')}), all still variations`,
+      outcome: 'PASS',
+      notes: 'guards the corruption the folder resolution would otherwise have introduced',
+    });
+  });
+
   // ── Live copies ───────────────────────────────────────────────────────────
 
   /** Creates the blueprint page and its component, returning both paths. */

@@ -1,4 +1,4 @@
-import { By, until, type WebDriver, type WebElement } from 'selenium-webdriver';
+import { By, Key, until, type WebDriver, type WebElement } from 'selenium-webdriver';
 import { loadEnv } from '../driver/env';
 import { waitForClickable, waitForPageReady, waitForVisible } from '../driver/waits';
 
@@ -175,7 +175,19 @@ export class EditorPage {
     return newUrl;
   }
 
-  async updateFirstEditableTextField(suffix: string): Promise<string> {
+  /**
+   * Set the first writable property field to `value`, replacing whatever was there.
+   *
+   * This used to *append* to the previous value. Because it writes to a shared fixture
+   * page that is never reset, the stored value grew by one marker on every run — it had
+   * reached 624 characters and 32 markers. `sendKeys` types character by character into
+   * a controlled React input that re-renders on each keystroke, so the longer the value
+   * the likelier a keystroke is lost, and the round-trip assertion compares the full
+   * string. That is why the scenario failed inside the loaded gate but passed when run
+   * on its own. Replacing keeps the value bounded and also proves the old value is gone,
+   * which appending never did.
+   */
+  async setFirstEditableTextField(value: string): Promise<string> {
     const fields = await this.driver.findElements(By.css('aside [data-testid^="editor-property-"][data-testid$="-input"]'));
     if (fields.length === 0) {
       throw new Error('No editable property input found in the editor sidebar.');
@@ -189,11 +201,23 @@ export class EditorPage {
 
       const tagName = (await field.getTagName()).toLowerCase();
       if (tagName === 'input' || tagName === 'textarea') {
-        const previousValue = (await field.getAttribute('value')) ?? '';
-        const nextValue = `${previousValue} ${suffix}`.trim();
-        await field.clear();
-        await field.sendKeys(nextValue);
-        return nextValue;
+        // Select-all then type, rather than `clear()` then type: `clear()` drives the
+        // input through an empty intermediate state that a controlled React field can
+        // normalise behind the test's back. `EditorAuthoringPage.clearAndType` already
+        // settled on this approach for the same reason.
+        await field.click();
+        await field.sendKeys(Key.chord(Key.CONTROL, 'a'));
+        await field.sendKeys(value);
+
+        // Confirm the input actually holds what was typed. Without this, a dropped
+        // keystroke surfaces only after the refresh, where it reads as a persistence
+        // bug in the product rather than a typing failure in the test.
+        await this.driver.wait(
+          async () => ((await field.getAttribute('value')) ?? '') === value,
+          15000,
+          `Typing into the property field did not take: the input never reached "${value}".`,
+        );
+        return value;
       }
 
       if (tagName === 'button') {

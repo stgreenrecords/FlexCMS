@@ -142,7 +142,11 @@ export default function DashboardPage() {
         </nav>
         <div className="flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight mb-2" style={{ color: '#e5e2e1' }}>
+            <h1
+              className="text-3xl font-extrabold tracking-tight mb-2"
+              style={{ color: '#e5e2e1' }}
+              data-testid="dashboard-heading"
+            >
               Workspace Overview
             </h1>
             <p className="font-medium" style={{ color: '#c3c6d6' }}>

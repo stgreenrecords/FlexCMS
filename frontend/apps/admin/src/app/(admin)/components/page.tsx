@@ -25,6 +25,8 @@ interface ComponentDef {
   title: string;
   description: string;
   group: ComponentGroup;
+  /** The registry's own group name, which is richer than the bucket it maps to. */
+  groupLabel: string;
   isContainer: boolean;
   status: ComponentStatus;
   usageCount: number;
@@ -44,13 +46,57 @@ type ViewMode = 'table' | 'grid';
 import { getApiBase } from '@/lib/apiBase';
 const API_BASE = getApiBase();
 
+/**
+ * Maps a registry group name onto one of the buckets this page is built around.
+ *
+ * The registry publishes 18 descriptive group names and this page has seven buckets
+ * driving its colours, icons, labels and filter. Matching on keywords rather than exact
+ * names means a group added to the registry later still lands in a sensible bucket
+ * instead of falling off the end.
+ */
+function toComponentGroup(registryGroup: string): ComponentGroup {
+  const group = registryGroup.toLowerCase();
+
+  if (group.includes('form') || group.includes('consent') || group.includes('data capture')) {
+    return 'forms';
+  }
+  if (group.includes('media') || group.includes('asset') || group.includes('visual')) {
+    return 'media';
+  }
+  if (group.includes('navigation') || group.includes('search') || group.includes('discovery')) {
+    return 'navigation';
+  }
+  if (group.includes('commerce') || group.includes('catalog') || group.includes('merchandis')) {
+    return 'commerce';
+  }
+  if (group.includes('layout') || group.includes('structure') || group.includes('fragment')) {
+    return 'layout';
+  }
+  if (
+    group.includes('editorial')
+    || group.includes('article')
+    || group.includes('content')
+    || group.includes('documentation')
+    || group.includes('education')
+    || group.includes('learning')
+  ) {
+    return 'content';
+  }
+  // Calls to action, community, events, account, brand, location: real groups with no
+  // bucket of their own, and 'utility' is the page's neutral one.
+  return 'utility';
+}
+
 function apiToComponentDef(c: Record<string, unknown>): ComponentDef {
   return {
     id: (c.resourceType as string) ?? '',
     resourceType: (c.resourceType as string) ?? '',
     title: (c.title as string) ?? (c.name as string) ?? '',
     description: (c.description as string) ?? '',
-    group: ((c.group as string) ?? 'content') as ComponentGroup,
+    // Mapped, not cast: the registry's group names are not this union's members, and
+    // the cast is what let an undefined colour lookup reach `.bg` and blank the page.
+    group: toComponentGroup((c.group as string) ?? ''),
+    groupLabel: (c.group as string) ?? 'Uncategorised',
     isContainer: (c.isContainer as boolean) ?? false,
     status: 'active',
     usageCount: 0,
@@ -78,6 +124,9 @@ const GROUP_LABELS: Record<ComponentGroup, string> = {
   commerce: 'Commerce',
   utility: 'Utility',
 };
+
+/** Used when a group has no entry, so a data surprise cannot blank the route. */
+const FALLBACK_GROUP_COLOR = { bg: '#42465433', text: '#c3c6d6' };
 
 const GROUP_COLORS: Record<ComponentGroup, { bg: string; text: string }> = {
   content:    { bg: '#0058cc22', text: '#b0c6ff' },
@@ -216,7 +265,7 @@ function EmptyState() {
 // ---------------------------------------------------------------------------
 
 function ComponentGridCard({ comp }: { comp: ComponentDef }) {
-  const groupColor = GROUP_COLORS[comp.group];
+  const groupColor = GROUP_COLORS[comp.group] ?? FALLBACK_GROUP_COLOR;
   const statusCfg = STATUS_CONFIG[comp.status];
 
   return (
@@ -266,7 +315,7 @@ function ComponentGridCard({ comp }: { comp: ComponentDef }) {
           className="px-1.5 py-0.5 rounded text-[10px] font-bold"
           style={{ background: groupColor.bg, color: groupColor.text }}
         >
-          {GROUP_LABELS[comp.group]}
+          {comp.groupLabel || GROUP_LABELS[comp.group]}
         </span>
 
         {/* Container badge */}
@@ -552,7 +601,7 @@ function ComponentRegistryPage() {
                   </thead>
                   <tbody>
                     {filteredComponents.map((comp, idx) => {
-                      const groupColor = GROUP_COLORS[comp.group];
+                      const groupColor = GROUP_COLORS[comp.group] ?? FALLBACK_GROUP_COLOR;
                       const statusCfg = STATUS_CONFIG[comp.status];
                       return (
                         <tr
@@ -594,7 +643,7 @@ function ComponentRegistryPage() {
                               className="px-2.5 py-1 rounded-full text-[10px] font-bold"
                               style={{ background: groupColor.bg, color: groupColor.text }}
                             >
-                              {GROUP_LABELS[comp.group]}
+                              {comp.groupLabel || GROUP_LABELS[comp.group]}
                             </span>
                           </td>
 

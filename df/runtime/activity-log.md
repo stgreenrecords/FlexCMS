@@ -1,3 +1,13 @@
+## 2026-08-24 local - devops (test-quality fix) - REB-13-FIXTURE-ACCUMULATION
+
+- State: n/a (defect in an already-`DONE` task's suite, found by the full gate)
+- Action: The full gate failed on `test:admin:ci` while the same suite passed 4/4 standalone against the same build. `EditorPage.updateFirstEditableTextField(suffix)` read the field's current value and wrote back `${previousValue} ${suffix}` — it **appended**, and nothing ever reset the shared fixture page. The stored `slug` on `content.tut-usa.home.page-metadata` had grown to **624 characters across 32 accumulated markers**. `sendKeys` types one character at a time into a controlled React input that re-renders per keystroke, and the assertion compares the whole string for equality, so the test got monotonically more fragile with every run and tipped over first under the load of the full gate. Replaced the helper with `setFirstEditableTextField(value)`, which overwrites via select-all-then-type (matching the pattern `EditorAuthoringPage.clearAndType` had already settled on) and then waits for the input to actually hold the value, so a lost keystroke fails at the point of typing instead of masquerading as a persistence bug after the refresh. Reset the stored `slug` to `home` through `PUT /api/author/content/node/properties`, sending the node's other five properties back unchanged.
+- Evidence: failure screenshot `reports/screenshots/1787604976901-failed-reb-13-...png` (the accumulated value is legible in the SLUG field); `hints_for_agent.md` entry "A test that appends to a shared fixture degrades until it fails, and only under load"
+- Checks: `pnpm test:admin:ci` 4 tests / 0 failures, property test 1471ms -> 1070ms; scanned every other `getAttribute('value')` call site in the suite — `EditorAuthoringPage.clearAndType` and `DamPage` already overwrite and wait, so REB-13 was the only instance
+- Result: PASS
+- Next: full gate rerun for the real `GATE_EXIT`
+- Risks/blockers: my first suspicion was the `pointer-events: none` rule added to `.flexcms-canvas` for `EDITOR-CANVAS-CLICK-INTERCEPT`, because the failing test edits properties. It was innocent — the properties panel is outside the canvas. Re-running the suite in isolation cannot clear this class of bug, because isolation is the condition under which it hides; the screenshot is what identified it. Also discarded one gate run: I edited suite source while it was in flight, and each `test:*:ci` recompiles, so that run would have mixed two builds.
+
 ## 2026-08-23 11:30 CEDT - devops (cross-lane, human-directed) - BLOCKER-REMEDIATION-2026-08-23
 
 - State: n/a (remediation of blockers raised by REB-19, REB-20, REB-21, REB-26, INFRA-TESTCONTAINERS-DOCKER29)
