@@ -1,8 +1,8 @@
 scenarioId,scenario,operation,target,apiEvidence,uiEvidence,publishEvidence,outcome,notes
 S1,reports every configured endpoint and names what is unreachable,harness:preflight,"admin app, author API, author health, publish API, public site","5 endpoints checked, all reachable",,,PASS,
 S2,refuses to verify publish against the author instance,harness:publish-verifier,http://localhost:8081,,,health 200; an unpublished path is not served; author URL rejected at construction,PASS,
-S3,generates namespaced names that cannot collide across runs,harness:test-data,reb-25-1787672157508,7 distinct names; content names are ltree-safe; SKUs upper-cased,,,PASS,
-S4,tears down in dependency order and audits what it kept,harness:cleanup-audit,reb-25-1787672157509,reverse-order teardown verified; retention and failure both recorded; clean=false,,,PASS,AC3: retained entities are distinguished from entities left behind
+S3,generates namespaced names that cannot collide across runs,harness:test-data,reb-25-1787689445169,7 distinct names; content names are ltree-safe; SKUs upper-cased,,,PASS,
+S4,tears down in dependency order and audits what it kept,harness:cleanup-audit,reb-25-1787689445170,reverse-order teardown verified; retention and failure both recorded; clean=false,,,PASS,AC3: retained entities are distinguished from entities left behind
 S5,finds real console errors and failed requests without over-filtering,harness:browser-health,"/dashboard, /components",,"no severe console errors or broken media; 3 ignore rules, none matching a TypeError",,PASS,
 S6,reports broken media on the public site,harness:media-health,http://localhost:3001/tut-usa/home,,"7 images checked after scrolling, none broken",,PASS,
 S7,runs the accessibility smoke over the admin routes,harness:a11y-smoke,"/dashboard, /sites, /components, /translations, /dam",,structural checks clean on 5 routes; 0 naming/focus gap(s) recorded,,PASS,

@@ -68,7 +68,7 @@ S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/
 S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,levels,structured,list,ui,PASS,"list field renders a structured editor (nested group / repeater), not a text input"
 S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,owner,text,scalar,ui,PASS,control text present and typed as contracted
 S1,"Support, Documentation & Knowledge",tut-usa/support-documentation-knowledge/escalation-matrix,Escalation Matrix,title,text,scalar,ui,PASS,control text present and typed as contracted
-S2,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceDate,text,scalar,"ui,author-api,headless,rendered",PASS,marker reb19-1787671958963-text
+S2,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceDate,text,scalar,"ui,author-api,headless,rendered",PASS,marker reb19-1787689266774-text
 S3,"Brand, Corporate, Investor & Governance",tut-usa/brand-corporate-investor-governance/office-location,Office Location,photo,text,asset,"ui,author-api,headless,rendered",PASS,asset /tut-usa/assets/images/02b2932f59db0cf8-ab6axudqjze3dqwk3mascd2fhfw6o-bd1xwf0veukzq8uuau.png
 S4,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceNumber,text,scalar,"ui,author-api,rendered",PASS,empty value renders without console errors
 S5,"Account, Portal & Transactional",tut-usa/account-portal-transactional/invoice-download,Invoice Download,invoiceDate,text,scalar,"ui,headless,rendered",PASS,784 characters

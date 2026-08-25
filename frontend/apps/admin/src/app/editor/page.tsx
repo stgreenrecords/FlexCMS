@@ -453,6 +453,14 @@ function EditorInner() {
    * write to the wrong parent.
    */
   const [loadedLtreePath, setLoadedLtreePath] = useState<string>('');
+  /**
+   * Whether the canvas is showing an experience fragment rather than a page.
+   *
+   * Taken from the path that was actually loaded, so it holds for a fragment reached
+   * through its folder as well as one addressed by its variation directly.
+   */
+  const isExperienceFragment = loadedLtreePath.startsWith('content.experience-fragments')
+    || contentPath.includes('/experience-fragments/');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [detachError, setDetachError] = useState<string | null>(null);
   const [detachInfo, setDetachInfo] = useState<string | null>(null);
@@ -1337,11 +1345,19 @@ function EditorInner() {
               </div>
             )}
 
-            {/* Locked XF Navigation slot — cannot be moved, edited, or deleted */}
-            <LockedXfSlot
-              label="Experience Fragment — Navigation"
-              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/navigation/master"
-            />
+            {/*
+              Locked XF slots describe what a *page* inherits: its navigation and footer
+              come from fragments an author edits elsewhere. When the thing on the canvas
+              is the fragment itself they are meaningless — the navigation slot linked to
+              the very page being edited — and they sit at the top of the canvas where
+              they painted over the fragment's own render.
+            */}
+            {!isExperienceFragment && (
+              <LockedXfSlot
+                label="Experience Fragment — Navigation"
+                xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/navigation/master"
+              />
+            )}
 
               <SortableContext
                 items={components.map((c) => c.instanceId)}
@@ -1424,11 +1440,12 @@ function EditorInner() {
                 )}
               </DragOverlay>
 
-            {/* Locked XF Footer slot — cannot be moved, edited, or deleted */}
-            <LockedXfSlot
-              label="Experience Fragment — Footer"
-              xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/footer/master"
-            />
+            {!isExperienceFragment && (
+              <LockedXfSlot
+                label="Experience Fragment — Footer"
+                xfEditPath="/editor?path=/content/experience-fragments/tut-usa/global/footer/master"
+              />
+            )}
           </div>
         </section>
 
@@ -2057,12 +2074,104 @@ function JsonValueEditor({
   );
 }
 
-function PropertyField({ field, value, onChange }: {
+/**
+ * Whether a value is structured (object or array) and so must never be edited as text.
+ *
+ * A schema can disagree with the data it describes — `product-grid.products` declares an
+ * array of strings while every stored page holds an array of objects. Rendering by the
+ * declared type alone put `[object Object]` in a text box whose next keystroke replaced
+ * the structure with that string.
+ */
+function isStructuredValue(value: unknown): boolean {
+  return value !== null && typeof value === 'object';
+}
+
+/** "productName" -> "Product Name", so a derived field reads like a declared one. */
+function humanizeKey(key: string): string {
+  const spaced = key
+    .replace(/[_-]+/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .trim();
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+}
+
+/**
+ * Derive item fields from the objects a list actually holds.
+ *
+ * Only used when the schema declares no item properties. Keys are collected across every
+ * entry rather than the first one, so an optional key present on later items is still
+ * editable, and each field's type comes from the first defined sample.
+ */
+/**
+ * Derive fields for one object value, so a nested structure gets labelled inputs rather
+ * than a JSON textarea. Delegates to the list version, which already unions keys and
+ * picks a type per key from a sample.
+ */
+function inferFieldsFromObject(value: unknown): PropField[] | undefined {
+  if (!isStructuredValue(value) || Array.isArray(value)) return undefined;
+  return inferFieldsFromEntries([value]);
+}
+
+function inferFieldsFromEntries(entries: unknown[]): PropField[] | undefined {
+  const objects = entries.filter(
+    (e): e is Record<string, unknown> => isStructuredValue(e) && !Array.isArray(e),
+  );
+  if (objects.length === 0) return undefined;
+
+  const keys: string[] = [];
+  for (const object of objects) {
+    for (const key of Object.keys(object)) {
+      if (!keys.includes(key)) keys.push(key);
+    }
+  }
+  if (keys.length === 0) return undefined;
+
+  return keys.map((key) => {
+    const sample = objects.find((o) => o[key] !== undefined && o[key] !== null)?.[key];
+    let type: PropField['type'] = 'text';
+    let fields: PropField[] | undefined;
+    let item: PropField['item'] | undefined;
+
+    if (typeof sample === 'number') {
+      type = 'number';
+    } else if (typeof sample === 'boolean') {
+      type = 'toggle';
+    } else if (Array.isArray(sample)) {
+      type = 'list';
+      item = isStructuredValue(sample[0])
+        ? { type: 'object', fields: inferFieldsFromEntries(sample) }
+        : { type: typeof sample[0] === 'number' ? 'number' : 'text' };
+    } else if (isStructuredValue(sample)) {
+      type = 'object';
+      // Recurse: a nested object should be labelled inputs too, not the point at which
+      // the author is handed raw JSON.
+      fields = inferFieldsFromEntries([sample]);
+    } else if (typeof sample === 'string' && sample.length > 120) {
+      type = 'textarea';
+    }
+
+    return { key, label: humanizeKey(key), type, fields, item };
+  });
+}
+
+function PropertyField({ field, value, onChange, testIdPath }: {
   field: PropField;
   value: unknown;
   onChange: (val: unknown) => void;
+  /**
+   * Test-id prefix for a nested field, scoping it to its parent.
+   *
+   * Without this every field's id came from its key alone, so a `title` inside a list
+   * item produced the same `editor-property-title-input` as the component's own `title`
+   * and a selector could not tell them apart. That was harmless while nested fields only
+   * existed where a schema declared properties, and became a real ambiguity once fields
+   * are derived from the data. Top-level ids are deliberately unchanged.
+   */
+  testIdPath?: string;
 }) {
-  const fieldTestId = `editor-property-${toTestId(field.key)}`;
+  const fieldTestId = testIdPath
+    ? `${testIdPath}-${toTestId(field.key)}`
+    : `editor-property-${toTestId(field.key)}`;
 
   /**
    * In-progress text for the number input, or null when it is not being edited.
@@ -2175,9 +2284,12 @@ function PropertyField({ field, value, onChange }: {
       ? (value as Record<string, unknown>)
       : {};
 
-    // Known shape: edit each declared property, preserving any key the schema does
-    // not mention so an edit cannot silently drop data.
-    if (field.fields?.length) {
+    // Known shape: edit each declared property, preserving any key the schema does not
+    // mention so an edit cannot silently drop data. Where the schema declares nothing,
+    // the shape is derived from the value — JSON is a last resort, not the normal way to
+    // edit a structure.
+    const objectFields = field.fields?.length ? field.fields : inferFieldsFromObject(value);
+    if (objectFields?.length) {
       return (
         <div className="block" data-testid={fieldTestId}>
           {labelEl}
@@ -2186,10 +2298,11 @@ function PropertyField({ field, value, onChange }: {
             style={{ borderColor: '#2a2d3a', backgroundColor: 'rgba(255,255,255,0.02)' }}
             data-testid={`${fieldTestId}-group`}
           >
-            {field.fields.map((sub) => (
+            {objectFields.map((sub) => (
               <PropertyField
                 key={sub.key}
                 field={sub}
+                testIdPath={fieldTestId}
                 value={current[sub.key]}
                 onChange={(next) => {
                   const merged = { ...current };
@@ -2216,7 +2329,16 @@ function PropertyField({ field, value, onChange }: {
 
   if (field.type === 'list') {
     const items: unknown[] = Array.isArray(value) ? (value as unknown[]) : [];
-    const itemType = field.item?.type ?? 'text';
+    const declaredItemType = field.item?.type ?? 'text';
+    // If the stored entries are structured, they are edited as structures whatever the
+    // schema claims. A schema that says "string" over object data is a stale contract,
+    // not a licence to stringify the author's content.
+    const itemType = items.some(isStructuredValue) ? 'object' : declaredItemType;
+    // Declared item properties win — they carry titles, enums and required flags that
+    // the data cannot. Derivation only fills the gap when the schema declares none.
+    const itemFields = field.item?.fields?.length
+      ? field.item.fields
+      : inferFieldsFromEntries(items);
 
     const replaceAt = (index: number, next: unknown) => {
       const copy = [...items];
@@ -2232,6 +2354,8 @@ function PropertyField({ field, value, onChange }: {
       onChange(copy);
     };
     const addItem = () => {
+      // Match the shape already in the list, so adding to a list of objects does not
+      // append an empty string that the renderer cannot use.
       const blank = itemType === 'number' ? 0 : itemType === 'object' ? {} : '';
       onChange([...items, blank]);
     };
@@ -2280,9 +2404,9 @@ function PropertyField({ field, value, onChange }: {
                 </div>
               </div>
 
-              {itemType === 'object' && field.item?.fields?.length ? (
+              {(itemType === 'object' || isStructuredValue(entry)) && itemFields?.length ? (
                 <div className="space-y-3">
-                  {field.item.fields.map((sub) => {
+                  {itemFields.map((sub) => {
                     const record = (entry && typeof entry === 'object' && !Array.isArray(entry))
                       ? (entry as Record<string, unknown>)
                       : {};
@@ -2290,6 +2414,7 @@ function PropertyField({ field, value, onChange }: {
                       <PropertyField
                         key={sub.key}
                         field={sub}
+                        testIdPath={`${fieldTestId}-item-${index}`}
                         value={record[sub.key]}
                         onChange={(next) => {
                           const merged = { ...record };
@@ -2301,7 +2426,7 @@ function PropertyField({ field, value, onChange }: {
                     );
                   })}
                 </div>
-              ) : itemType === 'object' ? (
+              ) : itemType === 'object' || isStructuredValue(entry) ? (
                 <JsonValueEditor
                   value={entry}
                   onChange={(next) => replaceAt(index, next)}
@@ -2342,6 +2467,25 @@ function PropertyField({ field, value, onChange }: {
   }
 
   // text (default)
+  // A field the schema calls a string can still hold a structure, for the same reason
+  // list items can. Editing it as JSON keeps the value intact; a text box would not.
+  if (isStructuredValue(value)) {
+    return (
+      <div className="block" data-testid={fieldTestId}>
+        {labelEl}
+        <JsonValueEditor
+          value={value}
+          onChange={onChange}
+          testId={fieldTestId}
+          rows={4}
+        />
+        {field.description && (
+          <span className="text-[10px] mt-1 block" style={{ color: '#424654' }}>{field.description}</span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="block" data-testid={fieldTestId}>
       {labelEl}

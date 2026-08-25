@@ -46,6 +46,29 @@
   pointer-events: none;
 }
 
+/*
+ * A component must occupy its place on the canvas.
+ *
+ * Site renderers pin real chrome: the navigation is `fixed top-0 z-50` so it stays put as
+ * a visitor scrolls. `contain` above keeps that inside the component's own slot, but a
+ * fixed or sticky element is still out of flow, so its slot collapsed to zero height —
+ * the navigation fragment rendered a full 114px navbar that contributed no layout and was
+ * painted over by the chrome above it. The canvas looked empty while the render was fine.
+ *
+ * Inside the canvas the element is put back in flow. Stickiness is a viewing behaviour and
+ * has no meaning while authoring; occupying the right space does. The utility classes are
+ * the reliable hook because every site renderer is Tailwind-based, and `top`/`left` offsets
+ * are neutralised so a `top-0` pin does not shift the element once it is relative.
+ */
+.flexcms-canvas .fixed,
+.flexcms-canvas .sticky {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+}
+
 /* FlexCMS Admin — base styles using theme tokens */
 :root {
   --color-background: #ffffff;

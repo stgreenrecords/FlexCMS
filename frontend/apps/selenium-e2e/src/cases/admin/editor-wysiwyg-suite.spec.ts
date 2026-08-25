@@ -300,4 +300,186 @@ describe('Editor WYSIWYG canvas suite', function () {
     expect(await anchors[0].getAttribute('href'), 'the link lost its destination')
       .to.equal(anchorHref);
   });
+
+  it('S8 never offers a structured value as editable text', async () => {
+    const dr = driver as WebDriver;
+
+    // The seeded home page carries the case that exposed this: `product-grid.products`
+    // stores objects while the registry declares an array of strings. The editor trusted
+    // the declaration and put `[object Object]` in a text input, whose next keystroke
+    // would have replaced a whole product with that literal string.
+    //
+    // The invariant is asserted across every component on the page rather than that one
+    // field: any component whose data has drifted from its schema produces the same
+    // hazard, and there are 419 registered components.
+    await dr.get(`${env.adminUrl}/editor?path=${encodeURIComponent(`/${SITE_ID}/home`)}`);
+    await waitForPageReady(dr);
+    await dr.wait(
+      async () => (await dr.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'the editor rendered no components',
+    );
+
+    const wrappers = await dr.findElements(By.css('[data-testid^="editor-canvas-item-"]'));
+    expect(wrappers.length, 'no canvas components to inspect').to.be.greaterThan(0);
+
+    const offenders: string[] = [];
+    let inspected = 0;
+
+    for (const wrapper of wrappers) {
+      // Selection lives on the wrapper; the rendered content takes no pointer events.
+      await dr.executeScript('arguments[0].scrollIntoView({block: "center"});', wrapper);
+      try {
+        await wrapper.click();
+      } catch {
+        continue; // Unselectable components are S3's concern, not this one.
+      }
+      inspected += 1;
+
+      const found = (await dr.executeScript(
+        `const bad = [];
+         document.querySelectorAll('aside input, aside textarea').forEach((el) => {
+           if ((el.value || '').includes('[object Object]')) {
+             bad.push(el.getAttribute('data-testid') || 'unnamed input');
+           }
+         });
+         document.querySelectorAll('aside').forEach((panel) => {
+           if ((panel.innerText || '').includes('[object Object]')) bad.push('panel text');
+         });
+         return bad;`,
+      )) as string[];
+
+      const id = (await wrapper.getAttribute('data-testid')) ?? 'unknown';
+      for (const field of found) offenders.push(`${id}: ${field}`);
+    }
+
+    expect(inspected, 'no component could be selected, so nothing was checked')
+      .to.be.greaterThan(0);
+    expect(
+      offenders,
+      'a structured value is being edited as text, so saving would replace it with the '
+        + `string "[object Object]": ${offenders.slice(0, 5).join(' | ')}`,
+    ).to.deep.equal([]);
+  });
+
+  it('S9 edits a nested value inside a list of objects without flattening it', async () => {
+    const dr = driver as WebDriver;
+
+    await dr.get(`${env.adminUrl}/editor?path=${encodeURIComponent(`/${SITE_ID}/home`)}`);
+    await waitForPageReady(dr);
+    await dr.wait(
+      async () => (await dr.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'the editor rendered no components',
+    );
+
+    // Select the product grid, whose `products` is a list of objects.
+    const wrapper = await waitForVisible(
+      dr,
+      By.xpath(
+        '//*[@data-testid and starts-with(@data-testid, "editor-canvas-item-")]'
+          + '[.//*[contains(@data-canvas-resource-type, "product-grid")]]',
+      ),
+    );
+    await dr.executeScript('arguments[0].scrollIntoView({block: "center"});', wrapper);
+    await wrapper.click();
+
+    // The schema declares no item properties, so the fields are derived from the stored
+    // objects. Their presence is what proves the list is editable field by field rather
+    // than as one opaque blob.
+    const labels = (await dr.executeScript(
+      `return Array.from(document.querySelectorAll('aside label, aside span'))
+         .map((e) => (e.textContent || '').trim())
+         .filter((t) => t.length > 0 && t.length < 40);`,
+    )) as string[];
+
+    const upper = labels.map((l) => l.toUpperCase());
+    for (const expected of ['PRODUCT NAME', 'PRICE', 'IMAGE']) {
+      expect(
+        upper.some((l) => l === expected),
+        `the products list offers no "${expected}" field, so its objects are not editable`,
+      ).to.equal(true);
+    }
+
+    // A numeric member must be a number input, not text — proof the derived type follows
+    // the value rather than defaulting to a string.
+    const numberInputs = (await dr.executeScript(
+      `return document.querySelectorAll('aside input[type="number"]').length;`,
+    )) as number;
+    expect(numberInputs, 'no numeric field in the products list').to.be.greaterThan(0);
+
+    // A nested object inside a list item must also be fields, not JSON. `cta` is
+    // `{url, label}`, so both must appear as their own inputs.
+    for (const nested of ['URL', 'LABEL']) {
+      expect(
+        upper.some((l) => l === nested),
+        `the nested cta object offers no "${nested}" field, so it is still edited as a blob`,
+      ).to.equal(true);
+    }
+
+    // And the panel must not be presenting raw JSON for the author to hand-edit. JSON is
+    // the last resort for a value nothing can be derived from, not the normal editor.
+    const looksLikeJson = (await dr.executeScript(
+      `const asides = Array.from(document.querySelectorAll('aside'));
+       const panel = asides[asides.length - 1];
+       return /\{\s*"/.test(panel.innerText || '');`,
+    )) as boolean;
+    expect(
+      looksLikeJson,
+      'the properties panel is showing raw JSON where labelled fields could be derived',
+    ).to.equal(false);
+  });
+
+  it('S10 shows an experience fragment as itself, not as a page with locked slots', async () => {
+    const dr = driver as WebDriver;
+
+    await dr.get(
+      `${env.adminUrl}/editor?path=` +
+        encodeURIComponent('/content/experience-fragments/tut-usa/global/navigation/master'),
+    );
+    await waitForPageReady(dr);
+    await dr.wait(
+      async () => (await dr.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'the fragment never rendered a component',
+    );
+
+    // The fragment's own component must occupy space. The navigation renders
+    // `fixed top-0 z-50`, which is out of flow, so its slot collapsed to zero height: the
+    // navbar was rendering correctly and the canvas still looked empty.
+    const heights = (await dr.executeScript(
+      `return Array.from(document.querySelectorAll('[data-canvas-resource-type]'))
+         .map((el) => Math.round(el.getBoundingClientRect().height));`,
+    )) as number[];
+    expect(heights.length, 'no canvas component to measure').to.be.greaterThan(0);
+    expect(
+      Math.max(...heights),
+      'the fragment rendered nothing with height — a fixed component is escaping the flow again',
+    ).to.be.greaterThan(0);
+
+    // The locked navigation/footer slots describe what a page inherits. On a fragment they
+    // are meaningless, and the navigation one linked to the page being edited.
+    const lockedSlots = (await dr.executeScript(
+      `return Array.from(document.querySelectorAll('a'))
+         .filter((a) => (a.textContent || '').includes('Edit in Experience Fragments'))
+         .length;`,
+    )) as number;
+    expect(lockedSlots, 'a fragment is showing the locked slots that belong to a page')
+      .to.equal(0);
+
+    // And a page must still show them, so hiding them did not simply delete the feature.
+    await dr.get(`${env.adminUrl}/editor?path=${encodeURIComponent(`/${SITE_ID}/home`)}`);
+    await waitForPageReady(dr);
+    await dr.wait(
+      async () => (await dr.findElements(By.css('[data-canvas-resource-type]'))).length > 0,
+      45_000,
+      'the page never rendered its components',
+    );
+    const pageSlots = (await dr.executeScript(
+      `return Array.from(document.querySelectorAll('a'))
+         .filter((a) => (a.textContent || '').includes('Edit in Experience Fragments'))
+         .length;`,
+    )) as number;
+    expect(pageSlots, 'a page lost the locked navigation/footer slots').to.be.greaterThan(0);
+  });
 });
