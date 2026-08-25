@@ -80,6 +80,29 @@ export class ContentTreePage {
     );
   }
 
+  /**
+   * The child-count badge on a row, or null when the row shows none.
+   *
+   * A row without a badge is a leaf: the tree only renders the chevron and count for
+   * rows that have structural children, which is what tells an author the row opens.
+   */
+  async childCountForRow(name: string): Promise<number | null> {
+    const badges = await this.driver.findElements(
+      By.css(`[data-testid="content-row-child-count-${name}"]`),
+    );
+    if (badges.length === 0) return null;
+    const text = (await badges[0].getText()).trim();
+    return Number(text.replace(/[^0-9]/g, ''));
+  }
+
+  /** Whether the row carries the expandable chevron. */
+  async hasExpandableMarker(name: string): Promise<boolean> {
+    const marks = await this.driver.findElements(
+      By.css(`[data-testid="content-row-expandable-${name}"]`),
+    );
+    return marks.length > 0;
+  }
+
   async readBodyText(): Promise<string> {
     const body = await waitForVisible(this.driver, By.css('body'));
     return body.getText();

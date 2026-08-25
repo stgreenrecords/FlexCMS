@@ -169,6 +169,117 @@ describe('REB-18 content tree and page lifecycle suite @smoke', function () {
     const publishChildren = await authorApi.waitForPublishChild(publishParentPath, nodeName);
     expect(publishChildren.some((node) => normalizeName(node.name) === normalizeName(nodeName))).to.equal(true);
   });
+
+  it('descends into a page that has child pages, and lists pages rather than components', async () => {
+    if (!driver) throw new Error('driver was not initialized');
+
+    // `GET /children` returns a page's components next to its child pages. Find a page
+    // that genuinely has both, from the live tree rather than a hardcoded name.
+    const siteChildren = await authorApi.getChildren('content.tut-usa');
+    let parent: AuthorChildNode | null = null;
+    let childPageNames: string[] = [];
+    let componentNames: string[] = [];
+
+    for (const candidate of siteChildren) {
+      if (candidate.resourceType !== 'flexcms/page') continue;
+      const kids = await authorApi.getChildren(candidate.path);
+      const pages = kids.filter((k) => k.resourceType === 'flexcms/page');
+      if (pages.length > 0) {
+        parent = candidate;
+        childPageNames = pages.map((p) => p.name);
+        componentNames = kids
+          .filter((k) => !k.resourceType.startsWith('flexcms/'))
+          .map((k) => k.name);
+        break;
+      }
+    }
+
+    expect(parent, 'no page in the site has child pages, so this cannot be verified')
+      .to.not.equal(null);
+    const parentNode = parent as AuthorChildNode;
+
+    await contentTreePage.open();
+    await contentTreePage.clickRowByName('tut-usa');
+    await contentTreePage.waitForRowNames([parentNode.name]);
+
+    // Before opening it: the row must advertise that it can be opened, and say how many
+    // pages are under it. Navigation alone left an author guessing which rows go
+    // anywhere, since a page with six child pages looked identical to a leaf.
+    expect(
+      await contentTreePage.hasExpandableMarker(parentNode.name),
+      `"${parentNode.name}" has ${childPageNames.length} child pages but shows no expandable marker`,
+    ).to.equal(true);
+    expect(
+      await contentTreePage.childCountForRow(parentNode.name),
+      `the child count shown for "${parentNode.name}" disagrees with the API`,
+    ).to.equal(childPageNames.length);
+
+    // The regression: the tree refused to enter any `flexcms/page`, so every child page
+    // of `vehicles`, `innovation`, `owners` and `learn` was unreachable from here.
+    await contentTreePage.clickRowByName(parentNode.name);
+    await contentTreePage.waitForRowNames(childPageNames.slice(0, 1));
+
+    const rows = await contentTreePage.readVisibleRowNames();
+    const normalized = new Set(rows.map(normalizeName));
+    for (const name of childPageNames) {
+      expect(
+        normalized.has(normalizeName(name)),
+        `child page "${name}" is missing after opening "${parentNode.name}"`,
+      ).to.equal(true);
+    }
+
+    // Components live on the canvas, not in the tree. Listing them here would present
+    // page content as navigable pages.
+    for (const name of componentNames) {
+      expect(
+        normalized.has(normalizeName(name)),
+        `component "${name}" is being listed as a tree row`,
+      ).to.equal(false);
+    }
+  });
+
+  it('stays put when a page has no child pages, so it remains a leaf', async () => {
+    if (!driver) throw new Error('driver was not initialized');
+
+    const siteChildren = await authorApi.getChildren('content.tut-usa');
+    let leaf: AuthorChildNode | null = null;
+    for (const candidate of siteChildren) {
+      if (candidate.resourceType !== 'flexcms/page') continue;
+      const kids = await authorApi.getChildren(candidate.path);
+      if (!kids.some((k) => k.resourceType.startsWith('flexcms/'))) {
+        leaf = candidate;
+        break;
+      }
+    }
+
+    expect(leaf, 'every page has child pages, so leaf behaviour cannot be verified')
+      .to.not.equal(null);
+    const leafNode = leaf as AuthorChildNode;
+
+    await contentTreePage.open();
+    await contentTreePage.clickRowByName('tut-usa');
+    await contentTreePage.waitForRowNames([leafNode.name]);
+    const before = await contentTreePage.readVisibleRowNames();
+
+    // A leaf must not advertise an affordance it cannot honour.
+    expect(
+      await contentTreePage.hasExpandableMarker(leafNode.name),
+      `leaf "${leafNode.name}" shows an expandable marker but has no child pages`,
+    ).to.equal(false);
+    expect(
+      await contentTreePage.childCountForRow(leafNode.name),
+      `leaf "${leafNode.name}" shows a child count`,
+    ).to.equal(null);
+
+    await contentTreePage.clickRowByName(leafNode.name);
+
+    // The counterpart to the test above: opening a page must not become "navigate into
+    // an empty level". A leaf keeps the level it is on, which is also what leaves
+    // double-click free to open the page on publish.
+    const after = await contentTreePage.readVisibleRowNames();
+    expect(after.map(normalizeName).sort(), `clicking leaf "${leafNode.name}" changed the level`)
+      .to.deep.equal(before.map(normalizeName).sort());
+  });
 });
 
 async function findNavigableNode(authorApi: AuthorApiClient, nodes: AuthorChildNode[]): Promise<AuthorChildNode | null> {

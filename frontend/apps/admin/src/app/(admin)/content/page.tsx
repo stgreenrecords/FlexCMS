@@ -45,6 +45,20 @@ import { getApiBase } from '@/lib/apiBase';
 const API_BASE = getApiBase();
 const PUBLISH_BASE_URL = process.env.NEXT_PUBLIC_PUBLISH_URL ?? 'http://localhost:3001';
 
+/**
+ * Whether a node belongs in the content tree at all.
+ *
+ * `GET /children` returns a page's components alongside its child pages — a page like
+ * `vehicles` has six child pages and nine components under the same parent. Components
+ * are page content, edited on the canvas, and listing them here would present them as
+ * navigable pages. Platform structure uses the reserved `flexcms/` prefix
+ * (`page`, `site-root`, `container`, `xf-folder`, `xf-page`); components are registered
+ * per site as `<site>/<group>/<name>`, so the prefix is what separates them.
+ */
+function isStructuralNode(resourceType: string): boolean {
+  return resourceType.startsWith('flexcms/');
+}
+
 function apiToUiNode(n: ApiContentNode): ContentNode {
   const statusMap: Record<string, ContentStatus> = {
     PUBLISHED: 'live',
@@ -103,6 +117,8 @@ export default function ContentTreePage() {
 
   // Folder navigation state
   const [currentPath, setCurrentPath] = useState<string>('content');
+  /** Structural child count per child path, so rows can show whether they open. */
+  const [childCounts, setChildCounts] = useState<Record<string, number>>({});
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
     { name: 'Content', path: 'content' },
   ]);
@@ -161,13 +177,32 @@ export default function ContentTreePage() {
     setSelected(new Set());
     setActionMenuId(null);
 
+    // Counts come from their own endpoint so `/children` keeps returning the plain node
+    // list every other caller parses. One request per level, not per row.
+    async function loadChildCounts() {
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/author/content/children/counts?path=${encodeURIComponent(currentPath)}`,
+        );
+        if (!res.ok) return;
+        const counts = (await res.json()) as Record<string, number>;
+        if (!cancelled) setChildCounts(counts);
+      } catch {
+        // Without counts every row simply shows no chevron; navigation still works.
+      }
+    }
+
     async function loadNodes() {
       try {
         const response = await fetch(`${API_BASE}/api/author/content/children?path=${encodeURIComponent(currentPath)}`);
         if (response.ok) {
           const data = await response.json() as ApiContentNode[];
           if (!cancelled) {
-            setNodes(Array.isArray(data) ? data.map(apiToUiNode) : []);
+            setNodes(
+              Array.isArray(data)
+                ? data.filter((n) => isStructuralNode(n.resourceType)).map(apiToUiNode)
+                : [],
+            );
           }
           return;
         }
@@ -176,7 +211,9 @@ export default function ContentTreePage() {
       } catch {
         try {
           const { nodes: allNodes } = await fetchAllNodes();
-          const filtered = allNodes.filter((node) => node.parentPath === currentPath);
+          const filtered = allNodes.filter(
+            (node) => node.parentPath === currentPath && isStructuralNode(node.resourceType),
+          );
           if (!cancelled) {
             setNodes(filtered.map(apiToUiNode));
           }
@@ -192,12 +229,37 @@ export default function ContentTreePage() {
       }
     }
 
+    setChildCounts({});
     void loadNodes();
+    void loadChildCounts();
 
     return () => {
       cancelled = true;
     };
   }, [currentPath]);
+
+  /**
+   * Open a row.
+   *
+   * Any node that has structural children is a folder for navigation purposes, including
+   * a page: `vehicles`, `innovation`, `owners` and `learn` each hold several child pages,
+   * and the tree used to refuse to enter *any* `flexcms/page`, which left that whole
+   * layer of the site unreachable from here.
+   *
+   * A page's expandability is not in the listing — `GET /children` reports each row's
+   * own `children` as `[]` and carries no child count — so it is resolved with one
+   * request on the click itself. That is deliberate: asking per row up front would be a
+   * request per row on every level, for information only needed when a row is opened.
+   */
+  function openNode(node: ContentNode) {
+    if (isStructuralNode(node.resourceType) && node.resourceType !== 'flexcms/page') {
+      navigateTo(node);
+      return;
+    }
+    // Resolved from the level's counts rather than a request per click. A leaf page stays
+    // put, which is what leaves double-click free to open it on publish.
+    if ((childCounts[node.ltreePath] ?? 0) > 0) navigateTo(node);
+  }
 
   // Navigate into a folder
   function navigateTo(node: ContentNode) {
@@ -471,7 +533,8 @@ export default function ContentTreePage() {
                     node={node}
                     isSelected={selected.has(node.id)}
                     onSelect={() => toggleSelect(node.id)}
-                    onNavigate={() => navigateTo(node)}
+                    childCount={childCounts[node.ltreePath] ?? 0}
+                    onNavigate={() => openNode(node)}
                     onOpenPublish={() => openOnPublish(node)}
                     showActionMenu={actionMenuId === node.id}
                     onActionMenu={(id) => setActionMenuId(id)}
@@ -615,6 +678,7 @@ export default function ContentTreePage() {
 function ContentRow({
   node,
   isSelected,
+  childCount,
   onSelect,
   onNavigate,
   onOpenPublish,
@@ -623,6 +687,8 @@ function ContentRow({
 }: {
   node: ContentNode;
   isSelected: boolean;
+  /** Structural children under this row; 0 means it cannot be opened. */
+  childCount: number;
   onSelect: () => void;
   onNavigate: () => void;
   onOpenPublish: () => void;
@@ -631,10 +697,10 @@ function ContentRow({
 }) {
   const status = STATUS_CONFIG[node.status];
 
+  const canOpen = childCount > 0;
+
   function handleClick() {
-    if (node.resourceType !== 'flexcms/page') {
-      onNavigate();
-    }
+    onNavigate();
   }
 
   function handleDoubleClick() {
@@ -647,11 +713,18 @@ function ContentRow({
       style={{
         background: isSelected ? 'rgba(176,198,255,0.06)' : 'transparent',
         borderBottom: '1px solid rgba(66,70,84,0.08)',
-        cursor: 'pointer',
+        // Only rows that go somewhere claim to be clickable.
+        cursor: canOpen ? 'pointer' : 'default',
       }}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
-      title={node.resourceType === 'flexcms/page' ? 'Double-click to open on publish' : undefined}
+      title={
+        canOpen
+          ? `Open — ${childCount} child ${childCount === 1 ? 'page' : 'pages'}`
+          : node.resourceType === 'flexcms/page'
+            ? 'Double-click to open on publish'
+            : undefined
+      }
       onMouseEnter={(e) => {
         if (!isSelected) (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.02)';
       }}
@@ -674,6 +747,24 @@ function ContentRow({
       {/* Name */}
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
+          {/*
+            Whether a row opens is not something an author could previously tell without
+            clicking it — a page with six child pages looked exactly like a leaf. The
+            chevron marks the rows that open and the count says how many are under them;
+            leaves get a same-width spacer so every name still lines up.
+          */}
+          {canOpen ? (
+            <span
+              aria-hidden="true"
+              data-testid={`content-row-expandable-${node.name}`}
+              style={{ color: '#b0c6ff', width: 10, flexShrink: 0, fontSize: '0.7rem' }}
+            >
+              ▶
+            </span>
+          ) : (
+            <span aria-hidden="true" style={{ width: 10, flexShrink: 0 }} />
+          )}
+
           <MaterialIcon
             name={node.icon}
             color={node.status === 'error' ? '#ffb4ab' : node.status === 'live' ? '#b0c6ff' : '#8d90a0'}
@@ -681,6 +772,16 @@ function ContentRow({
           <span className="text-sm font-semibold" style={{ color: '#e5e2e1' }}>
             {node.name}
           </span>
+
+          {canOpen && (
+            <span
+              className="text-[0.65rem] font-bold py-0.5 px-2 rounded-full"
+              data-testid={`content-row-child-count-${node.name}`}
+              style={{ background: 'rgba(176,198,255,0.12)', color: '#b0c6ff' }}
+            >
+              {childCount}
+            </span>
+          )}
         </div>
       </td>
 

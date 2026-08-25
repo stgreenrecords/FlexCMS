@@ -35,6 +35,8 @@ interface ComponentDef {
   version: string;
   hasDialog: boolean;
   hasPolicies: boolean;
+  /** The registry's data schema for this component, shown by View Schema. */
+  dataSchema: unknown;
 }
 
 type ViewMode = 'table' | 'grid';
@@ -105,9 +107,16 @@ function apiToComponentDef(c: Record<string, unknown>): ComponentDef {
     version: '—',
     hasDialog: !!(c.dialog),
     hasPolicies: false,
+    dataSchema: c.dataSchema ?? null,
   };
 }
 
+
+interface UsageRow {
+  path: string;
+  siteId: string | null;
+  status: string | null;
+}
 
 const PAGE_SIZE = 12;
 
@@ -374,17 +383,55 @@ function ComponentRegistryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
 
+  const [schemaFor, setSchemaFor] = useState<ComponentDef | null>(null);
+  const [usagesFor, setUsagesFor] = useState<ComponentDef | null>(null);
+  const [usageRows, setUsageRows] = useState<UsageRow[] | null>(null);
+  const [usageError, setUsageError] = useState<string | null>(null);
+
   useEffect(() => {
     setIsLoading(true);
     fetch(`${API_BASE}/api/content/v1/component-registry`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then((data) => {
+      .then(async (data) => {
         const items = ((data.components ?? []) as Record<string, unknown>[]).map(apiToComponentDef);
+
+        // The usage column read a hardcoded zero for every component. Counts come from
+        // one grouped query, not a request per component.
+        try {
+          const res = await fetch(`${API_BASE}/api/content/v1/component-registry/usage`);
+          if (res.ok) {
+            const usage = ((await res.json()).usage ?? {}) as Record<string, number>;
+            for (const item of items) {
+              item.usageCount = usage[item.resourceType] ?? 0;
+            }
+          }
+        } catch {
+          // A missing usage count must not cost the author the whole component list.
+        }
+
         setComponents(items);
       })
       .catch(() => setComponents([]))
       .finally(() => setIsLoading(false));
   }, []);
+
+  async function openUsages(comp: ComponentDef) {
+    setUsagesFor(comp);
+    setUsageRows(null);
+    setUsageError(null);
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/content/v1/component-registry/usages?resourceType=${encodeURIComponent(comp.resourceType)}`,
+      );
+      if (!res.ok) {
+        setUsageError(`Could not read usages (HTTP ${res.status}).`);
+        return;
+      }
+      setUsageRows(((await res.json()).usages ?? []) as UsageRow[]);
+    } catch {
+      setUsageError('Could not read usages - the server could not be reached.');
+    }
+  }
 
   const filteredComponents = useMemo(() => {
     return components.filter((c) => {
@@ -710,20 +757,42 @@ function ComponentRegistryPage() {
                                   className="absolute right-0 top-full mt-1 rounded-xl py-1 z-50 min-w-[160px] shadow-2xl"
                                   style={{ background: '#2a2a2a', border: '1px solid #42465433' }}
                                 >
+                                  {/*
+                                    All five items used to share one handler that closed
+                                    the menu and did nothing else. The registry API is
+                                    read-only - it serves the list and one component's
+                                    contract, and has no write endpoints because
+                                    definitions come from migrations - so the three that
+                                    would need to write are disabled and say why, rather
+                                    than looking available and doing nothing.
+                                  */}
                                   {[
-                                    { label: 'Edit Dialog', icon: '✏' },
-                                    { label: 'View Schema', icon: '{ }' },
-                                    { label: 'View Usages', icon: '◈' },
-                                    { label: 'Clone', icon: '⊕' },
-                                    { label: 'Deprecate', icon: '⚠', danger: true },
-                                  ].map(({ label, icon, danger }) => (
+                                    { label: 'Edit Dialog', icon: '✏',
+                                      testId: 'component-action-edit-dialog',
+                                      title: 'Component dialogs are defined in migrations; the registry API is read-only' },
+                                    { label: 'View Schema', icon: '{ }',
+                                      testId: 'component-action-view-schema',
+                                      run: () => setSchemaFor(comp) },
+                                    { label: 'View Usages', icon: '◈',
+                                      testId: 'component-action-view-usages',
+                                      run: () => void openUsages(comp) },
+                                    { label: 'Clone', icon: '⊕',
+                                      testId: 'component-action-clone',
+                                      title: 'Cloning needs a registry write endpoint, which does not exist' },
+                                    { label: 'Deprecate', icon: '⚠', danger: true,
+                                      testId: 'component-action-deprecate',
+                                      title: 'Deprecating needs a registry write endpoint, which does not exist' },
+                                  ].map(({ label, icon, danger, run, testId, title }) => (
                                     <button
                                       key={label}
-                                      className="flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors text-left"
+                                      data-testid={testId}
+                                      disabled={!run}
+                                      title={title}
+                                      className="flex items-center gap-3 w-full px-4 py-2 text-sm transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed"
                                       style={{ color: danger ? '#ef4444' : '#c3c6d6' }}
-                                      onMouseEnter={(e) => { e.currentTarget.style.background = '#353534'; }}
+                                      onMouseEnter={(e) => { if (run) e.currentTarget.style.background = '#353534'; }}
                                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                                      onClick={() => setOpenActionMenu(null)}
+                                      onClick={() => { setOpenActionMenu(null); run?.(); }}
                                     >
                                       <span className="font-mono text-xs w-5">{icon}</span>
                                       {label}
@@ -907,6 +976,116 @@ function ComponentRegistryPage() {
           aria-hidden="true"
         />
       )}
+
+      {/*
+        View Schema. The registry contract already carries `dataSchema`, so this needs no
+        request — the page fetched it with the component list.
+      */}
+      {schemaFor && (
+        <Overlay onClose={() => setSchemaFor(null)} testId="component-schema-dialog">
+          <h2 className="text-lg font-bold mb-1" style={{ color: '#e5e2e1' }}>
+            {schemaFor.title}
+          </h2>
+          <p className="font-mono text-xs mb-4" style={{ color: '#8d90a0' }}>
+            {schemaFor.resourceType}
+          </p>
+          <pre
+            className="text-xs overflow-auto rounded-lg p-4 max-h-[55vh]"
+            style={{ background: '#1c1c1c', color: '#c3c6d6' }}
+            data-testid="component-schema-body"
+          >
+            {JSON.stringify(schemaFor.dataSchema ?? {}, null, 2)}
+          </pre>
+        </Overlay>
+      )}
+
+      {/* View Usages — where this component actually appears in content. */}
+      {usagesFor && (
+        <Overlay onClose={() => { setUsagesFor(null); setUsageRows(null); setUsageError(null); }}
+                 testId="component-usages-dialog">
+          <h2 className="text-lg font-bold mb-1" style={{ color: '#e5e2e1' }}>
+            Usages of {usagesFor.title}
+          </h2>
+          <p className="font-mono text-xs mb-4" style={{ color: '#8d90a0' }}>
+            {usagesFor.resourceType}
+          </p>
+
+          {usageError && (
+            <p className="text-sm" style={{ color: '#ef4444' }} data-testid="component-usages-error">
+              {usageError}
+            </p>
+          )}
+
+          {!usageError && usageRows === null && (
+            <p className="text-sm" style={{ color: '#8d90a0' }}>Loading…</p>
+          )}
+
+          {!usageError && usageRows !== null && usageRows.length === 0 && (
+            <p className="text-sm" style={{ color: '#8d90a0' }} data-testid="component-usages-empty">
+              This component is not used on any page yet.
+            </p>
+          )}
+
+          {!usageError && usageRows !== null && usageRows.length > 0 && (
+            <ul className="text-xs overflow-auto max-h-[55vh] space-y-1" data-testid="component-usages-list">
+              {usageRows.map((u) => (
+                <li key={u.path} className="font-mono px-3 py-2 rounded"
+                    style={{ background: '#1c1c1c', color: '#c3c6d6' }}>
+                  {u.path}
+                  {u.status ? <span style={{ color: '#8d90a0' }}> · {u.status}</span> : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </Overlay>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Modal shell for the two read-only component dialogs.
+ *
+ * Local to this page rather than reaching for the UI kit's Dialog: the surrounding page
+ * styles itself with inline colours rather than theme tokens, and a token-driven dialog
+ * would not match it.
+ */
+function Overlay({
+  children,
+  onClose,
+  testId,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+  testId: string;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="rounded-2xl p-6 w-full max-w-2xl"
+        style={{ background: '#2a2a2a', border: '1px solid #42465433' }}
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        data-testid={testId}
+      >
+        {children}
+        <div className="mt-5 flex justify-end">
+          <button
+            className="px-4 py-2 rounded-lg text-sm"
+            style={{ background: '#353534', color: '#e5e2e1' }}
+            onClick={onClose}
+            data-testid={`${testId}-close`}
+          >
+            Close
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

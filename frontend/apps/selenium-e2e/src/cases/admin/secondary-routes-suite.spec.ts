@@ -412,4 +412,95 @@ describe('REB-24 secondary admin routes suite', function () {
       outcome: 'PASS',
     });
   });
+
+  it('S9 component row actions do real work, and the unsupported ones are disabled', async () => {
+    // Pick a component the API says is genuinely in use, so both the count and the
+    // usages list have something to prove.
+    const usageRes = await fetch(`${env.authorApiUrl}/content/v1/component-registry/usage`);
+    expect(usageRes.status, 'the usage endpoint is missing').to.equal(200);
+    const usage = ((await usageRes.json()) as { usage: Record<string, number> }).usage;
+
+    const used = Object.entries(usage)
+      .filter(([, count]) => count > 0)
+      .sort((a, b) => b[1] - a[1])[0];
+    expect(used, 'no component is used by any content node').to.not.equal(undefined);
+    const [resourceType, expectedCount] = used;
+
+    const registryRes = await fetch(`${env.authorApiUrl}/content/v1/component-registry`);
+    const registry = (await registryRes.json()) as {
+      components: Array<{ resourceType: string; title: string }>;
+    };
+    const target = registry.components.find((c) => c.resourceType === resourceType);
+    expect(target, `${resourceType} has usages but is not in the registry`).to.not.equal(undefined);
+    const title = (target as { title: string }).title;
+
+    const d = await open('/components');
+    await waitForVisible(d, By.css('[data-testid="components-heading"]'));
+
+    const search = await waitForVisible(d, By.css('[data-testid="components-search"]'));
+    await search.click();
+    await search.sendKeys(title);
+    await waitForPageReady(d);
+
+    // The usage column was a hardcoded zero for every component; it must now agree with
+    // the API.
+    const shownCount = await d.executeScript<string | null>(
+      `const rows = Array.from(document.querySelectorAll('tbody tr'));
+       const row = rows.find((r) => (r.textContent || '').includes(${JSON.stringify(resourceType)}));
+       if (!row) return null;
+       const cells = row.querySelectorAll('td');
+       return cells.length > 4 ? cells[4].textContent.trim() : null;`,
+    );
+    expect(shownCount, `no row found for ${resourceType}`).to.not.equal(null);
+    expect(
+      Number((shownCount ?? '').replace(/[^0-9]/g, '')),
+      `the usage column shows ${shownCount} but the API counts ${expectedCount}`,
+    ).to.equal(expectedCount);
+
+    const openMenu = async (): Promise<void> => {
+      const trigger = await waitForVisible(d, By.css('button[aria-label^="Actions for"]'));
+      await d.executeScript('arguments[0].scrollIntoView({block: "center"});', trigger);
+      await trigger.click();
+      await waitForVisible(d, By.css('[data-testid="component-action-view-schema"]'));
+    };
+
+    await openMenu();
+
+    // The three that would need to write to the registry have no endpoint behind them,
+    // so they must be disabled rather than silently inert.
+    for (const id of ['component-action-edit-dialog', 'component-action-clone', 'component-action-deprecate']) {
+      const el = await d.findElement(By.css(`[data-testid="${id}"]`));
+      expect(
+        await el.getAttribute('disabled'),
+        `${id} is enabled but there is no registry write endpoint for it`,
+      ).to.not.equal(null);
+    }
+
+    // View Schema renders the contract the registry already published.
+    await (await d.findElement(By.css('[data-testid="component-action-view-schema"]'))).click();
+    const schemaBody = await waitForVisible(d, By.css('[data-testid="component-schema-body"]'));
+    const schemaText = await schemaBody.getText();
+    expect(schemaText.length, 'the schema dialog is empty').to.be.greaterThan(2);
+    await (await d.findElement(By.css('[data-testid="component-schema-dialog-close"]'))).click();
+
+    // View Usages lists where the component actually appears.
+    await openMenu();
+    await (await d.findElement(By.css('[data-testid="component-action-view-usages"]'))).click();
+    const list = await waitForVisible(d, By.css('[data-testid="component-usages-list"]'));
+    const items = await list.findElements(By.css('li'));
+    expect(
+      items.length,
+      `usages list shows ${items.length} entries but the API counts ${expectedCount}`,
+    ).to.equal(expectedCount);
+
+    record({
+      scenarioId: 'S9',
+      scenario: 'component row actions do real work, and the unsupported ones are disabled',
+      operation: 'component:row-actions',
+      target: '/components',
+      api: `usage endpoint reports ${expectedCount} for ${resourceType}`,
+      ui: 'schema dialog renders; usages list matches the API; edit/clone/deprecate disabled',
+      outcome: 'PASS',
+    });
+  });
 });

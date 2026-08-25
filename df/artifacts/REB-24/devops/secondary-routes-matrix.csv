@@ -7,3 +7,4 @@ S5,records that the registry offers no route into the page editor,components:aut
 S6,follows the dashboard link to its route,dashboard:links,/content,,"1 distinct in-body link(s), each resolving to a rendering route",,PASS,
 S7,shows an empty state when a filter matches nothing,components:empty-state,"search ""zzz-no-such-component-zzz""",,the route acknowledges the empty result rather than rendering an empty list silently,,PASS,
 S8,"gives the secondary routes landmarks, headings and a keyboard path",admin:a11y-smoke,"/sites, /components, /translations, /dashboard",,"each route: one <main>, a <nav>, exactly one <h1>, and tab reaches a control",,PASS,
+S9,"component row actions do real work, and the unsupported ones are disabled",component:row-actions,/components,usage endpoint reports 64 for tut-usa/layout-page-structure/page-metadata,schema dialog renders; usages list matches the API; edit/clone/deprecate disabled,,PASS,

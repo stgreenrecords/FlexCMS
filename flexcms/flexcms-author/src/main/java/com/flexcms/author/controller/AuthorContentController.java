@@ -100,6 +100,21 @@ public class AuthorContentController {
         return ResponseEntity.ok(nodeService.getChildren(path));
     }
 
+    /**
+     * How many structural children each direct child of {@code path} has.
+     *
+     * <p>Lets the content tree show which rows can be opened. Returned as a separate
+     * endpoint rather than folded into {@code /children} so that response stays the
+     * plain node list every existing caller already parses.</p>
+     */
+    @Operation(summary = "Get child counts", description = "Structural child counts for the direct children of a path. Used by the admin Content Tree to mark expandable rows.")
+    @GetMapping("/children/counts")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")
+    public ResponseEntity<Map<String, Long>> getChildCounts(
+            @RequestParam(defaultValue = "content") String path) {
+        return ResponseEntity.ok(nodeService.getStructuralChildCounts(path));
+    }
+
     @Operation(summary = "Get page with component tree", description = "Returns a page node with its full nested component tree.")
     @GetMapping("/page")
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR','CONTENT_REVIEWER','CONTENT_PUBLISHER')")

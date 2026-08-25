@@ -325,7 +325,10 @@ describe('DAM folder tree suite', function () {
     // Copy URL reports what it did. Clipboard access can be refused in a headless
     // browser, in which case the page shows the URL instead — either way it must speak.
     await dam.clickMenuItem('dam-asset-copy-url');
-    const notice = await dam.actionNoticeText();
+    // The notice is set after an awaited clipboard write, so it has to be waited for.
+    // Reading it straight after the click passed on an idle machine and lost the race
+    // under the load of the full gate.
+    const notice = await dam.waitForActionNotice(/copied|clipboard/i);
     expect(notice, 'Copy URL produced no feedback at all').to.not.equal(null);
     expect(notice ?? '', 'the notice mentions neither the asset nor its URL')
       .to.satisfy((t: string) => t.includes(filename) || t.includes(asset.id));

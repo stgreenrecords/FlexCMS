@@ -191,6 +191,20 @@ class LiveCopyServiceTest {
     }
 
     @Test
+    void rollout_missingBlueprint_throwsInsteadOfReportingZeroUpdates() {
+        when(nodeRepository.findByPath("content.corporate.en.nope")).thenReturn(Optional.empty());
+
+        // Previously this answered `updatedNodes: 0` with no errors and HTTP 200, which is
+        // exactly what a real blueprint with no live copies returns — so a typo'd or
+        // deleted blueprint path was reported to the caller as a successful rollout.
+        assertThatThrownBy(() -> liveCopyService.rollout("content.corporate.en.nope", "admin"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("content.corporate.en.nope");
+
+        verify(nodeRepository, never()).save(any(ContentNode.class));
+    }
+
+    @Test
     void rollout_respectsExcludedProps() {
         LiveCopyRelationship rel = new LiveCopyRelationship(
                 "content.corporate.en.about", "content.regional.en.about", true, "admin");
@@ -215,6 +229,12 @@ class LiveCopyServiceTest {
 
     @Test
     void rollout_noRelationships_returnsZeroUpdated() {
+        // The blueprint has to exist for this to be the "nothing inherits from it" case.
+        // This test used to leave `findByPath` unstubbed, so it actually described a
+        // *missing* blueprint returning zero updates and no errors — the very behaviour
+        // that made a typo'd path look like a successful rollout. Stubbing the source
+        // splits the two cases apart; the missing one is covered above.
+        when(nodeRepository.findByPath("content.corporate.en.about")).thenReturn(Optional.of(sourceRoot));
         when(liveCopyRepo.findBySourcePathOrPrefix(anyString(), anyString())).thenReturn(List.of());
 
         LiveCopyService.RolloutResult result = liveCopyService.rollout("content.corporate.en.about", "admin");

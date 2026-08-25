@@ -9,6 +9,8 @@ import com.flexcms.core.model.BulkOperationResult;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.ContentNodeVersion;
 import com.flexcms.core.model.NodeStatus;
+import com.flexcms.core.repository.ComponentUsageCount;
+import com.flexcms.core.repository.StructuralChildCount;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ContentNodeVersionRepository;
 import com.flexcms.core.util.RichTextSanitizer;
@@ -57,6 +59,44 @@ public class ContentNodeService {
     @PreAuthorize("hasPermission(#path, 'READ')")
     public Optional<ContentNode> getByPath(String path) {
         return nodeRepository.findByPath(path);
+    }
+
+    /**
+     * Usage counts for every component resource type, keyed by resource type.
+     *
+     * <p>Backs the admin component list's "uses" column, which previously displayed a
+     * hardcoded zero for all 419 registered components.</p>
+     */
+    public Map<String, Long> getComponentUsageCounts() {
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (ComponentUsageCount row : nodeRepository.countUsagesByResourceType()) {
+            counts.put(row.resourceType(), row.usageCount());
+        }
+        return counts;
+    }
+
+    /**
+     * Structural child counts for the direct children of {@code parentPath}.
+     *
+     * <p>Keyed by child path, so the content tree can mark each row it is about to
+     * display as expandable or not. Grandchildren are filtered out here rather than in
+     * SQL: the query matches the whole subtree under the prefix, and comparing segment
+     * depth is clearer than expressing "exactly one level deeper" in JPQL.</p>
+     */
+    public Map<String, Long> getStructuralChildCounts(String parentPath) {
+        int childDepth = parentPath.split("\\.").length + 1;
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (StructuralChildCount row : nodeRepository.countStructuralChildrenUnder(parentPath)) {
+            if (row.parentPath().split("\\.").length == childDepth) {
+                counts.put(row.parentPath(), row.childCount());
+            }
+        }
+        return counts;
+    }
+
+    /** Content nodes of one component resource type — where that component is used. */
+    public List<ContentNode> getComponentUsages(String resourceType) {
+        return nodeRepository.findByResourceType(resourceType);
     }
 
     /**

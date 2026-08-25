@@ -322,6 +322,23 @@ describe('REB-25 harness hardening suite', function () {
       await d.get(`${env.adminUrl}${route}`);
       await waitForPageReady(d);
 
+      // `waitForPageReady` only waits for `document.readyState`, which a client-rendered
+      // route reaches before React has committed anything. These pages render their
+      // heading on the client, so the smoke could inspect an empty shell and report a
+      // missing `h1` that the page does have — `/components` started doing exactly that
+      // once it grew a second fetch for 419 components' usage counts.
+      //
+      // The wait is bounded and its failure is swallowed on purpose: if a route really
+      // has no `h1`, this times out and the smoke below still reports it.
+      try {
+        await d.wait(
+          async () => (await d.findElements(By.css('h1'))).length > 0,
+          15_000,
+        );
+      } catch {
+        // Fall through to the smoke, which is what turns this into a finding.
+      }
+
       const routeFindings = await accessibilitySmoke(d);
       perRoute.push({ route, findings: routeFindings.map((f) => `${f.check}: ${f.detail}`) });
     }

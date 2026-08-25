@@ -122,12 +122,26 @@ public class LiveCopyService {
      * {@code sourcePath}, the blueprint's current properties are merged into the live copy,
      * respecting each relationship's {@code excludedProps} list.</p>
      *
+     * <p>A source path with no live copies is a successful rollout of zero nodes. A source
+     * path that does not exist is a {@link NotFoundException} — the two used to be
+     * reported identically.</p>
+     *
      * @param sourcePath the blueprint root path to roll out from
      * @param userId     actor performing the rollout
      * @return a summary of how many nodes were updated
+     * @throws NotFoundException if {@code sourcePath} names no content node
      */
     @Transactional
     public RolloutResult rollout(String sourcePath, String userId) {
+        // A blueprint that does not exist is a caller error, not a rollout that happened
+        // to change nothing. Without this check both cases answered 200 with
+        // `updatedNodes: 0`, so a typo'd or deleted blueprint path was indistinguishable
+        // from a real blueprint with no live copies, and the caller was told it worked.
+        // Same failure shape as the bulk delete that counted missing paths as succeeded.
+        if (nodeRepository.findByPath(sourcePath).isEmpty()) {
+            throw new NotFoundException("Blueprint not found: " + sourcePath);
+        }
+
         String sourcePrefix = sourcePath + ".";
         List<LiveCopyRelationship> relationships =
                 liveCopyRepo.findBySourcePathOrPrefix(sourcePath, sourcePrefix + "%");

@@ -2,6 +2,7 @@ package com.flexcms.headless.controller;
 
 import com.flexcms.core.model.ComponentDefinition;
 import com.flexcms.core.service.ComponentRegistry;
+import com.flexcms.core.service.ContentNodeService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ public class ComponentRegistryController {
     @Autowired
     private ComponentRegistry componentRegistry;
 
+    @Autowired
+    private ContentNodeService nodeService;
+
     @Operation(summary = "Get full component registry", description = "Returns all registered component types with their data schemas — the primary backend/frontend contract.")
     @GetMapping
     public ResponseEntity<Map<String, Object>> getRegistry() {
@@ -38,6 +42,43 @@ public class ComponentRegistryController {
         response.put("version", "1.0.0");
         response.put("generatedAt", Instant.now().toString());
 
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Component usage counts",
+            description = "Number of content nodes per component resource type. Backs the admin component list's usage column.")
+    @GetMapping("/usage")
+    public ResponseEntity<Map<String, Object>> getUsageCounts() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("usage", nodeService.getComponentUsageCounts());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Where one component is used.
+     *
+     * <p>The resource type is a query parameter rather than a path variable because it
+     * contains slashes ({@code tut-usa/navigation-search-discovery/currency-selector}),
+     * which a path variable would split.</p>
+     */
+    @Operation(summary = "Component usages",
+            description = "Content nodes that use a component, so an author can see where it appears.")
+    @GetMapping("/usages")
+    public ResponseEntity<Map<String, Object>> getUsages(@RequestParam String resourceType) {
+        List<Map<String, Object>> usages = nodeService.getComponentUsages(resourceType).stream()
+                .map(node -> {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("path", node.getPath());
+                    row.put("siteId", node.getSiteId());
+                    row.put("status", node.getStatus() == null ? null : node.getStatus().name());
+                    return row;
+                })
+                .toList();
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("resourceType", resourceType);
+        response.put("count", usages.size());
+        response.put("usages", usages);
         return ResponseEntity.ok(response);
     }
 

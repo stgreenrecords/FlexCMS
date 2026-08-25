@@ -891,21 +891,9 @@ describe('REB-22 reusable content suite (experience fragments and live copies)',
     expect(malformed.body.detail ?? '', 'the error should name the offending field')
       .to.contain('excludedProps');
 
-    // Rolling out a source that does not exist reports success with nothing updated.
-    // Truthful for the copies it found, but it cannot distinguish "no live copies" from
-    // "you named a path that isn't there", so a typo looks like a no-op.
-    const unknownRollout = await call<{ updatedNodes: number }>(
-      'POST',
-      `${api}/livecopy/rollout?sourcePath=${encodeURIComponent(`content.${SITE_ID}.${runId}-nope`)}` +
-        '&userId=admin',
-    );
-    expect(unknownRollout.status).to.equal(200);
-    expect(unknownRollout.body.updatedNodes).to.equal(0);
-    observations.push(
-      'Rollout for a source path that does not exist answers HTTP 200 with updatedNodes=0 ' +
-        'rather than 404, so a mistyped blueprint path is indistinguishable from a blueprint ' +
-        'with no live copies.',
-    );
+    // Rolling out a source that does not exist used to answer 200 with `updatedNodes: 0`,
+    // and this scenario asserted that while recording it as a known defect. It is a 404
+    // now, and `S16` covers it — asserting it twice would just be duplication.
 
     record({
       scenarioId: 'S10',
@@ -914,7 +902,40 @@ describe('REB-22 reusable content suite (experience fragments and live copies)',
       target: 'invalid source / duplicate target / malformed body',
       api: 'missing source 404, duplicate target 409, unreadable body 400 — each naming the cause',
       outcome: 'PASS',
-      notes: 'rollout of an unknown source still answers 200 with updatedNodes=0 (documented)',
+      notes: 'rollout of an unknown source is covered by S16, which asserts its 404',
+    });
+  });
+
+  it('S16 refuses to roll out a blueprint that does not exist', async () => {
+    // `rollout` used to answer 200 with `updatedNodes: 0` and no errors for a source path
+    // that named nothing — identical to the response for a real blueprint that simply has
+    // no live copies (S8's counterpart). A typo'd or deleted blueprint therefore reported
+    // a successful rollout. Same failure shape as the bulk delete that counted missing
+    // paths as succeeded.
+    const missing = `${blueprint.page}-does-not-exist-${Date.now()}`;
+
+    const rollout = await call<{ updatedNodes?: number }>(
+      'POST',
+      `${api}/livecopy/rollout?sourcePath=${encodeURIComponent(missing)}&userId=admin`,
+    );
+
+    expect(
+      rollout.status,
+      `rolling out a nonexistent blueprint answered ${rollout.status} instead of 404`,
+    ).to.equal(404);
+    expect(
+      rollout.body.updatedNodes,
+      'a rejected rollout must not report an update count',
+    ).to.equal(undefined);
+
+    record({
+      scenarioId: 'S16',
+      scenario: 'refuses to roll out a blueprint that does not exist',
+      operation: 'livecopy:rollout',
+      target: missing,
+      api: `POST /livecopy/rollout -> ${rollout.status}`,
+      outcome: 'PASS',
+      notes: 'nonexistent blueprint is rejected rather than reported as zero updates',
     });
   });
 });

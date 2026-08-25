@@ -71,6 +71,37 @@ public interface ContentNodeRepository extends JpaRepository<ContentNode, UUID> 
     List<ContentNode> findByResourceType(String resourceType);
 
     /**
+     * Count content nodes per component resource type, in one query.
+     *
+     * <p>Structural nodes are excluded: everything under the reserved {@code flexcms/}
+     * prefix is a page, container or fragment rather than a registered component, and
+     * counting them as component usage would be meaningless.</p>
+     */
+    @Query("""
+            SELECT new com.flexcms.core.repository.ComponentUsageCount(n.resourceType, COUNT(n))
+            FROM ContentNode n
+            WHERE n.resourceType NOT LIKE 'flexcms/%'
+            GROUP BY n.resourceType
+            """)
+    List<ComponentUsageCount> countUsagesByResourceType();
+
+    /**
+     * Count structural children for every descendant-parent under {@code pathPrefix}.
+     *
+     * <p>Only {@code flexcms/} nodes are counted: a page's components share its path and
+     * are edited on the canvas, so counting them would mark every page as expandable.
+     * The caller narrows the result to the direct children it is displaying.</p>
+     */
+    @Query("""
+            SELECT new com.flexcms.core.repository.StructuralChildCount(n.parentPath, COUNT(n))
+            FROM ContentNode n
+            WHERE n.parentPath LIKE CONCAT(:pathPrefix, '.%')
+              AND n.resourceType LIKE 'flexcms/%'
+            GROUP BY n.parentPath
+            """)
+    List<StructuralChildCount> countStructuralChildrenUnder(@Param("pathPrefix") String pathPrefix);
+
+    /**
      * Find all nodes for a site, paginated (no status filter).
      * When locale is provided, also filters by locale.
      */
