@@ -9,7 +9,9 @@
       "height": 1200,
       "status": "ACTIVE",
       "createdAt": "2026-03-28T10:00:00Z",
-      "updatedAt": "2026-03-28T10:00:00Z"
+      "updatedAt": "2026-03-28T10:00:00Z",
+      "folderPath": "content/dam/tut-usa/heroes",
+      "path": "content/dam/tut-usa/heroes/hero-banner.jpg"
     },
     {
       "id": "asset-002",
@@ -20,7 +22,9 @@
       "height": 1080,
       "status": "ACTIVE",
       "createdAt": "2026-03-27T14:30:00Z",
-      "updatedAt": "2026-03-27T14:30:00Z"
+      "updatedAt": "2026-03-27T14:30:00Z",
+      "folderPath": "content/dam/tut-usa/video",
+      "path": "content/dam/tut-usa/video/product-launch.mp4"
     },
     {
       "id": "asset-003",
@@ -29,7 +33,9 @@
       "fileSize": 1048576,
       "status": "ACTIVE",
       "createdAt": "2026-03-26T09:00:00Z",
-      "updatedAt": "2026-03-26T09:00:00Z"
+      "updatedAt": "2026-03-26T09:00:00Z",
+      "folderPath": "content/dam/tut-usa/press",
+      "path": "content/dam/tut-usa/press/press-release-q1.pdf"
     },
     {
       "id": "asset-004",
@@ -38,7 +44,9 @@
       "fileSize": 20971520,
       "status": "ACTIVE",
       "createdAt": "2026-03-25T10:00:00Z",
-      "updatedAt": "2026-03-25T10:00:00Z"
+      "updatedAt": "2026-03-25T10:00:00Z",
+      "folderPath": "content/dam/tut-usa/brand",
+      "path": "content/dam/tut-usa/brand/brand-assets.zip"
     },
     {
       "id": "asset-005",
@@ -47,7 +55,9 @@
       "fileSize": 262144,
       "status": "ACTIVE",
       "createdAt": "2026-03-24T11:00:00Z",
-      "updatedAt": "2026-03-24T11:00:00Z"
+      "updatedAt": "2026-03-24T11:00:00Z",
+      "folderPath": "content/dam/tut-usa/specs",
+      "path": "content/dam/tut-usa/specs/model-specs.xlsx"
     },
     {
       "id": "asset-006",
@@ -58,11 +68,12 @@
       "height": 2000,
       "status": "ACTIVE",
       "createdAt": "2026-03-23T13:00:00Z",
-      "updatedAt": "2026-03-23T13:00:00Z"
+      "updatedAt": "2026-03-23T13:00:00Z",
+      "folderPath": "content/dam/tut-usa/heroes",
+      "path": "content/dam/tut-usa/heroes/showroom-interior.jpg"
     }
   ],
   "total": 6,
   "page": 0,
   "size": 20
 }
-

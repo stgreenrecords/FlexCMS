@@ -3,7 +3,7 @@
     "id": "u1111111-1111-1111-1111-111111111111",
     "path": "content.tut-usa.en",
     "name": "en",
-    "resourceType": "flexcms/page",
+    "resourceType": "flexcms/container",
     "parentPath": "content.tut-usa",
     "status": "PUBLISHED",
     "siteId": "tut-usa",

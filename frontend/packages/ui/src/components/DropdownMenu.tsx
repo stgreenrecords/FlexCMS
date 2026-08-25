@@ -118,9 +118,10 @@ export const DropdownMenuItem = forwardRef<
     /** Optional keyboard shortcut rendered to the right */
     shortcut?: string;
   }
->(({ className, inset, icon, shortcut, children, ...props }, ref) => (
+>(({ className, inset, icon, shortcut, children, asChild, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
+    asChild={asChild}
     className={cn(
       'relative flex cursor-default select-none items-center gap-2',
       'rounded-[var(--radius-sm)] px-2 py-1.5 text-sm',
@@ -132,12 +133,28 @@ export const DropdownMenuItem = forwardRef<
     )}
     {...props}
   >
-    {icon && <span className="h-4 w-4 shrink-0">{icon}</span>}
-    <span className="flex-1">{children}</span>
-    {shortcut && (
-      <span className="ml-auto text-xs tracking-widest text-[var(--color-muted-foreground)]">
-        {shortcut}
-      </span>
+    {/*
+      Under `asChild` the caller's element must reach Radix untouched.
+
+      The label/icon/shortcut wrapper below renders three children — `{icon && …}`
+      and `{shortcut && …}` evaluate to `false` when unset, and `false` still counts
+      as a child. Radix's `asChild` path calls `React.Children.only`, which throws on
+      anything but a single element, so forwarding `asChild` while still wrapping
+      crashed the whole page the moment such a menu opened. `asChild` means the caller
+      supplies the content, so `icon`/`shortcut` are theirs to compose.
+    */}
+    {asChild ? (
+      children
+    ) : (
+      <>
+        {icon && <span className="h-4 w-4 shrink-0">{icon}</span>}
+        <span className="flex-1">{children}</span>
+        {shortcut && (
+          <span className="ml-auto text-xs tracking-widest text-[var(--color-muted-foreground)]">
+            {shortcut}
+          </span>
+        )}
+      </>
     )}
   </DropdownMenuPrimitive.Item>
 ));

@@ -345,3 +345,64 @@ which appending never did. **Generalisation:** any test that mutates shared fixt
 *cumulatively* is a time bomb whose fuse length is the number of times it has run. When a test
 fails in the gate but passes alone, look for state the test itself left behind, and read the failure
 screenshot before theorising — the accumulated value was visible in it.
+
+### 2026-08-25 — `asChild` on the shared `DropdownMenuItem` crashed the whole page
+
+**Context:** Opening the asset actions menu (the three-dot button on a DAM asset card) at `/dam`.
+
+**Symptom:** The page white-screens to "Application error: a client-side exception has
+occurred". Selenium reports it indirectly and confusingly — `stale element reference`, or a
+15s timeout waiting for `[data-testid="dam-asset-delete"]`, or attributes that read `null`
+on an element that had them a moment earlier. The real error is only in the browser console:
+`React.Children.only expected to receive a single React element child.`
+
+**What failed:** Suspecting the `asChild`/`Slot` contract in `Button` (it is correct — it
+uses `forwardRef` and spreads props), and suspecting hydration (also fine — folder clicks in
+the same page work). Reading `outerHTML.slice(0,180)` in a probe was actively misleading: the
+Tailwind class string is longer than that, so `aria-haspopup`/`data-state` looked absent when
+they were merely truncated.
+
+**Solution:** `packages/ui/src/components/DropdownMenu.tsx` — `DropdownMenuItem` wrapped its
+children as `{icon && …}<span>{children}</span>{shortcut && …}` while forwarding `asChild`
+through `{...props}`. With `icon`/`shortcut` unset those two expressions evaluate to `false`,
+and `false` still counts as a child, so Radix's `asChild` path called `React.Children.only`
+on **three** children and threw. Now `asChild` renders `children` straight through and only
+the non-`asChild` path wraps.
+
+**Why it works:** `asChild` means the caller owns the rendered element, so a component that
+also decorates its children cannot forward the flag unchanged. **Generalisation:** any
+wrapper that both accepts `asChild` and renders extra children has this bug latent; the
+crash only appears when a caller actually passes `asChild`, which is why one usage in the
+whole repo (`dam/page.tsx`) was enough to break that page while every other dropdown worked.
+
+### 2026-08-25 — Playwright specs that mock the API describe a different tree than the live one
+
+**Context:** Repairing `admin-e2e/tests/phase1-critical/content-tree.spec.ts` after installing
+the missing Chromium (`CONTENT-PUBLISH-DOUBLECLICK`).
+
+**Symptom:** Six tests fail at `expect(rowByName(page,'home')).toBeVisible()` after clicking a
+row named `en`. Probing the live author API shows `content.tut-usa` has twelve children and
+none of them is `en`, which makes the locale level look invented.
+
+**What failed:** Concluding from that probe that the `en` hop was fictional and rewriting the
+spec to walk `tut-usa → home` — 34 lines of edits that broke two tests which had been
+passing, because this spec installs its own `page.route('**/api/**')` mocks in
+`test.beforeEach` and the mocked tree genuinely *is* `tut-usa → en → home`. Also burned two
+attempts on regex escaping (`\s` inside a JS template literal collapses to `s` before the
+`RegExp` sees it, so `/^\s*home\s*$/` silently became `/^s*homes*$/`).
+
+**Solution:** Reverted the spec (`git checkout --`) and fixed the fixture instead:
+`src/fixtures/data/content-children-tut-usa.json` typed `content.tut-usa.en` as
+`flexcms/page`, but the content tree only descends into **non**-page nodes
+(`handleClick` returns early for `flexcms/page`), so clicking it never loaded its children.
+Changing that one `resourceType` to `flexcms/container` took the file from 9 passed / 6 failed
+to **15/15**. The fixture had contradicted itself all along — a "page" that a sibling fixture
+gives nine children.
+
+**Why it works:** The mocks are the system under test here, not the database. **Two lessons:**
+(1) before probing a running service to explain a Playwright failure, check whether the spec
+intercepts `**/api/**` — otherwise you are debugging the wrong world; (2) when a whole family
+of tests fails identically, prefer the one-line data fix over rewriting the tests — the tests
+encoded the intended behaviour correctly and the fixture was wrong. Note also that
+`--workers` parallelism produced 14 phantom `TIMEDOUT` results on this suite; `--workers=1`
+showed the true 6.

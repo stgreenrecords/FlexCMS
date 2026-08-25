@@ -16,6 +16,22 @@ test.beforeEach(async ({ page }) => {
     const url = new URL(route.request().url());
     const { pathname } = url;
 
+    // `/assets/folders` has to be matched before `/assets`: it answers a different
+    // shape (`{folders: [...]}`), and serving the asset list here left the folder tree
+    // with nothing to build from.
+    if (pathname.includes('/api/author/assets/folders')) {
+      const counts = new Map<string, number>();
+      for (const a of assetsList.items as Array<{ folderPath?: string }>) {
+        if (a.folderPath) counts.set(a.folderPath, (counts.get(a.folderPath) ?? 0) + 1);
+      }
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          folders: [...counts].map(([path, assetCount]) => ({ path, assetCount })),
+        }),
+      });
+    }
     if (pathname.includes('/api/author/assets')) {
       return route.fulfill({
         status: 200,
@@ -119,18 +135,25 @@ test.describe('DAM Browser @smoke @regression', () => {
     expect(apiCalls.find((u) => u.includes('/api/author/assets'))).toBeTruthy();
   });
 
-  test('UI-038b: folder filter sidebar is visible', async ({ page }) => {
+  test('UI-038b: folder tree sidebar lists folders from stored asset paths', async ({ page }) => {
     await page.goto('/dam');
     await expect(page.getByText(/all assets/i)).toBeVisible({ timeout: 10_000 });
-    // Folder sidebar shows folder names
-    await expect(page.getByText(/images/i).first()).toBeVisible();
+
+    // The sidebar used to list fixed MIME buckets ("Images", "Videos"). It is now a real
+    // tree built from the folder paths the assets are stored under, so it is asserted
+    // against a folder that exists in the fixture rather than a hardcoded bucket name.
+    await expect(page.getByTestId('dam-folder-tree')).toBeVisible();
+    await expect(page.getByTestId('dam-folder-content-dam-tut-usa-heroes')).toBeVisible();
   });
 
   test('UI-038c: asset type badges are displayed', async ({ page }) => {
     await page.goto('/dam');
     await expect(page.getByText('hero-banner.jpg')).toBeVisible({ timeout: 10_000 });
-    // Type labels shown in list
-    await expect(page.getByText(/image/i).first()).toBeVisible();
+
+    // The type label sits on the placeholder thumbnail, which only non-image assets get
+    // — an image renders its own preview instead, so /image/i could never match. PDF is
+    // asserted because `press-release-q1.pdf` is in the fixture.
+    await expect(page.getByText('PDF', { exact: true }).first()).toBeVisible();
   });
 });
 

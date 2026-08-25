@@ -1,5 +1,6 @@
 package com.flexcms.dam.service;
 
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.core.model.AssetStatus;
 import com.flexcms.core.repository.AssetFolderSummary;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -170,10 +172,14 @@ class AssetIngestServiceTest {
     // ── deleteAsset ───────────────────────────────────────────────────────────
 
     @Test
-    void deleteAsset_notFound_doesNothing() {
+    void deleteAsset_notFound_throwsSoTheCallerIsNotToldItSucceeded() {
         when(assetRepository.findByPath("/dam/missing.png")).thenReturn(Optional.empty());
 
-        assetIngestService.deleteAsset("/dam/missing.png");
+        // This test previously asserted the delete "did nothing" and returned normally,
+        // which is exactly what let the API answer 200 for an asset that never existed.
+        assertThatThrownBy(() -> assetIngestService.deleteAsset("/dam/missing.png"))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("/dam/missing.png");
 
         verify(assetRepository, never()).delete(any());
         verify(s3Service, never()).delete(any());

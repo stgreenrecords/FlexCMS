@@ -12,14 +12,38 @@ test.beforeEach(async ({ page }) => {
     const url = new URL(route.request().url());
     const { pathname } = url;
 
-    if (pathname.includes('/api/author/xf/')) {
+    // The page resolves its site first and lists fragments for that site, so a mock that
+    // only answers the list endpoint leaves it with no site and nothing to fetch.
+    if (pathname.includes('/api/admin/sites')) {
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify([
-          { id: 'xf-1', name: 'Global Navigation', path: 'content.corporate.en.xf.global-nav',   modifiedAt: '2026-03-01T10:00:00Z', createdBy: 'admin' },
-          { id: 'xf-2', name: 'Footer Legal',      path: 'content.corporate.en.xf.footer-legal', modifiedAt: '2026-03-02T10:00:00Z', createdBy: 'admin' },
-          { id: 'xf-3', name: 'Cookie Banner',     path: 'content.corporate.en.xf.cookie-banner', modifiedAt: '2026-03-03T10:00:00Z', createdBy: 'editor' },
+          { siteId: 'corporate', title: 'Corporate', supportedLocales: ['en'] },
+        ]),
+      });
+    }
+
+    // Variations are a second call per fragment and must be matched before the list.
+    if (pathname.includes('/api/author/xf/variations')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([{ name: 'master', path: `${url.searchParams.get('path')}.master` }]),
+      });
+    }
+
+    // The list is `GET /api/author/xf` and its rows are snake_case: `xf_path`, `title`,
+    // `updated_at`. The previous mock answered `/api/author/xf/` (which the list URL
+    // never matches) with `name`/`path`/`modifiedAt`, so every row rendered empty.
+    if (pathname.endsWith('/api/author/xf') || pathname.includes('/api/author/xf?')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { xf_path: 'content.experience-fragments.corporate.en.global-nav',   title: 'Global Navigation', updated_at: '2026-03-01T10:00:00Z', created_by: 'admin' },
+          { xf_path: 'content.experience-fragments.corporate.en.footer-legal', title: 'Footer Legal',      updated_at: '2026-03-02T10:00:00Z', created_by: 'admin' },
+          { xf_path: 'content.experience-fragments.corporate.en.cookie-banner', title: 'Cookie Banner',    updated_at: '2026-03-03T10:00:00Z', created_by: 'editor' },
         ]),
       });
     }

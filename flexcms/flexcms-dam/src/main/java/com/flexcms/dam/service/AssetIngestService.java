@@ -1,5 +1,6 @@
 package com.flexcms.dam.service;
 
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.exception.ValidationException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.core.model.AssetRendition;
@@ -198,20 +199,25 @@ public class AssetIngestService {
      */
     @Transactional
     public void deleteAsset(String path) {
-        assetRepository.findByPath(path).ifPresent(asset -> {
-            // Delete renditions from S3
-            for (AssetRendition rendition : asset.getRenditions()) {
-                try { s3Service.delete(rendition.getStorageKey()); } catch (Exception e) {
-                    log.warn("Failed to delete rendition from S3: {}", rendition.getStorageKey());
-                }
+        // A missing path used to fall through `ifPresent` and return normally, so the
+        // controller answered 200 for an asset that was never there and no caller could
+        // tell a real deletion from a no-op. Same failure shape as the bulk-delete
+        // defect that counted missing paths as succeeded.
+        Asset asset = assetRepository.findByPath(path)
+                .orElseThrow(() -> new NotFoundException("Asset not found: " + path));
+
+        // Delete renditions from S3
+        for (AssetRendition rendition : asset.getRenditions()) {
+            try { s3Service.delete(rendition.getStorageKey()); } catch (Exception e) {
+                log.warn("Failed to delete rendition from S3: {}", rendition.getStorageKey());
             }
-            // Delete original from S3
-            try { s3Service.delete(asset.getStorageKey()); } catch (Exception e) {
-                log.warn("Failed to delete original from S3: {}", asset.getStorageKey());
-            }
-            assetRepository.delete(asset);
-            log.info("Deleted asset: {}", path);
-        });
+        }
+        // Delete original from S3
+        try { s3Service.delete(asset.getStorageKey()); } catch (Exception e) {
+            log.warn("Failed to delete original from S3: {}", asset.getStorageKey());
+        }
+        assetRepository.delete(asset);
+        log.info("Deleted asset: {}", path);
     }
 
     /**

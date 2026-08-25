@@ -38,6 +38,7 @@ interface Asset {
   sheets?: number;       // xlsx
   files?: number;        // zip
   folderPath: string;     // real DAM folder, e.g. "content/dam/tut-usa/heroes"
+  path: string;           // full DAM path — what DELETE /api/author/assets is keyed by
   uploadedAt: string;
   status: AssetStatus;
   thumbnailBg?: string;  // gradient or color for non-image thumbnails
@@ -115,6 +116,7 @@ function apiToAsset(a: Record<string, unknown>): Asset {
     sizeBytes,
     dimensions,
     folderPath: normalizeFolder(a.folderPath as string),
+    path: (a.path as string) ?? '',
     uploadedAt: a.createdAt
       ? new Date(a.createdAt as string).toISOString().slice(0, 10)
       : '—',
@@ -347,12 +349,23 @@ function AssetThumbnail({ asset, size = 'md' }: { asset: Asset; size?: 'sm' | 'm
 // Asset context menu
 // ---------------------------------------------------------------------------
 
-function AssetMenu({ asset, onDelete }: { asset: Asset; onDelete: (id: string) => void }) {
+function AssetMenu({
+  asset,
+  onDelete,
+  onDownload,
+  onCopyUrl,
+}: {
+  asset: Asset;
+  onDelete: (id: string) => void;
+  onDownload: (asset: Asset) => void;
+  onCopyUrl: (asset: Asset) => void;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-7 w-7"
-          aria-label="Asset actions" onClick={(e) => e.stopPropagation()}>
+          aria-label="Asset actions" data-testid={`dam-asset-menu-${asset.id}`}
+          onClick={(e) => e.stopPropagation()}>
           <DotsIcon />
         </Button>
       </DropdownMenuTrigger>
@@ -363,20 +376,33 @@ function AssetMenu({ asset, onDelete }: { asset: Asset; onDelete: (id: string) =
             View Details
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          data-testid="dam-asset-download"
+          onClick={() => onDownload(asset)}
+        >
           <DownloadIcon className="h-4 w-4 mr-2" />
           Download
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        {/*
+          "Move to folder" is left disabled rather than shown as an available action:
+          there is no move or update endpoint on the asset API at all (only upload, read,
+          list and delete), so nothing behind this item could work. A control that does
+          nothing when clicked is worse than one that says it is unavailable.
+        */}
+        <DropdownMenuItem disabled data-testid="dam-asset-move">
           <MoveIcon className="h-4 w-4 mr-2" />
           Move to folder
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          data-testid="dam-asset-copy-url"
+          onClick={() => onCopyUrl(asset)}
+        >
           <CopyIcon className="h-4 w-4 mr-2" />
           Copy URL
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-[var(--color-destructive)]"
+          data-testid="dam-asset-delete"
           onClick={() => onDelete(asset.id)}>
           <TrashIcon className="h-4 w-4 mr-2" />
           Delete
@@ -526,6 +552,8 @@ export default function DamBrowserPage() {
   /** Configured sites, so an upload can name one that exists. */
   const [sites, setSites] = useState<SiteInfo[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [actionNotice, setActionNotice] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/admin/sites`)
@@ -605,14 +633,122 @@ export default function DamBrowserPage() {
     }
   }
 
+  /**
+   * Delete an asset on the server, and only then drop it from the grid.
+   *
+   * Both delete paths used to filter local React state and nothing else: the asset
+   * disappeared, the author believed it was gone, and it came straight back on the next
+   * refresh because the server had never been told. Removing the row only after the API
+   * confirms means the grid cannot claim a deletion that did not happen.
+   *
+   * The API is keyed by `path`, not `id`, which is why `Asset` now carries it.
+   */
+  async function deleteAssetsByIds(ids: string[]): Promise<void> {
+    const targets = assets.filter((a) => ids.includes(a.id));
+    if (targets.length === 0) return;
+
+    setDeleteError(null);
+
+    const results = await Promise.all(
+      targets.map(async (asset) => {
+        if (!asset.path) {
+          return { asset, ok: false, reason: 'the server did not report a path for it' };
+        }
+        try {
+          const res = await fetch(
+            `${API_BASE}/api/author/assets?path=${encodeURIComponent(asset.path)}`,
+            { method: 'DELETE' },
+          );
+          return res.ok
+            ? { asset, ok: true, reason: '' }
+            : { asset, ok: false, reason: `the server answered ${res.status}` };
+        } catch {
+          return { asset, ok: false, reason: 'the server could not be reached' };
+        }
+      }),
+    );
+
+    const deleted = results.filter((r) => r.ok).map((r) => r.asset.id);
+    const failed = results.filter((r) => !r.ok);
+
+    if (deleted.length > 0) {
+      setAssets((prev) => prev.filter((a) => !deleted.includes(a.id)));
+    }
+    // Anything that failed stays selected, so a retry does not need re-picking it.
+    setSelected((prev) => {
+      const next = new Set(prev);
+      deleted.forEach((id) => next.delete(id));
+      return next;
+    });
+
+    if (failed.length === 1) {
+      setDeleteError(`"${failed[0].asset.name}" was not deleted — ${failed[0].reason}.`);
+    } else if (failed.length > 1) {
+      setDeleteError(`${failed.length} of ${targets.length} assets were not deleted — ${failed[0].reason}.`);
+    }
+
+    // The sidebar counts come from the server, so they have to be refetched rather
+    // than decremented locally.
+    if (deleted.length > 0) {
+      loadFolders();
+    }
+  }
+
+  /** The author API route that streams an asset's bytes — the only asset URL there is. */
+  function assetContentUrl(asset: Asset): string {
+    return `${API_BASE}/api/author/assets/${asset.id}/content`;
+  }
+
+  /**
+   * Download through a blob rather than a plain `<a download>`.
+   *
+   * The API is on a different origin from the admin app, and the `download` attribute is
+   * ignored cross-origin — the browser would navigate to the file instead of saving it.
+   */
+  async function downloadAsset(asset: Asset) {
+    setActionNotice(null);
+    setDeleteError(null);
+    try {
+      const res = await fetch(assetContentUrl(asset));
+      if (!res.ok) {
+        setDeleteError(`"${asset.name}" could not be downloaded — the server answered ${res.status}.`);
+        return;
+      }
+      const blob = await res.blob();
+      const href = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = href;
+      a.download = asset.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(href);
+      setActionNotice(`Downloaded "${asset.name}".`);
+    } catch {
+      setDeleteError(`"${asset.name}" could not be downloaded — the server could not be reached.`);
+    }
+  }
+
+  async function copyAssetUrl(asset: Asset) {
+    setActionNotice(null);
+    setDeleteError(null);
+    const url = assetContentUrl(asset);
+    try {
+      await navigator.clipboard.writeText(url);
+      setActionNotice(`URL copied for "${asset.name}".`);
+    } catch {
+      // Clipboard access needs a secure context and permission, so it can legitimately
+      // fail. Show the URL instead of silently doing nothing.
+      setActionNotice(`Clipboard unavailable — the URL is ${url}`);
+    }
+  }
+
   function deleteAsset(id: string) {
-    setAssets((prev) => prev.filter((a) => a.id !== id));
-    setSelected((prev) => { const n = new Set(prev); n.delete(id); return n; });
+    void deleteAssetsByIds([id]);
   }
 
   function deleteSelected() {
-    setAssets((prev) => prev.filter((a) => !selected.has(a.id)));
-    setSelected(new Set());
+    void deleteAssetsByIds(Array.from(selected));
   }
 
   function handleUpload() {
@@ -752,7 +888,7 @@ export default function DamBrowserPage() {
     {
       id: 'actions',
       header: '',
-      cell: ({ row }) => <AssetMenu asset={row.original} onDelete={deleteAsset} />,
+      cell: ({ row }) => <AssetMenu asset={row.original} onDelete={deleteAsset} onDownload={downloadAsset} onCopyUrl={copyAssetUrl} />,
       size: 48,
     },
   ];
@@ -819,6 +955,26 @@ export default function DamBrowserPage() {
           >
             Media Library
           </h1>
+
+          {actionNotice && (
+            <p
+              className="mt-2 text-sm text-[var(--color-muted-foreground)]"
+              data-testid="dam-action-notice"
+              role="status"
+            >
+              {actionNotice}
+            </p>
+          )}
+
+          {deleteError && (
+            <p
+              className="mt-2 text-sm text-[var(--color-destructive)]"
+              data-testid="dam-delete-error"
+              role="alert"
+            >
+              {deleteError}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-1 min-h-0 overflow-hidden">
@@ -1078,9 +1234,14 @@ export default function DamBrowserPage() {
                           </span>
                         </div>
 
-                        {/* Action menu (hover) */}
-                        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <AssetMenu asset={asset} onDelete={deleteAsset} />
+                        {/*
+                          Action menu. Revealed on hover, and also whenever something
+                          inside it holds focus: with hover as the only trigger, a
+                          keyboard user could tab to the actions button and still see
+                          nothing at all.
+                        */}
+                        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                          <AssetMenu asset={asset} onDelete={deleteAsset} onDownload={downloadAsset} onCopyUrl={copyAssetUrl} />
                         </div>
                       </div>
                     );

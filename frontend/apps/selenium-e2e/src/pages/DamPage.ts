@@ -17,7 +17,7 @@
  *   delivery anywhere in the platform, so that URL is the only way to fetch an
  *   asset's bytes.
  */
-import { By, Key, type WebDriver } from 'selenium-webdriver';
+import { By, Key, until, type WebDriver } from 'selenium-webdriver';
 import { loadEnv } from '../driver/env';
 import { waitForPageReady, waitForVisible } from '../driver/waits';
 
@@ -240,6 +240,89 @@ export class DamPage {
          .filter((img) => img.complete && img.naturalWidth === 0)
          .map((img) => img.src);`,
     )) as string[];
+  }
+
+  /**
+   * Delete an asset through the grid's own row menu.
+   *
+   * Deliberately driven through the UI rather than the API: the defect this covers was
+   * that the page deleted from React state only and never told the server, so an
+   * API-driven delete would have proved nothing about the button an author presses.
+   */
+  async deleteAssetViaMenu(assetId: string): Promise<void> {
+    // The card's action menu is `opacity-0` until the card is hovered, and Selenium's
+    // displayedness rules count an opacity-0 element as not displayed. So the element
+    // has to be hovered before it can be waited on, exactly as a mouse user would.
+    const trigger = await this.driver.wait(
+      until.elementLocated(By.css(`[data-testid="dam-asset-menu-${assetId}"]`)),
+      this.env.explicitWaitMs,
+    );
+    await this.driver.executeScript(
+      'arguments[0].scrollIntoView({block: "center"});',
+      trigger,
+    );
+    await this.driver.actions({ async: true }).move({ origin: trigger }).perform();
+
+    await this.driver.wait(until.elementIsVisible(trigger), this.env.explicitWaitMs);
+    await trigger.click();
+
+    const item = await waitForVisible(this.driver, By.css('[data-testid="dam-asset-delete"]'));
+    await item.click();
+  }
+
+  /** The page-level delete error, or null when the page is not reporting one. */
+  async deleteErrorText(): Promise<string | null> {
+    const nodes = await this.driver.findElements(By.css('[data-testid="dam-delete-error"]'));
+    if (nodes.length === 0) return null;
+    return (await nodes[0].getText()).trim();
+  }
+
+  /** Open an asset's row menu without activating anything in it. */
+  async openAssetMenu(assetId: string): Promise<void> {
+    const trigger = await this.driver.wait(
+      until.elementLocated(By.css(`[data-testid="dam-asset-menu-${assetId}"]`)),
+      this.env.explicitWaitMs,
+    );
+    await this.driver.executeScript('arguments[0].scrollIntoView({block: "center"});', trigger);
+    await this.driver.actions({ async: true }).move({ origin: trigger }).perform();
+    await this.driver.wait(until.elementIsVisible(trigger), this.env.explicitWaitMs);
+    await trigger.click();
+    await waitForVisible(this.driver, By.css('[data-testid="dam-asset-delete"]'));
+  }
+
+  /** Whether a menu item is present but disabled (Radix marks it `data-disabled`). */
+  async isMenuItemDisabled(testId: string): Promise<boolean> {
+    const nodes = await this.driver.findElements(By.css(`[data-testid="${testId}"]`));
+    if (nodes.length === 0) return false;
+    const disabled = await nodes[0].getAttribute('data-disabled');
+    const aria = await nodes[0].getAttribute('aria-disabled');
+    return disabled !== null || aria === 'true';
+  }
+
+  async clickMenuItem(testId: string): Promise<void> {
+    const item = await waitForVisible(this.driver, By.css(`[data-testid="${testId}"]`));
+    await item.click();
+  }
+
+  /** The neutral action notice (download/copy confirmations), or null. */
+  async actionNoticeText(): Promise<string | null> {
+    const nodes = await this.driver.findElements(By.css('[data-testid="dam-action-notice"]'));
+    if (nodes.length === 0) return null;
+    return (await nodes[0].getText()).trim();
+  }
+
+  /** Wait for an action notice matching `pattern`, returning it (or null on timeout). */
+  async waitForActionNotice(pattern: RegExp): Promise<string | null> {
+    try {
+      let text = '';
+      await this.driver.wait(async () => {
+        text = (await this.actionNoticeText()) ?? '';
+        return pattern.test(text);
+      }, this.env.explicitWaitMs);
+      return text;
+    } catch {
+      return null;
+    }
   }
 
   /** Whether the Upload control is present (upload is dialog-driven). */

@@ -210,4 +210,135 @@ describe('DAM folder tree suite', function () {
       'returning to Assets did not clear the folder filter',
     ).to.equal(true);
   });
+
+  /**
+   * The delete button used to filter React state and never call the server, so the
+   * asset vanished from the grid and was back on the next refresh. Both scenarios
+   * below therefore assert against the **server**, not against the grid: a UI-only
+   * assertion is precisely what the defect would have satisfied.
+   */
+  it('S8 deleting an asset through the row menu removes it from the server', async () => {
+    const filename = `delete-me-${Date.now()}.png`;
+    const path = `${root}/${filename}`;
+    const asset = await api.uploadAsset({
+      bytes: testPngBytes(),
+      filename,
+      contentType: 'image/png',
+      path,
+      siteId: SITE_ID,
+    });
+    uploadedPaths.add(path);
+
+    await dam.open();
+    await dam.setSearch(filename);
+    expect(await dam.waitForAssetPresence(filename, true), 'the fixture asset never appeared')
+      .to.equal(true);
+
+    await dam.deleteAssetViaMenu(asset.id);
+
+    expect(
+      await dam.waitForAssetPresence(filename, false),
+      'the row is still in the grid after deleting it',
+    ).to.equal(true);
+
+    // The assertion that matters: the server agrees it is gone.
+    expect(
+      await api.getAssetStatus(asset.id),
+      'the grid dropped the row but the server still has the asset — the delete never left the browser',
+    ).to.equal(404);
+
+    // And it stays gone across a reload, which is where the old behaviour gave itself away.
+    await dam.open();
+    await dam.setSearch(filename);
+    expect(
+      await dam.waitForAssetPresence(filename, false),
+      'the deleted asset came back after a refresh',
+    ).to.equal(true);
+
+    uploadedPaths.delete(path);
+  });
+
+  it('S9 a delete the server rejects leaves the row in place and says so', async () => {
+    const filename = `reject-me-${Date.now()}.png`;
+    const path = `${root}/${filename}`;
+    const asset = await api.uploadAsset({
+      bytes: testPngBytes(),
+      filename,
+      contentType: 'image/png',
+      path,
+      siteId: SITE_ID,
+    });
+    uploadedPaths.add(path);
+
+    await dam.open();
+    await dam.setSearch(filename);
+    expect(await dam.waitForAssetPresence(filename, true), 'the fixture asset never appeared')
+      .to.equal(true);
+
+    // Remove it behind the page's back, so the next UI delete must fail. This is how a
+    // stale grid behaves in practice — someone else deleted the asset first.
+    expect(await api.deleteAsset(path), 'the out-of-band delete did not succeed').to.equal(200);
+
+    await dam.deleteAssetViaMenu(asset.id);
+
+    const message = await dam.deleteErrorText();
+    expect(message, 'a failed delete reported no error to the author').to.not.equal(null);
+    expect(message ?? '', 'the error does not name the asset that failed').to.contain(filename);
+
+    // The row must survive: dropping it would repeat the original lie, just with a
+    // different cause.
+    expect(
+      await dam.showsAsset(filename),
+      'the row was removed even though the server refused the delete',
+    ).to.equal(true);
+
+    uploadedPaths.delete(path);
+  });
+
+  it('S10 offers working Download and Copy URL actions, and no dead Move item', async () => {
+    const filename = `menu-actions-${Date.now()}.png`;
+    const path = `${root}/${filename}`;
+    const asset = await api.uploadAsset({
+      bytes: testPngBytes(),
+      filename,
+      contentType: 'image/png',
+      path,
+      siteId: SITE_ID,
+    });
+    uploadedPaths.add(path);
+
+    await dam.open();
+    await dam.setSearch(filename);
+    expect(await dam.waitForAssetPresence(filename, true), 'the fixture asset never appeared')
+      .to.equal(true);
+
+    await dam.openAssetMenu(asset.id);
+
+    // `Move to folder` had no handler at all, like Download and Copy URL. There is no
+    // move endpoint on the asset API, so it is disabled rather than silently inert —
+    // this asserts it stays that way instead of quietly becoming a no-op again.
+    expect(
+      await dam.isMenuItemDisabled('dam-asset-move'),
+      'Move to folder must be disabled while no move endpoint exists',
+    ).to.equal(true);
+
+    // Copy URL reports what it did. Clipboard access can be refused in a headless
+    // browser, in which case the page shows the URL instead — either way it must speak.
+    await dam.clickMenuItem('dam-asset-copy-url');
+    const notice = await dam.actionNoticeText();
+    expect(notice, 'Copy URL produced no feedback at all').to.not.equal(null);
+    expect(notice ?? '', 'the notice mentions neither the asset nor its URL')
+      .to.satisfy((t: string) => t.includes(filename) || t.includes(asset.id));
+
+    // Download: the confirmation is only set after the bytes have been fetched and a
+    // blob built, so it stands in for "the download path actually ran". The saved file
+    // itself is the browser's business and not observable from here.
+    await dam.openAssetMenu(asset.id);
+    await dam.clickMenuItem('dam-asset-download');
+    const downloaded = await dam.waitForActionNotice(/downloaded/i);
+    expect(downloaded, 'Download produced no confirmation, so the fetch did not succeed')
+      .to.not.equal(null);
+    expect(downloaded ?? '', 'the confirmation does not name the downloaded asset')
+      .to.contain(filename);
+  });
 });

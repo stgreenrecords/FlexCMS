@@ -2,6 +2,7 @@
  * Page Editor E2E Tests — UI-021 → UI-037
  */
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // ── Fixture: registry with "components" key (what editor expects) ──────────
 const registryFixture = {
@@ -102,6 +103,19 @@ test.beforeEach(async ({ page }) => {
 });
 
 // ── Tests ──────────────────────────────────────────────────────────────────
+/**
+ * The canvas component wrapper that renders the given text.
+ *
+ * Selection lives on the wrapper (`editor-canvas-item-*`), and the rendered content
+ * inside it does not take pointer events, so this is the only clickable handle.
+ */
+function canvasComponentWithText(page: Page, text: string) {
+  return page
+    .locator('[data-testid^="editor-canvas-item-"]')
+    .filter({ hasText: text })
+    .first();
+}
+
 test.describe('Page Editor @smoke @regression', () => {
 
   test('UI-021: editor loads with component palette and canvas', async ({ page }) => {
@@ -129,17 +143,29 @@ test.describe('Page Editor @smoke @regression', () => {
   test('UI-024: clicking a canvas component shows property inputs in right panel', async ({ page }) => {
     await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByText('Drive the Future')).toBeVisible({ timeout: 10_000 });
-    await page.getByText('Drive the Future').first().click();
+    // Click the component, not the text inside it. Canvas content is
+    // `pointer-events: none` so that a click anywhere on a component selects it rather
+    // than activating a link inside it; that makes the inner text un-hit-testable, and
+    // Playwright refuses to click an element another one intercepts. The wrapper is what
+    // owns selection, and clicking it is what an author is actually doing.
+    await canvasComponentWithText(page, 'Drive the Future').click();
     // Right panel should show text inputs for string properties
     await expect(page.locator('aside').last().locator('input[type="text"]').first()).toBeVisible({ timeout: 5_000 });
   });
 
-  test('UI-025: enum field in right panel renders as a select element', async ({ page }) => {
+  test('UI-025: enum field in right panel offers its values as a listbox', async ({ page }) => {
     await page.goto('/editor?path=/tut-usa/en/home');
     await expect(page.getByText('Drive the Future')).toBeVisible({ timeout: 10_000 });
-    await page.getByText('Drive the Future').first().click();
-    // Variant field has enum values and renders as <select>
-    await expect(page.locator('aside').last().locator('select').first()).toBeVisible({ timeout: 5_000 });
+    await canvasComponentWithText(page, 'Drive the Future').click();
+
+    // The editor moved from a native `<select>` to the UI kit's Select, whose trigger is
+    // a `role="combobox"` button. Assert the enum *behaviour* rather than the tag name:
+    // a control that opens and offers its allowed values.
+    const combobox = page.locator('aside').last().getByRole('combobox').first();
+    await expect(combobox).toBeVisible({ timeout: 5_000 });
+
+    await combobox.click();
+    await expect(page.getByRole('option').first()).toBeVisible({ timeout: 5_000 });
   });
 
   test('UI-030: save button calls properties API for loaded components', async ({ page }) => {
