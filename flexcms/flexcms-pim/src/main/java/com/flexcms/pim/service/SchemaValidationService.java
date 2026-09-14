@@ -6,6 +6,7 @@ import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import com.networknt.schema.ValidationMessage;
+import com.flexcms.pim.exception.PimValidationException;
 import com.flexcms.pim.model.ProductSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  * <h3>Usage:</h3>
  * <pre>{@code
  * List<String> errors = schemaValidationService.validate(product.getSchema(), product.getAttributes());
- * if (!errors.isEmpty()) throw new IllegalArgumentException("Validation failed: " + errors);
+ * if (!errors.isEmpty()) throw new PimValidationException("Validation failed: " + errors);
  * }</pre>
  */
 @Service
@@ -67,13 +68,13 @@ public class SchemaValidationService {
     }
 
     /**
-     * Throw {@link IllegalArgumentException} if validation fails.
+     * Throw {@link PimValidationException} if validation fails.
      * Convenience wrapper for service layer use.
      */
     public void validateOrThrow(ProductSchema productSchema, Map<String, Object> attributes) {
         List<String> errors = validate(productSchema, attributes);
         if (!errors.isEmpty()) {
-            throw new IllegalArgumentException(
+            throw new PimValidationException(
                     "Product attributes failed schema validation: " + String.join("; ", errors)
             );
         }

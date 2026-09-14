@@ -1,5 +1,7 @@
 package com.flexcms.pim.service;
 
+import com.flexcms.pim.exception.PimConflictException;
+import com.flexcms.pim.exception.PimNotFoundException;
 import com.flexcms.pim.model.ProductSchema;
 import com.flexcms.pim.repository.ProductSchemaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +66,7 @@ public class SchemaService {
                                 Map<String, Object> schemaDef, Map<String, Object> attributeGroups,
                                 UUID parentId, String userId) {
         if (schemaRepo.findByNameAndVersion(name, version).isPresent()) {
-            throw new IllegalArgumentException("Schema already exists: " + name + " v" + version);
+            throw new PimConflictException("Schema already exists: " + name + " v" + version);
         }
 
         ProductSchema schema = new ProductSchema();
@@ -77,7 +79,7 @@ public class SchemaService {
 
         if (parentId != null) {
             ProductSchema parent = schemaRepo.findById(parentId)
-                    .orElseThrow(() -> new IllegalArgumentException("Parent schema not found: " + parentId));
+                    .orElseThrow(() -> new PimNotFoundException("Parent schema not found: " + parentId));
             schema.setParent(parent);
         }
 
@@ -91,7 +93,7 @@ public class SchemaService {
     public ProductSchema createNewVersion(UUID sourceSchemaId, String newVersion,
                                           Map<String, Object> schemaDef, String userId) {
         ProductSchema source = schemaRepo.findById(sourceSchemaId)
-                .orElseThrow(() -> new IllegalArgumentException("Source schema not found: " + sourceSchemaId));
+                .orElseThrow(() -> new PimNotFoundException("Source schema not found: " + sourceSchemaId));
 
         return create(source.getName(), newVersion, source.getDescription(),
                 schemaDef, source.getAttributeGroups(), sourceSchemaId, userId);
@@ -101,7 +103,7 @@ public class SchemaService {
     public ProductSchema update(UUID id, String description, Map<String, Object> schemaDef,
                                 Map<String, Object> attributeGroups) {
         ProductSchema schema = schemaRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Schema not found: " + id));
+                .orElseThrow(() -> new PimNotFoundException("Schema not found: " + id));
         if (description != null) schema.setDescription(description);
         if (schemaDef != null) schema.setSchemaDef(schemaDef);
         if (attributeGroups != null) schema.setAttributeGroups(attributeGroups);
@@ -111,7 +113,7 @@ public class SchemaService {
     @Transactional("pimTransactionManager")
     public void deactivate(UUID id) {
         ProductSchema schema = schemaRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Schema not found: " + id));
+                .orElseThrow(() -> new PimNotFoundException("Schema not found: " + id));
         schema.setActive(false);
         schemaRepo.save(schema);
     }
@@ -119,7 +121,7 @@ public class SchemaService {
     @Transactional("pimTransactionManager")
     public void delete(UUID id) {
         if (!schemaRepo.existsById(id)) {
-            throw new IllegalArgumentException("Schema not found: " + id);
+            throw new PimNotFoundException("Schema not found: " + id);
         }
         schemaRepo.deleteById(id);
     }

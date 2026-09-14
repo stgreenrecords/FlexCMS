@@ -104,7 +104,7 @@ class ProductServiceTest {
 
         assertThatThrownBy(() ->
                 productService.create("SKU-001", "Blue Shoe", catalogId, Map.of(), "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Catalog not found");
     }
 
@@ -149,7 +149,7 @@ class ProductServiceTest {
 
         assertThatThrownBy(() ->
                 productService.update("MISSING", Map.of(), "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Product not found");
     }
 
@@ -170,7 +170,7 @@ class ProductServiceTest {
         when(productRepo.findBySku("MISSING")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.delete("MISSING"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Product not found");
     }
 
@@ -197,7 +197,7 @@ class ProductServiceTest {
 
         assertThatThrownBy(() ->
                 productService.updateStatus("MISSING", ProductStatus.PUBLISHED, "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Product not found");
     }
 

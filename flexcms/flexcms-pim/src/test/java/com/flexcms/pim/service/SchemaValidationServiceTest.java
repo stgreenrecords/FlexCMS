@@ -146,7 +146,7 @@ class SchemaValidationServiceTest {
         Map<String, Object> attrs = Map.of("name", "Widget"); // missing 'price'
 
         assertThatThrownBy(() -> service.validateOrThrow(schema, attrs))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimValidationException.class)
                 .hasMessageContaining("schema validation");
     }
 
@@ -156,7 +156,7 @@ class SchemaValidationServiceTest {
         Map<String, Object> attrs = Map.of(); // both required fields missing
 
         assertThatThrownBy(() -> service.validateOrThrow(schema, attrs))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimValidationException.class)
                 .hasMessageContainingAll("price", "name");
     }
 }

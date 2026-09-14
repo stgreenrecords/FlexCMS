@@ -140,7 +140,7 @@ class CarryforwardServiceTest {
 
         org.assertj.core.api.Assertions.assertThatThrownBy(
                 () -> productService.carryforward(UUID.randomUUID(), missingId, "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Target catalog not found");
     }
 
@@ -201,7 +201,7 @@ class CarryforwardServiceTest {
 
         org.assertj.core.api.Assertions.assertThatThrownBy(
                 () -> productService.mergeInheritedAttributes("MISSING", "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Product not found");
     }
 

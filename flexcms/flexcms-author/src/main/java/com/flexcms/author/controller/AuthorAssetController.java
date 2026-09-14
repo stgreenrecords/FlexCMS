@@ -2,6 +2,7 @@ package com.flexcms.author.controller;
 
 import com.flexcms.core.repository.AssetFolderSummary;
 import com.flexcms.core.exception.NotFoundException;
+import com.flexcms.core.exception.ValidationException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.dam.service.AssetIngestService;
 import com.flexcms.dam.service.S3Service;
@@ -121,9 +122,17 @@ public class AuthorAssetController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
         Page<Asset> result;
-        String effectiveSite = (siteId != null && !siteId.isBlank()) ? siteId : "corporate";
         if (q != null && !q.isBlank()) {
-            result = assetService.searchAssets(effectiveSite, q, page, size);
+            // The underlying query filters by an exact site_id match — there is no
+            // cross-site search — so a missing siteId cannot mean "search everywhere".
+            // It previously defaulted silently to a hardcoded "corporate" site, so a
+            // caller searching any other site got an empty result with no indication
+            // anything was wrong. Require it explicitly instead, matching upload()
+            // and listFolder() in this same controller.
+            if (siteId == null || siteId.isBlank()) {
+                throw new ValidationException("siteId is required when searching with 'q'");
+            }
+            result = assetService.searchAssets(siteId, q, page, size);
         } else {
             result = assetService.listAll(page, size);
         }

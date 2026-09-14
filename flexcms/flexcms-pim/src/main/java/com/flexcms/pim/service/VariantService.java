@@ -1,5 +1,7 @@
 package com.flexcms.pim.service;
 
+import com.flexcms.pim.exception.PimConflictException;
+import com.flexcms.pim.exception.PimNotFoundException;
 import com.flexcms.pim.model.Product;
 import com.flexcms.pim.model.ProductVariant;
 import com.flexcms.pim.repository.ProductRepository;
@@ -44,10 +46,10 @@ public class VariantService {
                                  Map<String, Object> pricing,
                                  Map<String, Object> inventory) {
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
+                .orElseThrow(() -> new PimNotFoundException("Product not found: " + productId));
 
         if (variantRepo.existsByVariantSku(variantSku)) {
-            throw new IllegalArgumentException("Variant SKU already exists: " + variantSku);
+            throw new PimConflictException("Variant SKU already exists: " + variantSku);
         }
 
         ProductVariant variant = new ProductVariant();
@@ -63,7 +65,7 @@ public class VariantService {
     public ProductVariant update(UUID variantId, Map<String, Object> attributes,
                                  Map<String, Object> pricing, Map<String, Object> inventory) {
         ProductVariant variant = variantRepo.findById(variantId)
-                .orElseThrow(() -> new IllegalArgumentException("Variant not found: " + variantId));
+                .orElseThrow(() -> new PimNotFoundException("Variant not found: " + variantId));
         if (attributes != null) variant.setAttributes(attributes);
         if (pricing != null) variant.setPricing(pricing);
         if (inventory != null) variant.setInventory(inventory);
@@ -73,7 +75,7 @@ public class VariantService {
     @Transactional("pimTransactionManager")
     public void delete(UUID variantId) {
         if (!variantRepo.existsById(variantId)) {
-            throw new IllegalArgumentException("Variant not found: " + variantId);
+            throw new PimNotFoundException("Variant not found: " + variantId);
         }
         variantRepo.deleteById(variantId);
     }

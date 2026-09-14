@@ -61,7 +61,7 @@ class VariantServiceTest {
 
         assertThatThrownBy(() ->
                 variantService.create(productId, "SKU-X", null, null, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Product not found");
     }
 
@@ -73,7 +73,7 @@ class VariantServiceTest {
 
         assertThatThrownBy(() ->
                 variantService.create(productId, "SKU-S-RED", null, null, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimConflictException.class)
                 .hasMessageContaining("Variant SKU already exists");
     }
 
@@ -98,7 +98,7 @@ class VariantServiceTest {
         when(variantRepo.existsById(variantId)).thenReturn(false);
 
         assertThatThrownBy(() -> variantService.delete(variantId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Variant not found");
     }
 

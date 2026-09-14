@@ -4,14 +4,20 @@ import com.flexcms.core.exception.ConflictException;
 import com.flexcms.core.exception.ForbiddenException;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.exception.ValidationException;
+import com.flexcms.pim.exception.PimConflictException;
+import com.flexcms.pim.exception.PimNotFoundException;
+import com.flexcms.pim.exception.PimValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.http.MockHttpInputMessage;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 
@@ -173,6 +179,101 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ProblemDetail> response = handler.handleNotFound(ex, request);
 
         assertThat(response.getBody().getInstance().toString()).isEqualTo("/api/content/v1/pages/site/page");
+    }
+
+    // -------------------------------------------------------------------------
+    // NoResourceFoundException → 404
+    // -------------------------------------------------------------------------
+
+    /**
+     * An unmapped path — most often a trailing slash on a collection endpoint — had no
+     * handler, so it fell to the catch-all below and answered 500 instead of letting
+     * Spring's own correct 404 through. Found on {@code GET /api/pim/v1/products/}.
+     */
+    @Test
+    void noResourceFound_returns404NotThe500Catchall() {
+        NoResourceFoundException ex = new NoResourceFoundException(
+                org.springframework.http.HttpMethod.GET, "api/pim/v1/products/", "No static resource api/pim/v1/products");
+
+        ResponseEntity<ProblemDetail> response = handler.handleNoResourceFound(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getProperties().get("errorCode")).isEqualTo("NOT_FOUND");
+        assertThat(body.getProperties()).containsKey("correlationId");
+    }
+
+    // -------------------------------------------------------------------------
+    // MethodArgumentTypeMismatchException → 400
+    // -------------------------------------------------------------------------
+
+    /**
+     * An invalid enum constant on a {@code @RequestParam} (or a malformed UUID/number)
+     * had no handler, so it fell to the catch-all and answered 500 for what is always
+     * a caller mistake. Found on {@code POST .../node/status?status=NOT_A_STATUS}.
+     */
+    @Test
+    void typeMismatch_returns400NamingTheParameter() throws NoSuchMethodException {
+        MethodParameter param = new MethodParameter(String.class.getMethod("valueOf", int.class), 0);
+        MethodArgumentTypeMismatchException ex = new MethodArgumentTypeMismatchException(
+                "NOT_A_STATUS", com.flexcms.core.model.NodeStatus.class, "status", param, null);
+
+        ResponseEntity<ProblemDetail> response = handler.handleTypeMismatch(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getProperties().get("errorCode")).isEqualTo("VALIDATION_ERROR");
+        assertThat(body.getDetail()).contains("status").contains("NOT_A_STATUS").contains("NodeStatus");
+        assertThat(body.getProperties()).containsKey("correlationId");
+    }
+
+    // -------------------------------------------------------------------------
+    // PIM exceptions → 404 / 409 / 400
+    //
+    // PIM is a deliberately isolated module (own database, own migrations, own REST
+    // API) with no dependency on flexcms-core, so it defines its own equivalents of
+    // NotFoundException/ConflictException/ValidationException rather than throwing
+    // core's directly. Before these handlers existed, every "product/catalog/schema
+    // not found" and every illegal catalog-status transition answered 500.
+    // -------------------------------------------------------------------------
+
+    @Test
+    void pimNotFound_returns404() {
+        PimNotFoundException ex = new PimNotFoundException("Product not found: NO-SUCH-SKU");
+
+        ResponseEntity<ProblemDetail> response = handler.handlePimNotFound(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getDetail()).isEqualTo("Product not found: NO-SUCH-SKU");
+        assertThat(body.getProperties().get("errorCode")).isEqualTo("NOT_FOUND");
+    }
+
+    @Test
+    void pimConflict_returns409() {
+        PimConflictException ex = new PimConflictException("Only DRAFT catalogs can be activated; current status: ACTIVE");
+
+        ResponseEntity<ProblemDetail> response = handler.handlePimConflict(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getProperties().get("errorCode")).isEqualTo("CONFLICT");
+    }
+
+    @Test
+    void pimValidation_returns400() {
+        PimValidationException ex = new PimValidationException("Product attributes failed schema validation: required property 'name' not found");
+
+        ResponseEntity<ProblemDetail> response = handler.handlePimValidation(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        ProblemDetail body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getProperties().get("errorCode")).isEqualTo("VALIDATION_ERROR");
     }
 
     // -------------------------------------------------------------------------

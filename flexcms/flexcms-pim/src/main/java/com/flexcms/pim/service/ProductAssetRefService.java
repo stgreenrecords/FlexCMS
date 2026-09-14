@@ -1,5 +1,7 @@
 package com.flexcms.pim.service;
 
+import com.flexcms.pim.exception.PimConflictException;
+import com.flexcms.pim.exception.PimNotFoundException;
 import com.flexcms.pim.model.Product;
 import com.flexcms.pim.model.ProductAssetRef;
 import com.flexcms.pim.repository.ProductAssetRefRepository;
@@ -42,11 +44,11 @@ public class ProductAssetRefService {
     @Transactional("pimTransactionManager")
     public ProductAssetRef link(UUID productId, String assetPath, String role, int orderIndex) {
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
+                .orElseThrow(() -> new PimNotFoundException("Product not found: " + productId));
 
         // Prevent duplicates for the same (product, path, role) combination
         if (assetRefRepo.findByProductIdAndAssetPathAndRole(productId, assetPath, role).isPresent()) {
-            throw new IllegalArgumentException(
+            throw new PimConflictException(
                     "Asset already linked to this product with role '" + role + "': " + assetPath);
         }
 
@@ -64,7 +66,7 @@ public class ProductAssetRefService {
     @Transactional("pimTransactionManager")
     public void unlink(UUID refId) {
         if (!assetRefRepo.existsById(refId)) {
-            throw new IllegalArgumentException("Asset ref not found: " + refId);
+            throw new PimNotFoundException("Asset ref not found: " + refId);
         }
         assetRefRepo.deleteById(refId);
     }
@@ -75,7 +77,7 @@ public class ProductAssetRefService {
     @Transactional("pimTransactionManager")
     public ProductAssetRef updateRef(UUID refId, String role, int orderIndex) {
         ProductAssetRef ref = assetRefRepo.findById(refId)
-                .orElseThrow(() -> new IllegalArgumentException("Asset ref not found: " + refId));
+                .orElseThrow(() -> new PimNotFoundException("Asset ref not found: " + refId));
         if (role != null) ref.setRole(role);
         ref.setOrderIndex(orderIndex);
         return assetRefRepo.save(ref);

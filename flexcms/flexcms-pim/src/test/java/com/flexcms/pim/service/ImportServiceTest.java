@@ -238,7 +238,7 @@ class ImportServiceTest {
         c.setSourceType("EXCEL");
 
         assertThatThrownBy(() -> importService.importProducts(InputStream.nullInputStream(), c))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimValidationException.class)
                 .hasMessageContaining("No import source registered for type 'EXCEL'");
     }
 
@@ -275,7 +275,7 @@ class ImportServiceTest {
 
         assertThatThrownBy(() -> importService.importFromProfile(
                 InputStream.nullInputStream(), profileId, "user"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Mapping profile not found");
     }
 
@@ -314,7 +314,7 @@ class ImportServiceTest {
     @Test
     void inferSchema_unknownSourceType_throws() {
         assertThatThrownBy(() -> importService.inferSchema(InputStream.nullInputStream(), "XML"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimValidationException.class)
                 .hasMessageContaining("No import source registered for type 'XML'");
     }
 }

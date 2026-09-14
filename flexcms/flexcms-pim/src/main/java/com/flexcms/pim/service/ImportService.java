@@ -1,5 +1,7 @@
 package com.flexcms.pim.service;
 
+import com.flexcms.pim.exception.PimNotFoundException;
+import com.flexcms.pim.exception.PimValidationException;
 import com.flexcms.pim.importer.ImportConfig;
 import com.flexcms.pim.importer.ImportResult;
 import com.flexcms.pim.importer.ProductImportSource;
@@ -84,7 +86,7 @@ public class ImportService {
     @Transactional("pimTransactionManager")
     public ImportResult importFromProfile(InputStream input, UUID profileId, String userId) {
         FieldMappingProfile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new IllegalArgumentException("Mapping profile not found: " + profileId));
+                .orElseThrow(() -> new PimNotFoundException("Mapping profile not found: " + profileId));
 
         ImportConfig config = profileToConfig(profile, userId);
         return importProducts(input, config);
@@ -241,11 +243,11 @@ public class ImportService {
     }
 
     private ProductImportSource resolveSource(String sourceType) {
-        if (sourceType == null) throw new IllegalArgumentException("sourceType is required");
+        if (sourceType == null) throw new PimValidationException("sourceType is required");
         return importSources.stream()
                 .filter(s -> s.getSourceType().equalsIgnoreCase(sourceType))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new PimValidationException(
                         "No import source registered for type '" + sourceType + "'. Available: "
                         + importSources.stream().map(ProductImportSource::getSourceType)
                                 .collect(Collectors.joining(", "))));

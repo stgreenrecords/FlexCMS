@@ -59,7 +59,7 @@ class ProductAssetRefServiceTest {
         when(productRepo.findById(productId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> assetRefService.link(productId, "/dam/img.jpg", "gallery", 0))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Product not found");
     }
 
@@ -71,7 +71,7 @@ class ProductAssetRefServiceTest {
                 .thenReturn(Optional.of(new ProductAssetRef()));
 
         assertThatThrownBy(() -> assetRefService.link(productId, "/dam/hero.jpg", "hero", 0))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimConflictException.class)
                 .hasMessageContaining("Asset already linked");
     }
 
@@ -81,7 +81,7 @@ class ProductAssetRefServiceTest {
         when(assetRefRepo.existsById(refId)).thenReturn(false);
 
         assertThatThrownBy(() -> assetRefService.unlink(refId))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Asset ref not found");
     }
 

@@ -27,6 +27,68 @@
 
 ## Hints
 
+### 2026-09-08 — `flex start` cannot fix the Maven TLS failure: its spawned windows do not inherit `MAVEN_OPTS`
+**Context:** Bringing the stack up with `flex start local all` on a workstation behind the corporate TLS-inspecting proxy
+**Symptom:** Two distinct failures in sequence:
+1. `flex start local all` → infra + Admin + Sample Site launch, but both backends are skipped with
+   `Maven compile failed (exit code 1)` and
+   `Non-resolvable parent POM ... spring-boot-starter-parent:pom:4.1.0 (absent): (certificate_unknown) PKIX path building failed`.
+2. After persisting the documented fix with
+   `[Environment]::SetEnvironmentVariable('MAVEN_OPTS','-Djavax.net.ssl.trustStoreType=Windows-ROOT','User')`,
+   `flex start local author,publish` reports `Build OK` and `Launched in new window`, yet `.dev-logs/author.log`
+   still shows `BUILD FAILURE` with `Failed to read artifact descriptor for org.springframework.boot:spring-boot-buildpack-platform:jar:4.1.0`
+   (plus `spring-boot-loader-tools`, `maven-common-artifact-filters`, `commons-logging`, `micrometer-observation`,
+   `maven-shade-plugin`) — i.e. the same TLS failure, now at *plugin* resolution, and reported
+   `on project flexcms-parent` rather than `flexcms-app`.
+**What failed:**
+- Setting the **User**-scope `MAVEN_OPTS` and immediately re-running `flex` in the *same* shell session. The already-running
+  process keeps its original environment block, so neither it nor the windows it spawns see the new variable. Nothing in the
+  `flex` output hints at this — it prints `Build OK` because its own pre-flight compile step is a separate invocation.
+- Assuming `mvn -pl flexcms-app -am dependency:go-offline` had warmed everything. It resolves the *dependency* graph but
+  **not** the `spring-boot-maven-plugin`'s own runtime dependencies, so `spring-boot:run` still hit the network — and
+  therefore still hit the proxy — on first use.
+**Solution:** Do not rely on `flex` for the first backend start on such a machine. Set the variable **inline** on each
+Maven invocation, warm the cache once, then launch the services directly:
+```bash
+cd flexcms
+MAVEN_OPTS="-Djavax.net.ssl.trustStoreType=Windows-ROOT" mvn -q clean compile
+MAVEN_OPTS="-Djavax.net.ssl.trustStoreType=Windows-ROOT" mvn -q -pl flexcms-app -am dependency:go-offline
+MAVEN_OPTS="-Djavax.net.ssl.trustStoreType=Windows-ROOT" nohup mvn -B spring-boot:run \
+  -pl flexcms-app -am -Dspring-boot.run.profiles=author,local  > ../.dev-logs/author-manual.log 2>&1 &
+MAVEN_OPTS="-Djavax.net.ssl.trustStoreType=Windows-ROOT" nohup mvn -B spring-boot:run \
+  -pl flexcms-app -am -Dspring-boot.run.profiles=publish,local > ../.dev-logs/publish-manual.log 2>&1 &
+```
+Once every artifact is in `~/.m2`, `flex start local all` works normally in **new** shells, because those inherit the
+persisted User variable. Always pass `-B` (batch mode) to `spring-boot:run` when redirecting to a log — without it Maven
+writes tens of thousands of `Progress (4): 2.6/2.7 MB | ...` carriage-return lines that make the log unreadable and can
+blow up a log tail.
+**Why it works:** The persisted `MAVEN_OPTS` only reaches processes started *after* it is set, and a spawned child window
+inherits its parent's environment block, not the registry's current value. Setting it inline sidesteps environment
+inheritance entirely. `Windows-ROOT` makes the JVM read the Windows certificate store, which already contains the
+corporate MITM root CA, instead of the JDK's bundled `cacerts` — see the 2026-08-19 hint below for the original diagnosis.
+
+### 2026-09-08 — Node.js/pnpm can be entirely absent even when `.dev-logs/admin.log` shows a past successful run
+**Context:** Starting the Admin UI (port 3000) for a manual-test session
+**Symptom:** `flex start local all` prints `Admin UI ... Launched in new window` and the summary lists
+`Admin UI localhost:3000`, but nothing ever listens on 3000. `curl http://localhost:3000` returns nothing and
+`Get-NetTCPConnection -LocalPort 3000 -State Listen` returns no rows. Launching by hand gives
+`nohup: failed to run command 'pnpm': No such file or directory`.
+**What failed:**
+- Trusting `flex`'s "Launched in new window" message and the service summary table. `Launch-InWindow` reports success as
+  soon as the window is spawned; it never checks whether the command inside it resolved.
+- Trusting a healthy-looking `.dev-logs/admin.log` containing `✓ Ready in 217ms`. That log is **not truncated on start**,
+  so it can be weeks stale — check its mtime before believing it.
+- `Get-Command pnpm` / `Get-Command npm`, then probing `C:\Program Files\nodejs`, `$env:APPDATA\npm`,
+  `$env:LOCALAPPDATA\pnpm`, and finally `Get-ChildItem C:\ -Filter node.exe -Recurse -Depth 4` — all empty.
+  Node.js was genuinely not installed, despite the 2026-08-19 hint recording a working pnpm setup on an earlier machine.
+**Solution:** Verify the toolchain before diagnosing the app. `node --version && pnpm --version` must both answer. If not:
+install Node.js 20+ (LTS), then `npm install -g pnpm@9.0.0` to match the `packageManager` pin in `frontend/package.json`,
+then `cd frontend && pnpm install && pnpm build`. The backend is unaffected — Author/Publish start fine without Node, so
+an API-only session can proceed while the frontend toolchain is missing.
+**Why it works:** Nothing in the `flex` output distinguishes "started" from "spawned a window that died instantly", and the
+append-only logs preserve evidence of previous, successful runs on a differently-provisioned machine. Checking the two
+version commands takes seconds and rules out an entire class of misdiagnosis.
+
 ### 2026-08-23 — Rebuilding the frontends while their servers run invalidates any Selenium run in flight
 **Context:** Running `cd frontend && pnpm build` (turbo) to pick up a code change while `pnpm start` / `next start`
 are already serving :3000 and :3001, then running or continuing a Selenium suite

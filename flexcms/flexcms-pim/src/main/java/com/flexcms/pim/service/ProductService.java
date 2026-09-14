@@ -5,6 +5,7 @@ import com.flexcms.pim.model.*;
 import com.flexcms.pim.repository.CatalogRepository;
 import com.flexcms.pim.repository.ProductRepository;
 import com.flexcms.pim.repository.ProductSchemaRepository;
+import com.flexcms.pim.exception.PimNotFoundException;
 import com.flexcms.pim.repository.ProductVersionRepository;
 import org.hibernate.Hibernate;
 
@@ -84,7 +85,7 @@ public class ProductService {
     @Transactional("pimTransactionManager")
     public Product create(String sku, String name, UUID catalogId, Map<String, Object> attributes, String userId) {
         Catalog catalog = catalogRepo.findById(catalogId)
-                .orElseThrow(() -> new IllegalArgumentException("Catalog not found: " + catalogId));
+                .orElseThrow(() -> new PimNotFoundException("Catalog not found: " + catalogId));
 
         Product product = new Product();
         product.setSku(sku);
@@ -114,7 +115,7 @@ public class ProductService {
     @Transactional("pimTransactionManager")
     public Product update(String sku, Map<String, Object> newAttributes, String userId) {
         Product product = productRepo.findBySku(sku)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+                .orElseThrow(() -> new PimNotFoundException("Product not found: " + sku));
 
         // Validate against schema before merging
         Map<String, Object> merged = new HashMap<>(product.getAttributes());
@@ -159,7 +160,7 @@ public class ProductService {
     @Transactional("pimTransactionManager")
     public int carryforward(UUID sourceCatalogId, UUID targetCatalogId, String userId) {
         Catalog targetCatalog = catalogRepo.findById(targetCatalogId)
-                .orElseThrow(() -> new IllegalArgumentException("Target catalog not found"));
+                .orElseThrow(() -> new PimNotFoundException("Target catalog not found"));
 
         Page<Product> allSource = productRepo.findByCatalogId(sourceCatalogId, Pageable.unpaged());
 
@@ -198,7 +199,7 @@ public class ProductService {
     @Transactional("pimTransactionManager")
     public Product mergeInheritedAttributes(String sku, String userId) {
         Product product = productRepo.findBySku(sku)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+                .orElseThrow(() -> new PimNotFoundException("Product not found: " + sku));
 
         if (product.getSourceProduct() == null) {
             // Already standalone — nothing to merge
@@ -285,7 +286,7 @@ public class ProductService {
     @Transactional("pimTransactionManager")
     public void delete(String sku) {
         Product product = productRepo.findBySku(sku)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+                .orElseThrow(() -> new PimNotFoundException("Product not found: " + sku));
         productRepo.delete(product);
         productSearchService.remove(sku);
     }
@@ -293,7 +294,7 @@ public class ProductService {
     @Transactional("pimTransactionManager")
     public Product updateStatus(String sku, ProductStatus status, String userId) {
         Product product = productRepo.findBySku(sku)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + sku));
+                .orElseThrow(() -> new PimNotFoundException("Product not found: " + sku));
         product.setStatus(status);
         product.setUpdatedBy(userId);
         // saveAndFlush, not save: the version snapshot below reads
@@ -355,9 +356,9 @@ public class ProductService {
     @Transactional("pimTransactionManager")
     public Product restoreVersion(UUID productId, Long versionNumber, String userId) {
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found: " + productId));
+                .orElseThrow(() -> new PimNotFoundException("Product not found: " + productId));
         ProductVersion snapshot = productVersionRepo.findByProductIdAndVersionNumber(productId, versionNumber)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new PimNotFoundException(
                         "Version " + versionNumber + " not found for product " + productId));
 
         product.setAttributes(new HashMap<>(snapshot.getAttributes()));

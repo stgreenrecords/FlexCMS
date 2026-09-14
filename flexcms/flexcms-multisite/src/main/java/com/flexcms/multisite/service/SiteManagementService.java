@@ -1,5 +1,7 @@
 package com.flexcms.multisite.service;
 
+import com.flexcms.core.exception.ConflictException;
+import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.DomainMapping;
 import com.flexcms.core.model.Site;
@@ -42,7 +44,7 @@ public class SiteManagementService {
     public Site createSite(String siteId, String title, String defaultLocale,
                             List<String> supportedLocales, String userId) {
         if (siteRepository.existsById(siteId)) {
-            throw new IllegalArgumentException("Site already exists: " + siteId);
+            throw ConflictException.alreadyExists(siteId);
         }
 
         Site site = new Site();
@@ -71,7 +73,7 @@ public class SiteManagementService {
     @Transactional
     public DomainMapping addDomain(String siteId, String domain, boolean primary) {
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new IllegalArgumentException("Site not found: " + siteId));
+                .orElseThrow(() -> NotFoundException.forId("Site", siteId));
 
         DomainMapping mapping = new DomainMapping(domain, siteId);
         mapping.setPrimary(primary);
@@ -122,7 +124,7 @@ public class SiteManagementService {
      */
     public Map<String, Object> getSiteSummary(String siteId) {
         Site site = siteRepository.findById(siteId)
-                .orElseThrow(() -> new IllegalArgumentException("Site not found: " + siteId));
+                .orElseThrow(() -> NotFoundException.forId("Site", siteId));
 
         Map<String, Object> summary = new HashMap<>();
         summary.put("site", site);

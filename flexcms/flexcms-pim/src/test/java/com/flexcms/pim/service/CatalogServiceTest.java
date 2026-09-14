@@ -57,7 +57,7 @@ class CatalogServiceTest {
 
         assertThatThrownBy(() ->
                 catalogService.create("Spring 2026", 2026, null, null, schemaId, null, "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Schema not found");
     }
 
@@ -82,8 +82,30 @@ class CatalogServiceTest {
         when(catalogRepo.findById(id)).thenReturn(Optional.of(catalog));
 
         assertThatThrownBy(() -> catalogService.activate(id))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimConflictException.class)
                 .hasMessageContaining("Only DRAFT catalogs can be activated");
+    }
+
+    @Test
+    void activate_throwsWhenAnotherCatalogAlreadyActiveForSameYear() {
+        UUID id = UUID.randomUUID();
+        Catalog catalog = new Catalog();
+        catalog.setStatus(Catalog.CatalogStatus.DRAFT);
+        catalog.setYear(2026);
+        when(catalogRepo.findById(id)).thenReturn(Optional.of(catalog));
+
+        Catalog alreadyActive = new Catalog();
+        alreadyActive.setId(UUID.randomUUID());
+        alreadyActive.setStatus(Catalog.CatalogStatus.ACTIVE);
+        alreadyActive.setYear(2026);
+        when(catalogRepo.findByYearAndStatus(2026, Catalog.CatalogStatus.ACTIVE))
+                .thenReturn(java.util.List.of(alreadyActive));
+
+        assertThatThrownBy(() -> catalogService.activate(id))
+                .isInstanceOf(com.flexcms.pim.exception.PimConflictException.class)
+                .hasMessageContaining("Another catalog is already ACTIVE for year 2026");
+
+        verify(catalogRepo, never()).save(any());
     }
 
     @Test
@@ -107,7 +129,7 @@ class CatalogServiceTest {
         when(catalogRepo.findById(id)).thenReturn(Optional.of(catalog));
 
         assertThatThrownBy(() -> catalogService.archive(id))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimConflictException.class)
                 .hasMessageContaining("Only ACTIVE catalogs can be archived");
     }
 
@@ -119,7 +141,7 @@ class CatalogServiceTest {
         when(catalogRepo.findById(id)).thenReturn(Optional.of(catalog));
 
         assertThatThrownBy(() -> catalogService.delete(id))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimConflictException.class)
                 .hasMessageContaining("Cannot delete an ACTIVE catalog");
     }
 

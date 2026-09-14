@@ -1,5 +1,7 @@
 package com.flexcms.pim.service;
 
+import com.flexcms.pim.exception.PimConflictException;
+import com.flexcms.pim.exception.PimNotFoundException;
 import com.flexcms.pim.model.Catalog;
 import com.flexcms.pim.model.ProductSchema;
 import com.flexcms.pim.repository.CatalogRepository;
@@ -59,7 +61,7 @@ public class CatalogService {
     public Catalog create(String name, int year, String season, String description,
                           UUID schemaId, Map<String, Object> settings, String userId) {
         ProductSchema schema = schemaRepo.findById(schemaId)
-                .orElseThrow(() -> new IllegalArgumentException("Schema not found: " + schemaId));
+                .orElseThrow(() -> new PimNotFoundException("Schema not found: " + schemaId));
 
         Catalog catalog = new Catalog();
         catalog.setName(name);
@@ -75,7 +77,7 @@ public class CatalogService {
     @Transactional("pimTransactionManager")
     public Catalog update(UUID id, String name, String description, Map<String, Object> settings) {
         Catalog catalog = catalogRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Catalog not found: " + id));
+                .orElseThrow(() -> new PimNotFoundException("Catalog not found: " + id));
         if (name != null) catalog.setName(name);
         if (description != null) catalog.setDescription(description);
         if (settings != null) catalog.setSettings(settings);
@@ -84,14 +86,22 @@ public class CatalogService {
 
     /**
      * Activate a catalog (DRAFT → ACTIVE).
-     * Only DRAFT catalogs can be activated.
+     * Only DRAFT catalogs can be activated, and only one catalog per year may be
+     * ACTIVE at a time — archive the currently active one first.
      */
     @Transactional("pimTransactionManager")
     public Catalog activate(UUID id) {
         Catalog catalog = catalogRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Catalog not found: " + id));
+                .orElseThrow(() -> new PimNotFoundException("Catalog not found: " + id));
         if (catalog.getStatus() != Catalog.CatalogStatus.DRAFT) {
-            throw new IllegalStateException("Only DRAFT catalogs can be activated; current status: " + catalog.getStatus());
+            throw new PimConflictException("Only DRAFT catalogs can be activated; current status: " + catalog.getStatus());
+        }
+        boolean anotherActiveForYear = catalogRepo.findByYearAndStatus(catalog.getYear(), Catalog.CatalogStatus.ACTIVE)
+                .stream()
+                .anyMatch(c -> !c.getId().equals(id));
+        if (anotherActiveForYear) {
+            throw new PimConflictException("Another catalog is already ACTIVE for year " + catalog.getYear()
+                    + "; archive it before activating this one");
         }
         catalog.setStatus(Catalog.CatalogStatus.ACTIVE);
         return catalogRepo.save(catalog);
@@ -104,9 +114,9 @@ public class CatalogService {
     @Transactional("pimTransactionManager")
     public Catalog archive(UUID id) {
         Catalog catalog = catalogRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Catalog not found: " + id));
+                .orElseThrow(() -> new PimNotFoundException("Catalog not found: " + id));
         if (catalog.getStatus() != Catalog.CatalogStatus.ACTIVE) {
-            throw new IllegalStateException("Only ACTIVE catalogs can be archived; current status: " + catalog.getStatus());
+            throw new PimConflictException("Only ACTIVE catalogs can be archived; current status: " + catalog.getStatus());
         }
         catalog.setStatus(Catalog.CatalogStatus.ARCHIVED);
         return catalogRepo.save(catalog);
@@ -115,9 +125,9 @@ public class CatalogService {
     @Transactional("pimTransactionManager")
     public void delete(UUID id) {
         Catalog catalog = catalogRepo.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Catalog not found: " + id));
+                .orElseThrow(() -> new PimNotFoundException("Catalog not found: " + id));
         if (catalog.getStatus() == Catalog.CatalogStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot delete an ACTIVE catalog; archive it first");
+            throw new PimConflictException("Cannot delete an ACTIVE catalog; archive it first");
         }
         catalogRepo.deleteById(id);
     }

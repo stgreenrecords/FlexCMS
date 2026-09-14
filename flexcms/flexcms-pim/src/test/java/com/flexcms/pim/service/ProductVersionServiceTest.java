@@ -168,7 +168,7 @@ class ProductVersionServiceTest {
         when(productRepo.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.restoreVersion(id, 1L, "admin"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Product not found");
         verify(productVersionRepo, never()).save(any());
     }
@@ -181,7 +181,7 @@ class ProductVersionServiceTest {
         when(productVersionRepo.findByProductIdAndVersionNumber(id, 99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.restoreVersion(id, 99L, "admin"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Version 99 not found");
         verify(productVersionRepo, never()).save(any());
     }

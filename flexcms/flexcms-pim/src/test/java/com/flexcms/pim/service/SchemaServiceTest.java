@@ -49,7 +49,7 @@ class SchemaServiceTest {
 
         assertThatThrownBy(() ->
                 schemaService.create("Footwear", "2026", null, Map.of(), null, null, "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimConflictException.class)
                 .hasMessageContaining("Schema already exists");
     }
 
@@ -77,7 +77,7 @@ class SchemaServiceTest {
 
         assertThatThrownBy(() ->
                 schemaService.create("Footwear", "2027", null, Map.of(), null, parentId, "user1"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Parent schema not found");
     }
 
@@ -100,7 +100,7 @@ class SchemaServiceTest {
         when(schemaRepo.existsById(id)).thenReturn(false);
 
         assertThatThrownBy(() -> schemaService.delete(id))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.flexcms.pim.exception.PimNotFoundException.class)
                 .hasMessageContaining("Schema not found");
     }
 
