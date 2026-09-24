@@ -24,6 +24,24 @@
 $Command  = if ($args.Count -ge 1) { $args[0].ToLower() } else { "help" }
 $SubCmd   = if ($args.Count -ge 2) { $args[1].ToLower() } else { "" }
 
+# Tolerate the transposed form `flex start all local` (service list before "local")
+# alongside the documented `flex start local all`. This is a real, repeatedly-observed
+# mistake — with the strict form, "local" landing in the wrong slot makes the whole
+# command silently do nothing but print a two-line usage error, which reads as "flex
+# doesn't work" rather than "wrong argument order".
+if ($Command -eq "start" -and $SubCmd -ne "local" -and $args.Count -ge 3 -and $args[2].ToLower() -eq "local") {
+    $origCmd = $args[0]; $swapped = $args[1]
+    # Guard the trailing-args slice: PowerShell's `3..2` range is DESCENDING (@(3,2)), not
+    # empty, so appending $args[3..($args.Count-1)] unguarded — when there are no trailing
+    # args at all (Count -eq 3) — reaches an out-of-bounds index 3 (silently $null for an
+    # array) plus index 2 ("local" again), corrupting the rebuilt array with a spurious
+    # extra "local" service arg. Only slice when there's genuinely something past index 2.
+    $trailing = if ($args.Count -gt 3) { $args[3..($args.Count - 1)] } else { @() }
+    $args = @($origCmd, "local", $swapped) + $trailing
+    $SubCmd = "local"
+    Write-Host "  (Interpreting '$origCmd $swapped local' as '$origCmd local $swapped' — order doesn't matter.)" -ForegroundColor DarkGray
+}
+
 # Collect service names from args[2..N], supporting both space-separated and comma-separated
 $ServiceArgs = @()
 for ($i = 2; $i -lt $args.Count; $i++) {
@@ -146,12 +164,21 @@ function Stop-AllServices {
         }
     }
 
-    # Kill Node/Next.js dev server
-    Get-Process node -ErrorAction SilentlyContinue |
-        Where-Object { try { $_.CommandLine -match "next|flexcms|apps.admin" } catch { $false } } |
+    # Kill Node/Next.js dev server.
+    #
+    # BUG FIXED: this used to be `Get-Process node | Where-Object { $_.CommandLine -match ... }`.
+    # Get-Process objects (System.Diagnostics.Process) do NOT expose a CommandLine property at
+    # all — accessing it silently returns $null instead of throwing, so the filter always
+    # evaluated `$null -match "..."` -> $false, and this block never matched a single process.
+    # Every "flex start local all" left the previous run's Next.js dev servers (Admin :3000,
+    # Site :3001) alive, so the new ones spawned into an already-bound port and failed silently
+    # in their own window while the script still reported success. Get-CimInstance Win32_Process
+    # is the query that actually exposes CommandLine.
+    Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -and $_.CommandLine -match "FlexCMS" } |
         ForEach-Object {
-            Write-Host "    Stopping Node PID $($_.Id)" -ForegroundColor DarkGray
-            Stop-Process $_ -Force -ErrorAction SilentlyContinue
+            Write-Host "    Stopping Node PID $($_.ProcessId)" -ForegroundColor DarkGray
+            Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
         }
 
     # Wait for log file locks to release (up to 3 s)
@@ -166,6 +193,53 @@ function Stop-AllServices {
             } catch { Start-Sleep -Milliseconds 300 }
         }
     }
+}
+
+function Free-Port([int]$port) {
+    # Kill whatever is already listening on $port before we try to bind a new process to it.
+    # Without this, a stale process from a previous run (which Stop-AllServices's broad
+    # java/node kills can miss — e.g. a process started outside flex.ps1) makes the new
+    # launch fail with EADDRINUSE/"port already in use" inside its own spawned window, while
+    # this script has no way to see that and reports success anyway.
+    try {
+        $listeners = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction Stop
+        foreach ($listener in $listeners) {
+            Write-Host "    Freeing port $port (PID $($listener.OwningProcess))" -ForegroundColor DarkGray
+            Stop-Process -Id $listener.OwningProcess -Force -ErrorAction SilentlyContinue
+        }
+    } catch {
+        # Port already free, or Get-NetTCPConnection unavailable in a restricted shell — continue.
+    }
+}
+
+function Wait-ForUrl([string]$name, [string]$url, [int]$timeoutSec, [string]$logFile) {
+    # Actually verifies the service came up instead of assuming success the instant a window
+    # is spawned. Every Start-* function used to print "Launched in new window" unconditionally
+    # — that line is true regardless of whether the command inside the window ever succeeded,
+    # so a compile error, a missing dependency, or a port conflict all looked identical to a
+    # clean start. This polls the service's own health endpoint and reports the truth.
+    Write-Host "    Waiting for $name..." -ForegroundColor Yellow -NoNewline
+    $deadline = (Get-Date).AddSeconds($timeoutSec)
+    while ((Get-Date) -lt $deadline) {
+        try {
+            $resp = Invoke-WebRequest $url -TimeoutSec 3 -UseBasicParsing -ErrorAction Stop
+            if ($resp.StatusCode -ge 200 -and $resp.StatusCode -lt 400) {
+                Write-Host " UP" -ForegroundColor Green
+                return $true
+            }
+        } catch {
+            # Not up yet, or a non-2xx/3xx we don't treat as ready — keep polling.
+        }
+        Write-Host "." -NoNewline -ForegroundColor Yellow
+        Start-Sleep 2
+    }
+    Write-Host " FAILED" -ForegroundColor Red
+    Write-Host "    $name did not respond at $url within ${timeoutSec}s." -ForegroundColor Red
+    if ($logFile -and (Test-Path $logFile)) {
+        Write-Host "    Last 15 lines of $logFile :" -ForegroundColor Red
+        Get-Content $logFile -Tail 15 | ForEach-Object { Write-Host "      $_" -ForegroundColor DarkGray }
+    }
+    return $false
 }
 
 function Launch-InWindow([string]$title, [string]$workDir, [string]$cmd, [string]$logName) {
@@ -210,32 +284,29 @@ Write-Host '>>> Stopped. Press any key.' -ForegroundColor Yellow
 
 function Start-Author {
     Write-Banner "Author  (Content + DAM + PIM read-write)  :8080"
+    Free-Port 8080
     Launch-InWindow "FlexCMS Author :8080" $FlexcmsDir `
         "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=author,local" `
         "author"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
+    return Wait-ForUrl "Author" "http://localhost:8080/actuator/health" 180 (Join-Path $LogDir "author.log")
 }
 
 function Start-Publish {
     Write-Banner "Publish  (Content + DAM read-only)  :8081"
+    Free-Port 8081
     Launch-InWindow "FlexCMS Publish :8081" $FlexcmsDir `
         "mvn spring-boot:run -pl flexcms-app -am ``-Dspring-boot.run.profiles=publish,local" `
         "publish"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
+    return Wait-ForUrl "Publish" "http://localhost:8081/actuator/health" 180 (Join-Path $LogDir "publish.log")
 }
 
 function Start-Admin {
     Write-Banner "Admin UI  (Next.js)  :3000"
     $adminDir = Join-Path (Join-Path $FrontendDir "apps") "admin"
     $adminBuildCache = Join-Path $adminDir ".next"
-    try {
-        $listeners = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction Stop
-        foreach ($listener in $listeners) {
-            Stop-Process -Id $listener.OwningProcess -Force -ErrorAction SilentlyContinue
-        }
-    } catch {
-        # Port may be free or command unavailable in restricted shells; continue startup.
-    }
+    Free-Port 3000
     if (Test-Path $adminBuildCache) {
         Remove-Item -Recurse -Force $adminBuildCache -ErrorAction SilentlyContinue
     }
@@ -243,15 +314,18 @@ function Start-Admin {
         "pnpm install --silent 2>&1 | Out-Null; Set-Location '$adminDir'; pnpm dev" `
         "admin"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
+    return Wait-ForUrl "Admin UI" "http://localhost:3000" 120 (Join-Path $LogDir "admin.log")
 }
 
 function Start-Site {
     Write-Banner "Sample Site  (Next.js)  :3001"
     $siteDir = Join-Path (Join-Path $FrontendDir "apps") "site-nextjs"
+    Free-Port 3001
     Launch-InWindow "FlexCMS Site :3001" $FrontendDir `
         "pnpm install --silent 2>&1 | Out-Null; Set-Location '$siteDir'; pnpm dev" `
         "site"
     Write-Host "    Launched in new window" -ForegroundColor DarkGray
+    return Wait-ForUrl "Sample Site" "http://localhost:3001" 120 (Join-Path $LogDir "site.log")
 }
 
 function Get-PythonExe {
@@ -378,11 +452,15 @@ switch ($Command) {
             }
         }
 
+        # Track whether each requested service actually came up — used for a truthful
+        # summary below instead of assuming every "Launched in new window" succeeded.
+        $authorUp = $false; $publishUp = $false; $adminUp = $false; $siteUp = $false
+
         # 3) Author (skip if compile failed)
         if ("author" -in $services) {
             if ($backendOk) {
-                Start-Author
-                if ($isFullStack) {
+                $authorUp = Start-Author
+                if ($isFullStack -and $authorUp) {
                     Run-FullStackSeed
                 }
             }
@@ -393,22 +471,22 @@ switch ($Command) {
         if ("publish" -in $services) {
             if ($backendOk) {
                 if ("author" -in $services) { Start-Sleep 5 }
-                Start-Publish
+                $publishUp = Start-Publish
             } else {
                 Write-Host "    Skipping Publish — backend compile failed" -ForegroundColor Yellow
             }
         }
 
         # 5) Admin UI (always starts — no backend dependency)
-        if ("admin" -in $services) { Start-Admin }
+        if ("admin" -in $services) { $adminUp = Start-Admin }
 
         # 6) Sample Site (always starts — no backend dependency)
-        if ("site" -in $services) { Start-Site }
+        if ("site" -in $services) { $siteUp = Start-Site }
 
-        # Summary
+        # Summary — reflects what was actually verified above, not just what was launched.
         Write-Host ""
-        Write-Host "    SERVICE                    URL" -ForegroundColor White
-        Write-Host "    $("-" * 48)" -ForegroundColor DarkGray
+        Write-Host "    SERVICE                    URL              STATUS" -ForegroundColor White
+        Write-Host "    $("-" * 60)" -ForegroundColor DarkGray
         if ("infra"   -in $services) {
             Write-Svc "PostgreSQL"    "localhost:5432"
             Write-Svc "Redis"         "localhost:6379"
@@ -417,24 +495,42 @@ switch ($Command) {
             Write-Svc "Elasticsearch" "localhost:9200"
             Write-Svc "pgAdmin 4 (DB)" "localhost:5050"      "no login · DB pwd: flexcms"
         }
-        if ($backendOk) {
-            if ("author"  -in $services) { Write-Svc "Author (CMS+DAM+PIM)" "localhost:8080" ".dev-logs/author.log" }
-            if ("publish" -in $services) { Write-Svc "Publish (read-only)"  "localhost:8081" ".dev-logs/publish.log" }
-        } else {
-            if ("author"  -in $services) { Write-Host "    Author (CMS+DAM+PIM)       SKIPPED  (compile error)" -ForegroundColor Red }
-            if ("publish" -in $services) { Write-Host "    Publish (read-only)        SKIPPED  (compile error)" -ForegroundColor Red }
+        function Write-SvcStatus([string]$name, [string]$url, [bool]$up, [string]$log) {
+            $status = if ($up) { "UP" } else { "FAILED — see .dev-logs/$log" }
+            $color  = if ($up) { "Green" } else { "Red" }
+            Write-Host ("    {0,-26} {1,-16} " -f $name, $url) -NoNewline -ForegroundColor White
+            Write-Host $status -ForegroundColor $color
         }
-        if ("admin"   -in $services) { Write-Svc "Admin UI"             "localhost:3000" ".dev-logs/admin.log" }
-        if ("site"    -in $services) { Write-Svc "Sample Site"           "localhost:3001" ".dev-logs/site.log" }
+        if ("author" -in $services) {
+            if (-not $backendOk) { Write-Host "    Author (CMS+DAM+PIM)       SKIPPED  (compile error)" -ForegroundColor Red }
+            else { Write-SvcStatus "Author (CMS+DAM+PIM)" "localhost:8080" $authorUp "author.log" }
+        }
+        if ("publish" -in $services) {
+            if (-not $backendOk) { Write-Host "    Publish (read-only)        SKIPPED  (compile error)" -ForegroundColor Red }
+            else { Write-SvcStatus "Publish (read-only)" "localhost:8081" $publishUp "publish.log" }
+        }
+        if ("admin" -in $services) { Write-SvcStatus "Admin UI" "localhost:3000" $adminUp "admin.log" }
+        if ("site"  -in $services) { Write-SvcStatus "Sample Site" "localhost:3001" $siteUp "site.log" }
         Write-Host ""
         Write-Host "    flex status      check health" -ForegroundColor DarkGray
         Write-Host "    flex stop local  stop everything" -ForegroundColor DarkGray
         Write-Host "    flex logs author tail logs" -ForegroundColor DarkGray
+
+        $anyRequestedServiceFailed =
+            (("author"  -in $services) -and $backendOk -and -not $authorUp)  -or
+            (("publish" -in $services) -and $backendOk -and -not $publishUp) -or
+            (("admin"   -in $services) -and -not $adminUp) -or
+            (("site"    -in $services) -and -not $siteUp)
         Write-Host ""
         if (-not $backendOk) {
             Write-Host "    ⚠  Backend was not started due to compile errors." -ForegroundColor Yellow
             Write-Host "       Fix the errors and run: flex start local author" -ForegroundColor Yellow
             Write-Host ""
+        }
+        if ($anyRequestedServiceFailed -or -not $backendOk) {
+            Write-Host "    ✗  One or more services did not come up — see FAILED lines above." -ForegroundColor Red
+            Write-Host ""
+            exit 1
         }
     }
 
