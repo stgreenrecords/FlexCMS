@@ -1,8 +1,12 @@
 package com.flexcms.replication.service;
 
+import com.flexcms.core.event.AssetPublicationChangedEvent;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
+import com.flexcms.core.repository.AssetRenditionRepository;
+import com.flexcms.core.repository.AssetRepository;
 import com.flexcms.core.repository.ContentNodeRepository;
+import com.flexcms.replication.model.ReplicatedAsset;
 import com.flexcms.replication.model.ReplicationEvent;
 import com.flexcms.replication.model.ReplicationEvent.ReplicationAction;
 import com.flexcms.replication.model.ReplicationEvent.ReplicationType;
@@ -19,6 +23,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +32,8 @@ class ReplicationReceiverTest {
     @Mock private ContentNodeRepository nodeRepository;
     @Mock private AuthorNodeClient authorNodeClient;
     @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private AssetRepository assetRepository;
+    @Mock private AssetRenditionRepository renditionRepository;
 
     @InjectMocks
     private ReplicationReceiver replicationReceiver;
@@ -234,5 +241,93 @@ class ReplicationReceiverTest {
         replicationReceiver.handleReplication(event);
 
         verify(nodeRepository).deleteSubtree("content.corporate.en.old");
+    }
+
+    // ── ASSET events ───────────────────────────────────────────────────────────
+
+    private ReplicatedAsset assetPayload(UUID id) {
+        java.time.Instant now = java.time.Instant.parse("2026-09-01T10:00:00Z");
+        return new ReplicatedAsset(id, "/content/dam/corporate/logo.png", "logo.png", null, null, "image/png",
+                1234L, "logo.png", "originals/a/logo.png", "flexcms-assets", 640, 480, null, null, null, null,
+                null, null, Map.of("alt", "Logo"), "corporate", "/content/dam/corporate", "alice", now, "alice", now,
+                List.of(new ReplicatedAsset.ReplicatedRendition(UUID.randomUUID(), "thumbnail",
+                        "renditions/x/thumbnail.webp", "image/webp", 9L, 100, 75, "webp", now)));
+    }
+
+    @Test
+    void assetActivate_upsertsRowAndReplacesRenditions_neverTouchesContent() {
+        UUID id = UUID.randomUUID();
+
+        replicationReceiver.handleReplication(ReplicationEvent.assetActivate(assetPayload(id), "alice"));
+
+        var order = inOrder(renditionRepository, assetRepository);
+        order.verify(renditionRepository).deleteReplicatedByAssetPathAndIdNot("/content/dam/corporate/logo.png", id);
+        order.verify(assetRepository).deleteByPathAndIdNot("/content/dam/corporate/logo.png", id);
+        order.verify(assetRepository).upsertReplicated(eq(id), eq("/content/dam/corporate/logo.png"), eq("logo.png"),
+                any(), any(), eq("image/png"), eq(1234L), eq("logo.png"), eq("originals/a/logo.png"),
+                eq("flexcms-assets"), eq(640), eq(480), any(), any(), any(), any(), any(), any(),
+                eq("{\"alt\":\"Logo\"}"), eq("corporate"), eq("/content/dam/corporate"),
+                eq("alice"), any(), eq("alice"), any());
+        order.verify(renditionRepository).deleteReplicatedByAssetId(id);
+        order.verify(renditionRepository).insertReplicated(any(), eq(id), eq("thumbnail"),
+                eq("renditions/x/thumbnail.webp"), eq("image/webp"), eq(9L), eq(100), eq(75), eq("webp"), any());
+        verifyNoInteractions(nodeRepository, authorNodeClient);
+    }
+
+    @Test
+    void assetActivate_announcesAvailability_forCdnPurge() {
+        UUID id = UUID.randomUUID();
+
+        replicationReceiver.handleReplication(ReplicationEvent.assetActivate(assetPayload(id), "alice"));
+
+        ArgumentCaptor<org.springframework.context.ApplicationEvent> captor =
+                ArgumentCaptor.forClass(org.springframework.context.ApplicationEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue()).isInstanceOfSatisfying(AssetPublicationChangedEvent.class, e -> {
+            assertThat(e.getAssetId()).isEqualTo(id);
+            assertThat(e.isAvailable()).isTrue();
+        });
+    }
+
+    @Test
+    void assetDeactivate_deletesRenditionsThenRow_andAnnouncesWithdrawal() {
+        UUID id = UUID.randomUUID();
+
+        replicationReceiver.handleReplication(ReplicationEvent.assetRemove(id, "/content/dam/corporate/logo.png",
+                "corporate", ReplicationAction.DEACTIVATE, "alice"));
+
+        var order = inOrder(renditionRepository, assetRepository);
+        order.verify(renditionRepository).deleteReplicatedByAssetId(id);
+        order.verify(assetRepository).deleteReplicated(id);
+        ArgumentCaptor<org.springframework.context.ApplicationEvent> captor =
+                ArgumentCaptor.forClass(org.springframework.context.ApplicationEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue()).isInstanceOfSatisfying(AssetPublicationChangedEvent.class,
+                e -> assertThat(e.isAvailable()).isFalse());
+        verifyNoInteractions(nodeRepository);
+    }
+
+    @Test
+    void assetDelete_removesRow() {
+        UUID id = UUID.randomUUID();
+
+        replicationReceiver.handleReplication(ReplicationEvent.assetRemove(id, "/content/dam/corporate/logo.png",
+                "corporate", ReplicationAction.DELETE, "alice"));
+
+        verify(assetRepository).deleteReplicated(id);
+        verifyNoInteractions(nodeRepository);
+    }
+
+    @Test
+    void legacyAssetEvent_withoutId_isSkipped_andCreatesNoContentNode() {
+        // Before ECMS-03 an ASSET event fell into activateContent and upserted a bogus node.
+        ReplicationEvent legacy = new ReplicationEvent();
+        legacy.setType(ReplicationType.ASSET);
+        legacy.setAction(ReplicationAction.ACTIVATE);
+        legacy.setPath("/content/dam/logo.png");
+
+        replicationReceiver.handleReplication(legacy);
+
+        verifyNoInteractions(nodeRepository, assetRepository, renditionRepository, eventPublisher);
     }
 }

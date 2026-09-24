@@ -1,8 +1,15 @@
 package com.flexcms.replication;
 
+import com.flexcms.core.event.AssetDeletedEvent;
+import com.flexcms.core.event.ContentStatusChangedEvent;
+import com.flexcms.core.model.Asset;
+import com.flexcms.core.model.AssetRendition;
+import com.flexcms.core.model.AssetStatus;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.model.ReplicationLogEntry;
+import com.flexcms.core.repository.AssetRenditionRepository;
+import com.flexcms.core.repository.AssetRepository;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ReplicationLogRepository;
 import com.flexcms.replication.config.ReplicationQueueConfig;
@@ -14,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -71,9 +80,13 @@ class ReplicationAgentIT {
     @Autowired ReplicationAgent replicationAgent;
     @Autowired ContentNodeRepository nodeRepository;
     @Autowired ReplicationLogRepository replicationLogRepository;
+    @Autowired AssetRepository assetRepository;
+    @Autowired AssetRenditionRepository renditionRepository;
     @Autowired AmqpAdmin amqpAdmin;
     @Autowired RabbitTemplate amqpTemplate;
     @Autowired TopicExchange replicationExchange;
+    @Autowired ApplicationEventPublisher eventPublisher;
+    @Autowired TransactionTemplate transactionTemplate;
 
     /** Temporary queue created per-test to capture messages sent by the agent. */
     private String captureQueueName;
@@ -85,7 +98,10 @@ class ReplicationAgentIT {
         // Create a transient, auto-delete queue and bind it to the exchange
         // so we can assert that messages actually arrive at the broker.
         captureQueueName = "test.capture." + UUID.randomUUID();
-        amqpAdmin.declareQueue(new Queue(captureQueueName, false, false, true));
+        // Not auto-delete: a timed receiveAndConvert attaches a temporary consumer, and
+        // cancelling it deletes an auto-delete queue — a test reading two messages then
+        // finds the queue gone (404 NOT_FOUND). tearDown() deletes it explicitly.
+        amqpAdmin.declareQueue(new Queue(captureQueueName, false, false, false));
         amqpAdmin.declareBinding(new Binding(captureQueueName, Binding.DestinationType.QUEUE,
                 ReplicationQueueConfig.EXCHANGE_NAME, "content.replicate.#", null));
         amqpAdmin.declareBinding(new Binding(captureQueueName, Binding.DestinationType.QUEUE,
@@ -97,6 +113,8 @@ class ReplicationAgentIT {
         amqpAdmin.deleteQueue(captureQueueName);
         nodeRepository.deleteAll();
         replicationLogRepository.deleteAll();
+        renditionRepository.deleteAll();
+        assetRepository.deleteAll();
     }
 
     // ── Helper ─────────────────────────────────────────────────────────────────
@@ -234,19 +252,104 @@ class ReplicationAgentIT {
 
     // ── Tests: replicateAsset ─────────────────────────────────────────────────
 
-    @Test
-    void replicateAsset_messageArrivesWithRenditionKeys() {
-        List<String> renditions = List.of("renditions/logo-800.webp", "renditions/logo-400.webp");
+    private Asset savedAsset(String path) {
+        Asset a = new Asset();
+        a.setPath(path);
+        a.setName("logo.png");
+        a.setMimeType("image/png");
+        a.setFileSize(1234L);
+        a.setStorageKey("originals/" + UUID.randomUUID() + "/logo.png");
+        a.setStorageBucket("flexcms-assets");
+        a.setSiteId("corporate");
+        a.setFolderPath("/content/dam/corporate");
+        a.setWidth(640);
+        a.setHeight(480);
+        a.setMetadata(new java.util.HashMap<>(java.util.Map.of("alt", "Logo")));
+        a.setStatus(AssetStatus.ACTIVE);
+        Asset saved = assetRepository.save(a);
 
-        UUID eventId = replicationAgent.replicateAsset("/content/dam/logo.png", renditions, "alice");
+        AssetRendition r = new AssetRendition();
+        r.setAsset(saved);
+        r.setRenditionKey("thumbnail");
+        r.setStorageKey("renditions/" + saved.getId() + "/thumbnail.webp");
+        r.setMimeType("image/webp");
+        r.setGeneratedAt(java.time.Instant.parse("2026-09-01T00:00:00Z"));
+        renditionRepository.save(r);
+        return saved;
+    }
+
+    @Test
+    void replicateAsset_payloadSurvivesTheBrokerRoundTrip() {
+        // The publish tier writes the row from this payload alone, so every field it
+        // needs must deserialize — records, Instants and the metadata map included.
+        Asset a = savedAsset("/content/dam/corporate/logo.png");
+
+        UUID eventId = replicationAgent.replicateAsset(a.getId(), ReplicationEvent.ReplicationAction.ACTIVATE, "alice");
 
         ReplicationEvent received = receiveEvent();
-
         assertThat(received).isNotNull();
         assertThat(received.getEventId()).isEqualTo(eventId);
         assertThat(received.getType()).isEqualTo(ReplicationEvent.ReplicationType.ASSET);
-        assertThat(received.getPath()).isEqualTo("/content/dam/logo.png");
-        assertThat(received.getRenditionKeys()).containsAll(renditions);
+        assertThat(received.getAssetId()).isEqualTo(a.getId());
+        assertThat(received.getAsset().storageKey()).isEqualTo(a.getStorageKey());
+        assertThat(received.getAsset().metadata()).containsEntry("alt", "Logo");
+        assertThat(received.getAsset().renditions()).singleElement()
+                .satisfies(r -> {
+                    assertThat(r.renditionKey()).isEqualTo("thumbnail");
+                    assertThat(r.generatedAt()).isEqualTo(java.time.Instant.parse("2026-09-01T00:00:00Z"));
+                });
+        assertThat(received.getRenditionKeys()).containsExactly("thumbnail");
         assertThat(received.getInitiatedBy()).isEqualTo("alice");
+    }
+
+    @Test
+    void replicateTree_pageReferencingAnAsset_sendsTheAssetThenTheTree() {
+        Asset a = savedAsset("/content/dam/corporate/hero.png");
+        savedNode("content.corporate.en.home");
+        ContentNode hero = savedNode("content.corporate.en.home.hero");
+        hero.setProperties(new java.util.HashMap<>(java.util.Map.of(
+                "image", "/api/author/assets/" + a.getId() + "/content")));
+        nodeRepository.save(hero);
+
+        replicationAgent.replicateTree("content.corporate.en.home", "alice");
+
+        ReplicationEvent first = receiveEvent();
+        ReplicationEvent second = receiveEvent();
+        assertThat(first.getType()).isEqualTo(ReplicationEvent.ReplicationType.ASSET);
+        assertThat(first.getAssetId()).isEqualTo(a.getId());
+        assertThat(second.getType()).isEqualTo(ReplicationEvent.ReplicationType.TREE);
+    }
+
+    // ── Tests: listener path (AFTER_COMMIT) ───────────────────────────────────
+
+    @Test
+    void publishViaStatusEvent_afterCommit_persistsReplicationLog() {
+        // Regression: the AFTER_COMMIT listener used to join the already-committed
+        // transaction, so the message was sent but the log row was discarded.
+        ContentNode page = savedNode("content.corporate.en.home");
+
+        transactionTemplate.executeWithoutResult(status -> eventPublisher.publishEvent(
+                new ContentStatusChangedEvent(this, page, NodeStatus.DRAFT, NodeStatus.PUBLISHED, "alice")));
+
+        assertThat(receiveEvent().getType()).isEqualTo(ReplicationEvent.ReplicationType.TREE);
+        assertThat(replicationLogRepository.findAll())
+                .anySatisfy(entry -> {
+                    assertThat(entry.getReplicationType()).isEqualTo(ReplicationLogEntry.ReplicationType.TREE);
+                    assertThat(entry.getContentPath()).isEqualTo("content.corporate.en.home");
+                });
+    }
+
+    @Test
+    void assetDeletedEvent_afterCommit_sendsDeleteAndPersistsLog() {
+        UUID id = UUID.randomUUID();
+
+        transactionTemplate.executeWithoutResult(status -> eventPublisher.publishEvent(
+                new AssetDeletedEvent(this, id, "/content/dam/corporate/gone.png", "corporate", "alice")));
+
+        ReplicationEvent received = receiveEvent();
+        assertThat(received.getAction()).isEqualTo(ReplicationEvent.ReplicationAction.DELETE);
+        assertThat(received.getAssetId()).isEqualTo(id);
+        assertThat(replicationLogRepository.findAll())
+                .anySatisfy(entry -> assertThat(entry.getNodeId()).isEqualTo(id));
     }
 }

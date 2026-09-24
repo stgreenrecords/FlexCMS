@@ -48,13 +48,6 @@ function getImageUrl(value: unknown): string {
   return fallback;
 }
 
-function toBrowserImageUrl(url: string): string {
-  if (url.startsWith('/api/author/assets/')) {
-    return `http://localhost:8080${url}`;
-  }
-  return url;
-}
-
 export const NavigationRenderer: FlexCmsRenderer = ({ data }) => {
   const brand = asString(data.logo, 'TUT');
   const items = asList(data.primaryLinks).map((item) => toTutLink(item)).filter((item): item is NonNullable<typeof item> => item !== null);

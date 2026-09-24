@@ -34,6 +34,11 @@
             <groupId>com.flexcms</groupId>
             <artifactId>flexcms-pim</artifactId>
         </dependency>
+        <!-- Public asset delivery (/dam/renditions/**) resolves assets through the DAM service layer -->
+        <dependency>
+            <groupId>com.flexcms</groupId>
+            <artifactId>flexcms-dam</artifactId>
+        </dependency>
 
         <!-- Web -->
         <dependency>

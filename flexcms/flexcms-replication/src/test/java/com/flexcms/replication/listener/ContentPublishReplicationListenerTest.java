@@ -1,5 +1,6 @@
 package com.flexcms.replication.listener;
 
+import com.flexcms.core.event.AssetDeletedEvent;
 import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
@@ -138,6 +139,28 @@ class ContentPublishReplicationListenerTest {
                 .when(replicationAgent).replicateTree(anyString(), anyString());
 
         assertThatCode(() -> listener.onContentStatusChanged(event(page, NodeStatus.DRAFT, NodeStatus.PUBLISHED)))
+                .doesNotThrowAnyException();
+    }
+
+    // ── asset deletion ─────────────────────────────────────────────────────────
+
+    @Test
+    void assetDeleted_replicatesTheDeletion() {
+        java.util.UUID id = java.util.UUID.randomUUID();
+
+        listener.onAssetDeleted(new AssetDeletedEvent(this, id, "/content/dam/tut-usa/logo.png", "tut-usa", "admin"));
+
+        verify(replicationAgent).replicateAssetDelete(id, "/content/dam/tut-usa/logo.png", "tut-usa", "admin");
+    }
+
+    @Test
+    void assetDeleted_replicationFailure_isSwallowed() {
+        java.util.UUID id = java.util.UUID.randomUUID();
+        doThrow(new IllegalStateException("queue unavailable"))
+                .when(replicationAgent).replicateAssetDelete(any(), anyString(), anyString(), anyString());
+
+        assertThatCode(() -> listener.onAssetDeleted(
+                new AssetDeletedEvent(this, id, "/content/dam/tut-usa/logo.png", "tut-usa", "admin")))
                 .doesNotThrowAnyException();
     }
 }

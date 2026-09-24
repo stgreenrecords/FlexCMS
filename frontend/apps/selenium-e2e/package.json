@@ -19,6 +19,7 @@
     "test:reb26": "pnpm build && mocha --grep \"REB-26 exhaustive per-component sample-site editing suite\"",
     "test:reb20": "pnpm build && mocha --grep \"REB-20 publishing, workflow, scheduling, and bulk operation suite\"",
     "test:reb21": "pnpm build && mocha --grep \"REB-21 DAM authoring and asset-reference suite\"",
+    "test:ecms03": "pnpm build && mocha --grep \"ECMS-03 published asset rendering suite\"",
     "test:reb21:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-21 DAM authoring and asset-reference suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb21-suite.xml",
     "test:reb20:ci": "cross-env CI=true pnpm build && cross-env CI=true mocha --grep \"REB-20 publishing, workflow, scheduling, and bulk operation suite\" --reporter mocha-junit-reporter --reporter-options mochaFile=./reports/junit/reb20-suite.xml",
     "test:wysiwyg": "pnpm build && mocha --grep \"Editor WYSIWYG canvas suite\"",

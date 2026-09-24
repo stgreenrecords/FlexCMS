@@ -195,6 +195,27 @@ function Stop-AllServices {
     }
 }
 
+function Stop-ServiceWindows([string[]]$services) {
+    # Close the terminal windows of the named services only (titles set in Start-*).
+    # The processes they host are stopped by Free-Port in the matching Start-* function.
+    $titles = @{
+        "author"  = "FlexCMS Author :8080"
+        "publish" = "FlexCMS Publish :8081"
+        "admin"   = "FlexCMS Admin :3000"
+        "site"    = "FlexCMS Site :3001"
+    }
+    foreach ($svc in $services) {
+        if (-not $titles.ContainsKey($svc)) { continue }
+        $title = $titles[$svc]
+        Get-Process powershell -ErrorAction SilentlyContinue |
+            Where-Object { try { $_.MainWindowTitle -eq $title } catch { $false } } |
+            ForEach-Object {
+                Write-Host "    Closing: $title" -ForegroundColor DarkGray
+                Stop-Process $_ -Force -ErrorAction SilentlyContinue
+            }
+    }
+}
+
 function Free-Port([int]$port) {
     # Kill whatever is already listening on $port before we try to bind a new process to it.
     # Without this, a stale process from a previous run (which Stop-AllServices's broad
@@ -416,9 +437,19 @@ switch ($Command) {
 
         Write-Banner "FlexCMS -- Starting: $($services -join ' + ')"
 
-        # 0) Kill any previous runs so log files are not locked
+        # 0) Kill previous runs of what is being started, so log files are not locked.
+        #
+        # A full-stack start clears everything. A partial start must leave the other
+        # services alone: Stop-AllServices kills every java process and every FlexCMS
+        # node server, so `flex start local admin,site` used to take author and publish
+        # down with it. For a partial start, close only the requested services' windows;
+        # each Start-* function then frees its own port (Free-Port) before launching.
         Write-Host "    Stopping previous runs..." -ForegroundColor DarkGray
-        Stop-AllServices
+        if ($isFullStack) {
+            Stop-AllServices
+        } else {
+            Stop-ServiceWindows $services
+        }
         Write-Host "    Previous runs stopped." -ForegroundColor DarkGray
 
         # 1) Infra

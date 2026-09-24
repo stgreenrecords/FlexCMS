@@ -3,6 +3,7 @@ package com.flexcms.core.service;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.repository.ContentNodeRepository;
+import com.flexcms.core.util.AssetUrls;
 import com.flexcms.plugin.model.RenderContext;
 import com.flexcms.plugin.spi.ComponentModel;
 import com.flexcms.plugin.spi.ContentNodeData;
@@ -68,6 +69,11 @@ public class ContentDeliveryService {
 
     /**
      * Render a page as a structured JSON response for headless delivery.
+     *
+     * <p>Asset references are returned in canonical form: content authored with the
+     * author-only streaming URL is rewritten to {@code /dam/renditions/{id}} on the way
+     * out, so no consumer is ever handed an {@code /api/author/...} URL ({@code DEC-ECMS-002}).
+     * Stored content is left as it is.</p>
      */
     @Timed(value = "flexcms.content.page.render", description = "Time to render a page component tree")
     @Transactional(readOnly = true)
@@ -104,7 +110,7 @@ public class ContentDeliveryService {
         }
         result.put("components", components);
 
-        return result;
+        return AssetUrls.rewriteLegacyReferences(result);
     }
 
     /**
@@ -127,7 +133,7 @@ public class ContentDeliveryService {
             components.add(adaptComponent(child, context, 0));
         }
         result.put("components", components);
-        return result;
+        return AssetUrls.rewriteLegacyReferences(result);
     }
 
     // =========================================================================

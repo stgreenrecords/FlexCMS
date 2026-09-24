@@ -116,9 +116,11 @@ describe('DAM folder tree suite', function () {
     expect(visible, 'run folder missing from the tree').to.include(root);
 
     // The old sidebar's four MIME buckets must be gone: they were never folders.
-    const leaves = visible.map((p) => p.split('/').pop());
+    // A bucket had no stored path, so it shows up as the bare name. Compare whole paths:
+    // a real stored folder that happens to be called `images` (the seeded
+    // `content/dam/tut-usa/images`) is exactly what the tree should show.
     const seededByMime = ['images', 'videos', 'documents', 'archives'].filter((name) =>
-      leaves.includes(name),
+      visible.includes(name),
     );
     expect(
       seededByMime,

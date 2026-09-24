@@ -1,0 +1,21 @@
+    ✔ S1 loads the DAM library against the live API and records how many assets exist (908ms)
+    ✔ S2 uploads an asset and streams back exactly the bytes that were uploaded (89ms)
+    ✔ S3 opens the asset detail route and verifies its metadata and preview resolve (904ms)
+    ✔ S4 finds the uploaded asset in the library, and shows UI search and API search differ (2384ms)
+    ✔ S5 lists the test-owned DAM folder and finds only this run's assets in it (186ms)
+    ✔ S6 references the uploaded asset from a page component and verifies author API and delivery (128ms)
+    ✔ S7 publishes the asset-backed page and verifies what the publish environment can serve (10440ms)
+    ✔ S8 deletes a test-owned asset by path and leaves the run's other asset untouched (104ms)
+    ✔ S9 records how the upload endpoint responds to an empty file and an executable (58ms)
+    ✔ S10 records one evidence row per DAM operation with no unexplained outcomes
+    ✔ S1 reports every folder holding an asset, scoped to the site
+    ✔ S3 reconstructs a folder that holds no assets of its own (707ms)
+    ✔ S4 counts a folder by its whole subtree (602ms)
+    ✔ S5 collapses and expands a folder without selecting it (951ms)
+    ✔ S6 filters the grid to the selected folder and its descendants (913ms)
+    ✔ S7 walks back up through the breadcrumb (1316ms)
+    ✔ S8 deleting an asset through the row menu removes it from the server (4998ms)
+    ✔ S9 a delete the server rejects leaves the row in place and says so (2491ms)
+    ✔ S10 offers working Download and Copy URL actions, and no dead Move item (2866ms)
+  19 passing (33s)
+  1 failing

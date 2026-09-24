@@ -694,7 +694,7 @@ export default function DamBrowserPage() {
     }
   }
 
-  /** The author API route that streams an asset's bytes — the only asset URL there is. */
+  /** The author API route that streams an asset's bytes, used for download inside the admin. */
   function assetContentUrl(asset: Asset): string {
     return `${API_BASE}/api/author/assets/${asset.id}/content`;
   }
@@ -729,13 +729,23 @@ export default function DamBrowserPage() {
     }
   }
 
+  /**
+   * The URL to put in content: the canonical public URL, relative so it resolves on
+   * whichever host renders the page. The author streaming route (`assetContentUrl`) is
+   * role-guarded and does not exist on publish, so a page that used it showed broken
+   * images to every visitor (ECMS-03).
+   */
+  function assetPublicUrl(asset: Asset): string {
+    return `/dam/renditions/${asset.id}`;
+  }
+
   async function copyAssetUrl(asset: Asset) {
     setActionNotice(null);
     setDeleteError(null);
-    const url = assetContentUrl(asset);
+    const url = assetPublicUrl(asset);
     try {
       await navigator.clipboard.writeText(url);
-      setActionNotice(`URL copied for "${asset.name}".`);
+      setActionNotice(`URL copied for "${asset.name}": ${url}`);
     } catch {
       // Clipboard access needs a secure context and permission, so it can legitimately
       // fail. Show the URL instead of silently doing nothing.

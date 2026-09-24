@@ -9,6 +9,11 @@ export interface SeleniumEnv {
   adminUrl: string;
   adminUrlFallbacks: string[];
   siteUrl: string;
+  /**
+   * A reference-site instance whose live pages read from the publish tier. The default
+   * local site reads from author, so only this instance proves what visitors see.
+   */
+  publishSiteUrl: string;
   publishUrl: string;
   authorApiUrl: string;
   authorHealthUrl: string;
@@ -51,6 +56,7 @@ export function loadEnv(): SeleniumEnv {
     adminUrl,
     adminUrlFallbacks,
     siteUrl: process.env['SITE_URL'] ?? 'http://localhost:3001',
+    publishSiteUrl: process.env['PUBLISH_SITE_URL'] ?? 'http://localhost:3005',
     publishUrl: process.env['PUBLISH_URL'] ?? 'http://localhost:8081',
     authorApiUrl: process.env['AUTHOR_API_URL'] ?? 'http://localhost:8080/api',
     authorHealthUrl: process.env['AUTHOR_HEALTH_URL'] ?? 'http://localhost:8080/actuator/health',

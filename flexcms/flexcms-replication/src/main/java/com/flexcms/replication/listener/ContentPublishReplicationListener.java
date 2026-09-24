@@ -1,5 +1,6 @@
 package com.flexcms.replication.listener;
 
+import com.flexcms.core.event.AssetDeletedEvent;
 import com.flexcms.core.event.ContentDeletedEvent;
 import com.flexcms.core.event.ContentStatusChangedEvent;
 import com.flexcms.replication.model.ReplicationEvent;
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -31,6 +34,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * the content is legitimately published on the author side, and a failed
  * replication must not roll the transition back — it is recoverable by
  * re-publishing.</p>
+ *
+ * <p>Every handler runs in {@link Propagation#REQUIRES_NEW}. An {@code AFTER_COMMIT}
+ * callback still has the finished transaction bound to the thread, so the agent's
+ * {@code @Transactional} methods used to join a transaction that had already committed:
+ * the RabbitMQ message went out, but the {@code replication_log} entry (and anything
+ * else the agent wrote) was silently discarded. Not one CONTENT or TREE log row had ever
+ * been persisted. A fresh transaction is what Spring documents for this phase.</p>
  */
 @Component
 @ConditionalOnProperty(name = "flexcms.runmode", havingValue = "author", matchIfMissing = true)
@@ -52,6 +62,7 @@ public class ContentPublishReplicationListener {
     private ReplicationAgent replicationAgent;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onContentStatusChanged(ContentStatusChangedEvent event) {
         String path = event.getPath();
         if (path == null) {
@@ -94,6 +105,7 @@ public class ContentPublishReplicationListener {
      * recoverable by re-issuing the delete once replication is healthy.</p>
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void onContentDeleted(ContentDeletedEvent event) {
         String path = event.getPath();
         if (path == null) {
@@ -107,6 +119,28 @@ public class ContentPublishReplicationListener {
             log.debug("Replicated deletion of {}", path);
         } catch (Exception e) {
             log.error("Delete replication failed for '{}': {}", path, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Removes a deleted DAM asset from the publish environment.
+     *
+     * <p>Assets reach publish when content referencing them is published or when they
+     * are published explicitly; without this a deleted asset would keep being served
+     * there. Same AFTER_COMMIT and log-and-swallow contract as {@link #onContentDeleted}.</p>
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onAssetDeleted(AssetDeletedEvent event) {
+        if (event.getAssetId() == null) {
+            return;
+        }
+        try {
+            replicationAgent.replicateAssetDelete(event.getAssetId(), event.getPath(),
+                    event.getSiteId(), event.getUserId());
+            log.debug("Replicated deletion of asset {}", event.getPath());
+        } catch (Exception e) {
+            log.error("Asset delete replication failed for '{}': {}", event.getPath(), e.getMessage(), e);
         }
     }
 

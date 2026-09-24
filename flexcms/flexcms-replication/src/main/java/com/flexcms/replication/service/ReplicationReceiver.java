@@ -1,9 +1,14 @@
 package com.flexcms.replication.service;
 
+import com.flexcms.core.converter.JsonbConverter;
+import com.flexcms.core.event.AssetPublicationChangedEvent;
 import com.flexcms.core.event.ContentIndexEvent;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
+import com.flexcms.core.repository.AssetRenditionRepository;
+import com.flexcms.core.repository.AssetRepository;
 import com.flexcms.core.repository.ContentNodeRepository;
+import com.flexcms.replication.model.ReplicatedAsset;
 import com.flexcms.replication.model.ReplicationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Publish-side replication receiver: consumes events and updates the local content store.
@@ -36,10 +42,25 @@ public class ReplicationReceiver {
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
+    @Autowired
+    private AssetRepository assetRepository;
+
+    @Autowired
+    private AssetRenditionRepository renditionRepository;
+
+    private final JsonbConverter jsonbConverter = new JsonbConverter();
+
     @RabbitListener(queues = "#{publishQueue.name}")
     @Transactional
     public void handleReplication(ReplicationEvent event) {
         log.info("Received replication event: {} {} {}", event.getAction(), event.getType(), event.getPath());
+
+        // Before the content switch: an ASSET event used to fall into activateContent and
+        // upsert a bogus content node at the asset's path.
+        if (event.getType() == ReplicationEvent.ReplicationType.ASSET) {
+            handleAsset(event);
+            return;
+        }
 
         switch (event.getAction()) {
             case ACTIVATE -> activateContent(event);
@@ -180,6 +201,62 @@ public class ReplicationReceiver {
         nodeRepository.deleteSubtree(event.getPath());
         log.info("Deleted content from publish: {}", event.getPath());
         eventPublisher.publishEvent(ContentIndexEvent.remove(this, event.getPath()));
+    }
+
+    /**
+     * Mirror an asset onto this tier, or withdraw it.
+     *
+     * <p>The publish row is what makes {@code /dam/renditions/{id}} resolve here (the
+     * binary is in the shared bucket either way), so activation writes the author's row
+     * under the author's id and withdrawal deletes it; renditions follow by replacement
+     * and by cascade respectively.</p>
+     */
+    private void handleAsset(ReplicationEvent event) {
+        UUID assetId = event.getAssetId();
+        if (assetId == null) {
+            // Events from before asset replication carried only a path and rendition keys.
+            log.warn("Asset replication event {} for '{}' has no asset id — skipping",
+                    event.getEventId(), event.getPath());
+            return;
+        }
+
+        if (event.getAction() == ReplicationEvent.ReplicationAction.ACTIVATE) {
+            ReplicatedAsset asset = event.getAsset();
+            if (asset == null) {
+                log.warn("Asset activation event {} for {} has no payload — skipping", event.getEventId(), assetId);
+                return;
+            }
+            activateAsset(asset);
+            eventPublisher.publishEvent(new AssetPublicationChangedEvent(this, assetId, asset.path(), true));
+            log.info("Activated asset on publish: {} ({})", asset.path(), assetId);
+        } else {
+            renditionRepository.deleteReplicatedByAssetId(assetId);
+            int removed = assetRepository.deleteReplicated(assetId);
+            eventPublisher.publishEvent(new AssetPublicationChangedEvent(this, assetId, event.getPath(), false));
+            log.info("Removed asset from publish: {} ({}), {} row(s)", event.getPath(), assetId, removed);
+        }
+    }
+
+    private void activateAsset(ReplicatedAsset a) {
+        // path is unique: a predecessor deleted and re-uploaded at the same path on author
+        // has a different id and would block the insert.
+        renditionRepository.deleteReplicatedByAssetPathAndIdNot(a.path(), a.id());
+        assetRepository.deleteByPathAndIdNot(a.path(), a.id());
+        assetRepository.upsertReplicated(a.id(), a.path(), a.name(), a.title(), a.description(),
+                a.mimeType(), a.fileSize(), a.originalFilename(), a.storageKey(), a.storageBucket(),
+                a.width(), a.height(), a.colorSpace(), a.aspectRatio(), a.duration(),
+                a.videoCodec(), a.audioCodec(), a.frameRate(),
+                jsonbConverter.convertToDatabaseColumn(a.metadata()),
+                a.siteId(), a.folderPath(), a.createdBy(), a.createdAt(), a.modifiedBy(), a.modifiedAt());
+
+        renditionRepository.deleteReplicatedByAssetId(a.id());
+        if (a.renditions() != null) {
+            for (ReplicatedAsset.ReplicatedRendition r : a.renditions()) {
+                renditionRepository.insertReplicated(r.id() != null ? r.id() : UUID.randomUUID(), a.id(),
+                        r.renditionKey(), r.storageKey(), r.mimeType(), r.fileSize(),
+                        r.width(), r.height(), r.format(), r.generatedAt());
+            }
+        }
     }
 
     private String extractName(String path) {

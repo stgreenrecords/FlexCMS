@@ -102,11 +102,6 @@ public class Asset {
                 .orElse(null);
     }
 
-    public String getRenditionUrl(String key) {
-        AssetRendition rendition = getRendition(key);
-        return rendition != null ? rendition.getStorageKey() : storageKey;
-    }
-
     // Getters and setters
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }

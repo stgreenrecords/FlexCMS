@@ -1,6 +1,7 @@
 package com.flexcms.dam.client;
 
 import com.flexcms.core.model.Asset;
+import com.flexcms.core.util.AssetUrls;
 import com.flexcms.dam.service.AssetIngestService;
 import com.flexcms.plugin.dam.DamAssetData;
 import com.flexcms.plugin.dam.DamClient;
@@ -28,9 +29,6 @@ import java.util.Optional;
  */
 @Service
 public class DirectDamClient implements DamClient {
-
-    private static final String STREAM_URL_PREFIX = "/api/author/assets/";
-    private static final String STREAM_URL_SUFFIX = "/content";
 
     @Autowired
     private AssetIngestService assetIngestService;
@@ -102,12 +100,20 @@ public class DirectDamClient implements DamClient {
         );
     }
 
+    /**
+     * Canonical public URL of the original. This used to be the author-only streaming
+     * endpoint, which the publish tier does not serve, so every URL handed to a
+     * component model was dead on the live site ({@code R-REB-21-003}).
+     */
     private static String streamUrl(Asset asset) {
-        return STREAM_URL_PREFIX + asset.getId() + STREAM_URL_SUFFIX;
+        return AssetUrls.original(asset.getId());
     }
 
+    /**
+     * Canonical rendition URL. Built without touching the lazy rendition collection: the
+     * delivery endpoint falls back to the original when the rendition does not exist.
+     */
     private static String renditionUrl(Asset asset, String renditionKey) {
-        String url = asset.getRenditionUrl(renditionKey);
-        return url != null ? url : streamUrl(asset);
+        return AssetUrls.rendition(asset.getId(), renditionKey);
     }
 }

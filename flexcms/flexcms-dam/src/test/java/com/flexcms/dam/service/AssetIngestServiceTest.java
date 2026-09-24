@@ -1,5 +1,6 @@
 package com.flexcms.dam.service;
 
+import com.flexcms.core.event.AssetDeletedEvent;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.model.Asset;
 import com.flexcms.core.model.AssetStatus;
@@ -11,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ class AssetIngestServiceTest {
     @Mock private S3Service s3Service;
     @Mock private ImageProcessingService imageProcessor;
     @Mock private RenditionPipelineService renditionPipeline;
+    @Mock private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private AssetIngestService assetIngestService;
@@ -160,13 +163,14 @@ class AssetIngestServiceTest {
     }
 
     @Test
-    void getRenditionUrl_noRendition_returnsOriginalKey() {
+    void getRenditionUrl_returnsCanonicalDeliveryUrl_notTheStorageKey() {
         Asset a = savedAsset("/dam/logo.png", "image/png");
         when(assetRepository.findByPath("/dam/logo.png")).thenReturn(Optional.of(a));
 
-        // No renditions → falls back to storageKey
+        // Used to return the S3 storage key, which no browser can load.
         String url = assetIngestService.getRenditionUrl("/dam/logo.png", "thumbnail");
-        assertThat(url).isEqualTo(a.getStorageKey());
+        assertThat(url).isEqualTo("/dam/renditions/" + a.getId() + "/thumbnail");
+        assertThat(url).doesNotContain(a.getStorageKey());
     }
 
     // ── deleteAsset ───────────────────────────────────────────────────────────
@@ -177,7 +181,7 @@ class AssetIngestServiceTest {
 
         // This test previously asserted the delete "did nothing" and returned normally,
         // which is exactly what let the API answer 200 for an asset that never existed.
-        assertThatThrownBy(() -> assetIngestService.deleteAsset("/dam/missing.png"))
+        assertThatThrownBy(() -> assetIngestService.deleteAsset("/dam/missing.png", "alice"))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("/dam/missing.png");
 
@@ -190,10 +194,36 @@ class AssetIngestServiceTest {
         Asset a = savedAsset("/dam/logo.png", "image/png");
         when(assetRepository.findByPath("/dam/logo.png")).thenReturn(Optional.of(a));
 
-        assetIngestService.deleteAsset("/dam/logo.png");
+        assetIngestService.deleteAsset("/dam/logo.png", "alice");
 
         verify(s3Service).delete(a.getStorageKey());
         verify(assetRepository).delete(a);
+    }
+
+    @Test
+    void deleteAsset_publishesAssetDeletedEvent_soPublishTierIsTold() {
+        Asset a = savedAsset("/dam/logo.png", "image/png");
+        a.setSiteId("corporate");
+        when(assetRepository.findByPath("/dam/logo.png")).thenReturn(Optional.of(a));
+
+        assetIngestService.deleteAsset("/dam/logo.png", "alice");
+
+        ArgumentCaptor<AssetDeletedEvent> captor = ArgumentCaptor.forClass(AssetDeletedEvent.class);
+        verify(eventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue().getAssetId()).isEqualTo(a.getId());
+        assertThat(captor.getValue().getPath()).isEqualTo("/dam/logo.png");
+        assertThat(captor.getValue().getSiteId()).isEqualTo("corporate");
+        assertThat(captor.getValue().getUserId()).isEqualTo("alice");
+    }
+
+    @Test
+    void deleteAsset_notFound_publishesNoEvent() {
+        when(assetRepository.findByPath("/dam/missing.png")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> assetIngestService.deleteAsset("/dam/missing.png", "alice"))
+                .isInstanceOf(NotFoundException.class);
+
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     // ── listFolder ─────────────────────────────────────────────────────────────

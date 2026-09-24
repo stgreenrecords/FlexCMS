@@ -132,6 +132,32 @@ class ContentDeliveryServiceTest {
 
     @Test
     @SuppressWarnings("unchecked")
+    void renderPage_rewritesAuthorOnlyAssetUrls_toCanonicalDeliveryUrls() {
+        // ECMS-03-TC03: delivery JSON must never point a visitor at /api/author/...
+        String id = "11111111-2222-3333-4444-555555555555";
+        ContentNode page = buildPage("content.corporate.en.home", "Home");
+        ContentNode image = new ContentNode("content.corporate.en.home.image", "image", "flexcms/image");
+        image.setProperties(new HashMap<>(Map.of(
+                "src", "/api/author/assets/" + id + "/content",
+                "caption", "<img src=\"http://localhost:8080/api/author/assets/" + id + "/content\">")));
+        image.setChildren(new ArrayList<>());
+        page.setChildren(List.of(image));
+        when(nodeService.getWithChildren("content.corporate.en.home")).thenReturn(Optional.of(page));
+        when(componentRegistry.getModel("flexcms/image")).thenReturn(Optional.empty());
+
+        Map<String, Object> result = contentDeliveryService.renderPage("content.corporate.en.home", buildContext());
+
+        List<Map<String, Object>> components = (List<Map<String, Object>>) result.get("components");
+        Map<String, Object> data = (Map<String, Object>) components.get(0).get("data");
+        assertThat(data).containsEntry("src", "/dam/renditions/" + id);
+        assertThat(data).containsEntry("caption", "<img src=\"/dam/renditions/" + id + "\">");
+        assertThat(result.toString()).doesNotContain("/api/author/");
+        // Stored content is untouched.
+        assertThat(image.getProperties().get("src")).isEqualTo("/api/author/assets/" + id + "/content");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
     void renderPage_handlesComponentModelException_gracefully() throws Exception {
         ContentNode page = buildPage("content.corporate.en.home", "Home");
         ContentNode broken = new ContentNode("content.corporate.en.home.broken", "broken", "flexcms/broken");

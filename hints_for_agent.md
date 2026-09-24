@@ -27,6 +27,20 @@
 
 ## Hints
 
+### 2026-09-24 — `@TransactionalEventListener(AFTER_COMMIT)` handlers silently lose every DB write
+**Context:** Writing or changing a listener that reacts to a committed change (e.g. `ContentPublishReplicationListener`) and calls a `@Transactional` service.
+**Symptom:** The side effect outside the database happens (the RabbitMQ message is sent, publish gets the content), but rows the service writes never appear. No exception, no log line. `replication_log` had **zero** `CONTENT`/`TREE` rows in its whole history even though publishing worked.
+**What failed:** Unit tests with mocks pass. They can't see transaction boundaries. Reading the service code shows nothing wrong: it is `@Transactional` and calls `save()`.
+**Solution:** Annotate the listener method with `@Transactional(propagation = Propagation.REQUIRES_NEW)` next to `@TransactionalEventListener(phase = AFTER_COMMIT)`. Prove it with an `*IT`: publish the event inside `TransactionTemplate.executeWithoutResult(...)`, then assert the row exists (see `ReplicationAgentIT.publishViaStatusEvent_afterCommit_persistsReplicationLog`, which fails without the annotation).
+**Why it works:** During `AFTER_COMMIT` the finished transaction is still bound to the thread, so a `REQUIRED` service joins it and its writes are never committed. `REQUIRES_NEW` opens a real transaction.
+
+### 2026-09-24 — Git Bash rewrites `curl -F path=/content/...` into `C:/Program Files/Git/content/...`
+**Context:** Calling the author API from the Bash tool with multipart form fields whose values start with `/` (DAM upload `path=`, etc.).
+**Symptom:** The upload "succeeds" but the asset is stored at `C:/Program Files/Git/content/dam/...` with `folderPath` to match. Later calls using the real path get 404.
+**What failed:** Quoting the value. MSYS still converts any argument that looks like a POSIX path.
+**Solution:** Prefix the command with `MSYS_NO_PATHCONV=1` (same as for `cmd.exe /c .\flex.cmd`). To remove a mangled asset: `MSYS_NO_PATHCONV=1 curl -G -X DELETE .../api/author/assets --data-urlencode "path=C:/Program Files/Git/content/..."`.
+**Why it works:** MSYS path conversion rewrites arguments before `curl` sees them; the variable disables it for that process.
+
 ### 2026-09-08 — `flex start` cannot fix the Maven TLS failure: its spawned windows do not inherit `MAVEN_OPTS`
 **Context:** Bringing the stack up with `flex start local all` on a workstation behind the corporate TLS-inspecting proxy
 **Symptom:** Two distinct failures in sequence:

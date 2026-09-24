@@ -97,3 +97,26 @@ Use `df/templates/decision-record.md` for new decision records.
   - Where the product supports a working path for a required outcome, the scenario asserts the outcome through that path. REB-19 S10 therefore verifies the published edit on the publish environment through the tree-replicating bulk publish endpoint, while recording that the editor's own publish button does not replicate.
   - `AuthorableField.isLossyInEditor` marks list, object, and asset fields so no suite authors structured content through a control that would stringify it. REB-26 must honour this flag.
 - Consequences: The REB-19 suite reports 8 passing / 2 pending / 0 failing. The two pending scenarios flip to genuine passes as soon as the capabilities are implemented — no test edit required — and the gate never reports a false green for functionality that does not exist.
+
+## 2026-09-24 local - DEC-ECMS-001 - Scope and conventions for the enterprise-CMS parity program
+
+- Status: Accepted (sa, ECMS-00; naming per explicit human instruction)
+- Context: The human asked for FlexCMS to be compared against an enterprise-level CMS feature reference and for tasks to fill the gaps, and instructed that the reference product is not named anywhere — it is referred to as "an enterprise-level CMS".
+- Decision:
+  - Program prefix `ECMS`; no vendor or branded feature names in task ids, titles, or artifacts. Generic terms are used instead (e.g. "historical as-of view", "component style variants", "staged releases", "on-demand media delivery").
+  - Baseline is native platform capability only. Third-party integrations and AI-dependent features (auto-tagging, similarity search, automated form conversion) are excluded until a model/vendor decision exists.
+  - The backend stays JSON-only: capabilities that produce HTML (e.g. plain-HTML fragment export) are delivered by the frontend render service.
+  - Capabilities where FlexCMS exceeds the baseline (PIM, multi-framework SDKs, static build dependency graph) must not be regressed by ECMS tasks.
+  - Tasks touching schemas, public APIs, or more than one lane start in `NEEDS_ARCHITECTURE`; visible UI without an approved design starts in `READY_FOR_DESIGN`.
+- Consequences: 66 tasks on the board; 32 need an SA solution design and a single-lane split before delivery.
+
+## 2026-09-24 local - DEC-ECMS-002 - Publish-tier asset delivery via replicated metadata and a canonical `/dam/renditions` URL
+
+- Status: Accepted (sa, ECMS-03)
+- Context: Published pages cannot render DAM assets (`R-REB-21-003`): content stores author-only URLs, the publish database has no asset rows, and nothing serves `/dam/renditions/**` although security and routing already reserve it.
+- Decision:
+  - Canonical public asset URLs are `/dam/renditions/{assetId}` and `/dam/renditions/{assetId}/{renditionKey}`, owned by `com.flexcms.core.util.AssetUrls`. Legacy `/api/author/assets/{id}/content` references are rewritten on delivery, not in stored content.
+  - Asset **metadata** is replicated to publish (upsert by the author's id); binaries stay in the shared object store. Publish serves only assets whose row was replicated, preserving author/publish separation.
+  - Publishing content replicates the assets it references; assets also have explicit publish/unpublish; asset deletion replicates. Page unpublish does not retract assets until reference counting exists (`ECMS-02`).
+  - Moving binaries to a dedicated static/CDN bucket later is possible without changing the URL contract.
+- Consequences: `flexcms-headless` depends on `flexcms-dam`; `ReplicationEvent` carries asset payloads; the reference site proxies `/dam/renditions` to its own API host.

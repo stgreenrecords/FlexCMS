@@ -1641,3 +1641,23 @@ Use `df/templates/activity-log-entry.md` for new entries.
 - Result: PASS
 - Next: Cloud QA role completed; PO review is next.
 - Risks/blockers: cloud task completed
+
+## 2026-09-24 local - sa - ECMS-00
+
+- State: OPEN -> ARCHITECTURE_IN_PROGRESS -> DONE (docs-only SA work)
+- Action: Compared FlexCMS against the native feature set of an enterprise-level CMS across 15 capability areas; created 66 child tasks `ECMS-01`..`ECMS-66` with acceptance criteria, owner roles, and explicit dependencies; registered all on `board.md`; regenerated lane sub-boards.
+- Evidence: `df/artifacts/ECMS-00/gap-analysis.md`, `df/artifacts/ECMS-00/task.md`, `df/artifacts/ECMS-01..66/task.md`; live stack probe (component registry 420, templates 21, DAM 182, PIM 4 products) and code search on `main` at `0eb8541`.
+- Result: PASS
+- Next: `sa` picks up the `NEEDS_ARCHITECTURE` first-wave tasks (ECMS-03 P0, ECMS-02, ECMS-18, ECMS-23, ECMS-48); `backend-dev` can start ECMS-01, ECMS-04, ECMS-08, ECMS-25, ECMS-41 now.
+- Risks/blockers: Priorities are an SA proposal and need human confirmation. ECMS-03 overlaps open risk `R-REB-21-003` and closes it when delivered.
+
+## 2026-09-24 local - backend-dev - ECMS-03A
+
+- State: READY_FOR_DEV -> DEV_IN_PROGRESS -> DONE (Mode B)
+- Action: Implemented the ECMS-03 design sections 1–5. `AssetUrls` contract; `AssetDeliveryService` + `AssetDeliveryController` (`/dam/renditions/**`, Cache-Control/ETag/304, sandbox CSP); asset payload in `ReplicationEvent`; referenced assets replicated before content on tree and single-node publish; `POST /api/author/assets/{id}/publish|unpublish`; `AssetDeletedEvent` replicated after commit; receiver ASSET branch with native upserts; `AssetCdnPurgeListener`; delivery JSON rewrite; canonical `DamClient` URLs.
+- Also fixed (pre-existing): `ContentPublishReplicationListener` handlers joined the already-committed transaction during `AFTER_COMMIT`, so `replication_log` never persisted a CONTENT/TREE row. Now `REQUIRES_NEW`; regression ITs fail without it.
+- Evidence: `df/artifacts/ECMS-03A/backend/test-scenarios.md`, `live-verify.sh`, `live-verify-2026-09-24.out` (29/29); `mvn verify` green (AssetRepositoryIT 8, ReplicationAgentIT 11, ReplicationReceiverIT 10, plus existing suites).
+- Result: PASS
+- Next: `frontend-dev` picks up ECMS-03B (site proxy rewrites, URL normaliser, admin Copy URL, Selenium TC05).
+- Risks/blockers: `R-REB-21-003` mitigated on the backend and closes with ECMS-03B. Docker image build (pre-push step 6) not run; nothing pushed.
+

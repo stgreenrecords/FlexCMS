@@ -25,6 +25,10 @@ public class ReplicationEvent implements Serializable {
     private String assetPath;
     private List<String> renditionKeys;
 
+    // Asset events (type ASSET): id is the public URL key, payload set on ACTIVATE only
+    private UUID assetId;
+    private ReplicatedAsset asset;
+
     // Embedded node data for ACTIVATE events
     private Map<String, Object> nodeProperties;
     private String resourceType;
@@ -75,13 +79,45 @@ public class ReplicationEvent implements Serializable {
         return event;
     }
 
-    public static ReplicationEvent assetActivate(String assetPath, List<String> renditionKeys, String userId) {
+    /**
+     * Activate (or refresh) an asset on publish. The event carries the full row and its
+     * renditions, so the receiver needs no call back to author.
+     */
+    public static ReplicationEvent assetActivate(ReplicatedAsset asset, String userId) {
         ReplicationEvent event = new ReplicationEvent();
         event.eventId = UUID.randomUUID();
         event.action = ReplicationAction.ACTIVATE;
+        event.path = asset.path();
+        event.assetId = asset.id();
+        event.assetPath = asset.path();
+        event.asset = asset;
+        event.renditionKeys = asset.renditions().stream()
+                .map(ReplicatedAsset.ReplicatedRendition::renditionKey)
+                .toList();
+        event.siteId = asset.siteId();
+        event.timestamp = Instant.now();
+        event.initiatedBy = userId;
+        event.type = ReplicationType.ASSET;
+        return event;
+    }
+
+    /**
+     * Withdraw an asset from publish: {@link ReplicationAction#DEACTIVATE} for an unpublish,
+     * {@link ReplicationAction#DELETE} for a deletion. Either way the publish row goes;
+     * only the audit trail distinguishes them.
+     */
+    public static ReplicationEvent assetRemove(UUID assetId, String assetPath, String siteId,
+                                               ReplicationAction action, String userId) {
+        if (action == ReplicationAction.ACTIVATE) {
+            throw new IllegalArgumentException("assetRemove needs DEACTIVATE or DELETE, not ACTIVATE");
+        }
+        ReplicationEvent event = new ReplicationEvent();
+        event.eventId = UUID.randomUUID();
+        event.action = action;
         event.path = assetPath;
+        event.assetId = assetId;
         event.assetPath = assetPath;
-        event.renditionKeys = renditionKeys;
+        event.siteId = siteId;
         event.timestamp = Instant.now();
         event.initiatedBy = userId;
         event.type = ReplicationType.ASSET;
@@ -118,6 +154,10 @@ public class ReplicationEvent implements Serializable {
     public void setAssetPath(String assetPath) { this.assetPath = assetPath; }
     public List<String> getRenditionKeys() { return renditionKeys; }
     public void setRenditionKeys(List<String> renditionKeys) { this.renditionKeys = renditionKeys; }
+    public UUID getAssetId() { return assetId; }
+    public void setAssetId(UUID assetId) { this.assetId = assetId; }
+    public ReplicatedAsset getAsset() { return asset; }
+    public void setAsset(ReplicatedAsset asset) { this.asset = asset; }
     public Map<String, Object> getNodeProperties() { return nodeProperties; }
     public void setNodeProperties(Map<String, Object> nodeProperties) { this.nodeProperties = nodeProperties; }
     public String getResourceType() { return resourceType; }

@@ -1,5 +1,7 @@
 package com.flexcms.author.controller;
 
+import com.flexcms.author.service.AssetPublicationService;
+import com.flexcms.author.service.AssetPublicationService.AssetPublicationResult;
 import com.flexcms.core.repository.AssetFolderSummary;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.exception.ValidationException;
@@ -42,6 +44,9 @@ public class AuthorAssetController {
 
     @Autowired
     private S3Service s3Service;
+
+    @Autowired
+    private AssetPublicationService publicationService;
 
     @Operation(summary = "Upload asset", description = "Uploads a new asset binary and registers it in the DAM.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -145,12 +150,35 @@ public class AuthorAssetController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Publish asset",
+            description = "Replicates the asset to the publish tier, where /dam/renditions/{id} starts serving it. "
+                    + "Assets referenced by published content are published automatically; use this for the rest.")
+    @PostMapping("/{id}/publish")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
+    public ResponseEntity<AssetPublicationResult> publishAsset(
+            @PathVariable UUID id,
+            @RequestParam(required = false) String userId) {
+        return ResponseEntity.ok(publicationService.publish(id, userId));
+    }
+
+    @Operation(summary = "Unpublish asset",
+            description = "Withdraws the asset from the publish tier; it stays on author. Its public URL answers 404 "
+                    + "on publish afterwards.")
+    @PostMapping("/{id}/unpublish")
+    @PreAuthorize("hasAnyRole('ADMIN','CONTENT_PUBLISHER')")
+    public ResponseEntity<AssetPublicationResult> unpublishAsset(
+            @PathVariable UUID id,
+            @RequestParam(required = false) String userId) {
+        return ResponseEntity.ok(publicationService.unpublish(id, userId));
+    }
+
     @Operation(summary = "Delete asset", description = "Deletes an asset from the DAM and object storage by its path.")
     @DeleteMapping
     @PreAuthorize("hasAnyRole('ADMIN','CONTENT_AUTHOR')")
     public ResponseEntity<Void> deleteAsset(
-            @NotBlank(message = "path is required") @RequestParam String path) {
-        assetService.deleteAsset(path);
+            @NotBlank(message = "path is required") @RequestParam String path,
+            @RequestParam(required = false) String userId) {
+        assetService.deleteAsset(path, userId);
         return ResponseEntity.ok().build();
     }
 }

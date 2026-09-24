@@ -35,6 +35,8 @@ yarn-error.log*
 .eslintcache
 .stylelintcache
 .next/
+# Extra Next.js build dirs (NEXT_DIST_DIR), e.g. the publish-backed site instance
+.next-*/
 **/.nuxt/
 **/.output/
 **/dist/

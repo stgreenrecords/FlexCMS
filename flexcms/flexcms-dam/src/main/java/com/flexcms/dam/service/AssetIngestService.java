@@ -1,5 +1,6 @@
 package com.flexcms.dam.service;
 
+import com.flexcms.core.event.AssetDeletedEvent;
 import com.flexcms.core.exception.NotFoundException;
 import com.flexcms.core.exception.ValidationException;
 import com.flexcms.core.model.Asset;
@@ -7,11 +8,13 @@ import com.flexcms.core.model.AssetRendition;
 import com.flexcms.core.model.AssetStatus;
 import com.flexcms.core.repository.AssetFolderSummary;
 import com.flexcms.core.repository.AssetRepository;
+import com.flexcms.core.util.AssetUrls;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +45,9 @@ public class AssetIngestService {
 
     @Autowired
     private RenditionPipelineService renditionPipeline;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     /** 100 MB, matching the cap the admin upload dialog advertises. */
     private static final long DEFAULT_MAX_UPLOAD_BYTES = 100L * 1024 * 1024;
@@ -186,19 +192,28 @@ public class AssetIngestService {
     }
 
     /**
-     * Get rendition URL for an asset.
+     * Public URL of an asset's rendition, or {@code null} when no asset has that path.
+     *
+     * <p>This used to return the rendition's S3 storage key, which the {@code DamClient}
+     * SPI passed to component models as a "URL" that no browser can load. It now returns
+     * the canonical delivery URL; the delivery endpoint falls back to the original when
+     * the rendition was never generated, so the URL resolves either way.</p>
      */
     public String getRenditionUrl(String assetPath, String renditionKey) {
         return assetRepository.findByPath(assetPath)
-                .map(asset -> asset.getRenditionUrl(renditionKey))
+                .map(asset -> AssetUrls.rendition(asset.getId(), renditionKey))
                 .orElse(null);
     }
 
     /**
      * Delete an asset and all its renditions from storage and DB.
+     *
+     * <p>Publishes {@link AssetDeletedEvent} so the deletion reaches the publish tier;
+     * without it a published page would keep serving an asset that no longer exists on
+     * author. The replication listener binds {@code AFTER_COMMIT}.</p>
      */
     @Transactional
-    public void deleteAsset(String path) {
+    public void deleteAsset(String path, String userId) {
         // A missing path used to fall through `ifPresent` and return normally, so the
         // controller answered 200 for an asset that was never there and no caller could
         // tell a real deletion from a no-op. Same failure shape as the bulk-delete
@@ -217,6 +232,8 @@ public class AssetIngestService {
             log.warn("Failed to delete original from S3: {}", asset.getStorageKey());
         }
         assetRepository.delete(asset);
+        eventPublisher.publishEvent(new AssetDeletedEvent(this, asset.getId(), asset.getPath(),
+                asset.getSiteId(), userId));
         log.info("Deleted asset: {}", path);
     }
 

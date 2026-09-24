@@ -1,6 +1,7 @@
 import { FlexCmsClient } from '@flexcms/sdk';
 import { CmsPageClient } from './CmsPageClient';
 import { normalizePageAssetUrls } from '../lib/normalizeAssetUrls';
+import { liveApiUrl, publicApiUrl as resolvePublicApiUrl } from '../../../apiBases';
 
 // Public CMS pages must always render latest author/publish payloads.
 export const dynamic = 'force-dynamic';
@@ -18,20 +19,15 @@ export default async function CmsPage({ params }: { params: { slug?: string[] } 
   const defaultLocale = process.env.FLEXCMS_DEFAULT_LOCALE ?? 'en';
   const path = params.slug ? `/${params.slug.join('/')}` : `/${defaultSite}/home`;
 
-  const apiUrl =
-    process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
-    process.env.NEXT_PUBLIC_FLEXCMS_API ??
-    process.env.FLEXCMS_API_URL ??
-    'http://localhost:8080';
-  const publicApiUrl =
-    process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
-    process.env.NEXT_PUBLIC_FLEXCMS_API ??
-    '';
+  // Same resolution the `/dam/renditions` proxy uses (apiBases.js), so assets come from
+  // the tier the page came from.
+  const apiUrl = liveApiUrl();
+  const publicApiUrl = resolvePublicApiUrl();
 
   const client = new FlexCmsClient({ apiUrl, defaultSite, defaultLocale });
 
   try {
-    const pageData = normalizePageAssetUrls(await client.getPage(path));
+    const pageData = normalizePageAssetUrls(await client.getPage(path), 'live');
     return (
       <CmsPageClient
         pageData={pageData}

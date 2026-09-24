@@ -1,6 +1,7 @@
 import { FlexCmsClient } from '@flexcms/sdk';
 import { CmsPageClient } from '../../[[...slug]]/CmsPageClient';
 import { normalizePageAssetUrls } from '../../lib/normalizeAssetUrls';
+import { previewApiUrl, publicApiUrl as resolvePublicApiUrl } from '../../../../apiBases';
 
 /**
  * Draft preview route — /preview/...
@@ -18,16 +19,15 @@ export default async function PreviewPage({ params }: { params: { slug?: string[
   const defaultLocale = process.env.FLEXCMS_DEFAULT_LOCALE ?? 'en';
   const path = params.slug ? `/${params.slug.join('/')}` : `/${defaultSite}/${defaultLocale}/home`;
 
-  const apiUrl = process.env.FLEXCMS_API_URL ?? 'http://localhost:8080';
-  const publicApiUrl =
-    process.env.NEXT_PUBLIC_FLEXCMS_API_URL ??
-    process.env.NEXT_PUBLIC_FLEXCMS_API ??
-    '';
+  const apiUrl = previewApiUrl();
+  const publicApiUrl = resolvePublicApiUrl();
 
   const client = new FlexCmsClient({ apiUrl, defaultSite, defaultLocale });
 
   try {
-    const pageData = normalizePageAssetUrls(await client.getPage(path));
+    // 'preview' routes asset URLs through /draft-dam/renditions, which proxies to author,
+    // so assets that are not published yet still show in a draft.
+    const pageData = normalizePageAssetUrls(await client.getPage(path), 'preview');
     return (
       <CmsPageClient
         pageData={pageData}

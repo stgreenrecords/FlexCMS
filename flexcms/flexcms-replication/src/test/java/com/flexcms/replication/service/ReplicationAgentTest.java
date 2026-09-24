@@ -1,8 +1,13 @@
 package com.flexcms.replication.service;
 
+import com.flexcms.core.model.Asset;
+import com.flexcms.core.model.AssetRendition;
+import com.flexcms.core.model.AssetStatus;
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
 import com.flexcms.core.model.ReplicationLogEntry;
+import com.flexcms.core.repository.AssetRenditionRepository;
+import com.flexcms.core.repository.AssetRepository;
 import com.flexcms.core.repository.ContentNodeRepository;
 import com.flexcms.core.repository.ReplicationLogRepository;
 import com.flexcms.replication.config.ReplicationQueueConfig;
@@ -14,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 import java.util.*;
@@ -30,6 +36,8 @@ class ReplicationAgentTest {
     @Mock private RabbitTemplate rabbitTemplate;
     @Mock private ContentNodeRepository nodeRepository;
     @Mock private ReplicationLogRepository replicationLog;
+    @Mock private AssetRepository assetRepository;
+    @Mock private AssetRenditionRepository renditionRepository;
 
     @InjectMocks
     private ReplicationAgent replicationAgent;
@@ -190,23 +198,190 @@ class ReplicationAgentTest {
 
     // ── replicateAsset ─────────────────────────────────────────────────────────
 
-    @Test
-    void replicateAsset_sendsEventToAssetQueue() {
-        when(replicationLog.save(any())).thenAnswer(inv -> inv.getArgument(0));
+    private Asset asset(AssetStatus status) {
+        Asset a = new Asset();
+        a.setId(UUID.randomUUID());
+        a.setPath("/content/dam/corporate/logo.png");
+        a.setName("logo.png");
+        a.setMimeType("image/png");
+        a.setStorageKey("originals/x/logo.png");
+        a.setSiteId("corporate");
+        a.setStatus(status);
+        return a;
+    }
 
-        List<String> renditions = List.of("renditions/logo-800.webp", "renditions/logo-400.webp");
-        replicationAgent.replicateAsset("/content/dam/logo.png", renditions, "alice");
+    private AssetRendition rendition(String key) {
+        AssetRendition r = new AssetRendition();
+        r.setId(UUID.randomUUID());
+        r.setRenditionKey(key);
+        r.setStorageKey("renditions/x/" + key + ".webp");
+        return r;
+    }
 
+    private ReplicationEvent captureAssetEvent() {
         ArgumentCaptor<ReplicationEvent> captor = ArgumentCaptor.forClass(ReplicationEvent.class);
         verify(rabbitTemplate).convertAndSend(
                 eq(ReplicationQueueConfig.EXCHANGE_NAME),
                 eq(ReplicationQueueConfig.ASSET_ROUTING_KEY),
                 captor.capture());
+        return captor.getValue();
+    }
 
-        ReplicationEvent event = captor.getValue();
+    @Test
+    void replicateAsset_activate_sendsFullPayloadToAssetQueue() {
+        Asset a = asset(AssetStatus.ACTIVE);
+        when(assetRepository.findById(a.getId())).thenReturn(Optional.of(a));
+        when(renditionRepository.findByAssetId(a.getId()))
+                .thenReturn(List.of(rendition("thumbnail"), rendition("web-small")));
+
+        replicationAgent.replicateAsset(a.getId(), ReplicationAction.ACTIVATE, "alice");
+
+        ReplicationEvent event = captureAssetEvent();
         assertThat(event.getType()).isEqualTo(ReplicationEvent.ReplicationType.ASSET);
-        assertThat(event.getPath()).isEqualTo("/content/dam/logo.png");
-        assertThat(event.getRenditionKeys()).containsAll(renditions);
+        assertThat(event.getAction()).isEqualTo(ReplicationAction.ACTIVATE);
+        assertThat(event.getAssetId()).isEqualTo(a.getId());
+        assertThat(event.getPath()).isEqualTo("/content/dam/corporate/logo.png");
+        assertThat(event.getAsset().storageKey()).isEqualTo("originals/x/logo.png");
+        assertThat(event.getAsset().renditions()).hasSize(2);
+        assertThat(event.getRenditionKeys()).containsExactly("thumbnail", "web-small");
         assertThat(event.getInitiatedBy()).isEqualTo("alice");
+    }
+
+    @Test
+    void replicateAsset_activate_logsAssetIdForTraceability() {
+        Asset a = asset(AssetStatus.ACTIVE);
+        when(assetRepository.findById(a.getId())).thenReturn(Optional.of(a));
+
+        replicationAgent.replicateAsset(a.getId(), ReplicationAction.ACTIVATE, "alice");
+
+        ArgumentCaptor<ReplicationLogEntry> log = ArgumentCaptor.forClass(ReplicationLogEntry.class);
+        verify(replicationLog).save(log.capture());
+        assertThat(log.getValue().getNodeId()).isEqualTo(a.getId());
+        assertThat(log.getValue().getReplicationType()).isEqualTo(ReplicationLogEntry.ReplicationType.ASSET);
+    }
+
+    @Test
+    void replicateAsset_deactivate_sendsRemovalWithoutPayload() {
+        Asset a = asset(AssetStatus.ACTIVE);
+        when(assetRepository.findById(a.getId())).thenReturn(Optional.of(a));
+
+        replicationAgent.replicateAsset(a.getId(), ReplicationAction.DEACTIVATE, "alice");
+
+        ReplicationEvent event = captureAssetEvent();
+        assertThat(event.getAction()).isEqualTo(ReplicationAction.DEACTIVATE);
+        assertThat(event.getAssetId()).isEqualTo(a.getId());
+        assertThat(event.getAsset()).isNull();
+        verify(renditionRepository, never()).findByAssetId(any());
+    }
+
+    @Test
+    void replicateAsset_activateInactiveAsset_throwsAndSendsNothing() {
+        Asset a = asset(AssetStatus.PROCESSING);
+        when(assetRepository.findById(a.getId())).thenReturn(Optional.of(a));
+
+        assertThatThrownBy(() -> replicationAgent.replicateAsset(a.getId(), ReplicationAction.ACTIVATE, "alice"))
+                .isInstanceOf(IllegalStateException.class);
+        verifyNoInteractions(rabbitTemplate);
+    }
+
+    @Test
+    void replicateAsset_unknownAsset_throws() {
+        UUID id = UUID.randomUUID();
+        when(assetRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> replicationAgent.replicateAsset(id, ReplicationAction.ACTIVATE, "alice"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(id.toString());
+    }
+
+    @Test
+    void replicateAssetDelete_sendsDeleteWithoutLoadingTheAsset() {
+        UUID id = UUID.randomUUID();
+
+        replicationAgent.replicateAssetDelete(id, "/content/dam/corporate/old.png", "corporate", "alice");
+
+        ReplicationEvent event = captureAssetEvent();
+        assertThat(event.getAction()).isEqualTo(ReplicationAction.DELETE);
+        assertThat(event.getAssetId()).isEqualTo(id);
+        assertThat(event.getPath()).isEqualTo("/content/dam/corporate/old.png");
+        verifyNoInteractions(assetRepository);
+    }
+
+    // ── referenced assets travel with content ──────────────────────────────────
+
+    @Test
+    void replicateReferencedAssets_sendsEachActiveReferencedAsset_skipsInactive() {
+        Asset active = asset(AssetStatus.ACTIVE);
+        Asset archived = asset(AssetStatus.ARCHIVED);
+        ContentNode hero = node("content.corporate.en.home.hero");
+        hero.setProperties(new HashMap<>(Map.of(
+                "image", "/api/author/assets/" + active.getId() + "/content",
+                "bg", "/dam/renditions/" + archived.getId())));
+        when(assetRepository.findAllById(any())).thenReturn(List.of(active, archived));
+
+        int sent = replicationAgent.replicateReferencedAssets(List.of(hero), "alice");
+
+        assertThat(sent).isEqualTo(1);
+        ReplicationEvent event = captureAssetEvent();
+        assertThat(event.getAssetId()).isEqualTo(active.getId());
+    }
+
+    @Test
+    void replicateReferencedAssets_noReferences_touchesNothing() {
+        int sent = replicationAgent.replicateReferencedAssets(List.of(node("content.corporate.en.home")), "alice");
+
+        assertThat(sent).isZero();
+        verifyNoInteractions(assetRepository, rabbitTemplate);
+    }
+
+    @Test
+    void replicateReferencedAssets_sendFailure_isSwallowedPerAsset() {
+        Asset first = asset(AssetStatus.ACTIVE);
+        Asset second = asset(AssetStatus.ACTIVE);
+        ContentNode hero = node("content.corporate.en.home.hero");
+        hero.setProperties(new HashMap<>(Map.of(
+                "a", "/dam/renditions/" + first.getId(),
+                "b", "/dam/renditions/" + second.getId())));
+        when(assetRepository.findAllById(any())).thenReturn(List.of(first, second));
+        doThrow(new AmqpException("broker down")).doNothing().when(rabbitTemplate)
+                .convertAndSend(eq(ReplicationQueueConfig.EXCHANGE_NAME),
+                        eq(ReplicationQueueConfig.ASSET_ROUTING_KEY), any(ReplicationEvent.class));
+
+        assertThat(replicationAgent.replicateReferencedAssets(List.of(hero), "alice")).isEqualTo(1);
+    }
+
+    @Test
+    void replicateTree_sendsReferencedAssetsBeforeTheTree() {
+        // ECMS-03-TC02: publishing a page publishes the assets it references.
+        Asset img = asset(AssetStatus.ACTIVE);
+        ContentNode root = node("content.home");
+        ContentNode hero = node("content.home.hero");
+        hero.setProperties(new HashMap<>(Map.of("image", "/api/author/assets/" + img.getId() + "/content")));
+        when(nodeRepository.findDescendants("content.home")).thenReturn(new ArrayList<>(List.of(hero)));
+        when(nodeRepository.findByPath("content.home")).thenReturn(Optional.of(root));
+        when(assetRepository.findAllById(any())).thenReturn(List.of(img));
+
+        replicationAgent.replicateTree("content.home", "alice");
+
+        var order = inOrder(rabbitTemplate);
+        order.verify(rabbitTemplate).convertAndSend(eq(ReplicationQueueConfig.EXCHANGE_NAME),
+                eq(ReplicationQueueConfig.ASSET_ROUTING_KEY), any(ReplicationEvent.class));
+        order.verify(rabbitTemplate).convertAndSend(eq(ReplicationQueueConfig.EXCHANGE_NAME),
+                eq(ReplicationQueueConfig.TREE_ROUTING_KEY), any(ReplicationEvent.class));
+    }
+
+    @Test
+    void replicate_activate_sendsReferencedAssets_deactivateDoesNot() {
+        Asset img = asset(AssetStatus.ACTIVE);
+        ContentNode n = node("content.corporate.en.home.image");
+        n.setProperties(new HashMap<>(Map.of("src", "/dam/renditions/" + img.getId())));
+        when(nodeRepository.findByPath(n.getPath())).thenReturn(Optional.of(n));
+        when(assetRepository.findAllById(any())).thenReturn(List.of(img));
+
+        replicationAgent.replicate(n.getPath(), ReplicationAction.ACTIVATE, "alice");
+        replicationAgent.replicate(n.getPath(), ReplicationAction.DEACTIVATE, "alice");
+
+        verify(rabbitTemplate, times(1)).convertAndSend(eq(ReplicationQueueConfig.EXCHANGE_NAME),
+                eq(ReplicationQueueConfig.ASSET_ROUTING_KEY), any(ReplicationEvent.class));
     }
 }

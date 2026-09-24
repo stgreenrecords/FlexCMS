@@ -2,9 +2,14 @@ package com.flexcms.replication;
 
 import com.flexcms.core.model.ContentNode;
 import com.flexcms.core.model.NodeStatus;
+import com.flexcms.core.model.AssetStatus;
+import com.flexcms.core.repository.AssetRenditionRepository;
+import com.flexcms.core.repository.AssetRepository;
 import com.flexcms.core.repository.ContentNodeRepository;
+import com.flexcms.replication.model.ReplicatedAsset;
 import com.flexcms.replication.config.ReplicationQueueConfig;
 import com.flexcms.replication.model.ReplicationEvent;
+import com.flexcms.replication.model.ReplicationEvent.ReplicationAction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -19,6 +24,8 @@ import org.testcontainers.rabbitmq.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -68,6 +75,8 @@ class ReplicationReceiverIT {
     // ── Injected beans ─────────────────────────────────────────────────────────
 
     @Autowired ContentNodeRepository nodeRepository;
+    @Autowired AssetRepository assetRepository;
+    @Autowired AssetRenditionRepository renditionRepository;
     @Autowired AmqpTemplate amqpTemplate;
 
     // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -75,6 +84,8 @@ class ReplicationReceiverIT {
     @AfterEach
     void tearDown() {
         nodeRepository.deleteAll();
+        renditionRepository.deleteAll();
+        assetRepository.deleteAll();
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
@@ -96,6 +107,66 @@ class ReplicationReceiverIT {
         e.setParentPath("content.corporate.en");
         e.setOrderIndex(0);
         return e;
+    }
+
+    private ReplicatedAsset assetPayload(UUID id, String path, String storageKey) {
+        Instant now = Instant.parse("2026-09-01T10:00:00Z");
+        return new ReplicatedAsset(id, path, "logo.png", "Logo", null, "image/png", 1234L, "logo.png",
+                storageKey, "flexcms-assets", 640, 480, null, 1.333, null, null, null, null,
+                Map.of("alt", "Logo"), "corporate", "/content/dam/corporate", "alice", now, "alice", now,
+                List.of(new ReplicatedAsset.ReplicatedRendition(UUID.randomUUID(), "thumbnail",
+                        "renditions/" + id + "/thumbnail.webp", "image/webp", 99L, 100, 75, "webp", now)));
+    }
+
+    // ── Tests: ASSET ───────────────────────────────────────────────────────────
+
+    @Test
+    void assetActivate_writesRowUnderAuthorId_withRenditions_andNoContentNode() {
+        // ECMS-03-TC02: the publish row keeps the author id, so /dam/renditions/{id} matches.
+        UUID id = UUID.randomUUID();
+        send(ReplicationEvent.assetActivate(assetPayload(id, "/content/dam/corporate/logo.png", "originals/a/logo.png"), "alice"));
+
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertThat(assetRepository.findById(id)).get()
+                    .satisfies(a -> {
+                        assertThat(a.getPath()).isEqualTo("/content/dam/corporate/logo.png");
+                        assertThat(a.getStatus()).isEqualTo(AssetStatus.ACTIVE);
+                        assertThat(a.getStorageKey()).isEqualTo("originals/a/logo.png");
+                    });
+            assertThat(renditionRepository.findByAssetId(id)).extracting("renditionKey").containsExactly("thumbnail");
+        });
+        // The old receiver routed ASSET events into content activation.
+        assertThat(nodeRepository.count()).isZero();
+    }
+
+    @Test
+    void assetActivate_reupload_samePathNewId_replacesPredecessor() {
+        UUID oldId = UUID.randomUUID();
+        UUID newId = UUID.randomUUID();
+        send(ReplicationEvent.assetActivate(assetPayload(oldId, "/content/dam/corporate/logo.png", "originals/a/logo.png"), "alice"));
+        await().atMost(5, TimeUnit.SECONDS).until(() -> assetRepository.findById(oldId).isPresent());
+
+        send(ReplicationEvent.assetActivate(assetPayload(newId, "/content/dam/corporate/logo.png", "originals/b/logo.png"), "alice"));
+
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertThat(assetRepository.findById(newId)).isPresent();
+            assertThat(assetRepository.findById(oldId)).isEmpty();
+        });
+    }
+
+    @Test
+    void assetDeactivate_removesRowAndRenditions() {
+        UUID id = UUID.randomUUID();
+        send(ReplicationEvent.assetActivate(assetPayload(id, "/content/dam/corporate/logo.png", "originals/a/logo.png"), "alice"));
+        await().atMost(5, TimeUnit.SECONDS).until(() -> assetRepository.findById(id).isPresent());
+
+        send(ReplicationEvent.assetRemove(id, "/content/dam/corporate/logo.png", "corporate",
+                ReplicationAction.DEACTIVATE, "alice"));
+
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertThat(assetRepository.findById(id)).isEmpty();
+            assertThat(renditionRepository.findByAssetId(id)).isEmpty();
+        });
     }
 
     // ── Tests: ACTIVATE ────────────────────────────────────────────────────────
