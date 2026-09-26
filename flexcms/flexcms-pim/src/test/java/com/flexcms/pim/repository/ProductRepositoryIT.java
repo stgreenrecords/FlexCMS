@@ -76,8 +76,7 @@ class ProductRepositoryIT {
         // "No enum constant com.flexcms.pim.model.ProductStatus.ACTIVE" before any test
         // body runs. A bulk delete issues one DELETE statement and never maps a row, so
         // this suite stays independent of whatever the seed contains. The seed/enum
-        // mismatch itself is a product defect, reported separately — see
-        // df/artifacts/INFRA-TESTCONTAINERS-DOCKER29/devops/blockers.md.
+        // mismatch itself was fixed by PIM migration V5__fix_seeded_product_status.sql.
         productRepository.deleteAllInBatch();
         catalogRepository.deleteAllInBatch();
         schemaRepository.deleteAllInBatch();

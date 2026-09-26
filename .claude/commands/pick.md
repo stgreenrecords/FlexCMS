@@ -1,31 +1,10 @@
-Implement a specific work item. The user will provide the item ID (e.g., P1-04, P3-01, BUG-02).
+Work on one specific backlog task: $ARGUMENTS
 
-Item to implement: $ARGUMENTS
-
-## Step 1: Read Work Board
-
-Read `WORK_BOARD.md`. Find the item with the specified ID in §3.
-
-- If the item doesn't exist, report the error and list available OPEN items.
-- If the item is not OPEN or PAUSED, report its current status and suggest alternatives.
-- If the item has unresolved blockers, report which blockers must be completed first.
-
-## Step 2: Claim
-
-1. Update the item status to 🔵 IN PROGRESS in §3.
-2. Lock the modules in §2.
-
-## Step 3: Load Context
-
-Read the Context Packet in §4 for this item. If none exists, read the source files in the modules listed in "Modules Touched".
-
-If the task is frontend-related, also read `Design/DesignerPrompt.md` §8.
-
-## Step 4: Implement
-
-Implement the task following all acceptance criteria. Follow `CLAUDE.md` conventions.
-
-## Step 5: Validate and Complete
-
-Run builds, verify AC, update WORK_BOARD.md (status, module locks, completion notes in §5).
-
+1. Read `AGENTS.md`, `docs/process/SDLC.md`, and `docs/process/TESTING.md` if they are not already in context this session.
+2. Find the task's row in `backlog/BOARD.md` and open `backlog/tasks/<ID>.md`. If either one is missing, report it and stop.
+3. Act on the task's current status:
+   - **Needs Refinement**: refine it until it meets the Definition of Ready (SDLC §4), then move it to **Ready**. Build it only if the user asked for that too.
+   - **Ready** or **In Progress**: check that every **Depends on** task is **Done**. If one is not, name it and stop. Otherwise follow SDLC §5 through to **Done**.
+   - **Blocked**: show the open questions from the spec and stop.
+   - **Done**: say so and stop.
+4. Finish with a short report: what changed, which tests were added, the gate results, and the new board status.

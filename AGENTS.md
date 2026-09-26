@@ -1,213 +1,194 @@
-# AGENTS.md — FlexCMS Dark Factory Agent Reference
+# AGENTS.md — FlexCMS guide for AI agents
 
-> **Primary workflow: Dark Factory.** Run the SDLC exactly as defined in `df/`.
-> `DF-master/` is the reusable upstream example only; this repository's active
-> runtime is `df/runtime/` and task evidence lives in `df/artifacts/{task-id}/`.
->
-> The old `WORK_BOARD_*.md`, Kyle/Erik flow, and `agents/queue.json` dispatcher are
-> historical/legacy unless a human explicitly asks for legacy inspection. For new
-> work, use Dark Factory role states, role files, runtime board, evidence, QA gate,
-> and PO acceptance.
+This file is the entry point for **every** AI coding agent (Claude Code, Cursor, Codex, JetBrains AI, …) and for humans who work like one. `CLAUDE.md` imports this file, so there is only one set of rules.
 
-## Dark Factory boot sequence — mandatory
+## Start here (every session)
 
-Before starting or continuing work, read in this order:
+1. **Find the work:** open [`backlog/BOARD.md`](backlog/BOARD.md), the only source of task status.
+2. **Know the process:** [`docs/process/SDLC.md`](docs/process/SDLC.md) covers the lifecycle, how to pick a task, and the Definitions of Ready and Done.
+3. **Know the testing bar:** [`docs/process/TESTING.md`](docs/process/TESTING.md). Every feature ships with Playwright tests that prove its acceptance criteria.
+4. **Avoid known dead ends:** skim [`docs/process/HINTS.md`](docs/process/HINTS.md) for the stack you will touch.
+5. **Read the task spec** `backlog/tasks/<ID>.md` and every file in its `Read first` list, then read the current source.
 
-1. `df/00-start-here.md`
-2. `df/01-operating-model.md`
-3. `df/02-state-machine.md`
-4. `df/03-orchestration-rules.md`
-5. `df/04-documentation-standards.md`
-6. the responsible role file in `df/roles/`
-7. `df/runtime/board.md` plus relevant subboards
-8. `docs/FLEXCMS_BUSINESS_CONTEXT.md` for product-specific rules
+## Commands
 
-## Required behavior
+When the user types one of these words, with or without a leading `/`, do exactly this. In Claude Code, these are also slash commands (`.claude/commands/`).
 
-- Execute exactly **one Dark Factory role per session**.
-- Update runtime evidence on every meaningful action.
-- Write task artifacts under `df/artifacts/{task-id}/`.
-- Do not finish work unless `qa` has passed it and `po` has accepted it.
-- If work is rejected, return it to the responsible role/lane with evidence and defects.
-- Preserve user work and prefer minimal, reversible changes.
+| Command | What to do |
+|---|---|
+| `implement` | Pick the next task using [SDLC §3](docs/process/SDLC.md#3-picking-the-next-task): resume **In Progress**, else the first **Ready** task with its dependencies **Done**, else refine the first eligible **Needs Refinement** task. Then carry it to **Done** ([SDLC §5](docs/process/SDLC.md#5-implementation-workflow)). Afterwards, report the result and stop, unless the user asked you to keep going. |
+| `pick <ID>` | Same as `implement`, but for that task. Refuse to build it if a dependency is not **Done**, and say which one. |
+| `new-task <description>` | Draft the task(s) from [`backlog/templates/`](backlog/templates/), show them, and write them to the backlog only after the user confirms ([SDLC §8](docs/process/SDLC.md#8-adding-new-work)). |
+| `status` | Summarize `BOARD.md`: counts per status, what is **In Progress**, the next 5 eligible **Ready** tasks, **Blocked** tasks and their questions, and anomalies such as a Ready task with a missing spec or a Done task with unticked ACs. |
+| `validate` | Run every quality gate ([TESTING.md §7](docs/process/TESTING.md#7-quality-gates)), check backlog consistency (every board row has a spec, every spec has a row, no two tasks In Progress, Done tasks have every **Automated in** filled), and report PASS/FAIL per item with the fix for each failure. |
 
-## Dark Factory commands
+---
+
+## Project identity
+
+FlexCMS is an enterprise **headless** CMS with three independent pillars: **Content (CMS)**, **Digital Assets (DAM)**, and **Products (PIM)**.
+
+- **Backend:** Spring Boot 3.3, Java 21, PostgreSQL 16 (ltree + JSONB), Redis, RabbitMQ, MinIO/S3, Elasticsearch. **The backend never generates HTML. It returns JSON only, and all rendering happens in the frontend.**
+- **Frontend:** a TypeScript pnpm + Turborepo monorepo with Next.js 14 (admin and reference site), Nuxt (reference site), and the `@flexcms/ui` design system (Radix + Tailwind + CVA).
+- **Product rules and domain context:** [`docs/product/BUSINESS_CONTEXT.md`](docs/product/BUSINESS_CONTEXT.md).
+
+```
+Author (:8080, read-write) ──RabbitMQ──► Publish (:8081, read-only) ──► CDN ──► Browser
+        │                                      │
+        ▼                                      ▼
+PostgreSQL (ltree + JSONB)              Redis + Caffeine
+```
+
+## Repository map
+
+```
+AGENTS.md / CLAUDE.md             # agent rules (this file)
+backlog/                          # BOARD.md (status), tasks/<ID>.md (specs), designs/, templates/
+docs/
+├── process/                      # SDLC.md, TESTING.md, HINTS.md
+├── architecture/                 # DECISIONS.md (architecture decision log)
+├── product/                      # business context, XF guide, client guide, ECMS gap analysis
+├── ops/                          # deployment, dev-environment reliability, QA env status
+└── testing/                      # test data spec, manual authoring test catalogue
+Design/UI/stitch_flexcms_admin_ui_requirements_summary/<page>/   # reference admin UI designs
+flexcms/                          # Maven multi-module backend
+├── flexcms-core/                 # domain models, JPA repositories, core services
+├── flexcms-plugin-api/           # extension SPI (ComponentModel, CdnProvider, WorkflowStep)
+├── flexcms-author/               # read-write APIs + workflow engine
+├── flexcms-publish/              # read-only JSON page resolver
+├── flexcms-headless/             # REST + GraphQL delivery APIs
+├── flexcms-dam/                  # digital asset management (S3/MinIO + renditions)
+├── flexcms-replication/          # author → publish replication via RabbitMQ
+├── flexcms-cache/  flexcms-cdn/  # Redis/Caffeine/HTTP caching, CDN purge SPI
+├── flexcms-i18n/  flexcms-multisite/  flexcms-search/  flexcms-clientlibs/
+├── flexcms-pim/                  # product information management (own DB: flexcms_pim)
+└── flexcms-app/                  # Spring Boot entry point, security, CMS Flyway migrations
+frontend/
+├── packages/  sdk/ react/ vue/ ui/ site-renderers/
+└── apps/
+    ├── admin/                    # Next.js admin UI (:3000)
+    ├── site-nextjs/  site-nuxt/  # reference sites (:3001 / :3002)
+    ├── build-worker/             # static site compilation worker
+    ├── e2e/                      # Playwright suite — ui / api / e2e / a11y / visual
+    └── selenium-e2e/             # LEGACY, frozen — being ported to Playwright
+scripts/                          # seeding and import scripts (Python)
+infra/                            # deployment infrastructure
+flex, flex.ps1, flex.cmd          # local dev CLI
+```
+
+## Build, run, test
 
 ```bash
-./start factory --dry-run              # show the next role-session plan
-./start factory --adapter manual       # prepare one role-session prompt
-./start factory                        # autonomous router; requires DF_AGENT_CMD
-./flex agent run                       # FlexCMS shortcut to Dark Factory router
-./flex agent validate                  # deterministic FlexCMS build/test gate
-./flex agent legacy status             # inspect the old agents/queue.json dispatcher
+# Local stack — `flex` CLI from the repo root (Windows: flex.cmd / flex.ps1)
+flex start local all                    # infra + author + publish + admin + sites
+flex start local author                 # infra + author only
+flex status                             # health of every service
+flex logs author                        # tail a service log
+flex stop local
+
+# Backend
+cd flexcms && mvn clean compile         # compile all modules
+cd flexcms && mvn test                  # unit tests
+cd flexcms && mvn verify                # unit + *IT integration tests (Docker required)
+cd flexcms/flexcms-app && mvn spring-boot:run -Dspring-boot.run.profiles=author,local
+
+# Frontend
+cd frontend && pnpm install && pnpm build   # dependency order: sdk → adapters → apps
+cd frontend && pnpm test                    # Vitest unit tests
+cd frontend/apps/admin && pnpm dev          # admin dev server (:3000)
+
+# Playwright (details: docs/process/TESTING.md §6)
+cd frontend && pnpm test:e2e                # mocked admin UI, no backend needed
+cd frontend && pnpm test:e2e:live           # api + e2e + ui-live against the running stack
+cd frontend/apps/e2e && pnpm exec playwright test --grep @ECMS-01   # one task's tests
 ```
-
-Legacy implementation details for the old dispatcher are in `agents/FACTORY.md`.
-Use them only for migration/troubleshooting, not as the active SDLC source.
-
----
-
-## Architecture at a Glance
-
-FlexCMS is a **headless-only** CMS: backend returns JSON only, never HTML.
-
-```
-Author (8080) ──RabbitMQ──→ Publish (8081) ──→ CDN → Browser
-    │                           │
-    ▼                           ▼
-PostgreSQL (ltree+JSONB)    Redis + Caffeine
-```
-
-Three pillars share the Spring Boot monorepo: **CMS** (content tree), **DAM** (assets), **PIM** (products in separate DB `flexcms_pim`).
-
----
-
-## Before Any Implementation
-
-1. Complete the Dark Factory boot sequence and identify the responsible role from `df/runtime/board.md`.
-2. Read the role file in `df/roles/` and the task artifact under `df/artifacts/{task-id}/`.
-3. For delivery lanes, use the router/worktree isolation when available; do not hand-edit legacy module locks.
-4. **Never start coding before reading the current source** — another role-session may have changed it.
-5. Record evidence and handoff notes in `df/runtime/` and `df/artifacts/{task-id}/` before ending the role session.
-
----
-
-## Mandatory Build Gates (every task)
-
-> **⛔ NEVER push to GitHub until ALL of these pass locally. No exceptions.**
-
-```bash
-# 1. Backend compile (must pass — no exceptions)
-cd flexcms && mvn clean compile
-
-# 2. Backend unit tests (must pass — never skip or @Ignore)
-cd flexcms && mvn test
-
-# 3. Frontend build (must pass)
-cd frontend && pnpm install && pnpm build
-
-# 4. Selenium E2E gates (must pass)
-cd frontend && pnpm test:e2e:selenium:smoke
-cd frontend && pnpm test:e2e:selenium:full
-# Artifact bundle: frontend/apps/selenium-e2e/reports/retained/{smoke,full}/
-
-# 5. Docker image build (if backend code changed)
-cd flexcms && docker build -t flexcms-app:local-test .
-# Skip ONLY if changes are frontend-only
-```
-
-**If ANY step fails → fix it locally. Do NOT push broken code.**
-If you cannot fix after 3 attempts → move the task to the appropriate Dark Factory blocked/rework state and document the exact blocker in `df/runtime/activity-log.md` plus `df/artifacts/{task-id}/handoffs.md`.
-
-Commit format: `feat(P2-01): description` or `fix(BUG-03): description`
-
----
-
-## Layer Rules (violations = tech debt)
-
-| Layer | What lives here | What NEVER lives here |
-|---|---|---|
-| `model/` | JPA entities, enums | Business logic |
-| `repository/` | Spring Data interfaces + JPQL | Service calls |
-| `service/` | All business logic, `@Transactional` | HTTP/controllers |
-| `controller/` | Request mapping, DTO→service | Repository calls, business logic |
-
-- Controllers call services. Services call repositories. Never skip a layer.
-- Return DTOs/projections from APIs, not raw JPA entities.
-- `FetchType.EAGER` is forbidden — fix the session boundary instead.
-
----
-
-## Content Path Convention
-
-- Database (ltree): dot-separated — `content.site.en.home`
-- URLs: slash-separated — `/site/en/home`
-- `PathUtils.toContentPath(urlPath)` converts URL → ltree (adds `content.` prefix)
-- **`GET /api/author/content/children`** accepts ltree path directly (no conversion)
-- **GraphQL `node()`** uses path verbatim (no `content.` prefix added)
-- **GraphQL `page()`** uses `toContentPath()` (adds `content.` prefix)
-
----
-
-## Key Files for Each Pillar
-
-### CMS (Content)
-- Model: `flexcms-core/…/model/ContentNode.java`
-- Service: `flexcms-core/…/service/ContentNodeService.java`
-- Author API: `flexcms-author/…/controller/AuthorContentController.java`
-- Headless API: `flexcms-headless/…/controller/PageApiController.java`
-- GraphQL: `flexcms-headless/…/graphql/ContentQueryResolver.java`
-
-### DAM
-- Service: `flexcms-dam/…/service/AssetIngestService.java`
-- Author API: `flexcms-author/…/controller/AuthorAssetController.java`
-
-### PIM (isolated DB)
-- Service: `flexcms-pim/…/service/ProductService.java`
-- API: `flexcms-pim/…/controller/ProductApiController.java`
-- **Always use PIM's own DataSource** — never the CMS `DataSource`
-
----
-
-## Flyway Migration Rules
-
-- CMS migrations: `flexcms-app/src/main/resources/db/migration/V{N}__description.sql`
-- PIM migrations: `flexcms-pim/src/main/resources/db/pim/V{N}__description.sql`
-- Version numbers must be sequential and **never reused**
-- Check existing files for next version number before creating a new migration
-
----
-
-## NodeStatus Enum
-
-Valid values only: `DRAFT`, `IN_REVIEW`, `APPROVED`, `PUBLISHED`, `ARCHIVED`
-**Never use `LIVE`** — it does not exist in the enum.
-
----
-
-## Admin UI Rules
-
-1. Look for reference design in `Design/UI/stitch_flexcms_admin_ui_requirements_summary/<page-name>/` before writing any UI
-2. **Never hardcode colors** — use `var(--color-*)` CSS tokens
-3. **Never use raw HTML for interactive UI** — use `@flexcms/ui` components
-4. Every admin page needs: breadcrumb, loading skeleton, empty state
-5. Named exports only — no `export default` for components
-
----
-
-## Local Dev Auth Bypass
-
-Run with `-Dspring-boot.run.profiles=author,local` — this sets `flexcms.local-dev=true` which bypasses OAuth2/Keycloak and grants `ROLE_ADMIN` to anonymous users. No Keycloak required for local development.
-
----
-
-## Service Endpoints
 
 | Service | URL |
 |---|---|
 | Author API | http://localhost:8080/api/author/ |
 | Headless REST | http://localhost:8080/api/content/v1/ |
 | GraphiQL | http://localhost:8080/graphiql |
-| Publish API | http://localhost:8081 |
+| Publish | http://localhost:8081 |
 | Admin UI | http://localhost:3000 |
-| pgAdmin 4 | http://localhost:5050 (no login; DB password: `flexcms`) |
+| Reference site (React / Vue) | http://localhost:3001 / http://localhost:3002 |
+| RabbitMQ | http://localhost:15672 (guest/guest) |
+| MinIO console | http://localhost:9001 (minioadmin/minioadmin) |
+| Elasticsearch | http://localhost:9200 |
+| pgAdmin | http://localhost:5050 (no login; DB password `flexcms`) |
+
+**Local auth bypass:** run the backend with the `author,local` profiles. `application-local.yml` sets `flexcms.local-dev=true`, so `SecurityConfig` permits every request and grants `ROLE_ADMIN` to anonymous users. Keycloak is not needed locally.
 
 ---
 
-## Component Model SPI
+## Engineering rules
 
-To add a new backend component:
-1. Extend `AbstractComponentModel`, annotate fields with `@ValueMapValue`
-2. Annotate with `@FlexCmsComponent` → auto-registered in `ComponentRegistry`
-3. Register the frontend renderer in `component-map.tsx`
-4. Add a `component_definitions` row (Flyway migration) with the `data_schema` JSONB
+### Architecture over speed
 
----
+**Never choose a faster or shorter implementation over the architecturally correct one.** Before writing code, ask three questions:
 
-## Common Gotchas
+1. Does this follow the layer separation?
+2. Does it bypass a pattern already present in the codebase?
+3. Would a senior engineer on this project call it production quality?
 
-- Spring MVC 6: catch-all path variable `{*varName}` cannot have subsequent path segments — use `@RequestParam String path` instead
-- `@EnableElasticsearchRepositories` must list ALL packages explicitly: `{"com.flexcms.search.repository", "com.flexcms.pim.search"}`
-- Content path double-prefix bug: `AuthorContentController.getChildren()` does NOT call `toContentPath()` to avoid `content.content.*` — this is intentional
-- PIM tests: `**/*IT.java` are excluded from `mvn test` (require Docker) — run explicitly with `-Dtest=ProductRepositoryIT`
+If the correct approach takes longer, do it anyway.
 
+| Layer | Contains | Never contains |
+|---|---|---|
+| `model/` | JPA entities, enums | Business logic |
+| `repository/` | Spring Data interfaces, JPQL/native queries | Service calls |
+| `service/` | All business logic, `@Transactional` on writes | HTTP concerns |
+| `controller/` | Request mapping, DTO ↔ service | Repository calls, business logic |
+
+- Controllers call services, and services call repositories. Never skip a layer.
+- Return **DTOs or projections** from APIs, never raw JPA entities.
+- **`FetchType.EAGER` is forbidden.** Fix the session/transaction boundary instead. Do not paper over a problem with `@JsonIgnore` or `JOIN FETCH` without understanding why the boundary is wrong.
+- Every write operation runs in a transaction.
+- Errors are RFC 7807 problem responses via `GlobalExceptionHandler` and the existing exception types. User errors are never HTTP 500.
+- Do not duplicate code to avoid a refactor. Extract and reuse.
+
+### Java conventions
+
+- Packages follow `com.flexcms.{module}.{layer}`, for example `com.flexcms.core.service`.
+- `@Autowired` field injection is the existing convention.
+- A new dependency goes in the module `pom.xml` **and** in the parent `pom.xml` dependency management.
+
+### Content paths
+
+- **Database (ltree):** dot-separated, e.g. `content.site.en.home`. **URLs:** slash-separated, e.g. `/site/en/home`. Controllers convert between the two.
+- `PathUtils.toContentPath(urlPath)` converts a URL path to ltree and adds the `content.` prefix.
+- `GET /api/author/content/children` takes an ltree path directly and does not convert it. This is intentional: it avoids a `content.content.*` double prefix.
+- GraphQL `node()` uses the path verbatim. GraphQL `page()` uses `toContentPath()`, which adds `content.`.
+
+### Data and migrations
+
+- **CMS Flyway migrations:** `flexcms-app/src/main/resources/db/migration/V{N}__description.sql`. **PIM migrations:** `flexcms-pim/src/main/resources/db/pim/V{N}__description.sql`. Versions are sequential and never reused, so check the existing files first.
+- **PIM is isolated.** Its database is `flexcms_pim`, with its own `DataSource`. Never use the CMS `DataSource` for PIM.
+- **`NodeStatus`:** `DRAFT`, `IN_REVIEW`, `APPROVED`, `PUBLISHED`, `ARCHIVED`. There is **no** `LIVE`.
+- **Seed resets are opt-in and environment-guarded.** Tests never modify seeded data.
+
+### Components (backend ↔ frontend contract)
+
+- Every component has a `dataSchema` (JSON Schema) in `component_definitions.data_schema`, served by `GET /api/content/v1/component-registry`. The frontend renders from that schema, and the backend guarantees its output matches it.
+- **To add a backend component:** extend `AbstractComponentModel`, annotate fields with `@ValueMapValue`, annotate the class with `@FlexCmsComponent`, and add a `component_definitions` row (Flyway) with its `data_schema`.
+- **To add a frontend renderer:** register it in `frontend/apps/site-nextjs/src/components/component-map.tsx`, and in the Vue map when the Nuxt site needs it.
+
+### Frontend and admin UI
+
+- **Never hardcode colors.** Use the `var(--color-*)` tokens.
+- **Never use raw HTML elements for interactive UI.** Use `@flexcms/ui` components.
+- Every admin page has a **breadcrumb**, a **loading skeleton**, and an **empty state**.
+- Use named exports only; no `export default` for components. Components are `PascalCase.tsx`; utilities are `camelCase.ts`.
+- **Before building any admin UI,** read `Design/UI/stitch_flexcms_admin_ui_requirements_summary/<page>/screen.png` and `code.html`. If there is no reference, the task's `## UI design` section is the spec. It is written during refinement, and you should match the nearest existing screen.
+
+### Code quality
+
+- No mock or dummy data in production code. Mock data belongs in tests only.
+- No `System.out.println` or `console.log` debugging, and no commented-out code blocks.
+
+### Gotchas
+
+- **Spring MVC 6:** a catch-all `{*varName}` cannot be followed by more path segments. Use `@RequestParam String path` for non-terminal dynamic paths.
+- **`@EnableElasticsearchRepositories`** in `FlexCmsApplication` must list every package: `{"com.flexcms.search.repository", "com.flexcms.pim.search"}`.
+- **`mvn test` runs no `*IT` suites.** Surefire matches `*Test`, `Test*` and `*Tests` only. Integration tests run with `mvn verify` (failsafe, Testcontainers, Docker required).
+- **Technical debt:** `SecurityConfig` has `permitAll()` in the production profile. It is a placeholder, not permanent.
+- More problems and their fixes are in [`docs/process/HINTS.md`](docs/process/HINTS.md). Add a hint whenever something took two or more failed attempts to solve.

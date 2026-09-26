@@ -23,9 +23,9 @@ from typing import Any
 DEFAULT_SITE_PUBLIC_ROOT = Path("frontend/apps/site-nextjs/public/tut-usa/assets")
 DEFAULT_ADMIN_PUBLIC_ROOT = Path("frontend/apps/admin/public/tut-usa/assets")
 DEFAULT_GLOBAL_MANIFEST = Path("Design/tut-usa/manifest.json")
-DEFAULT_MAP_OUTPUT = Path("df/artifacts/REB-07/data/dam-import-map.json")
-DEFAULT_CHECKSUM_OUTPUT = Path("df/artifacts/REB-07/data/checksum-evidence.md")
-DEFAULT_ROLLBACK_OUTPUT = Path("df/artifacts/REB-07/data/rollback-notes.md")
+DEFAULT_MAP_OUTPUT = Path("scripts/data/tut-usa-dam-import/dam-import-map.json")
+DEFAULT_CHECKSUM_OUTPUT = Path("scripts/data/tut-usa-dam-import/checksum-evidence.md")
+DEFAULT_ROLLBACK_OUTPUT = Path("scripts/data/tut-usa-dam-import/rollback-notes.md")
 
 
 @dataclass

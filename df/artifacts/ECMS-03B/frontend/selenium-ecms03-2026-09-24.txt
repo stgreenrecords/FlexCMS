@@ -1,7 +1,0 @@
-    ✔ S1 keeps an unpublished asset off the publish tier but shows it in draft preview (341ms)
-    ✔ S2 publishing the page publishes its image, which renders on the publish-backed site (TC05) (417ms)
-    ✔ S3 the default site proxies the same canonical URL (control) (312ms)
-    ✔ S4 withdrawing the asset breaks it on the publish-backed site only, and re-publishing restores it (1603ms)
-    ✔ S5 the admin DAM Copy URL action offers the canonical public URL (2336ms)
-    ✔ S6 deleting the asset on author removes it from the publish-backed site (1063ms)
-  6 passing (7s)

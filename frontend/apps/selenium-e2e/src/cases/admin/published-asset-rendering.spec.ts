@@ -2,7 +2,7 @@
  * ECMS-03 — published pages render their DAM images.
  *
  * Covers `ECMS-03-TC05` and the frontend half of `ECMS-03-TC02/TC03` in
- * `docs/MANUAL_TEST_CASES_ECMS_UPCOMING.md`: a page that references a DAM image is
+ * ECMS-03 test cases (`backlog/tasks/ECMS-03B.md`): a page that references a DAM image is
  * published, and the image actually decodes in a browser. This is checked on:
  *
  * - the **publish-backed site** (`PUBLISH_SITE_URL`, a reference-site instance whose
@@ -16,7 +16,7 @@
  * proves the publish tier is the one serving it. Re-publishing proves it recovers.
  *
  * Start the publish-backed instance before running (see
- * `df/artifacts/ECMS-03B/frontend/test-scenarios.md`):
+ * `backlog/tasks/ECMS-03B.md`, test cases TC03-TC08):
  *
  *   cd frontend/apps/site-nextjs
  *   NEXT_DIST_DIR=.next-publish FLEXCMS_API_URL=http://localhost:8081 \

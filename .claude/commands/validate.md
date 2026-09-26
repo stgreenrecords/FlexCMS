@@ -1,55 +1,22 @@
-You are reviewing completed work and validating the current project state. Execute ALL steps — this is the full §7 checklist from WORK_BOARD.md.
+Validate the project state. Run every check, even after one fails, and report PASS / FAIL / SKIPPED (with the reason) for each.
 
-## Step 1: Build Backend
+**Quality gates** (`docs/process/TESTING.md` §7):
+1. `cd flexcms && mvn clean compile`
+2. `cd flexcms && mvn verify` (needs Docker; this also runs the unit tests)
+3. `cd frontend && pnpm install && pnpm build`
+4. `cd frontend && pnpm test`
+5. `cd frontend && pnpm test:e2e` (mocked Playwright, chromium)
+6. `cd frontend && pnpm test:e2e:live` — only if the stack is up (`flex status`). Otherwise SKIPPED, with the reason.
 
-Run the full backend build and report results:
-```bash
-cd flexcms && mvn clean compile
-```
+**Backlog consistency** (`backlog/`):
+7. Every board row has a spec, and every spec has exactly one board row.
+8. At most one task is In Progress.
+9. Every Done task has all its ACs ticked, and every test-case row has **Automated in** filled.
+10. Every file named in **Automated in** exists, and contains the TC ID in a test title.
+11. Every **Depends on** ID exists, and no Ready task depends on a task in Needs Refinement.
 
-Report: which modules compile successfully, which have errors.
+**Code quality**:
+12. No `System.out.println` in `flexcms/**/src/main`, no stray `console.log` in `frontend/apps/*/src` or `frontend/packages/*/src`, no commented-out code blocks, and no mock data in production code.
+13. No `test.only`, and no new `test.skip` without a linked task ID in its reason.
 
-## Step 2: Test Backend
-
-Run all backend tests:
-```bash
-cd flexcms && mvn test
-```
-
-Report: total tests run, passed, failed, skipped. List any failures with class + method names.
-
-## Step 3: Check Frontend
-
-Check frontend package builds:
-```bash
-cd frontend && pnpm install && pnpm build
-```
-
-Report: which packages build successfully, which have errors.
-
-## Step 4: Code Quality Scan
-
-Check for violations:
-1. **Mock data in production code:** Search for hardcoded arrays of fake data outside of test files.
-2. **Debug statements:** Search for `System.out.println` in Java production code (not test code).
-3. **Commented-out code:** Look for large blocks of commented code in recently changed files.
-
-## Step 5: Verify Work Board Consistency
-
-Read `WORK_BOARD.md` and check:
-1. Are there any 🔵 IN PROGRESS items with no agent working? (orphaned tasks)
-2. Are there module locks in §2 that don't match any IN PROGRESS item? (stale locks)
-3. Are there any items marked ✅ DONE that have incomplete completion notes in §5?
-4. Are there any items with blockers that are now resolved (blocker items are DONE)?
-   - If so, list them — they can be unblocked (status should change from 🔴 BLOCKED to 🟢 OPEN).
-
-## Step 6: Suggest Next Actions
-
-Based on the current state, suggest:
-1. Which PAUSED items need immediate pickup.
-2. Which newly-unblocked items should be prioritized.
-3. Any stale locks to clean up.
-4. Compilation or test failures that need fixing.
-5. Code quality issues found in Step 4.
-
-Report all findings clearly with a summary verdict: **HEALTHY** / **NEEDS ATTENTION** / **BROKEN**.
+End with a list of the exact fixes required for every FAIL. Do not fix anything unless the user asks.

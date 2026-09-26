@@ -73,8 +73,8 @@ public class AssetIngestService {
      * fonts and stylesheets as well as images, video, and documents (REB-07 imported
      * 22 fonts and 15 stylesheets), so an allow-list copied from the admin dialog's
      * `accept` attribute would reject assets the platform is meant to store.
-     * Whether the DAM should move to a positive allow-list is an `sa` policy
-     * decision — see df/artifacts/REB-21/devops/blockers.md R21-1.
+     * Whether the DAM should move to a positive allow-list is an open policy
+     * decision (risk R21-1); record it in docs/architecture/DECISIONS.md if changed.
      */
     private static final Set<String> REFUSED_MIME_TYPES = Set.of(
             "application/x-msdownload",

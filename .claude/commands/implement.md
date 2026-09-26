@@ -1,91 +1,14 @@
-You are starting an implementation session on FlexCMS. Execute the following steps IN ORDER — do not skip any step.
+Pick the next task from the FlexCMS backlog and carry it to Done.
 
-## Step 1: Read Core Documentation
+1. Read `AGENTS.md`, `docs/process/SDLC.md`, and `docs/process/TESTING.md` if they are not already in context this session.
+2. Open `backlog/BOARD.md` and choose the task exactly as described in SDLC §3:
+   - A task in **In Progress**: resume it from the last `Handoff:` entry in its Log.
+   - Otherwise, the first **Ready** row whose **Depends on** tasks are all **Done**: build it.
+   - Otherwise, the first **Needs Refinement** row whose dependencies are not themselves in **Needs Refinement**: refine it (SDLC §4). Stop when it meets the Definition of Ready and is moved to **Ready**.
+   - Nothing eligible: report what blocks the top tasks, then stop.
+3. Tell the user which task you picked and why, in one line.
+4. Building: follow SDLC §5 step by step. Claim the task, understand it, write the tests from the test-case table, implement, make it green, run the quality gates (TESTING.md §7), update the spec and the board, then commit and push.
+5. If you cannot finish, leave a `Handoff:` Log entry and keep the task **In Progress**. Move it to **Blocked** only if a human is needed.
+6. Finish with a short report: the task, what changed, which tests were added, the gate results, and the new board status. Do not start another task unless the user asked for continuous work ($ARGUMENTS contains "loop" or "continue").
 
-Read these files completely to understand the project:
-
-1. Read `WORK_BOARD.md` — the entire file. This is the coordination system.
-2. Read `README.md` section §9 "AI Agent Onboarding Guide" — architecture, conventions, file map.
-
-## Step 2: Identify Next Task
-
-From `WORK_BOARD.md` §3, find the next task to work on:
-
-1. Look for items with status 🟢 OPEN.
-2. Among OPEN items, first check for any 🟠 PAUSED items — these have priority because another agent started them. Read their handoff notes in §5 to continue.
-3. If no PAUSED items, pick the highest priority OPEN item (🔴 P0 first) that has NO blockers (check "Blocked By" column — all items listed there must be ✅ DONE).
-4. Verify no module conflict: check §2 Module Lock Table — if any module in the item's "Modules Touched" column is locked by another IN PROGRESS item, skip to the next eligible item.
-
-## Step 3: Claim the Task
-
-1. Update the item's status from 🟢 OPEN to 🔵 IN PROGRESS in `WORK_BOARD.md` §3.
-2. Update the Module Lock Table in §2: set "Locked By Item" and "Agent" columns for every module this item touches.
-
-## Step 4: Read Context Packet
-
-Look up the item ID in `WORK_BOARD.md` §4 "Context Packets":
-- If a context packet exists for this item: read ALL files listed in `read_first`, understand the `understand` section, note the `acceptance_criteria` and `output_files`.
-- If no context packet exists: read the item's description and "Modules Touched" column, then read the relevant source files in those modules to understand the current state.
-
-If this task touches the frontend, also read `Design/DesignerPrompt.md` §8 for mandatory style rules.
-
-## Step 5: Implement
-
-Now implement the task. Follow these rules:
-- Follow all conventions from `CLAUDE.md`.
-- Verify each acceptance criterion as you work.
-- If you create new files, follow the existing package/folder structure in the target module.
-- If you modify existing files, preserve existing code style.
-- Validate with build commands after implementation.
-
-## Step 6: Validate
-
-Run ALL applicable validation gates — you MUST NOT proceed until they pass:
-
-### 6a. Compile
-- Backend changes: `cd flexcms && mvn clean compile`
-- Frontend changes: `cd frontend && pnpm build`
-- Fix any compilation errors before proceeding.
-
-### 6b. Tests
-- If backend tests exist: `cd flexcms && mvn test`
-- If frontend tests exist: `cd frontend && pnpm test`
-- If YOUR task created new tests: verify they pass.
-- Fix any test failures before proceeding.
-
-### 6c. Code Quality
-- Verify NO mock/dummy data exists in production code (mock data is only acceptable in test classes).
-- Verify no `System.out.println` debugging statements remain.
-- Verify no commented-out code blocks remain.
-
-## Step 7: Update Work Board
-
-1. If task is COMPLETE: update status to ✅ DONE in §3. Clear module locks in §2. Add a Completion Note in §5 using the DONE template (list all AC verifications, files changed, build status).
-2. If you must STOP before finishing: update status to 🟠 PAUSED in §3. Add a Handoff Note in §5 using the PAUSED template (progress %, what was done, what remains, where you stopped, exact continuation steps).
-
-## Step 8: Push to GitHub
-
-After the work board is updated, commit and push all changes to the `main` branch:
-
-```bash
-git add -A
-git commit -m "feat(<item-id>): <short description of what was implemented>
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
-git push origin main
-```
-
-Rules:
-- Use the item ID as the commit scope (e.g., `feat(P0-XF-02): ...`).
-- Keep the subject line under 72 characters.
-- If `git push` fails due to a diverged remote, run `git pull --rebase origin main` first, then push again.
-- Do NOT force-push. If rebase produces conflicts, stop and report to the user.
-
-## Step 9: Continue Automatically
-
-After pushing, immediately invoke the `/implement` command again to pick up the next task. Do not wait for the user — keep working through the backlog until the user interrupts the session.
-
-## Begin
-
-Start with Step 1 now. Read `WORK_BOARD.md` completely, then proceed through each step.
-
+$ARGUMENTS

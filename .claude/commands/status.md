@@ -1,8 +1,13 @@
-Show the current state of the work board. Read `WORK_BOARD.md` and provide:
+Summarize the FlexCMS backlog from `backlog/BOARD.md`. This is read-only; change nothing.
 
-1. **Summary counts**: How many items are OPEN, IN PROGRESS, PAUSED, BLOCKED, DONE.
-2. **Currently in progress**: List any 🔵 IN PROGRESS items with their agent and modules locked.
-3. **Paused items needing pickup**: List any 🟠 PAUSED items — these need immediate attention.
-4. **Next available tasks**: List the top 5 highest-priority 🟢 OPEN items that have no blockers (all items in "Blocked By" must be ✅ DONE). Show their ID, title, priority, effort, and modules.
-5. **Module lock conflicts**: Check if any modules are locked that would prevent parallel work.
-
+1. Counts per status: In Progress, Ready, Needs Refinement, Blocked, Done.
+2. **In Progress** tasks, each with the last Log entry from its spec.
+3. The next 5 **eligible** Ready tasks: rows whose dependencies are all Done. List each by ID, priority, and title.
+4. Ready tasks that wait on dependencies, and what each one waits on.
+5. **Blocked** tasks, with their open questions.
+6. The task `implement` would pick next, and why.
+7. Anomalies:
+   - A board row without a spec, or a spec without a row.
+   - More than one task In Progress.
+   - A Done task with unticked ACs, or with test cases whose **Automated in** is `—`.
+   - A dependency on an ID that does not exist.

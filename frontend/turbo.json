@@ -29,15 +29,6 @@
     "build-storybook": {
       "dependsOn": ["^build"],
       "outputs": ["storybook-static/**"]
-    },
-    "test:e2e": {
-      "dependsOn": ["^build"],
-      "outputs": [
-        "playwright-report/**",
-        "test-results/**",
-        "apps/selenium-e2e/reports/**"
-      ],
-      "cache": false
     }
   }
 }

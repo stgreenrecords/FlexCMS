@@ -79,5 +79,7 @@ logs/
 **/playwright-report/
 **/test-results/
 **/.playwright-browsers/
+# Playwright MCP session scratch files
+.playwright-mcp/
 /aws.config
 /AEM-Website-Example/

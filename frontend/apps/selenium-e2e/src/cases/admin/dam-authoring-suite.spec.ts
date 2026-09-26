@@ -164,7 +164,7 @@ describe('REB-21 DAM authoring and asset-reference suite', function () {
       observe(
         'The DAM contains no assets at all. REB-07 copied 182 captured assets into ' +
           'frontend/apps/site-nextjs/public and frontend/apps/admin/public but uploaded none to the DAM — its own ' +
-          'df/artifacts/REB-07/data/dam-import-map.json records "damUploaded": 0 next to "copiedSiteNextjs": 182 — ' +
+          'scripts/data/tut-usa-dam-import/dam-import-map.json records "damUploaded": 0 next to "copiedSiteNextjs": 182 — ' +
           'so the asset library starts empty and every DAM-backed feature (picker, renditions, asset search) has no ' +
           'data to work with. This suite therefore uploads everything it verifies.',
       );

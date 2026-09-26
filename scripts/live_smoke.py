@@ -3,7 +3,7 @@
 live_smoke.py — FlexCMS live-stack verification probe (Tier T3/T5).
 
 Unlike the mocked Playwright suite, this hits the REAL running services and seeded
-database. It is the fast evidence gate for the retest plan (docs/RETEST_PLAN.md) and
+database. It is a fast live-stack probe (the Playwright `api`/`e2e` projects are the real gate) and
 directly reproduces the two reported failures:
 
   * "can't edit page dummy data"  -> page-edit round-trip check

@@ -1,9 +1,15 @@
-# @flexcms/selenium-e2e
+# @flexcms/selenium-e2e — LEGACY (frozen)
+
+> **Do not add or extend tests here.** Since 2026-09-26, Playwright (`frontend/apps/e2e`) is the only
+> test framework (`docs/architecture/DECISIONS.md` DEC-PROC-001), and this suite is no longer a quality gate.
+> Its suites are being ported to Playwright by the `TEST-002`…`TEST-007` tasks on `backlog/BOARD.md`,
+> and the package is deleted by `TEST-009`. The text below is kept for running the legacy suites
+> during porting.
 
 Selenium-based end-to-end automation framework foundation for the FlexCMS
 rebuild program (`REB-05`). This package **adds** Selenium as the rebuild
 automation framework; it does **not** replace or delete the existing
-Playwright suite (`frontend/apps/admin-e2e`), which stays in place until
+Playwright suite (then `frontend/apps/admin-e2e`, now `frontend/apps/e2e`), which stays in place until
 equivalent Selenium coverage is implemented and accepted (`DEC-REB-004`).
 
 `REB-02` extends this package with a browser-first capture runner that serves
@@ -52,7 +58,7 @@ Downstream rebuild tasks build on top of this foundation:
   draft preview route, the rendered reference site, and the publish environment.
   It reuses the REB-19 contract model (`src/fixtures/component-contracts.ts`) and
   writes one matrix row per component to
-  `df/artifacts/REB-26/devops/component-editing-matrix.csv`, plus per-field detail
+  `reports/matrix/REB-26/component-editing-matrix.csv`, plus per-field detail
   to `field-coverage.csv`.
 - `REB-14` wires this package into CI/local validation gates and retained
   artifact bundles.
@@ -140,11 +146,8 @@ pnpm ci:gate:full
 
 ## Selenium and Playwright coexistence
 
-- Selenium (`frontend/apps/selenium-e2e`) is the active rebuild gate.
-- Playwright (`frontend/apps/admin-e2e`) remains as a legacy safety net until the
-  backlog explicitly retires it.
-- CI/local can run both; a Selenium gate failure blocks delivery regardless of
-  Playwright status.
+- Playwright (`frontend/apps/e2e`) is the active framework and the quality gate.
+- This Selenium suite is frozen until each suite is ported, then deleted.
 
 ## Environment variables
 

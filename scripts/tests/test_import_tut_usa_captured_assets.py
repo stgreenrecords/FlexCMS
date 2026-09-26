@@ -114,9 +114,9 @@ class ImportCapturedAssetsTests(unittest.TestCase):
             class Args:
                 repo_root = str(root)
                 manifest = "Design/tut-usa/manifest.json"
-                map_output = "df/artifacts/REB-07/data/dam-import-map.json"
-                checksum_output = "df/artifacts/REB-07/data/checksum-evidence.md"
-                rollback_output = "df/artifacts/REB-07/data/rollback-notes.md"
+                map_output = "scripts/data/tut-usa-dam-import/dam-import-map.json"
+                checksum_output = "scripts/data/tut-usa-dam-import/checksum-evidence.md"
+                rollback_output = "scripts/data/tut-usa-dam-import/rollback-notes.md"
                 upload_dam = False
                 author_api = "http://localhost:8080"
                 site_id = "tut-usa"
@@ -130,7 +130,7 @@ class ImportCapturedAssetsTests(unittest.TestCase):
             self.assertTrue(copied_site.exists())
             self.assertTrue(copied_admin.exists())
 
-            map_file = root / "df/artifacts/REB-07/data/dam-import-map.json"
+            map_file = root / "scripts/data/tut-usa-dam-import/dam-import-map.json"
             self.assertTrue(map_file.exists())
             payload = json.loads(map_file.read_text(encoding="utf-8"))
             self.assertEqual(1, payload["totals"]["uniqueLocalAssets"])

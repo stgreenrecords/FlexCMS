@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 TUT Luxury Cars — Test Data Seeder
-Populates FlexCMS with the full TUT test dataset per docs/TEST_DATA_SPECIFICATION.md
+Populates FlexCMS with the full TUT test dataset per docs/testing/TEST_DATA_SPECIFICATION.md
 """
 
 import json
